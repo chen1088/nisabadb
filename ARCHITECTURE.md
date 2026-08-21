@@ -79,4 +79,4 @@ The current application is static-first by design. A future database or worker c
 - `/papers/:paperId/distilled` — generated linear reading
 - `/theorems/:statementId` — canonical deep-linked statement
 
-Vite builds a static artifact. A copied `404.html` lets GitHub Pages return the SPA shell for deep routes, while React Router resolves the canonical page client-side.
+Vite builds a static artifact. The build copies the same validated application shell to every known paper, distilled-paper, catalog, and theorem route, so GitHub Pages serves canonical deep links directly; a copied `404.html` remains as a fallback for unknown client routes. React Router resolves the requested record from that shared shell.

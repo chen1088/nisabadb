@@ -17,10 +17,13 @@ describe("NisabaDB content", () => {
   });
 
   it("imports the complete legacy inventory plus the audited matching-trial construction", () => {
-    expect(statements).toHaveLength(51);
-    expect(statements.filter((statement) => statement.kind === "definition")).toHaveLength(16);
-    expect(statements.filter((statement) => statement.kind === "notation")).toHaveLength(2);
-    expect(statements.reduce((sum, statement) => sum + statement.dependencies.length, 0)).toBe(117);
+    const dictStatements = statements.filter((statement) =>
+      statement.paperId === "dimension-free-dictatorship-tester"
+    );
+    expect(dictStatements).toHaveLength(51);
+    expect(dictStatements.filter((statement) => statement.kind === "definition")).toHaveLength(16);
+    expect(dictStatements.filter((statement) => statement.kind === "notation")).toHaveLength(2);
+    expect(dictStatements.reduce((sum, statement) => sum + statement.dependencies.length, 0)).toBe(117);
     expect(statements.some((statement) => statement.formalStatus === "fully-certified")).toBe(false);
     expect(statements.every((statement) => !/^\$$/m.test(statement.exactStatement))).toBe(true);
     expect(statementById.get("S02_L03")?.exactStatement).toContain("$$");
@@ -75,7 +78,10 @@ describe("NisabaDB content", () => {
     const main = statementById.get("S01_T01");
     expect(main?.proofRoutes[0]?.status).toBe("complete");
     expect(main?.exactStatement).toContain("O(\\epsilon^{-2})");
-    for (const statement of statements.filter((item) => item.proofRoutes.length > 0)) {
+    const dictStatements = statements.filter((statement) =>
+      statement.paperId === "dimension-free-dictatorship-tester"
+    );
+    for (const statement of dictStatements.filter((item) => item.proofRoutes.length > 0)) {
       expect(statement.proofRoutes.every((route) =>
         route.status === "complete" || route.proof.includes("Proof not yet distilled"),
       )).toBe(true);
@@ -84,7 +90,7 @@ describe("NisabaDB content", () => {
     expect(coverage.total).toBe(33);
     expect(coverage.complete).toBe(31);
     expect(
-      statements
+      dictStatements
         .filter((statement) => statement.proofRoutes.some((route) => route.status !== "complete"))
         .map((statement) => statement.id)
         .sort(),
@@ -92,6 +98,61 @@ describe("NisabaDB content", () => {
     expect(statementById.get("S02_T01")?.proofRoutes[0]?.sourceAttribution).toContain(
       "preserves that discrepancy",
     );
+  });
+
+  it("promotes the multislice paper with a complete numbered-result map and honest gaps", () => {
+    const paperId = "braverman-khot-lifshitz-minzer-2025-invariance-principle-multislice";
+    const paper = paperById.get(paperId);
+    const paperStatements = statements.filter((statement) => statement.paperId === paperId);
+
+    expect(paper).toMatchObject({
+      status: "gold",
+      theoremExtractionStatus: "complete",
+      rewriteStatus: "partial-distillation",
+      formalizationStatus: "statement-only",
+    });
+    expect(paperStatements).toHaveLength(42);
+    expect(paper?.graph.paperRoots).toHaveLength(21);
+    expect(new Set(paper?.graph.paperRoots).size).toBe(21);
+    expect(statementById.get("BKLM_C04")?.proofRoutes[0]?.status)
+      .toBe("proof-not-yet-distilled");
+    expect(["BKLM_C05", "BKLM_C06"].every((id) =>
+      statementById.get(id)?.proofRoutes[0]?.status === "complete"
+    )).toBe(true);
+    expect(statementById.get("BKLM_T01")?.proofRoutes[0]?.status).toBe("complete");
+    expect(statementById.get("BKLM_L03")?.proofRoutes[0]?.status)
+      .toBe("proof-not-yet-distilled");
+    expect(statementById.get("BKLM_L09")?.dependencies).toContain("BKLM_I14");
+    expect(statementById.get("BKLM_L06")?.dependencies).toContain("BKLM_I19");
+    expect(statementById.get("BKLM_L06")?.proofRoutes[0]?.status)
+      .toBe("proof-not-yet-distilled");
+    expect(statementById.get("BKLM_T03")?.proofRoutes[0]?.status)
+      .toBe("proof-not-yet-distilled");
+    expect(statementById.get("BKLM_L01")?.proofRoutes[0]?.status)
+      .toBe("proof-not-yet-distilled");
+    expect(statementById.get("BKLM_L01")?.statementNote).toContain("tail condition is vacuous");
+    expect(statementById.get("BKLM_D08")?.exactStatement).toContain(
+      "partition induced by a uniformly random incident edge",
+    );
+    expect(statementById.get("BKLM_D09")?.dependencies).toEqual(["BKLM_D13"]);
+    expect(statementById.get("BKLM_L09")?.dependencies).toContain("BKLM_D13");
+    expect(statementById.get("BKLM_L07")?.exactStatement).toContain(
+      "every $(\\alpha,\\zeta)$-coupling",
+    );
+    expect(statementById.get("BKLM_L08")?.exactStatement).toContain(
+      "$\\beta n/2\\in\\mathbb N$",
+    );
+    expect(statementById.get("BKLM_T06")?.proofRoutes[0]?.status).toBe("proof-not-yet-distilled");
+    expect(statementById.get("BKLM_T06")?.statementNote).toContain("line-graph connectivity");
+    expect(statementById.get("BKLM_T05")?.dependencies).toEqual(
+      expect.arrayContaining(["BKLM_I11", "BKLM_I12", "BKLM_C04", "BKLM_C05", "BKLM_C06"]),
+    );
+    expect(statementById.get("BKLM_T07")?.proofRoutes[0]?.proof)
+      .toContain("Proof not yet distilled");
+    expect(statementById.get("BKLM_L08")?.statementNote).toContain("restores");
+    expect(paperStatements.every((statement) =>
+      statement.formalDeclarations.length === 0 && statement.formalStatus === "statement-only"
+    )).toBe(true);
   });
 
   it("orders selected prerequisites before the main theorem", () => {
@@ -118,13 +179,17 @@ describe("NisabaDB content", () => {
 
   it("represents every actual direct citation and does not invent incoming closure", () => {
     const featured = paperById.get("dimension-free-dictatorship-tester");
+    const multisliceId =
+      "braverman-khot-lifshitz-minzer-2025-invariance-principle-multislice";
+    const multislice = paperById.get(multisliceId);
     const citedIds = new Set(corpus.citationEdges.map((edge) => edge.citedPaperId));
 
-    expect(corpus.papers).toHaveLength(18);
-    expect(corpus.citationEdges).toHaveLength(17);
-    expect(corpus.ingestionQueue).toHaveLength(18);
-    expect(corpus.ingestionQueue.filter((item) => item.state === "metadata-fetched")).toHaveLength(16);
-    expect(corpus.ingestionQueue.filter((item) => item.state === "blocked")).toHaveLength(2);
+    expect(corpus.papers).toHaveLength(92);
+    expect(corpus.citationEdges).toHaveLength(93);
+    expect(corpus.ingestionQueue).toHaveLength(92);
+    expect(corpus.ingestionQueue.filter((item) => item.state === "metadata-fetched")).toHaveLength(43);
+    expect(corpus.ingestionQueue.filter((item) => item.state === "blocked")).toHaveLength(48);
+    expect(corpus.ingestionQueue.filter((item) => item.state === "neighbors-fetched")).toHaveLength(1);
     expect(citationAudit.records).toHaveLength(17);
     expect(citationAudit.records.every((record) => citedIds.has(record.id))).toBe(true);
     expect(featured?.citationCoverage).toMatchObject({
@@ -136,6 +201,20 @@ describe("NisabaDB content", () => {
       providerSearchesAttempted: 5,
       recursiveClosureComplete: false,
     });
+    expect(multislice?.citationCoverage).toMatchObject({
+      outgoingFound: 48,
+      outgoingResolved: 48,
+      incomingFound: 28,
+      incomingResolved: 28,
+      incomingStatus: "provider-visible-only",
+      recursiveClosureComplete: false,
+    });
+    expect(corpus.citationEdges.filter((edge) =>
+      edge.discoveredFromPaperId === multisliceId && edge.discoveryDirection === "outgoing"
+    )).toHaveLength(48);
+    expect(corpus.citationEdges.filter((edge) =>
+      edge.discoveredFromPaperId === multisliceId && edge.discoveryDirection === "incoming"
+    )).toHaveLength(28);
     expect(citationAudit.bibliographyOnly.every((entry) =>
       corpus.papers.every((paper) => paper.identifiers.doi !== entry.identifiers.doi),
     )).toBe(true);

@@ -32,6 +32,7 @@ The Zod schema and cross-record checks reject:
 - undeclared proof-step or Lean-declaration references;
 - complete routes that display unused dependencies;
 - theorem-like nodes without a proof route;
+- more than one featured paper, gold papers without statements or graph views, non-local gold dependencies, and duplicate graph-view IDs;
 - mismatched source-statement repair records or missing modification history;
 - impossible citation coverage, recursive-closure, or completed-queue claims;
 - `fully-certified` statement or route claims without reviewed alignment and a clean, input-free formal audit.
@@ -40,7 +41,11 @@ The main dependency order is computed from the selected route at runtime. The di
 
 ## Import boundary
 
-`scripts/import-dict-lean.mjs` reads `dict_lean` and the author manuscript without modifying either. It verifies the checkout's exact pinned commit, resolves current Lean declaration lines, adds NisabaDB proof distillations, joins the citation snapshot, validates through the test suite, and emits the public corpus.
+`scripts/import-dict-lean.mjs` reads `dict_lean` and the author manuscript without modifying either. It verifies the checkout's exact pinned commit, resolves current Lean declaration lines, adds NisabaDB proof distillations, and passes the primary paper, durable citation snapshot, and reviewed gold packs to `scripts/corpus-assembly.mjs`.
+
+Each gold pack owns one paper's metadata override, theorem graph, and statements. The assembler promotes only an exact provisional paper ID, preserves citation-worker coverage and queue state, unions stable provenance/history, rejects identifier and global-statement collisions, and requires every packed statement to use the paper's global namespace. This prevents a future importer run from erasing a hand-curated second paper.
+
+The current second pack, `scripts/paper-packs/bklm-invariance.mjs`, pins `arXiv:2110.10725v2` by TeX, source-archive, and PDF hashes. It contains original NisabaDB restatements—not copied paper text—and records all 21 unique numbered results, the three Section 4 claims required by the main theorem, key definitions, external inputs, correction notes, and explicit proof gaps.
 
 The untouched legacy graph snapshot is retained separately. Reviewed repairs applied to the curated corpus include:
 
@@ -68,6 +73,8 @@ Formal declarations retain repository, 40-character commit, file, declaration na
 `data/citation-neighborhood.json` is the durable queue snapshot consumed by the static build. Rebuilding the reviewed baseline is a non-destructive merge by default; an explicit `--reset` is required to discard recursive progress. `scripts/ingest-citations.mjs` processes a bounded number of queued papers per invocation while allowing unbounded recursive depth across invocations. Provider responses are cached as provenance envelopes. Newly discovered papers begin as metadata-only provisional records and are enqueued for their own neighborhoods. If a provider reports references whose records were not retrieved, their IDs remain on the queue for retry rather than being counted as resolved.
 
 Identity merging requires an exact DOI, arXiv, OpenAlex, Semantic Scholar, ISBN, or internal ID match. Similar titles alone never trigger a merge. Every edge retains its discovery provider, provider record, retrieval time, and confidence.
+
+Reviewed source bibliography counts outrank provider aggregates. For the multislice paper, comment-stripped TeX and the `.bbl` agree on 48 cited works, while the canonical OpenAlex journal record reports 45 and has unresolved/bad endpoints. The source-audited count is therefore durable and cannot be overwritten by a later provider pass. Incoming coverage is separately labeled provider-visible-only because it is discovered through a split FOCS-version identity rather than the journal record.
 
 The current application is static-first by design. A future database or worker can preserve these record shapes and invariants while replacing committed JSON and batch scripts.
 

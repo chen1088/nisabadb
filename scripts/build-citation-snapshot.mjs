@@ -1,8 +1,10 @@
 import { readFile, rename, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { mergeAuditIntoSnapshot } from "./citation-snapshot-lib.mjs";
+import { mergeMultisliceCitationAuditIntoSnapshot } from "./multislice-citation-audit-lib.mjs";
 
 const AUDIT_PATH = resolve("data/citations/direct-neighborhood-audit.json");
+const MULTISLICE_AUDIT_PATH = resolve("data/citations/multislice-neighborhood-audit.json");
 const SNAPSHOT_PATH = resolve("data/citation-neighborhood.json");
 const reset = process.argv.slice(2).includes("--reset");
 const unknownArguments = process.argv.slice(2).filter((argument) => argument !== "--reset");
@@ -11,6 +13,7 @@ if (unknownArguments.length > 0) {
 }
 
 const audit = JSON.parse(await readFile(AUDIT_PATH, "utf8"));
+const multisliceAudit = JSON.parse(await readFile(MULTISLICE_AUDIT_PATH, "utf8"));
 let existingSnapshot;
 if (!reset) {
   try {
@@ -20,13 +23,20 @@ if (!reset) {
   }
 }
 
-const snapshot = mergeAuditIntoSnapshot(audit, existingSnapshot);
+const directSnapshot = mergeAuditIntoSnapshot(audit, existingSnapshot);
+const { snapshot, stats: multisliceStats } = mergeMultisliceCitationAuditIntoSnapshot(
+  multisliceAudit,
+  directSnapshot,
+);
 const temporaryPath = `${SNAPSHOT_PATH}.${process.pid}.${Date.now()}.tmp`;
 await writeFile(temporaryPath, `${JSON.stringify(snapshot, null, 2)}\n`, "utf8");
 await rename(temporaryPath, SNAPSHOT_PATH);
 
 const blocked = snapshot.ingestionQueue.filter((item) => item.state === "blocked").length;
 console.log(
-  `${reset ? "Reset" : "Merged"} the reviewed direct audit: ${snapshot.papers.length} papers, ${snapshot.citationEdges.length} citation edges, ${snapshot.ingestionQueue.length} queue items.`,
+  `${reset ? "Reset" : "Merged"} the reviewed citation audits: ${snapshot.papers.length} papers, ${snapshot.citationEdges.length} citation edges, ${snapshot.ingestionQueue.length} queue items.`,
+);
+console.log(
+  `Multislice audit preserved ${multisliceStats.outgoingEndpoints} source-authoritative outgoing endpoints and ${multisliceStats.incomingEndpoints} non-XPAC version-family incoming endpoints; ${multisliceStats.reviewedExistingPaperReuses} exact existing records were reused.`,
 );
 console.log(`${blocked} queue item(s) are blocked on stable-identifier resolution; existing recursive crawl progress was ${reset ? "intentionally reset" : "preserved"}.`);

@@ -3,6 +3,7 @@ import type { Paper, Statement } from "../data/schema";
 import {
   corpus,
   formatDate,
+  isTheoremLike,
   paperById,
   shortIdentifier,
   verificationMeta,
@@ -14,9 +15,7 @@ interface FormalCoveragePanelProps {
 }
 
 export function FormalCoveragePanel({ paper, statements }: FormalCoveragePanelProps) {
-  const theoremLike = statements.filter(
-    (statement) => !["definition", "notation"].includes(statement.kind),
-  );
+  const theoremLike = statements.filter(isTheoremLike);
   const checked = statements.filter(
     (statement) =>
       statement.formalDeclarations.length > 0 &&

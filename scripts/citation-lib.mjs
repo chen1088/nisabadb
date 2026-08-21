@@ -14,6 +14,7 @@ const QUEUE_TASKS = Object.freeze([
   "fetch-incoming",
   "deduplicate",
 ]);
+const SOURCE_AUDIT_VERSION_PREFIX = "citation-source-audit:";
 
 function asNonemptyString(value) {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
@@ -79,6 +80,12 @@ export function findExactPaperMatch(papers, candidate) {
     );
   }
   return matches[0];
+}
+
+export function hasSourceAuthoritativeCitationCoverage(paper) {
+  return paper?.modificationHistory?.some(
+    (entry) => entry.version?.startsWith(SOURCE_AUDIT_VERSION_PREFIX),
+  ) ?? false;
 }
 
 function uniqueBy(items, keyFor) {
@@ -301,6 +308,21 @@ function discoveredQueueItem(paperId, updatedAt) {
   };
 }
 
+function activateResolvedIdentifierQueueItem(queue, paperId, updatedAt) {
+  return queue.map((item) =>
+    item.paperId === paperId && item.state === "blocked" &&
+      item.nextTasks.includes("resolve-identifiers")
+      ? {
+          paperId,
+          state: "metadata-fetched",
+          nextTasks: [...QUEUE_TASKS],
+          attempts: item.attempts,
+          updatedAt,
+        }
+      : item
+  );
+}
+
 function citationEdge(citingPaperId, citedPaperId, discoveredFromPaperId, direction, record) {
   const providerRecordId = normalizeOpenAlexId(record.work?.id ?? record.work?.ids?.openalex);
   return {
@@ -351,23 +373,58 @@ function retainIncompleteQueueItem(queue, paperId, completedAt, unresolvedProvid
   } : item);
 }
 
+function retainSourceAuditedQueueItem(queue, paperId, completedAt, unresolvedProviderIds) {
+  return queue.map((item) => item.paperId === paperId ? {
+    paperId,
+    state: "neighbors-fetched",
+    nextTasks: uniqueBy(
+      [...item.nextTasks.filter((task) => ["deduplicate", "review-match"].includes(task)), "deduplicate", "review-match"],
+      (task) => task,
+    ),
+    attempts: item.attempts + 1,
+    updatedAt: completedAt,
+    lastError: unresolvedProviderIds.length
+      ? `Source-authoritative direct endpoints remain persisted; OpenAlex still did not return ${unresolvedProviderIds.length} referenced identifier(s), so provider identity reconciliation remains under review.`
+      : "Source-authoritative direct endpoints remain persisted; provider identity reconciliation and recursive endpoint crawling remain under review.",
+  } : item);
+}
+
 function updatePaperCoverage(papers, paperId, coverage) {
   const completeForProvider = coverage.unresolvedOutgoingIds.length === 0;
-  return papers.map((paper) => paper.id === paperId ? {
-    ...paper,
-    citationCoverage: {
-      outgoingFound: coverage.outgoingFound,
-      outgoingResolved: coverage.outgoingResolved,
-      incomingFound: coverage.incomingFound,
-      incomingResolved: coverage.incomingResolved,
-      incomingStatus: "provider-visible-only",
-      providerSearchesAttempted: (paper.citationCoverage?.providerSearchesAttempted ?? 0) + 2,
-      recursiveClosureComplete: false,
-      note: completeForProvider
-        ? "OpenAlex direct incoming and outgoing neighborhoods were fetched completely for this provider. Newly discovered papers remain in the persistent recursive queue."
-        : `OpenAlex returned no work record for ${coverage.unresolvedOutgoingIds.length} referenced identifier(s). Those exact IDs remain on this paper's queue item for retry; the direct neighborhood is not marked complete.`,
-    },
-  } : paper);
+  return papers.map((paper) => {
+    if (paper.id !== paperId) return paper;
+    const prior = paper.citationCoverage;
+    if (hasSourceAuthoritativeCitationCoverage(paper)) {
+      return {
+        ...paper,
+        citationCoverage: {
+          outgoingFound: Math.max(prior.outgoingFound, coverage.outgoingFound),
+          outgoingResolved: Math.max(prior.outgoingResolved, coverage.outgoingResolved),
+          incomingFound: Math.max(prior.incomingFound, coverage.incomingFound),
+          incomingResolved: Math.max(prior.incomingResolved, coverage.incomingResolved),
+          incomingStatus: "provider-visible-only",
+          providerSearchesAttempted: (prior.providerSearchesAttempted ?? 0) + 2,
+          recursiveClosureComplete: false,
+          note: prior.note,
+        },
+      };
+    }
+    return {
+      ...paper,
+      citationCoverage: {
+        outgoingFound: coverage.outgoingFound,
+        outgoingResolved: coverage.outgoingResolved,
+        incomingFound: coverage.incomingFound,
+        incomingResolved: coverage.incomingResolved,
+        incomingStatus: "provider-visible-only",
+        providerSearchesAttempted: (prior?.providerSearchesAttempted ?? 0) + 2,
+        recursiveClosureComplete: false,
+        note: completeForProvider
+          ? "OpenAlex direct incoming and outgoing neighborhoods were fetched completely for this provider. Newly discovered papers remain in the persistent recursive queue."
+          : `OpenAlex returned no work record for ${coverage.unresolvedOutgoingIds.length} referenced identifier(s). Those exact IDs remain on this paper's queue item for retry; the direct neighborhood is not marked complete.`,
+      },
+    };
+  });
 }
 
 function upsertDiscoveredRecord(state, record) {
@@ -388,19 +445,40 @@ function upsertDiscoveredRecord(state, record) {
 
 export function integrateOpenAlexNeighborhood(snapshot, input) {
   const seedCandidate = openAlexWorkToPaper(input.seed.work, input.seed.retrievedAt);
+  const sourceAuthoritativeSeed = hasSourceAuthoritativeCitationCoverage(
+    snapshot.papers.find((paper) => paper.id === input.paperId),
+  );
   let papers = mergeKnownPaper([...snapshot.papers], input.paperId, seedCandidate);
   let edges = [...snapshot.citationEdges];
   let queue = [...snapshot.ingestionQueue];
   let papersAdded = 0;
   let edgesAdded = 0;
   let queueItemsAdded = 0;
+  let providerOutgoingRecordsSkipped = 0;
   const outgoingResolved = new Set();
   const incomingResolved = new Set();
+  const sourceAuditedOutgoingPaperIds = new Set(
+    edges
+      .filter((edge) => edge.citingPaperId === input.paperId &&
+        edge.provenance.some((entry) => entry.provider === "arXiv source bibliography"))
+      .map((edge) => edge.citedPaperId),
+  );
 
   for (const record of input.outgoing) {
+    if (sourceAuthoritativeSeed) {
+      const candidate = openAlexWorkToPaper(record.work, record.retrievedAt);
+      const exactMatch = findExactPaperMatch(papers, candidate);
+      if (!exactMatch || !sourceAuditedOutgoingPaperIds.has(exactMatch.id)) {
+        providerOutgoingRecordsSkipped += 1;
+        continue;
+      }
+    }
     const merged = upsertDiscoveredRecord({ papers, queue }, record);
     papers = merged.papers;
     queue = merged.queue;
+    if (sourceAuthoritativeSeed) {
+      queue = activateResolvedIdentifierQueueItem(queue, merged.paperId, record.retrievedAt);
+    }
     if (merged.paperAdded) papersAdded += 1;
     if (merged.queueAdded) queueItemsAdded += 1;
     if (merged.paperId === input.paperId) continue;
@@ -464,9 +542,11 @@ export function integrateOpenAlexNeighborhood(snapshot, input) {
     incomingResolved: incomingProviderIds.size,
     unresolvedOutgoingIds,
   });
-  queue = unresolvedOutgoingIds.length === 0
-    ? completeQueueItem(queue, input.paperId, input.completedAt)
-    : retainIncompleteQueueItem(queue, input.paperId, input.completedAt, unresolvedOutgoingIds);
+  queue = sourceAuthoritativeSeed
+    ? retainSourceAuditedQueueItem(queue, input.paperId, input.completedAt, unresolvedOutgoingIds)
+    : unresolvedOutgoingIds.length === 0
+      ? completeQueueItem(queue, input.paperId, input.completedAt)
+      : retainIncompleteQueueItem(queue, input.paperId, input.completedAt, unresolvedOutgoingIds);
 
   return {
     snapshot: { ...snapshot, papers, citationEdges: edges, ingestionQueue: queue },
@@ -477,6 +557,7 @@ export function integrateOpenAlexNeighborhood(snapshot, input) {
       unresolvedOutgoingIds,
       canonicalOutgoingPapers: outgoingResolved.size,
       canonicalIncomingPapers: incomingResolved.size,
+      providerOutgoingRecordsSkipped,
     },
   };
 }
@@ -503,6 +584,7 @@ export function eligibleQueueItems(snapshot) {
   const papersById = new Map(snapshot.papers.map((paper) => [paper.id, paper]));
   return snapshot.ingestionQueue.filter((item) => {
     if (["blocked", "complete-direct-neighborhood"].includes(item.state)) return false;
+    if (!item.nextTasks.some((task) => ["fetch-outgoing", "fetch-incoming"].includes(task))) return false;
     const paper = papersById.get(item.paperId);
     return Boolean(normalizeOpenAlexId(paper?.identifiers?.openAlex));
   });

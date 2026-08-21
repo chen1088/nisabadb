@@ -5,6 +5,7 @@ export const statementKindSchema = z.enum([
   "lemma",
   "proposition",
   "corollary",
+  "conjecture",
   "definition",
   "notation",
   "imported-result",
@@ -232,12 +233,14 @@ export const corpusSchema = z.object({
   const statementIds = new Set<string>();
   const globalIds = new Set<string>();
   const stableIdentifierOwners = new Map<string, string>();
+  const featuredPaperIds: string[] = [];
 
   for (const paper of corpus.papers) {
     if (paperIds.has(paper.id)) {
       context.addIssue({ code: "custom", message: `Duplicate paper ID: ${paper.id}` });
     }
     paperIds.add(paper.id);
+    if (paper.featured) featuredPaperIds.push(paper.id);
     for (const [kind, value] of Object.entries(paper.identifiers)) {
       if (!value) continue;
       const key = `${kind}:${normalizeCorpusIdentifier(kind, value)}`;
@@ -264,6 +267,13 @@ export const corpusSchema = z.object({
     }
   }
 
+  if (featuredPaperIds.length > 1) {
+    context.addIssue({
+      code: "custom",
+      message: `At most one paper may be featured; found ${featuredPaperIds.join(", ")}`,
+    });
+  }
+
   for (const statement of corpus.statements) {
     if (statementIds.has(statement.id)) {
       context.addIssue({ code: "custom", message: `Duplicate statement ID: ${statement.id}` });
@@ -276,7 +286,15 @@ export const corpusSchema = z.object({
     if (!paperIds.has(statement.paperId)) {
       context.addIssue({ code: "custom", message: `Statement ${statement.id} has missing paper ${statement.paperId}` });
     }
+    if (!statement.globalStatementId.startsWith(`${statement.paperId}.`)) {
+      context.addIssue({
+        code: "custom",
+        message: `Statement ${statement.id} must use the global namespace of paper ${statement.paperId}`,
+      });
+    }
   }
+
+  const statementById = new Map(corpus.statements.map((statement) => [statement.id, statement]));
 
   for (const statement of corpus.statements) {
     if (Boolean(statement.sourceStatement) !== Boolean(statement.statementNote)) {
@@ -292,6 +310,13 @@ export const corpusSchema = z.object({
       }
       if (dependency === statement.id) {
         context.addIssue({ code: "custom", message: `${statement.id} depends on itself` });
+      }
+      const dependencyStatement = statementById.get(dependency);
+      if (dependencyStatement && dependencyStatement.paperId !== statement.paperId) {
+        context.addIssue({
+          code: "custom",
+          message: `${statement.id} has cross-paper dependency ${dependency}`,
+        });
       }
     }
 
@@ -379,7 +404,6 @@ export const corpusSchema = z.object({
 
   const visiting = new Set<string>();
   const visited = new Set<string>();
-  const statementById = new Map(corpus.statements.map((statement) => [statement.id, statement]));
   const visit = (id: string, path: string[]) => {
     if (visited.has(id)) return;
     if (visiting.has(id)) {
@@ -401,9 +425,43 @@ export const corpusSchema = z.object({
   corpus.statements.forEach((statement) => visit(statement.id, []));
 
   for (const paper of corpus.papers) {
+    const paperStatements = corpus.statements.filter((statement) => statement.paperId === paper.id);
+    if (paper.status === "gold") {
+      if (paperStatements.length === 0) {
+        context.addIssue({
+          code: "custom",
+          message: `Gold paper ${paper.id} must have at least one statement`,
+        });
+      }
+      if (!paper.graph.mainRoot || paper.graph.paperRoots.length === 0 || paper.graph.views.length === 0) {
+        context.addIssue({
+          code: "custom",
+          message: `Gold paper ${paper.id} must define a main root, paper roots, and graph views`,
+        });
+      }
+    }
+
+    const viewIds = new Set<string>();
+    for (const view of paper.graph.views) {
+      if (viewIds.has(view.id)) {
+        context.addIssue({
+          code: "custom",
+          message: `Paper ${paper.id} has duplicate graph view ID ${view.id}`,
+        });
+      }
+      viewIds.add(view.id);
+    }
+
     for (const root of [paper.graph.mainRoot, ...paper.graph.paperRoots, ...paper.graph.views.flatMap((view) => [...view.roots, ...view.initiallyExpanded])].filter(Boolean) as string[]) {
       if (!statementIds.has(root)) {
         context.addIssue({ code: "custom", message: `Paper ${paper.id} graph references missing statement ${root}` });
+      }
+      const rootStatement = statementById.get(root);
+      if (rootStatement && rootStatement.paperId !== paper.id) {
+        context.addIssue({
+          code: "custom",
+          message: `Paper ${paper.id} graph references cross-paper statement ${root}`,
+        });
       }
     }
   }

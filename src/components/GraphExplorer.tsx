@@ -68,6 +68,12 @@ function routeStatusCopy(route: ProofRoute): string {
   return "Proof not yet distilled";
 }
 
+function ideaHeading(statement: Statement): string {
+  if (statement.kind === "conjecture") return "Conjectural rationale";
+  if (["definition", "notation"].includes(statement.kind)) return "Intuition";
+  return "Proof idea";
+}
+
 export function GraphExplorer({ paper, statements }: GraphExplorerProps) {
   const [parameters, setParameters] = useSearchParams();
   const [expandedByView, setExpandedByView] = useState<ExpandedByView>(() =>
@@ -511,7 +517,9 @@ export function ProofPanel({
     >
       <div className="proof-panel-header">
         <div className="proof-kicker-row">
-          <span className="panel-index">Selected result</span>
+          <span className="panel-index">
+            {statement.kind === "conjecture" ? "Selected conjecture" : "Selected result"}
+          </span>
           <VerificationBadge status={statement.formalStatus} />
         </div>
         <div className="proof-title-row">
@@ -554,7 +562,7 @@ export function ProofPanel({
       </section>
 
       <section className="proof-section idea-section">
-        <h4>{["definition", "notation"].includes(statement.kind) ? "Intuition" : "Proof idea"}</h4>
+        <h4>{ideaHeading(statement)}</h4>
         <MathMarkdown onStatementReference={selectReference}>
           {statement.intuition ?? statement.idea}
         </MathMarkdown>
@@ -632,6 +640,14 @@ export function ProofPanel({
             </section>
           ) : null}
         </Fragment>
+      ) : statement.kind === "conjecture" ? (
+        <section className="proof-section definition-note">
+          <h4>Open conjecture</h4>
+          <p>
+            This record states an unproved claim. Its dependencies support the formulation
+            or explain later conditional results; NisabaDB does not claim a proof.
+          </p>
+        </section>
       ) : (
         <section className="proof-section definition-note">
           <h4>Reference object</h4>

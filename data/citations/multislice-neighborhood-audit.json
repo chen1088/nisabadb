@@ -1,0 +1,619 @@
+{
+  "schemaVersion": "1.0.0",
+  "auditId": "arxiv:2110.10725v2-citation-neighborhood",
+  "auditAsOf": "2026-08-21T21:10:08.000Z",
+  "seedPaperId": "braverman-khot-lifshitz-minzer-2025-invariance-principle-multislice",
+  "sourceAudit": {
+    "title": "An invariance principle for the multi-slice, with applications",
+    "authors": ["Mark Braverman", "Subhash Khot", "Noam Lifshitz", "Dor Minzer"],
+    "arxiv": "2110.10725v2",
+    "arxivVersionDate": "2025-07-25",
+    "journalDoi": "10.1016/j.aim.2025.110460",
+    "journalPublication": "Advances in Mathematics 480 (2025), article 110460",
+    "sourceArchiveUrl": "https://arxiv.org/src/2110.10725v2",
+    "sourceArchiveSha256": "1BF0C03E573579678E7FE0031728F5D995568E5947F25A82867451140E964278",
+    "sourceFile": "inv_nonprod.tex",
+    "sourceFileLineCount": 4569,
+    "bibliographyFile": "inv_nonprod.bbl",
+    "citationCommandCountAfterCommentRemoval": 77,
+    "uniqueInTextCitationCount": 48,
+    "bibliographyEntryCount": 48,
+    "citationKeySetMatchesBibliography": true,
+    "crossrefReferenceCount": 48,
+    "crossrefExactDoiReferenceCount": 20,
+    "citationExtractionMethod": "Remove each unescaped percent-comment suffix before scanning TeX, collect comma-separated keys from cite-family commands, retain their one-based source line numbers, de-duplicate keys, and compare the resulting key set exactly with all bibitem keys in inv_nonprod.bbl.",
+    "commentRemovalNote": "TeX comments were removed before citation extraction. A commented line containing FKMW and FM is excluded; FM is not an in-text citation key.",
+    "licenseAssessment": {
+      "arxivSubmissionLicenseUrl": "http://arxiv.org/licenses/nonexclusive-distrib/1.0/",
+      "publisherSharingPolicyUrl": "https://www.elsevier.com/about/policies-and-standards/sharing",
+      "normalizedReusableFullTextLicense": null,
+      "decision": "Do not redistribute, display, or adapt the source, TeX, or publisher full text. Persist only bibliographic facts, citation locations, provider identities, provenance, and original NisabaDB distillation."
+    },
+    "evidenceUrls": [
+      "https://arxiv.org/abs/2110.10725v2",
+      "https://arxiv.org/src/2110.10725v2",
+      "https://api.crossref.org/works/10.1016%2Fj.aim.2025.110460",
+      "https://api.datacite.org/dois/10.48550%2FarXiv.2110.10725",
+      "https://api.openalex.org/works/W4413142925"
+    ]
+  },
+  "versionFamily": {
+    "journal": {
+      "doi": "10.1016/j.aim.2025.110460",
+      "openAlex": "W4413142925",
+      "incomingProviderVisibleCount": 0
+    },
+    "arxiv": {
+      "arxiv": "2110.10725v2",
+      "openAlex": "W4299462815",
+      "incomingProviderVisibleCount": 0
+    },
+    "conference": {
+      "doi": "10.1109/FOCS52979.2021.00030",
+      "openAlex": "W3207594656",
+      "incomingProviderVisibleNonXpacCount": 28,
+      "incomingProviderVisibleInclusiveCount": 29,
+      "queryUrl": "https://api.openalex.org/works?filter=cites%3AW3207594656&per-page=200",
+      "inclusiveQueryUrl": "https://api.openalex.org/works?filter=cites%3AW3207594656&include_xpac=true&per-page=200",
+      "excludedXpacRecord": {
+        "openAlex": "W7132832390",
+        "doi": "10.1145/3799414",
+        "title": "Hierarchies of Minion Tests for PCSPs through Tensors",
+        "date": "2026-02-28",
+        "reason": "OpenAlex includes this record only with include_xpac=true; it is a later journal version of a provider-visible work already present in the non-XPAC result set."
+      }
+    },
+    "identityPolicy": "The journal, arXiv, and FOCS records remain distinct provider identities. The 28 incoming edges are explicitly version-family evidence discovered through the FOCS identity; they are not asserted to cite the 2025 journal record itself.",
+    "crossrefCitedByCounts": {
+      "journal": 0,
+      "conference": 16
+    }
+  },
+  "providerGaps": {
+    "journalReferencedWorksEvidenceUrl": "https://api.openalex.org/works/W4413142925?select=id,referenced_works",
+    "resolutionMethod": "Resolve the 45 exact referenced-work IDs in an OpenAlex openalex_id batch filter; do not use titles for endpoint merging.",
+    "journalOpenAlexReferencedWorkCount": 45,
+    "journalOpenAlexResolvedAtAudit": 22,
+    "unresolvedReferencedWorkIds": [
+      "W1999032440",
+      "W2038663599",
+      "W2913545565",
+      "W2962930974",
+      "W2963536098",
+      "W3102754027",
+      "W3170971055",
+      "W6641611605",
+      "W6649888732",
+      "W6670863709",
+      "W6676420355",
+      "W6676951151",
+      "W6677712778",
+      "W6724143327",
+      "W6732340802",
+      "W6732672821",
+      "W6734205034",
+      "W6750696926",
+      "W6754287101",
+      "W6764545289",
+      "W6766242744",
+      "W6768553426",
+      "W6771051337"
+    ],
+    "interpretation": "The author source and Crossref independently establish 48 outgoing bibliography entries. OpenAlex's 45 referenced-work IDs are neither a replacement count nor a complete endpoint-resolution source; some resolving records are proceedings containers and 23 IDs returned no work record at audit time."
+  },
+  "outgoing": [
+    {
+      "id": "alon-frankl-lovasz-1986-chromatic-kneser-hypergraphs",
+      "bibKey": "alon1986chromatic",
+      "title": "The chromatic number of Kneser hypergraphs",
+      "authors": ["Noga Alon", "Peter Frankl", "László Lovász"],
+      "date": "1986",
+      "venue": "Transactions of the American Mathematical Society 298(1), pages 359-370",
+      "citationLines": [595],
+      "identifiers": { "doi": "10.1090/S0002-9947-1986-0857448-8", "internal": "arxiv-source:2110.10725v2#bib:alon1986chromatic" }
+    },
+    {
+      "id": "arora-lund-motwani-sudan-szegedy-1998-proof-verification",
+      "bibKey": "ALMSS",
+      "title": "Proof verification and the hardness of approximation problems",
+      "authors": ["Sanjeev Arora", "Carsten Lund", "Rajeev Motwani", "Madhu Sudan", "Mario Szegedy"],
+      "date": "1998",
+      "venue": "Journal of the ACM 45(3), pages 501-555",
+      "citationLines": [452],
+      "identifiers": { "doi": "10.1145/278298.278306", "internal": "arxiv-source:2110.10725v2#bib:ALMSS" }
+    },
+    {
+      "id": "arora-safra-1998-probabilistic-checking-proofs",
+      "bibKey": "AS",
+      "title": "Probabilistic checking of proofs: A new characterization of NP",
+      "authors": ["Sanjeev Arora", "Shmuel Safra"],
+      "date": "1998",
+      "venue": "Journal of the ACM 45(1), pages 70-122",
+      "citationLines": [452],
+      "identifiers": { "doi": "10.1145/273865.273901", "internal": "arxiv-source:2110.10725v2#bib:AS" }
+    },
+    {
+      "id": "barak-kothari-steurer-2019-small-set-expansion-shortcode",
+      "bibKey": "BKS",
+      "title": "Small-set expansion in shortcode graph and the 2-to-2 conjecture",
+      "authors": ["Boaz Barak", "Pravesh K. Kothari", "David Steurer"],
+      "date": "2019",
+      "venue": "10th Innovations in Theoretical Computer Science Conference (ITCS 2019), article 9",
+      "citationLines": [434],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:BKS" }
+    },
+    {
+      "id": "bhangale-khot-2019-ug-hardness-np-hardness-losing-half",
+      "bibKey": "BKhalf",
+      "title": "UG-hardness to NP-hardness by losing half",
+      "authors": ["Amey Bhangale", "Subhash Khot"],
+      "date": "2019",
+      "venue": "34th Computational Complexity Conference (CCC 2019), article 3",
+      "citationLines": [435],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:BKhalf" }
+    },
+    {
+      "id": "bhangale-khot-thiruvenkatachari-2017-improved-dictatorship-test",
+      "bibKey": "BKT",
+      "title": "An improved dictatorship test with perfect completeness",
+      "authors": ["Amey Bhangale", "Subhash Khot", "Devanathan Thiruvenkatachari"],
+      "date": "2017",
+      "venue": "37th IARCS Conference on Foundations of Software Technology and Theoretical Computer Science (FSTTCS 2017), article 15",
+      "citationLines": [540, 541, 4142, 4152, 4173],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:BKT" }
+    },
+    {
+      "id": "blais-odonnell-2010-lower-bounds-function-isomorphism",
+      "bibKey": "testing",
+      "title": "Lower bounds for testing function isomorphism",
+      "authors": ["Eric Blais", "Ryan O'Donnell"],
+      "date": "2010",
+      "venue": "2010 IEEE 25th Annual Conference on Computational Complexity, pages 235-246",
+      "citationLines": [176],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:testing" }
+    },
+    {
+      "id": "braverman-khot-lifshitz-minzer-removal-ramsey-turan-large-uniformity",
+      "bibKey": "BKLMcomb",
+      "title": "Removal, Ramsey and Turán number for hypergraphs of large uniformity",
+      "authors": ["Mark Braverman", "Subhash Khot", "Noam Lifshitz", "Dor Minzer"],
+      "date": "Forthcoming in the cited source",
+      "venue": "Forthcoming",
+      "citationLines": [575, 591],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:BKLMcomb" }
+    },
+    {
+      "id": "braverman-khot-minzer-2021-rich-2-to-1-games",
+      "bibKey": "BKM",
+      "title": "On rich 2-to-1 games",
+      "authors": ["Mark Braverman", "Subhash Khot", "Dor Minzer"],
+      "date": "2021",
+      "venue": "12th Innovations in Theoretical Computer Science Conference (ITCS 2021), article 27",
+      "citationLines": [425, 489, 508, 514],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:BKM" }
+    },
+    {
+      "id": "charikar-makarychev-makarychev-2009-near-optimal-max-csp",
+      "bibKey": "charikar2009near",
+      "title": "Near-optimal algorithms for maximum constraint satisfaction problems",
+      "authors": ["Moses Charikar", "Konstantin Makarychev", "Yury Makarychev"],
+      "date": "2009",
+      "venue": "ACM Transactions on Algorithms 5(3), pages 1-14",
+      "citationLines": [553],
+      "identifiers": { "doi": "10.1145/1541885.1541893", "internal": "arxiv-source:2110.10725v2#bib:charikar2009near" }
+    },
+    {
+      "id": "chatterjee-2005-simple-invariance-theorem",
+      "bibKey": "Chatterjee",
+      "title": "A simple invariance theorem",
+      "authors": ["Sourav Chatterjee"],
+      "date": "2005",
+      "venue": "arXiv preprint",
+      "citationLines": [166],
+      "identifiers": { "arxiv": "math/0508213", "internal": "arxiv-source:2110.10725v2#bib:Chatterjee" }
+    },
+    {
+      "id": "dinur-friedgut-regev-2008-independent-sets-graph-powers-juntas",
+      "bibKey": "DFR",
+      "title": "Independent sets in graph powers are almost contained in juntas",
+      "authors": ["Irit Dinur", "Ehud Friedgut", "Oded Regev"],
+      "date": "2008",
+      "venue": "Geometric and Functional Analysis 18(1), pages 77-97",
+      "citationLines": [176, 597],
+      "identifiers": { "doi": "10.1007/s00039-008-0651-1", "internal": "arxiv-source:2110.10725v2#bib:DFR" }
+    },
+    {
+      "id": "dinur-khot-kindler-minzer-safra-2018-towards-2-to-1-games",
+      "bibKey": "DKKMS-1",
+      "title": "Towards a proof of the 2-to-1 games conjecture?",
+      "authors": ["Irit Dinur", "Subhash Khot", "Guy Kindler", "Dor Minzer", "Muli Safra"],
+      "date": "2018",
+      "venue": "50th Annual ACM Symposium on Theory of Computing (STOC 2018), pages 376-389",
+      "citationLines": [434, 484],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:DKKMS-1" }
+    },
+    {
+      "id": "dinur-khot-kindler-minzer-safra-2021-nonoptimally-expanding-grassmann",
+      "bibKey": "DKKMS-2",
+      "title": "On non-optimally expanding sets in Grassmann graphs",
+      "authors": ["Irit Dinur", "Subhash Khot", "Guy Kindler", "Dor Minzer", "Muli Safra"],
+      "date": "2021",
+      "venue": "Israel Journal of Mathematics 243(1), pages 377-420",
+      "citationLines": [434, 484],
+      "identifiers": { "doi": "10.1007/s11856-021-2164-7", "internal": "arxiv-source:2110.10725v2#bib:DKKMS-2" }
+    },
+    {
+      "id": "dinur-mossel-regev-2009-conditional-hardness-approximate-coloring",
+      "bibKey": "DMR",
+      "title": "Conditional hardness for approximate coloring",
+      "authors": ["Irit Dinur", "Elchanan Mossel", "Oded Regev"],
+      "date": "2009",
+      "venue": "SIAM Journal on Computing 39(3), pages 843-873",
+      "citationLines": [561, 570, 4194],
+      "identifiers": { "doi": "10.1137/07068062X", "internal": "arxiv-source:2110.10725v2#bib:DMR" }
+    },
+    {
+      "id": "dubhashi-ranjan-1996-balls-bins-negative-dependence",
+      "bibKey": "negativeassoc2",
+      "title": "Balls and bins: A study in negative dependence",
+      "authors": ["Devdatt P. Dubhashi", "Desh Ranjan"],
+      "date": "1996",
+      "venue": "BRICS Report Series 3(25)",
+      "citationLines": [1058, 4201],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:negativeassoc2" }
+    },
+    {
+      "id": "ellis-friedgut-pilpel-2011-intersecting-families-permutations",
+      "reusePaperId": "ellis-friedgut-pilpel-2011-intersecting-families-permutations",
+      "bibKey": "EFP",
+      "title": "Intersecting families of permutations",
+      "authors": ["David Ellis", "Ehud Friedgut", "Haran Pilpel"],
+      "date": "2011",
+      "venue": "Journal of the American Mathematical Society 24(3), pages 649-682",
+      "citationLines": [814, 846],
+      "identifiers": { "doi": "10.1090/S0894-0347-2011-00690-5", "internal": "arxiv-source:2110.10725v2#bib:EFP" }
+    },
+    {
+      "id": "ellis-keller-lifshitz-2016-stability-complete-intersection",
+      "bibKey": "ellis2016stability",
+      "title": "Stability for the complete intersection theorem, and the forbidden intersection problem of Erdős and Sós",
+      "authors": ["David Ellis", "Nathan Keller", "Noam Lifshitz"],
+      "date": "2016",
+      "venue": "arXiv e-prints (the cited bibliography supplies only the incomplete identifier 'arXiv--1604')",
+      "citationLines": [596, 618, 622],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:ellis2016stability" }
+    },
+    {
+      "id": "erdos-1975-problems-results-graph-theory-combinatorial-analysis",
+      "bibKey": "erdHos1975problems",
+      "title": "Problems and results in graph theory and combinatorial analysis",
+      "authors": ["Paul Erdős"],
+      "date": "1975",
+      "venue": "Proceedings of the Fifth British Combinatorial Conference, pages 169-192",
+      "citationLines": [621],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:erdHos1975problems" }
+    },
+    {
+      "id": "feige-goldwasser-lovasz-safra-szegedy-1996-interactive-proofs-cliques",
+      "bibKey": "FGLSS",
+      "title": "Interactive proofs and the hardness of approximating cliques",
+      "authors": ["Uriel Feige", "Shafi Goldwasser", "László Lovász", "Shmuel Safra", "Mario Szegedy"],
+      "date": "1996-03",
+      "venue": "Journal of the ACM 43(2), pages 268-292",
+      "citationLines": [452],
+      "identifiers": { "doi": "10.1145/226643.226652", "internal": "arxiv-source:2110.10725v2#bib:FGLSS" }
+    },
+    {
+      "id": "feldman-guruswami-raghavendra-wu-2012-agnostic-learning-monomials",
+      "bibKey": "learning",
+      "title": "Agnostic learning of monomials by halfspaces is hard",
+      "authors": ["Vitaly Feldman", "Venkatesan Guruswami", "Prasad Raghavendra", "Yi Wu"],
+      "date": "2012",
+      "venue": "SIAM Journal on Computing 41(6), pages 1558-1590",
+      "citationLines": [175],
+      "identifiers": { "doi": "10.1137/120865094", "internal": "arxiv-source:2110.10725v2#bib:learning" }
+    },
+    {
+      "id": "filmus-kindler-lifshitz-minzer-2020-hypercontractivity-symmetric-group",
+      "bibKey": "FKLM",
+      "title": "Hypercontractivity on the symmetric group",
+      "authors": ["Yuval Filmus", "Guy Kindler", "Noam Lifshitz", "Dor Minzer"],
+      "date": "2020",
+      "venue": "arXiv preprint",
+      "citationLines": [644, 1022],
+      "identifiers": { "arxiv": "2009.05503", "internal": "arxiv-source:2110.10725v2#bib:FKLM" }
+    },
+    {
+      "id": "filmus-kindler-mossel-wimmer-2018-invariance-principle-slice",
+      "bibKey": "FKMW",
+      "title": "Invariance principle on the slice",
+      "authors": ["Yuval Filmus", "Guy Kindler", "Elchanan Mossel", "Karl Wimmer"],
+      "date": "2018",
+      "venue": "ACM Transactions on Computation Theory 10(3), article 11",
+      "citationLines": [142, 172, 180, 392, 401, 405, 417],
+      "identifiers": { "doi": "10.1145/3186590", "internal": "arxiv-source:2110.10725v2#bib:FKMW" }
+    },
+    {
+      "id": "filmus-mossel-2019-harmonicity-invariance-slices-boolean-cube",
+      "bibKey": "FM2019",
+      "title": "Harmonicity and invariance on slices of the Boolean cube",
+      "authors": ["Yuval Filmus", "Elchanan Mossel"],
+      "date": "2019",
+      "venue": "Probability Theory and Related Fields 175(3-4), pages 721-782",
+      "citationLines": [172, 180, 392, 401, 405, 417],
+      "identifiers": { "doi": "10.1007/s00440-019-00900-w", "internal": "arxiv-source:2110.10725v2#bib:FM2019" }
+    },
+    {
+      "id": "filmus-odonnell-wu-2019-log-sobolev-multislice",
+      "bibKey": "FOW",
+      "title": "A log-Sobolev inequality for the multislice, with applications",
+      "authors": ["Yuval Filmus", "Ryan O'Donnell", "Xinyu Wu"],
+      "date": "2019",
+      "venue": "10th Innovations in Theoretical Computer Science Conference (ITCS 2019), article 34",
+      "citationLines": [2983, 2986, 2993],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:FOW" }
+    },
+    {
+      "id": "frankl-kupavskii-2018-erdos-matching-conjecture-concentration",
+      "bibKey": "frankl2018erd",
+      "title": "The Erdős matching conjecture and concentration inequalities",
+      "authors": ["Peter Frankl", "Andrey Kupavskii"],
+      "date": "2018",
+      "venue": "arXiv preprint",
+      "citationLines": [595],
+      "identifiers": { "arxiv": "1806.08855", "internal": "arxiv-source:2110.10725v2#bib:frankl2018erd" }
+    },
+    {
+      "id": "friedgut-regev-2017-kneser-graphs-swiss-cheese",
+      "bibKey": "friedgut2017kneser",
+      "title": "Kneser graphs are like Swiss cheese",
+      "authors": ["Ehud Friedgut", "Oded Regev"],
+      "date": "2017",
+      "venue": "arXiv preprint",
+      "citationLines": [596],
+      "identifiers": { "arxiv": "1702.04073", "internal": "arxiv-source:2110.10725v2#bib:friedgut2017kneser" }
+    },
+    {
+      "id": "ghazi-kamath-sudan-2016-noninteractive-simulation-joint-distributions",
+      "bibKey": "coding",
+      "title": "Decidability of non-interactive simulation of joint distributions",
+      "authors": ["Badih Ghazi", "Pritish Kamath", "Madhu Sudan"],
+      "date": "2016",
+      "venue": "2016 IEEE 57th Annual Symposium on Foundations of Computer Science, pages 545-554",
+      "citationLines": [175],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:coding" }
+    },
+    {
+      "id": "guruswami-sandeep-2020-d-to-1-hardness-coloring",
+      "bibKey": "GS20",
+      "title": "d-to-1 hardness of coloring 3-colorable graphs with O(1) colors",
+      "authors": ["Venkatesan Guruswami", "Sai Sandeep"],
+      "date": "2020",
+      "venue": "47th International Colloquium on Automata, Languages, and Programming (ICALP 2020), article 62",
+      "citationLines": [559],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:GS20" }
+    },
+    {
+      "id": "hastad-1996-clique-hard-approximate",
+      "bibKey": "Hastadclique",
+      "title": "Clique is hard to approximate within n^(1-epsilon)",
+      "authors": ["Johan Håstad"],
+      "date": "1996",
+      "venue": "37th Annual Symposium on Foundations of Computer Science, pages 627-636",
+      "citationLines": [429],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:Hastadclique" }
+    },
+    {
+      "id": "hastad-2001-optimal-inapproximability-results",
+      "bibKey": "Hastad",
+      "title": "Some optimal inapproximability results",
+      "authors": ["Johan Håstad"],
+      "date": "2001",
+      "venue": "Journal of the ACM 48(4), pages 798-859",
+      "citationLines": [429, 479],
+      "identifiers": { "doi": "10.1145/502090.502098", "internal": "arxiv-source:2110.10725v2#bib:Hastad" }
+    },
+    {
+      "id": "huang-2013-approximation-resistance-satisfiable-predicates",
+      "bibKey": "Huang",
+      "title": "Approximation resistance on satisfiable instances for predicates with few accepting inputs",
+      "authors": ["Sangxia Huang"],
+      "date": "2013",
+      "venue": "Symposium on Theory of Computing Conference (STOC 2013), pages 457-466",
+      "citationLines": [552],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:Huang" }
+    },
+    {
+      "id": "joag-dev-proschan-1983-negative-association-random-variables",
+      "bibKey": "negativeassoc",
+      "title": "Negative association of random variables with applications",
+      "authors": ["Kumar Joag-Dev", "Frank Proschan"],
+      "date": "1983",
+      "venue": "Annals of Statistics, pages 286-295",
+      "citationLines": [1040, 1050, 4201],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:negativeassoc" }
+    },
+    {
+      "id": "keevash-lifshitz-long-minzer-2021-forbidden-intersections-codes",
+      "bibKey": "KLLMcodes",
+      "title": "Forbidden intersections for codes",
+      "authors": ["Peter Keevash", "Noam Lifshitz", "Eoin Long", "Dor Minzer"],
+      "date": "2021",
+      "venue": "arXiv preprint",
+      "citationLines": [176],
+      "identifiers": { "arxiv": "2103.05050", "internal": "arxiv-source:2110.10725v2#bib:KLLMcodes" }
+    },
+    {
+      "id": "khot-2002-power-unique-2-prover-1-round-games",
+      "bibKey": "Khot",
+      "title": "On the power of unique 2-prover 1-round games",
+      "authors": ["Subhash Khot"],
+      "date": "2002",
+      "venue": "17th Annual IEEE Conference on Computational Complexity, page 25",
+      "citationLines": [168, 431],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:Khot" }
+    },
+    {
+      "id": "khot-kindler-mossel-odonnell-2007-optimal-maxcut-inapproximability",
+      "bibKey": "KKMO",
+      "title": "Optimal inapproximability results for MAX-CUT and other 2-variable CSPs?",
+      "authors": ["Subhash Khot", "Guy Kindler", "Elchanan Mossel", "Ryan O'Donnell"],
+      "date": "2007",
+      "venue": "SIAM Journal on Computing 37(1), pages 319-357",
+      "citationLines": [168, 524],
+      "identifiers": { "doi": "10.1137/S0097539705447372", "internal": "arxiv-source:2110.10725v2#bib:KKMO" }
+    },
+    {
+      "id": "khot-minzer-safra-2017-independent-sets-2-to-2-grassmann",
+      "bibKey": "KMS",
+      "title": "On independent sets, 2-to-2 games, and Grassmann graphs",
+      "authors": ["Subhash Khot", "Dor Minzer", "Muli Safra"],
+      "date": "2017",
+      "venue": "49th Annual ACM Symposium on Theory of Computing (STOC 2017), pages 576-589",
+      "citationLines": [434, 484],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:KMS" }
+    },
+    {
+      "id": "khot-minzer-safra-2023-pseudorandom-grassmann-near-perfect-expansion",
+      "bibKey": "KMS2",
+      "title": "Pseudorandom sets in Grassmann graph have near-perfect expansion",
+      "authors": ["Subhash Khot", "Dor Minzer", "Muli Safra"],
+      "date": "2023",
+      "venue": "Annals of Mathematics 198(1), pages 1-92",
+      "citationLines": [434, 484],
+      "identifiers": { "doi": "10.4007/annals.2023.198.1.1", "internal": "arxiv-source:2110.10725v2#bib:KMS2" }
+    },
+    {
+      "id": "lifshitz-2018-hypergraph-removal-robust-sharp-threshold",
+      "bibKey": "Lifshitz",
+      "title": "Hypergraph removal lemmas via robust sharp threshold theorems",
+      "authors": ["Noam Lifshitz"],
+      "date": "2018",
+      "venue": "arXiv preprint",
+      "citationLines": [176],
+      "identifiers": { "arxiv": "1804.00328", "internal": "arxiv-source:2110.10725v2#bib:Lifshitz" }
+    },
+    {
+      "id": "lovasz-1978-kneser-conjecture-chromatic-homotopy",
+      "bibKey": "lovasz1978kneser",
+      "title": "Kneser's conjecture, chromatic number, and homotopy",
+      "authors": ["László Lovász"],
+      "date": "1978",
+      "venue": "Journal of Combinatorial Theory, Series A 25(3), pages 319-324",
+      "citationLines": [595],
+      "identifiers": { "doi": "10.1016/0097-3165(78)90022-5", "internal": "arxiv-source:2110.10725v2#bib:lovasz1978kneser" }
+    },
+    {
+      "id": "makarychev-makarychev-2012-approximation-nonboolean-max-k-csp",
+      "bibKey": "makarychev2012approximation",
+      "title": "Approximation algorithm for non-Boolean Max k-CSP",
+      "authors": ["Konstantin Makarychev", "Yury Makarychev"],
+      "date": "2012",
+      "venue": "International Workshop on Approximation Algorithms for Combinatorial Optimization, pages 254-265",
+      "citationLines": [553],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:makarychev2012approximation" }
+    },
+    {
+      "id": "mossel-2010-gaussian-bounds-noise-correlation-functions",
+      "bibKey": "MosselGaussian",
+      "title": "Gaussian bounds for noise correlation of functions",
+      "authors": ["Elchanan Mossel"],
+      "date": "2010",
+      "venue": "Geometric and Functional Analysis 19(6), pages 1713-1756",
+      "citationLines": [157, 171, 300, 372, 416, 1475, 4252],
+      "identifiers": { "doi": "10.1007/s00039-010-0047-x", "internal": "arxiv-source:2110.10725v2#bib:MosselGaussian" }
+    },
+    {
+      "id": "mossel-2017-gaussian-bounds-noise-correlation-resilient-functions",
+      "bibKey": "MosselResilient",
+      "title": "Gaussian bounds for noise correlation of resilient functions",
+      "authors": ["Elchanan Mossel"],
+      "date": "2017",
+      "venue": "arXiv preprint",
+      "citationLines": [172],
+      "identifiers": { "arxiv": "1704.04745", "internal": "arxiv-source:2110.10725v2#bib:MosselResilient" }
+    },
+    {
+      "id": "mossel-odonnell-oleszkiewicz-2010-noise-stability-low-influences",
+      "bibKey": "MOO",
+      "title": "Noise stability of functions with low influences: Invariance and optimality",
+      "authors": ["Elchanan Mossel", "Ryan O'Donnell", "Krzysztof Oleszkiewicz"],
+      "date": "2010",
+      "venue": "Annals of Mathematics 171, pages 295-341",
+      "citationLines": [164, 300],
+      "identifiers": { "doi": "10.4007/annals.2010.171.295", "internal": "arxiv-source:2110.10725v2#bib:MOO" }
+    },
+    {
+      "id": "odonnell-2014-analysis-boolean-functions",
+      "reusePaperId": "odonnell-2014-analysis-boolean-functions",
+      "bibKey": "Od",
+      "title": "Analysis of Boolean Functions",
+      "authors": ["Ryan O'Donnell"],
+      "date": "2014",
+      "venue": "Cambridge University Press",
+      "citationLines": [1015, 4316],
+      "doiEvidence": "reviewed-existing-record",
+      "identifiers": { "doi": "10.1017/CBO9781139814782", "internal": "arxiv-source:2110.10725v2#bib:Od" }
+    },
+    {
+      "id": "raghavendra-2008-optimal-algorithms-inapproximability-every-csp",
+      "bibKey": "Rag",
+      "title": "Optimal algorithms and inapproximability results for every CSP?",
+      "authors": ["Prasad Raghavendra"],
+      "date": "2008",
+      "venue": "40th Annual ACM Symposium on Theory of Computing, pages 245-254",
+      "citationLines": [174, 432, 477, 524, 689, 2874],
+      "identifiers": { "internal": "arxiv-source:2110.10725v2#bib:Rag" }
+    },
+    {
+      "id": "raz-1998-parallel-repetition-theorem",
+      "bibKey": "Raz",
+      "title": "A parallel repetition theorem",
+      "authors": ["Ran Raz"],
+      "date": "1998",
+      "venue": "SIAM Journal on Computing 27(3), pages 763-803",
+      "citationLines": [452],
+      "identifiers": { "doi": "10.1137/S0097539795280895", "internal": "arxiv-source:2110.10725v2#bib:Raz" }
+    },
+    {
+      "id": "rotar-1979-limit-theorems-polylinear-forms",
+      "bibKey": "Rotar",
+      "title": "Limit theorems for polylinear forms",
+      "authors": ["Vladimir I. Rotar"],
+      "date": "1979",
+      "venue": "Journal of Multivariate Analysis 9(4), pages 511-530",
+      "citationLines": [166],
+      "identifiers": { "doi": "10.1016/0047-259X(79)90055-1", "internal": "arxiv-source:2110.10725v2#bib:Rotar" }
+    }
+  ],
+  "incoming": [
+    { "openAlex": "W4281885517", "doi": "10.1145/3519935.3520028", "title": "On approximability of satisfiable k-CSPs: I", "authors": ["Amey Bhangale", "Subhash Khot", "Dor Minzer"], "date": "2022-06-09", "type": "conference-paper", "venue": "Venue not supplied by OpenAlex" },
+    { "openAlex": "W4311539176", "doi": "10.1145/3568031", "title": "On Monotonicity Testing and the 2-to-2 Games Conjecture", "authors": ["Dor Minzer"], "date": "2022-12-05", "type": "book", "venue": "ACM eBooks" },
+    { "openAlex": "W3000532033", "doi": "10.1145/3568031.3568036", "title": "Pseudo-random Sets in the Grassmann Graph Have Near-Perfect Expansion", "authors": ["Dor Minzer"], "date": "2022-12-05", "type": "book-chapter", "venue": "ACM eBooks" },
+    { "openAlex": "W4316652390", "doi": "10.1137/1.9781611977554.ch25", "title": "Hierarchies of Minion Tests for PCSPs through Tensors", "authors": ["Lorenzo Ciardo", "Stanislav Živný"], "date": "2023-01-01", "type": "conference-paper", "venue": "Society for Industrial and Applied Mathematics eBooks" },
+    { "openAlex": "W4376639551", "doi": "10.1145/3564246.3585112", "title": "Approximate Graph Colouring and the Hollow Shadow", "authors": ["Lorenzo Ciardo", "Stanislav Živný"], "date": "2023-05-16", "type": "conference-paper", "venue": "Venue not supplied by OpenAlex" },
+    { "openAlex": "W3212348617", "doi": "10.1145/3519935.3520004", "title": "Hypercontractivity on high dimensional expanders", "authors": ["Tom Gur", "Noam Lifshitz", "Siqi Liu"], "date": "2022-06-09", "type": "conference-paper", "venue": "Venue not supplied by OpenAlex" },
+    { "openAlex": "W4293248662", "doi": "10.1145/3559736.3559740", "title": "An invitation to the promise constraint satisfaction problem", "authors": ["Andrei Krokhin", "Jakub Opršal"], "date": "2022-07-01", "type": "article", "venue": "ACM SIGLOG News" },
+    { "openAlex": "W4316652373", "doi": "10.1137/1.9781611977554.ch86", "title": "Approximate Graph Colouring and Crystals", "authors": ["Lorenzo Ciardo", "Stanislav Živný"], "date": "2023-01-01", "type": "conference-paper", "venue": "Society for Industrial and Applied Mathematics eBooks" },
+    { "openAlex": "W4376651385", "doi": "10.1145/3564246.3585121", "title": "On Approximability of Satisfiable k-CSPs: III", "authors": ["Amey Bhangale", "Subhash Khot", "Dor Minzer"], "date": "2023-05-16", "type": "conference-paper", "venue": "Venue not supplied by OpenAlex" },
+    { "openAlex": "W4375928990", "doi": "10.1109/tac.2023.3274215", "title": "Generalized Invariance Principles for Stochastic Dynamical Systems and Their Applications", "authors": ["Shijie Zhou", "Wei Lin", "Xuerong Mao", "Jianhong Wu"], "date": "2023-05-08", "type": "article", "venue": "IEEE Transactions on Automatic Control" },
+    { "openAlex": "W4376639703", "doi": "10.1145/3564246.3585120", "title": "On Approximability of Satisfiable k-CSPs: II", "authors": ["Amey Bhangale", "Subhash Khot", "Dor Minzer"], "date": "2023-05-16", "type": "conference-paper", "venue": "Venue not supplied by OpenAlex" },
+    { "openAlex": "W4399522327", "doi": "10.1145/3618260.3649635", "title": "Semidefinite Programming and Linear Equations vs. Homomorphism Problems", "authors": ["Lorenzo Ciardo", "Stanislav Živný"], "date": "2024-06-10", "type": "conference-paper", "venue": "Venue not supplied by OpenAlex" },
+    { "openAlex": "W4412543997", "doi": "10.1007/s00037-025-00267-6", "title": "On approximability of satisfiable k-CSPs: I", "authors": ["Amey Bhangale", "Subhash Khot", "Dor Minzer"], "date": "2025-07-22", "type": "article", "venue": "Computational Complexity" },
+    { "openAlex": "W4399889428", "doi": "10.1145/3661814.3662069", "title": "1-in-3 vs. Not-All-Equal: Dichotomy of a broken promise", "authors": ["Lorenzo Ciardo", "Marcin Kozik", "Andrei Krokhin", "Tamio-Vesa Nakajima", "Stanislav Živný"], "date": "2024-06-21", "type": "conference-paper", "venue": "Venue not supplied by OpenAlex" },
+    { "openAlex": "W3217590873", "title": "Hypercontractivity on High Dimensional Expanders: Approximate Efron-Stein Decompositions for ε-Product Spaces", "authors": ["Tom Gur", "Noam Lifshitz", "Siqi Liu"], "date": "2021-11-30", "type": "preprint", "venue": "arXiv" },
+    { "openAlex": "W4311538958", "doi": "10.1145/3568031.3568035", "title": "NP-hardness of 2-to-2 Games", "authors": ["Dor Minzer"], "date": "2022-12-05", "type": "book-chapter", "venue": "ACM eBooks" },
+    { "openAlex": "W4311538962", "doi": "10.1145/3568031.3568038", "title": "Conclusions and Open Problems", "authors": ["Dor Minzer"], "date": "2022-12-05", "type": "book-chapter", "venue": "ACM eBooks" },
+    { "openAlex": "W4311538965", "doi": "10.1145/3568031.3568033", "title": "Introduction", "authors": ["Dor Minzer"], "date": "2022-12-05", "type": "other", "venue": "Venue not supplied by OpenAlex" },
+    { "openAlex": "W4311538967", "doi": "10.1145/3568031.3568034", "title": "Monotonicity Testing and Directed Isoperimetric Inequalities", "authors": ["Dor Minzer"], "date": "2022-12-05", "type": "book-chapter", "venue": "ACM eBooks" },
+    { "openAlex": "W4311539049", "doi": "10.1145/3568031.3568040", "title": "Author Biographies/Index", "authors": ["Dor Minzer"], "date": "2022-12-05", "type": "paratext", "venue": "Venue not supplied by OpenAlex" },
+    { "openAlex": "W4311539061", "doi": "10.1145/3568031.3568039", "title": "Bibliography", "authors": ["Dor Minzer"], "date": "2022-12-05", "type": "paratext", "venue": "Venue not supplied by OpenAlex" },
+    { "openAlex": "W4311539114", "doi": "10.1145/3568031.3568032", "title": "Acknowledgements", "authors": ["Dor Minzer"], "date": "2022-12-05", "type": "paratext", "venue": "Venue not supplied by OpenAlex" },
+    { "openAlex": "W4311539178", "doi": "10.1145/3568031.3568037", "title": "The Biased Long Code and Hardness of Vertex Cover", "authors": ["Dor Minzer"], "date": "2022-12-05", "type": "book-chapter", "venue": "ACM eBooks" },
+    { "openAlex": "W4404849632", "doi": "10.1109/focs61266.2024.00056", "title": "A Dense Model Theorem for the Boolean Slice", "authors": ["Gil Kalai", "Noam Lifshitz", "Dor Minzer", "Tamar Ziegler"], "date": "2024-10-27", "type": "conference-paper", "venue": "Venue not supplied by OpenAlex" },
+    { "openAlex": "W4407769948", "doi": "10.1145/3719007", "title": "1-in-3 vs. Not-All-Equal: Dichotomy of a Broken Promise", "authors": ["Lorenzo Ciardo", "Marcin Kozik", "Andrei Krokhin", "Tamio-Vesa Nakajima", "Stanislav Živný"], "date": "2025-02-20", "type": "article", "venue": "ACM Transactions on Computational Logic" },
+    { "openAlex": "W4411319963", "doi": "10.1145/3717823.3718154", "title": "Hardness of 4-Colouring G-Colourable Graphs", "authors": ["Sergey Avvakumov", "Marek Filakovský", "Jakub Opršal", "Gianluca Tasinato", "Uli Wagner"], "date": "2025-06-15", "type": "conference-paper", "venue": "Venue not supplied by OpenAlex" },
+    { "openAlex": "W4413366411", "doi": "10.1017/s0963548325100114", "title": "On approximability of satisfiable k-CSPs: II", "authors": ["Amey Bhangale", "Subhash Khot", "Dor Minzer"], "date": "2025-08-20", "type": "article", "venue": "Combinatorics Probability and Computing" },
+    { "openAlex": "W4416907084", "doi": "10.1145/3779121", "title": "Hardness of linearly ordered 4-colouring of 3-colourable 3-uniform hypergraphs", "authors": ["Marek Filakovský", "Tamio-Vesa Nakajima", "Jakub Opršal", "Gianluca Tasinato", "Uli Wagner"], "date": "2025-12-02", "type": "article", "venue": "ACM Transactions on Computation Theory" }
+  ]
+}

@@ -168,7 +168,13 @@ export function DistilledPaperPage() {
                   </div>
                   {mode === "distilled" ? (
                     <div>
-                      <h3>{route ? `Proof · ${route.label}` : "Intuition"}</h3>
+                      <h3>
+                        {route
+                          ? `Proof · ${route.label}`
+                          : statement.kind === "conjecture"
+                            ? "Conjectural rationale"
+                            : "Intuition"}
+                      </h3>
                       <MathMarkdown onStatementReference={selectReference}>
                         {route?.proof ?? statement.intuition ?? statement.idea}
                       </MathMarkdown>

@@ -79,7 +79,11 @@ export function topologicalReadingOrder(
 }
 
 export function proofCoverage(paperId: string) {
-  const theoremLike = statementsForPaper(paperId).filter((statement) => statement.proofRoutes.length > 0);
+  const theoremLike = statementsForPaper(paperId).filter((statement) =>
+    ["theorem", "lemma", "proposition", "corollary", "imported-result"].includes(
+      statement.kind,
+    ),
+  );
   const complete = theoremLike.filter((statement) =>
     statement.proofRoutes.some((route) => route.status === "complete"),
   );

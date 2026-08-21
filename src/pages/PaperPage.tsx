@@ -4,6 +4,7 @@ import { CitationNeighborhood, FormalCoveragePanel } from "../components/PaperPa
 import {
   formatDate,
   getPaperStatements,
+  isTheoremLike,
   paperById,
   shortIdentifier,
 } from "../components/content";
@@ -14,9 +15,9 @@ export function PaperPage() {
   const paper = paperId ? paperById.get(paperId) : undefined;
   if (!paper) return <NotFoundPage />;
   const statements = getPaperStatements(paper.id);
-  const resultCount = statements.filter(
-    (statement) => !["definition", "notation"].includes(statement.kind),
-  ).length;
+  const resultCount = statements.filter(isTheoremLike).length;
+  const conjectureCount = statements.filter((statement) => statement.kind === "conjecture").length;
+  const referenceCount = statements.length - resultCount - conjectureCount;
 
   return (
     <div className="paper-page">
@@ -72,8 +73,13 @@ export function PaperPage() {
                 <strong>{resultCount}</strong> results
               </span>
               <span>
-                <strong>{statements.length - resultCount}</strong> definitions & notation
+                <strong>{referenceCount}</strong> definitions & notation
               </span>
+              {conjectureCount ? (
+                <span>
+                  <strong>{conjectureCount}</strong> conjecture{conjectureCount === 1 ? "" : "s"}
+                </span>
+              ) : null}
             </div>
             <div className="source-link-list">
               {paper.sourceLinks.map((source) => (

@@ -36,6 +36,23 @@ describe("NisabaDB application", () => {
     expect(within(selectedPanel).getByText(/complete relative to the listed prerequisites/i)).toBeInTheDocument();
   });
 
+  it("serves the multislice gold rewrite and its source-audited main theorem", () => {
+    renderAt(
+      "/papers/braverman-khot-lifshitz-minzer-2025-invariance-principle-multislice?view=main-invariance&node=BKLM_T01",
+    );
+    expect(screen.getByRole("heading", {
+      name: /an invariance principle for the multi-slice/i,
+    })).toBeInTheDocument();
+    const selectedPanel = screen.getByRole("article", {
+      name: /multilinear invariance principle for the multislice/i,
+    });
+    expect(within(selectedPanel).getByText(/complete relative to the listed prerequisites/i))
+      .toBeInTheDocument();
+    expect(within(selectedPanel).getAllByRole("button", { name: /claim 4\.1/i }).length)
+      .toBeGreaterThan(0);
+    expect(document.querySelector(".katex-error")).not.toBeInTheDocument();
+  });
+
   it("filters the graph by mathematical content without losing its ancestor path", () => {
     renderAt("/papers/dimension-free-dictatorship-tester?view=main");
     fireEvent.change(screen.getByRole("searchbox", { name: /search statements/i }), {

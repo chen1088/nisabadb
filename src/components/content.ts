@@ -41,6 +41,7 @@ export const kindLabels: Record<Statement["kind"], string> = {
   lemma: "Lemma",
   proposition: "Proposition",
   corollary: "Corollary",
+  conjecture: "Conjecture",
   definition: "Definition",
   notation: "Notation",
   "imported-result": "Imported result",
@@ -104,5 +105,7 @@ export function repositoryUrl(
 }
 
 export function isTheoremLike(statement: Statement): boolean {
-  return !["definition", "notation"].includes(statement.kind);
+  return ["theorem", "lemma", "proposition", "corollary", "imported-result"].includes(
+    statement.kind,
+  );
 }

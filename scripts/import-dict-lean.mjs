@@ -4,6 +4,8 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
 import vm from "node:vm";
+import { assembleCorpus } from "./corpus-assembly.mjs";
+import { bklmPaperPack } from "./paper-packs/bklm-invariance.mjs";
 import { proofOverrides } from "./proof-overrides.mjs";
 
 const args = new Map();
@@ -557,14 +559,14 @@ const mainPaper = {
 };
 
 const neighborhood = JSON.parse(await readFile("data/citation-neighborhood.json", "utf8"));
-const corpus = {
+const corpus = assembleCorpus({
   schemaVersion: "1.0.0",
   generatedAt,
-  papers: [mainPaper, ...neighborhood.papers],
-  statements,
-  citationEdges: neighborhood.citationEdges,
-  ingestionQueue: neighborhood.ingestionQueue,
-};
+  primaryPapers: [mainPaper],
+  primaryStatements: statements,
+  neighborhood,
+  goldPacks: [bklmPaperPack],
+});
 
 await mkdir("data/source-snapshots", { recursive: true });
 await mkdir("src/data", { recursive: true });

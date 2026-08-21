@@ -1,0 +1,46 @@
+{
+  "id": "https://openalex.org/W999000111",
+  "doi": "https://doi.org/10.5555/FIXTURE.2024.1",
+  "title": "A Fixture Theorem for Citation Graphs",
+  "display_name": "A Fixture Theorem for Citation Graphs",
+  "publication_year": 2024,
+  "publication_date": "2024-02-03",
+  "type": "article",
+  "authorships": [
+    {
+      "author": {
+        "display_name": "Ada Example"
+      }
+    },
+    {
+      "author": {
+        "display_name": "Emmy Fixture"
+      }
+    }
+  ],
+  "primary_location": {
+    "landing_page_url": "https://doi.org/10.5555/FIXTURE.2024.1",
+    "license": "cc-by",
+    "source": {
+      "display_name": "Journal of Reproducible Fixtures"
+    }
+  },
+  "best_oa_location": {
+    "landing_page_url": "https://example.test/fixture",
+    "license": "cc-by"
+  },
+  "biblio": {
+    "volume": "7",
+    "issue": "2",
+    "first_page": "10",
+    "last_page": "24"
+  },
+  "ids": {
+    "openalex": "https://openalex.org/W999000111",
+    "doi": "https://doi.org/10.5555/FIXTURE.2024.1"
+  },
+  "referenced_works": [
+    "https://openalex.org/W123"
+  ],
+  "cited_by_count": 4
+}

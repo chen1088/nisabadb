@@ -1,0 +1,428 @@
+{
+  "auditAsOf": "2026-08-21T19:31:18.000Z",
+  "targetTitle": "A Dimension-Free Dictatorship Tester on the Symmetric Group",
+  "targetIdentity": {
+    "doi": null,
+    "arxiv": null,
+    "openAlex": null,
+    "semanticScholar": null,
+    "dataCite": null
+  },
+  "records": [
+    {
+      "id": "blais-2009-testing-juntas-nearly-optimally",
+      "bibKey": "Blais2009",
+      "kind": "conference-paper",
+      "title": "Testing juntas nearly optimally",
+      "authors": ["Eric Blais"],
+      "date": "2009-05-31",
+      "venue": "Proceedings of the 41st Annual ACM Symposium on Theory of Computing (STOC), pages 151-158",
+      "citationLines": [272],
+      "identifiers": { "doi": "10.1145/1536414.1536437", "openAlex": "W2009813398" },
+      "sourceLinks": [
+        { "label": "DOI", "url": "https://doi.org/10.1145/1536414.1536437" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W2009813398" }
+      ],
+      "license": "No normalized reusable full-text license confirmed.",
+      "providerRecords": [
+        { "provider": "Crossref", "id": "10.1145/1536414.1536437", "evidenceUrl": "https://api.crossref.org/works/10.1145%2F1536414.1536437" },
+        { "provider": "OpenAlex", "id": "W2009813398", "evidenceUrl": "https://api.openalex.org/works/W2009813398" }
+      ]
+    },
+    {
+      "id": "braverman-khot-lifshitz-minzer-2025-invariance-principle-multislice",
+      "bibKey": "BKLM2021",
+      "kind": "journal-article",
+      "title": "An invariance principle for the multi-slice, with applications",
+      "authors": ["Mark Braverman", "Subhash Khot", "Noam Lifshitz", "Dor Minzer"],
+      "date": "2025-11",
+      "venue": "Advances in Mathematics 480, article 110460",
+      "citationLines": [281],
+      "identifiers": { "doi": "10.1016/j.aim.2025.110460", "openAlex": "W4413142925", "arxiv": "2110.10725v2", "internal": "related-doi:10.1109/focs52979.2021.00030" },
+      "sourceLinks": [
+        { "label": "DOI", "url": "https://doi.org/10.1016/j.aim.2025.110460" },
+        { "label": "arXiv", "url": "https://arxiv.org/abs/2110.10725" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W4413142925" }
+      ],
+      "license": "No normalized reusable full-text license confirmed.",
+      "providerRecords": [
+        { "provider": "Crossref", "id": "10.1016/j.aim.2025.110460", "evidenceUrl": "https://api.crossref.org/works/10.1016%2Fj.aim.2025.110460" },
+        { "provider": "OpenAlex", "id": "W4413142925", "evidenceUrl": "https://api.openalex.org/works/W4413142925" },
+        { "provider": "arXiv", "id": "2110.10725v2", "evidenceUrl": "https://export.arxiv.org/api/query?id_list=2110.10725" }
+      ]
+    },
+    {
+      "id": "chen-servedio-tan-waingarten-xie-2017-nonadaptive-junta-testing",
+      "bibKey": "CSTWX2017",
+      "kind": "conference-paper",
+      "title": "Settling the Query Complexity of Non-Adaptive Junta Testing",
+      "authors": ["Xi Chen", "Rocco A. Servedio", "Li-Yang Tan", "Erik Waingarten", "Jinyu Xie"],
+      "date": "2017",
+      "venue": "32nd Computational Complexity Conference, LIPIcs 79, article 26",
+      "citationLines": [273],
+      "identifiers": { "doi": "10.4230/lipics.ccc.2017.26", "openAlex": "W3198849096", "arxiv": "1704.06314v1", "internal": "related-doi:10.1145/3213772" },
+      "sourceLinks": [
+        { "label": "DOI", "url": "https://doi.org/10.4230/LIPIcs.CCC.2017.26" },
+        { "label": "arXiv", "url": "https://arxiv.org/abs/1704.06314" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W3198849096" }
+      ],
+      "license": "CC-BY-3.0",
+      "providerRecords": [
+        { "provider": "DataCite", "id": "10.4230/lipics.ccc.2017.26", "evidenceUrl": "https://api.datacite.org/dois/10.4230%2FLIPIcs.CCC.2017.26" },
+        { "provider": "OpenAlex", "id": "W3198849096", "evidenceUrl": "https://api.openalex.org/works/W3198849096" },
+        { "provider": "arXiv", "id": "1704.06314v1", "evidenceUrl": "https://export.arxiv.org/api/query?id_list=1704.06314" }
+      ]
+    },
+    {
+      "id": "ellis-filmus-friedgut-2015-quasi-stability-dictatorships-sn",
+      "bibKey": "EFFQuasi",
+      "kind": "journal-article",
+      "title": "A quasi-stability result for dictatorships in S_n",
+      "authors": ["David Ellis", "Yuval Filmus", "Ehud Friedgut"],
+      "date": "2015-10",
+      "venue": "Combinatorica 35(5), pages 573-618",
+      "citationLines": [277],
+      "identifiers": { "doi": "10.1007/s00493-014-3027-1", "openAlex": "W2122024168", "arxiv": "1209.5557v8" },
+      "sourceLinks": [
+        { "label": "DOI", "url": "https://doi.org/10.1007/s00493-014-3027-1" },
+        { "label": "arXiv", "url": "https://arxiv.org/abs/1209.5557" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W2122024168" }
+      ],
+      "license": "No normalized reusable full-text license confirmed.",
+      "providerRecords": [
+        { "provider": "Crossref", "id": "10.1007/s00493-014-3027-1", "evidenceUrl": "https://api.crossref.org/works/10.1007%2Fs00493-014-3027-1" },
+        { "provider": "OpenAlex", "id": "W2122024168", "evidenceUrl": "https://api.openalex.org/works/W2122024168" },
+        { "provider": "arXiv", "id": "1209.5557v8", "evidenceUrl": "https://export.arxiv.org/api/query?id_list=1209.5557" }
+      ]
+    },
+    {
+      "id": "ellis-filmus-friedgut-2015-balanced-dictatorships-sn",
+      "bibKey": "EFFBalanced",
+      "kind": "journal-article",
+      "title": "A stability result for balanced dictatorships in S_n",
+      "authors": ["David Ellis", "Yuval Filmus", "Ehud Friedgut"],
+      "date": "2015-05",
+      "venue": "Random Structures & Algorithms 46(3), pages 494-530",
+      "citationLines": [277],
+      "identifiers": { "doi": "10.1002/rsa.20515", "openAlex": "W1732472973", "arxiv": "1210.3989v4" },
+      "sourceLinks": [
+        { "label": "DOI", "url": "https://doi.org/10.1002/rsa.20515" },
+        { "label": "arXiv", "url": "https://arxiv.org/abs/1210.3989" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W1732472973" }
+      ],
+      "license": "No normalized reusable full-text license confirmed.",
+      "providerRecords": [
+        { "provider": "Crossref", "id": "10.1002/rsa.20515", "evidenceUrl": "https://api.crossref.org/works/10.1002%2Frsa.20515" },
+        { "provider": "OpenAlex", "id": "W1732472973", "evidenceUrl": "https://api.openalex.org/works/W1732472973" },
+        { "provider": "arXiv", "id": "1210.3989v4", "evidenceUrl": "https://export.arxiv.org/api/query?id_list=1210.3989" }
+      ]
+    },
+    {
+      "id": "ellis-filmus-friedgut-2017-low-degree-boolean-functions-sn",
+      "bibKey": "EFFLowDegree",
+      "kind": "journal-article",
+      "title": "Low-degree Boolean functions on S_n, with an application to isoperimetry",
+      "authors": ["David Ellis", "Yuval Filmus", "Ehud Friedgut"],
+      "date": "2017",
+      "venue": "Forum of Mathematics, Sigma 5, article e23",
+      "citationLines": [277, 406],
+      "identifiers": { "doi": "10.1017/fms.2017.24", "openAlex": "W2963406632", "arxiv": "1511.08694v2" },
+      "sourceLinks": [
+        { "label": "DOI", "url": "https://doi.org/10.1017/fms.2017.24" },
+        { "label": "arXiv", "url": "https://arxiv.org/abs/1511.08694" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W2963406632" }
+      ],
+      "license": "CC-BY-4.0",
+      "providerRecords": [
+        { "provider": "Crossref", "id": "10.1017/fms.2017.24", "evidenceUrl": "https://api.crossref.org/works/10.1017%2Ffms.2017.24" },
+        { "provider": "OpenAlex", "id": "W2963406632", "evidenceUrl": "https://api.openalex.org/works/W2963406632" },
+        { "provider": "arXiv", "id": "1511.08694v2", "evidenceUrl": "https://export.arxiv.org/api/query?id_list=1511.08694" }
+      ]
+    },
+    {
+      "id": "ellis-friedgut-pilpel-2011-intersecting-families-permutations",
+      "bibKey": "EFP2011",
+      "kind": "journal-article",
+      "title": "Intersecting families of permutations",
+      "authors": ["David Ellis", "Ehud Friedgut", "Haran Pilpel"],
+      "date": "2011-01-31",
+      "venue": "Journal of the American Mathematical Society 24(3), pages 649-682",
+      "citationLines": [276, 406],
+      "identifiers": { "doi": "10.1090/s0894-0347-2011-00690-5", "openAlex": "W1984685721", "arxiv": "1011.3342v2" },
+      "sourceLinks": [
+        { "label": "DOI", "url": "https://doi.org/10.1090/S0894-0347-2011-00690-5" },
+        { "label": "arXiv", "url": "https://arxiv.org/abs/1011.3342" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W1984685721" }
+      ],
+      "license": "No normalized reusable full-text license confirmed.",
+      "providerRecords": [
+        { "provider": "Crossref", "id": "10.1090/s0894-0347-2011-00690-5", "evidenceUrl": "https://api.crossref.org/works/10.1090%2Fs0894-0347-2011-00690-5" },
+        { "provider": "OpenAlex", "id": "W1984685721", "evidenceUrl": "https://api.openalex.org/works/W1984685721" },
+        { "provider": "arXiv", "id": "1011.3342v2", "evidenceUrl": "https://export.arxiv.org/api/query?id_list=1011.3342" }
+      ]
+    },
+    {
+      "id": "filmus-2020-fkn-theorem-multislice",
+      "bibKey": "FilmusMultislice",
+      "kind": "journal-article",
+      "title": "FKN theorem for the multislice, with applications",
+      "authors": ["Yuval Filmus"],
+      "date": "2020-03",
+      "venue": "Combinatorics, Probability and Computing 29(2), pages 200-212",
+      "citationLines": [279],
+      "identifiers": { "doi": "10.1017/s0963548319000361", "openAlex": "W2890621164", "arxiv": "1809.03089v1" },
+      "sourceLinks": [
+        { "label": "DOI", "url": "https://doi.org/10.1017/S0963548319000361" },
+        { "label": "arXiv", "url": "https://arxiv.org/abs/1809.03089" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W2890621164" }
+      ],
+      "license": "No normalized reusable full-text license confirmed.",
+      "providerRecords": [
+        { "provider": "Crossref", "id": "10.1017/s0963548319000361", "evidenceUrl": "https://api.crossref.org/works/10.1017%2Fs0963548319000361" },
+        { "provider": "OpenAlex", "id": "W2890621164", "evidenceUrl": "https://api.openalex.org/works/W2890621164" },
+        { "provider": "arXiv", "id": "1809.03089v1", "evidenceUrl": "https://export.arxiv.org/api/query?id_list=1809.03089" }
+      ]
+    },
+    {
+      "id": "filmus-2021-boolean-functions-sn-nearly-linear",
+      "bibKey": "Filmus2021",
+      "kind": "journal-article",
+      "title": "Boolean functions on S_n which are nearly linear",
+      "authors": ["Yuval Filmus"],
+      "date": "2021-12-13",
+      "venue": "Discrete Analysis, 2021:25, 27 pages",
+      "citationLines": [278],
+      "identifiers": { "doi": "10.19086/da.30186", "openAlex": "W4205451935", "arxiv": "2107.07833v2" },
+      "sourceLinks": [
+        { "label": "Journal", "url": "https://discreteanalysisjournal.com/article/30186-boolean-functions-on-s_n-which-are-nearly-linear" },
+        { "label": "DOI", "url": "https://doi.org/10.19086/da.30186" },
+        { "label": "arXiv", "url": "https://arxiv.org/abs/2107.07833" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W4205451935" }
+      ],
+      "license": "CC-BY-4.0",
+      "providerRecords": [
+        { "provider": "Discrete Analysis", "id": "30186", "evidenceUrl": "https://discreteanalysisjournal.com/article/30186-boolean-functions-on-s_n-which-are-nearly-linear" },
+        { "provider": "OpenAlex", "id": "W4205451935", "evidenceUrl": "https://api.openalex.org/works/W4205451935" },
+        { "provider": "arXiv", "id": "2107.07833v2", "evidenceUrl": "https://export.arxiv.org/api/query?id_list=2107.07833" }
+      ]
+    },
+    {
+      "id": "odonnell-2014-analysis-boolean-functions",
+      "bibKey": "ODonnell2014",
+      "kind": "book",
+      "title": "Analysis of Boolean Functions",
+      "authors": ["Ryan O'Donnell"],
+      "date": "2014-06-05",
+      "venue": "Cambridge University Press",
+      "citationLines": [274],
+      "identifiers": { "doi": "10.1017/cbo9781139814782", "openAlex": "W1891181203", "isbn": "9781107038325", "internal": "related-arxiv:2105.10386v1" },
+      "sourceLinks": [
+        { "label": "DOI", "url": "https://doi.org/10.1017/CBO9781139814782" },
+        { "label": "Later arXiv edition", "url": "https://arxiv.org/abs/2105.10386" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W1891181203" }
+      ],
+      "license": "No normalized reusable full-text license confirmed for the cited edition.",
+      "providerRecords": [
+        { "provider": "Crossref", "id": "10.1017/cbo9781139814782", "evidenceUrl": "https://api.crossref.org/works/10.1017%2Fcbo9781139814782" },
+        { "provider": "OpenAlex", "id": "W1891181203", "evidenceUrl": "https://api.openalex.org/works/W1891181203" }
+      ]
+    },
+    {
+      "id": "james-kerber-1981-representation-theory-symmetric-group",
+      "bibKey": "JamesKerber1981",
+      "kind": "book",
+      "title": "The Representation Theory of the Symmetric Group",
+      "authors": ["Gordon D. James", "Adalbert Kerber"],
+      "date": "1981",
+      "venue": "Encyclopedia of Mathematics and its Applications 16, Addison-Wesley",
+      "citationLines": [1138, 1328, 1453],
+      "identifiers": { "isbn": "9780201135152", "internal": "openlibrary:OL8265839W" },
+      "sourceLinks": [
+        { "label": "Open Library work", "url": "https://openlibrary.org/works/OL8265839W" },
+        { "label": "Open Library edition", "url": "https://openlibrary.org/books/OL22618629M" }
+      ],
+      "license": "No normalized reusable full-text license confirmed. A later Cambridge reissue has a different DOI and is not merged with this cited edition.",
+      "providerRecords": [
+        { "provider": "Open Library", "id": "OL8265839W", "evidenceUrl": "https://openlibrary.org/search.json?title=The%20Representation%20Theory%20of%20the%20Symmetric%20Group&author=Gordon%20James" }
+      ]
+    },
+    {
+      "id": "sagan-2001-symmetric-group-second-edition",
+      "bibKey": "Sagan2001",
+      "kind": "book",
+      "title": "The Symmetric Group: Representations, Combinatorial Algorithms, and Symmetric Functions",
+      "authors": ["Bruce E. Sagan"],
+      "date": "2001",
+      "venue": "Graduate Texts in Mathematics 203, second edition, Springer",
+      "citationLines": [1138, 1328, 1453, 1760],
+      "identifiers": { "doi": "10.1007/978-1-4757-6804-6", "openAlex": "W2495029002", "isbn": "9780387950679" },
+      "sourceLinks": [
+        { "label": "DOI", "url": "https://doi.org/10.1007/978-1-4757-6804-6" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W2495029002" }
+      ],
+      "license": "No normalized reusable full-text license confirmed.",
+      "providerRecords": [
+        { "provider": "Crossref", "id": "10.1007/978-1-4757-6804-6", "evidenceUrl": "https://api.crossref.org/works/10.1007%2F978-1-4757-6804-6" },
+        { "provider": "OpenAlex", "id": "W2495029002", "evidenceUrl": "https://api.openalex.org/works/W2495029002" }
+      ]
+    },
+    {
+      "id": "vershik-okounkov-2005-new-approach-symmetric-groups-2",
+      "bibKey": "OkounkovVershik2005",
+      "kind": "journal-article",
+      "title": "A New Approach to the Representation Theory of the Symmetric Groups. II",
+      "authors": ["A. M. Vershik", "A. Yu. Okounkov"],
+      "date": "2005-11",
+      "venue": "Journal of Mathematical Sciences 131(2), pages 5471-5494",
+      "citationLines": [1138, 1194, 1453, 1760],
+      "identifiers": { "doi": "10.1007/s10958-005-0421-7", "openAlex": "W2906379215", "arxiv": "math/0503040v3" },
+      "sourceLinks": [
+        { "label": "DOI", "url": "https://doi.org/10.1007/s10958-005-0421-7" },
+        { "label": "arXiv", "url": "https://arxiv.org/abs/math/0503040" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W2906379215" }
+      ],
+      "license": "No normalized reusable full-text license confirmed.",
+      "providerRecords": [
+        { "provider": "Crossref", "id": "10.1007/s10958-005-0421-7", "evidenceUrl": "https://api.crossref.org/works/10.1007%2Fs10958-005-0421-7" },
+        { "provider": "OpenAlex", "id": "W2906379215", "evidenceUrl": "https://api.openalex.org/works/W2906379215" },
+        { "provider": "arXiv", "id": "math/0503040v3", "evidenceUrl": "https://export.arxiv.org/api/query?id_list=math%2F0503040" }
+      ]
+    },
+    {
+      "id": "etingof-et-al-2011-introduction-representation-theory",
+      "bibKey": "EtingofRepTheory",
+      "kind": "book",
+      "title": "Introduction to Representation Theory",
+      "authors": ["Pavel Etingof", "Oleg Golberg", "Sebastian Hensel", "Tiankai Liu", "Alex Schwendner", "Dmitry Vaintrob", "Elena Yudovina"],
+      "date": "2011-07-26",
+      "venue": "Student Mathematical Library 59, American Mathematical Society",
+      "citationLines": [1292, 1328, 1386],
+      "identifiers": { "doi": "10.1090/stml/059", "openAlex": "W4297849754", "arxiv": "0901.0827v5", "isbn": "9780821853511" },
+      "sourceLinks": [
+        { "label": "DOI", "url": "https://doi.org/10.1090/stml/059" },
+        { "label": "arXiv", "url": "https://arxiv.org/abs/0901.0827" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W4297849754" }
+      ],
+      "license": "No normalized reusable full-text license confirmed.",
+      "providerRecords": [
+        { "provider": "Crossref", "id": "10.1090/stml/059", "evidenceUrl": "https://api.crossref.org/works/10.1090%2Fstml%2F059" },
+        { "provider": "OpenAlex", "id": "W4297849754", "evidenceUrl": "https://api.openalex.org/works/W4297849754" },
+        { "provider": "arXiv", "id": "0901.0827v5", "evidenceUrl": "https://export.arxiv.org/api/query?id_list=0901.0827" }
+      ]
+    },
+    {
+      "id": "serre-1977-linear-representations-finite-groups",
+      "bibKey": "Serre1977",
+      "kind": "book",
+      "title": "Linear Representations of Finite Groups",
+      "authors": ["Jean-Pierre Serre"],
+      "date": "1977",
+      "venue": "Graduate Texts in Mathematics, Springer",
+      "citationLines": [1292, 1328, 1386],
+      "identifiers": { "doi": "10.1007/978-1-4684-9458-7", "openAlex": "W1596185498", "isbn": "9781468494600" },
+      "sourceLinks": [
+        { "label": "DOI", "url": "https://doi.org/10.1007/978-1-4684-9458-7" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W1596185498" }
+      ],
+      "license": "No normalized reusable full-text license confirmed.",
+      "providerRecords": [
+        { "provider": "Crossref", "id": "10.1007/978-1-4684-9458-7", "evidenceUrl": "https://api.crossref.org/works/10.1007%2F978-1-4684-9458-7" },
+        { "provider": "OpenAlex", "id": "W1596185498", "evidenceUrl": "https://api.openalex.org/works/W1596185498" }
+      ]
+    },
+    {
+      "id": "oono-yoshida-2016-testing-properties-functions-finite-groups",
+      "bibKey": "OonoYoshida2015",
+      "kind": "journal-article",
+      "title": "Testing properties of functions on finite groups",
+      "authors": ["Kenta Oono", "Yuichi Yoshida"],
+      "date": "2016-02-16",
+      "venue": "Random Structures & Algorithms 49(3), pages 579-598",
+      "citationLines": [284],
+      "identifiers": { "doi": "10.1002/rsa.20639", "openAlex": "W2964058770", "arxiv": "1509.00930v1" },
+      "sourceLinks": [
+        { "label": "DOI", "url": "https://doi.org/10.1002/rsa.20639" },
+        { "label": "arXiv", "url": "https://arxiv.org/abs/1509.00930" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W2964058770" }
+      ],
+      "license": "No normalized reusable full-text license confirmed.",
+      "providerRecords": [
+        { "provider": "Crossref", "id": "10.1002/rsa.20639", "evidenceUrl": "https://api.crossref.org/works/10.1002%2Frsa.20639" },
+        { "provider": "OpenAlex", "id": "W2964058770", "evidenceUrl": "https://api.openalex.org/works/W2964058770" },
+        { "provider": "arXiv", "id": "1509.00930v1", "evidenceUrl": "https://export.arxiv.org/api/query?id_list=1509.00930" }
+      ]
+    },
+    {
+      "id": "parnas-ron-samorodnitsky-2002-testing-basic-boolean-formulae",
+      "bibKey": "PRS2002",
+      "kind": "journal-article",
+      "title": "Testing Basic Boolean Formulae",
+      "authors": ["Michal Parnas", "Dana Ron", "Alex Samorodnitsky"],
+      "date": "2002-01",
+      "venue": "SIAM Journal on Discrete Mathematics 16(1), pages 20-46",
+      "citationLines": [272],
+      "identifiers": { "doi": "10.1137/s0895480101407444", "openAlex": "W2055194501" },
+      "sourceLinks": [
+        { "label": "DOI", "url": "https://doi.org/10.1137/S0895480101407444" },
+        { "label": "OpenAlex", "url": "https://openalex.org/W2055194501" }
+      ],
+      "license": "No normalized reusable full-text license confirmed.",
+      "providerRecords": [
+        { "provider": "Crossref", "id": "10.1137/s0895480101407444", "evidenceUrl": "https://api.crossref.org/works/10.1137%2Fs0895480101407444" },
+        { "provider": "OpenAlex", "id": "W2055194501", "evidenceUrl": "https://api.openalex.org/works/W2055194501" }
+      ]
+    }
+  ],
+  "bibliographyOnly": [
+    {
+      "bibKey": "DFLLV2021",
+      "title": "Complexity Measures on the Symmetric Group and Beyond",
+      "inTextCitationCount": 0,
+      "identifiers": { "doi": "10.4230/lipics.itcs.2021.87", "openAlex": "W3134996725", "arxiv": "2010.07405v1" }
+    },
+    {
+      "bibKey": "BowmanDeVisscherOrellana2013",
+      "title": "The partition algebra and the Kronecker coefficients",
+      "inTextCitationCount": 0,
+      "identifiers": { "doi": "10.1090/s0002-9947-2014-06245-4", "openAlex": "W2057998637", "arxiv": "1210.5579v6" }
+    }
+  ],
+  "incomingScan": {
+    "discoveredCount": 0,
+    "complete": false,
+    "status": "target-unindexed",
+    "interpretation": "Zero provider-visible incoming citations, not proof of zero real-world citations.",
+    "queries": [
+      {
+        "provider": "OpenAlex",
+        "url": "https://api.openalex.org/works?filter=title.search.exact:A%20Dimension-Free%20Dictatorship%20Tester%20on%20the%20Symmetric%20Group&per-page=25&select=id,doi,display_name,publication_year,authorships,ids,cited_by_count",
+        "result": "0 exact matches",
+        "retrievedAt": "2026-08-21T19:30:56.150Z"
+      },
+      {
+        "provider": "Crossref",
+        "url": "https://api.crossref.org/works?query.title=A%20Dimension-Free%20Dictatorship%20Tester%20on%20the%20Symmetric%20Group&rows=20&select=DOI,title,author,published,container-title,type,URL,score",
+        "result": "20 candidates, 0 exact normalized-title matches",
+        "retrievedAt": "2026-08-21T19:25:20.668Z"
+      },
+      {
+        "provider": "arXiv",
+        "url": "https://export.arxiv.org/api/query?search_query=ti:%22A%20Dimension-Free%20Dictatorship%20Tester%20on%20the%20Symmetric%20Group%22&start=0&max_results=20",
+        "result": "0 results",
+        "retrievedAt": "2026-08-21T19:25:39.511Z"
+      },
+      {
+        "provider": "DataCite",
+        "url": "https://api.datacite.org/dois?query=titles.title%3A%22A%20Dimension-Free%20Dictatorship%20Tester%20on%20the%20Symmetric%20Group%22&page[size]=25",
+        "result": "0 results",
+        "retrievedAt": "2026-08-21T19:30:48.896Z"
+      },
+      {
+        "provider": "Semantic Scholar",
+        "url": "https://api.semanticscholar.org/graph/v1/paper/search/match?query=A%20Dimension-Free%20Dictatorship%20Tester%20on%20the%20Symmetric%20Group&fields=paperId,title,authors,year,venue,externalIds,citationCount,referenceCount,url",
+        "result": "HTTP 404, title match not found",
+        "retrievedAt": "2026-08-21T19:31:02.605Z"
+      }
+    ]
+  }
+}

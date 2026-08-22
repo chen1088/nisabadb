@@ -2,6 +2,70 @@
 
 Status date: 2026-08-22
 
+## Cloud continuation snapshot
+
+This file is the handoff for continuing NisabaDB from another machine or a cloud development environment.
+
+- Canonical repository: `https://github.com/chen1088/nisabadb`
+- Canonical branch: `main`; continue from `origin/main`, not from an old local checkout or an unmerged branch.
+- Live site: `https://chen1088.github.io/nisabadb/`
+- Live Knowledge book: `https://chen1088.github.io/nisabadb/knowledge`
+- Content baseline before this handoff: `6ae6841268ea46ec2e876e6fdc5445185c700e52` (`Write the first compressed Knowledge volume`).
+- Deployment: every push to `main` runs `.github/workflows/deploy-pages.yml`, executes the full check, builds with `VITE_BASE_PATH=/nisabadb/`, and publishes GitHub Pages.
+- Verified milestone workflow: `https://github.com/chen1088/nisabadb/actions/runs/32584795993` completed successfully.
+- Hosting boundary: the public site is a static browser application. It currently has no runtime backend, cloud secrets, DigitalOcean worker, or proof-submission service.
+- Required runtime: Node.js 24 and the committed npm lockfile.
+- Snapshot verification: 13 test files and 106 tests pass; the ordinary build and GitHub Pages base-path build pass; the `6ae6841` deployment completed successfully.
+- The repository was clean and synchronized with `origin/main` when this handoff was written.
+
+Resume with:
+
+```sh
+git clone https://github.com/chen1088/nisabadb.git
+cd nisabadb
+git switch main
+git pull --ff-only origin main
+npm ci
+npm run check
+npm run dev
+```
+
+On Windows PowerShell, use `npm.cmd` if script execution policy blocks `npm.ps1`. Before publishing, run `npm run check`; a push to `main` is not complete until the Pages workflow succeeds and the live route is verified. Do not commit `dist/`.
+
+Read these files before changing the mathematical model:
+
+| File | Authority |
+| --- | --- |
+| `STATUS.md` | Current verified claims, open gaps, and continuation order |
+| `ARCHITECTURE.md` | Data ownership, schema boundaries, trust model, and route structure |
+| `src/data/knowledge.json` | The 60 actually written Knowledge lessons, chapter order, notation use, direct prerequisite edges, and source lineage |
+| `src/data/knowledge-roadmap.ts` | The provisional 126-chapter map; Draft mappings are not review claims and Planned entries are not lessons |
+| `src/data/knowledge-schema.ts` and `src/data/knowledge-roadmap-schema.ts` | Executable invariants for the written book and its planning map |
+| `src/data/compression.json` | Candidate whole-field compression clusters and residual hypotheses |
+| `data/knowledge/source-records.json` | The approved 688-record reference registry |
+| `data/knowledge/coverage-ledger.json` | Exact-edition and theorem-occurrence coverage; its present zero counts are real gates |
+| `src/data/corpus.json` | Generated public paper corpus; regenerate it from the immutable inputs described in `README.md` rather than hand-editing it |
+| `src/pages/KnowledgePage.tsx` | Reader-first Knowledge interface; references must remain subordinate to the rewritten book |
+
+Non-negotiable status boundaries for the next session:
+
+1. `initial-rewrite` means written but unreviewed. All 60 Knowledge lessons have that status; the reviewed count is 0.
+2. Only 20 roadmap chapters contain draft lessons. The other 106 are Planned, non-clickable, and must not be presented as written.
+3. Textbooks and other materials are references and non-omission evidence, not public curriculum units. NisabaDB writes one independent book in one notation.
+4. The 688 source records do not yet constitute theorem coverage: exact editions, theorem occurrences, and verified source-to-Knowledge mappings are all 0.
+5. The 60-node Knowledge prerequisite graph is authoritative for written material and must remain acyclic and transitively reduced. A convenient reading order does not create a dependency.
+6. Candidate roadmap dependencies and compression clusters are editorial hypotheses. Do not upgrade them to reviewed or minimized routes without mathematical and administrative review.
+7. The static GitHub Pages application is deployed. The distributed DigitalOcean prompt-worker and prover-submission service are not implemented or deployed yet.
+
+Default continuation order, unless the user gives a newer priority:
+
+1. Independently review the current 60 lessons for mathematical correctness, zero-background readability, notation consistency, and undeclared prerequisite use. Keep review evidence separate from authorship.
+2. Repair the written DAG whenever a lesson uses a concept outside its prerequisite closure; prefer rewriting the example to adding a large unnecessary prerequisite.
+3. Start the first unbuilt roadmap chapter, `R003` “Scope, binding, and substitution,” as complete tutorial nodes with examples and exercises—not as a title-only stub.
+4. Re-run the roadmap and content tests, then repeat chapter by chapter while looking for shared concepts that allow nodes or edges to be merged.
+5. In parallel, resolve source editions and inventory theorem occurrences. Never claim that all 688 references are covered until the coverage ledger proves it.
+6. Continue gold-paper proof distillation and feed only reusable, independently rewritten concepts into Knowledge with explicit lineage.
+
 ## Product structure
 
 - The primary navigation is Knowledge, Papers, Unsolved, and Train; the brand remains the home link.

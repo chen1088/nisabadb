@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0.0",
+  "phase": "source-dependency-graph",
+  "identity": {
+    "bookGraphId": "S0636:complete-source",
+    "sourceSetRevision": "approved-2026-08-22-r1",
+    "sourceRecordId": "S0636",
+    "sourceOrdinal": 636,
+    "familyId": "F27",
+    "sourceTitle": "Actuarial Mathematics for Life Contingent Risks",
+    "sourceAuthorLine": "David C. M. Dickson, Mary R. Hardy, Howard R. Waters",
+    "sourceRawCitation": "Actuarial Mathematics for Life Contingent Risks — David C. M. Dickson, Mary R. Hardy, Howard R. Waters",
+    "componentId": "complete-source",
+    "componentLabel": "Complete source named by this row"
+  },
+  "exactEdition": null,
+  "sourceUnits": [],
+  "unitInventories": [],
+  "graph": {
+    "nodes": [],
+    "externalInputs": [],
+    "directDependencies": [],
+    "proofRoutes": [],
+    "references": []
+  },
+  "extractionState": {
+    "status": "awaiting-edition",
+    "extractionAudit": null,
+    "independentReview": null,
+    "note": "Awaiting acquisition and identification of the exact edition before theorem extraction."
+  },
+  "graphState": {
+    "status": "not-started",
+    "graphAudit": null,
+    "independentReview": null,
+    "note": "Phase-I source dependency graph has not been extracted."
+  }
+}

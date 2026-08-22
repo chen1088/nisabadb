@@ -11,12 +11,13 @@ const compressionProgram = JSON.parse(
 );
 const allowedCoverageFiles = new Set([
   "source-records.json",
-  "coverage-ledger.json",
   "verification-policy.json",
 ]);
+const allowedBookDataPath = /^(?:manifest\.json|S\d{4}\/[a-z0-9][a-z0-9-]*\.json)$/;
 
 function serveKnowledgeCoverageData() {
-  const dataRoot = fileURLToPath(new URL("./data/knowledge/", import.meta.url));
+  const knowledgeDataRoot = fileURLToPath(new URL("./data/knowledge/", import.meta.url));
+  const bookDataRoot = fileURLToPath(new URL("./data/books/", import.meta.url));
   return {
     name: "serve-knowledge-coverage-data",
     configureServer(server: { middlewares: { use: (handler: (request: { url?: string }, response: { statusCode: number; setHeader: (name: string, value: string) => void; end: (body?: string) => void }, next: () => void) => void) => void } }) {
@@ -25,15 +26,26 @@ function serveKnowledgeCoverageData() {
         const marker = "/_knowledge-coverage/";
         const markerIndex = pathname.indexOf(marker);
         if (markerIndex < 0) return next();
-        const filename = decodeURIComponent(pathname.slice(markerIndex + marker.length));
-        if (!allowedCoverageFiles.has(filename)) {
+        let requestedPath: string;
+        try {
+          requestedPath = decodeURIComponent(pathname.slice(markerIndex + marker.length));
+        } catch {
+          response.statusCode = 400;
+          response.end("Bad request");
+          return;
+        }
+        const isBookData = requestedPath.startsWith("books/");
+        const bookPath = isBookData ? requestedPath.slice("books/".length) : "";
+        if ((!isBookData && !allowedCoverageFiles.has(requestedPath))
+          || (isBookData && !allowedBookDataPath.test(bookPath))) {
           response.statusCode = 404;
           response.end("Not found");
           return;
         }
+        const dataPath = isBookData ? `${bookDataRoot}/${bookPath}` : `${knowledgeDataRoot}/${requestedPath}`;
         response.setHeader("Content-Type", "application/json; charset=utf-8");
         response.setHeader("Cache-Control", "no-store");
-        response.end(readFileSync(`${dataRoot}/${filename}`, "utf8"));
+        response.end(readFileSync(dataPath, "utf8"));
       });
     },
   };
@@ -44,6 +56,12 @@ export default defineConfig({
   plugins: [react(), serveKnowledgeCoverageData()],
   define: {
     __SOURCE_RECORD_COUNT__: JSON.stringify(sourceRegistry.records.length),
+    __SOURCE_COMPONENT_COUNT__: JSON.stringify(
+      sourceRegistry.records.reduce(
+        (total: number, record: { requiredEditionComponents: unknown[] }) => total + record.requiredEditionComponents.length,
+        0,
+      ),
+    ),
     __COMPRESSION_CLUSTER_COUNT__: JSON.stringify(compressionProgram.clusters.length),
     __COMPRESSION_RESIDUAL_COUNT__: JSON.stringify(
       compressionProgram.clusters.reduce(

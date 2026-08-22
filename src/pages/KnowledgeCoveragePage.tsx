@@ -1,19 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { knowledgeBook, knowledgeNodes } from "../data/knowledge";
 import {
-  deriveCoverageSummary,
-  validateSourceCoverage,
-  type SourceCoverageLedger,
-  type SourceRegistry,
-  type VerificationPolicy,
-} from "../data/source-coverage-schema";
+  bookGraphManifestSchema,
+  validateBookGraphFile,
+  type BookGraphFile,
+  type BookGraphManifest,
+} from "../data/book-graph-schema";
+import { sourceRegistrySchema, type SourceRegistry } from "../data/source-coverage-schema";
 
 type CoverageData = {
   registry: SourceRegistry;
-  ledger: SourceCoverageLedger;
-  verificationPolicy: VerificationPolicy;
+  manifest: BookGraphManifest;
 };
+
+type ManifestEntry = BookGraphManifest["entries"][number];
 
 const pageSize = 30;
 
@@ -32,11 +32,62 @@ function humanize(value: string) {
   return value.replaceAll("-", " ");
 }
 
+function entryMetricsMatchFile(entry: ManifestEntry, file: BookGraphFile) {
+  const theoremNodeCount = file.graph.nodes.filter((node) => node.nodeClass === "theorem-like").length;
+  const routedTheoremIds = new Set(file.graph.proofRoutes.map((route) => route.theoremNodeId));
+  const unroutedTheoremCount = file.graph.nodes.filter((node) => (
+    node.nodeClass === "theorem-like" && !routedTheoremIds.has(node.id)
+  )).length;
+  const supportNodeCount = file.graph.nodes.length - theoremNodeCount;
+  const reviewedDependencyCount = file.graph.directDependencies.filter((dependency) => (
+    dependency.evidence.status === "reviewed"
+  )).length;
+  const unresolvedReferenceCount = file.graph.references.filter((reference) => (
+    reference.resolution.status === "unresolved"
+  )).length;
+
+  return entry.extractionStatus === file.extractionState.status
+    && entry.graphStatus === file.graphState.status
+    && entry.exactEditionResolved === (file.exactEdition !== null)
+    && entry.sourceUnitCount === file.sourceUnits.length
+    && entry.inventoriedSourceUnitCount === file.unitInventories.filter((inventory) => inventory.evidence.status !== "pending").length
+    && entry.reviewedSourceUnitCount === file.unitInventories.filter((inventory) => inventory.evidence.status === "reviewed").length
+    && entry.theoremNodeCount === theoremNodeCount
+    && entry.unroutedTheoremCount === unroutedTheoremCount
+    && entry.supportNodeCount === supportNodeCount
+    && entry.dependencyCount === file.graph.directDependencies.length
+    && entry.reviewedDependencyCount === reviewedDependencyCount
+    && entry.unresolvedReferenceCount === unresolvedReferenceCount;
+}
+
+function aggregateStatus(entries: readonly ManifestEntry[]) {
+  const statusCounts = new Map<string, number>();
+  for (const entry of entries) {
+    statusCounts.set(entry.graphStatus, (statusCounts.get(entry.graphStatus) ?? 0) + 1);
+  }
+  return [...statusCounts.entries()]
+    .map(([status, count]) => entries.length === 1 ? humanize(status) : `${count} ${humanize(status)}`)
+    .join(" · ");
+}
+
+function targetLabel(file: BookGraphFile, type: "node" | "external-input", id: string) {
+  if (type === "node") {
+    const node = file.graph.nodes.find((candidate) => candidate.id === id);
+    return node ? `${node.title} (${id})` : id;
+  }
+  const input = file.graph.externalInputs.find((candidate) => candidate.id === id);
+  return input ? `${input.label} (${id})` : id;
+}
+
 export function KnowledgeCoveragePage() {
   const [parameters] = useSearchParams();
   const { hash } = useLocation();
   const [data, setData] = useState<CoverageData | null>(null);
   const [error, setError] = useState("");
+  const [selectedGraph, setSelectedGraph] = useState<BookGraphFile | null>(null);
+  const [selectedGraphPath, setSelectedGraphPath] = useState("");
+  const [selectedGraphError, setSelectedGraphError] = useState("");
+  const [selectedGraphLoading, setSelectedGraphLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [familyId, setFamilyId] = useState(parameters.get("family") ?? "all");
   const [page, setPage] = useState(1);
@@ -45,35 +96,43 @@ export function KnowledgeCoveragePage() {
     const controller = new AbortController();
     const load = async () => {
       try {
-        const [registryResponse, ledgerResponse, policyResponse] = await Promise.all([
+        const [registryResponse, manifestResponse] = await Promise.all([
           fetch(coverageDataUrl("source-records.json"), { signal: controller.signal }),
-          fetch(coverageDataUrl("coverage-ledger.json"), { signal: controller.signal }),
-          fetch(coverageDataUrl("verification-policy.json"), { signal: controller.signal }),
+          fetch(coverageDataUrl("books/manifest.json"), { signal: controller.signal }),
         ]);
-        if (!registryResponse.ok || !ledgerResponse.ok || !policyResponse.ok) {
-          throw new Error("The coverage data could not be loaded.");
+        if (!registryResponse.ok || !manifestResponse.ok) {
+          throw new Error("The source registry or book-graph manifest could not be loaded.");
         }
-        const validated = validateSourceCoverage(
-          await registryResponse.json(),
-          await ledgerResponse.json(),
-          await policyResponse.json(),
-          {
-            knowledgeNodes: knowledgeNodes.map((node) => ({
-              id: node.id,
-              contentSha256: node.contentSha256,
-            })),
-            knowledgeEdition: knowledgeBook.edition,
-          },
-        );
-        setData(validated);
+        const registry = sourceRegistrySchema.parse(await registryResponse.json());
+        const manifest = bookGraphManifestSchema.parse(await manifestResponse.json());
+        const requiredComponentCount = registry.records.reduce((count, record) => (
+          count + record.requiredEditionComponents.length
+        ), 0);
+        if (manifest.sourceSetRevision !== registry.sourceSetRevision
+          || manifest.sourceRecordCount !== registry.records.length
+          || manifest.componentFileCount !== requiredComponentCount
+          || manifest.entries.length !== requiredComponentCount) {
+          throw new Error("The book-graph manifest does not match the approved source registry.");
+        }
+        setData({ registry, manifest });
       } catch (loadError) {
         if (controller.signal.aborted) return;
-        setError(loadError instanceof Error ? loadError.message : "The coverage data could not be loaded.");
+        setError(loadError instanceof Error ? loadError.message : "The source graph index could not be loaded.");
       }
     };
     void load();
     return () => controller.abort();
   }, []);
+
+  const entriesByRecord = useMemo(() => {
+    const result = new Map<string, ManifestEntry[]>();
+    for (const entry of data?.manifest.entries ?? []) {
+      const entries = result.get(entry.sourceRecordId) ?? [];
+      entries.push(entry);
+      result.set(entry.sourceRecordId, entries);
+    }
+    return result;
+  }, [data]);
 
   const normalizedQuery = query.trim().toLocaleLowerCase();
   const visibleRecords = useMemo(() => {
@@ -91,21 +150,53 @@ export function KnowledgeCoveragePage() {
   const safePage = Math.min(page, pageCount);
   const pageRecords = visibleRecords.slice((safePage - 1) * pageSize, safePage * pageSize);
   const selectedRecordId = parameters.get("source");
+  const requestedComponentId = parameters.get("component");
   const selectedRecord = data?.registry.records.find((record) => record.id === selectedRecordId);
+  const selectedEntries = selectedRecord ? entriesByRecord.get(selectedRecord.id) ?? [] : [];
+  const selectedEntry = selectedEntries.find((entry) => entry.componentId === requestedComponentId)
+    ?? selectedEntries[0];
   const familyById = new Map(data?.registry.families.map((family) => [family.id, family]) ?? []);
-  const editionById = new Map(data?.ledger.editions.map((edition) => [edition.id, edition]) ?? []);
-  const claimById = new Map(data?.ledger.canonicalClaims.map((claim) => [claim.id, claim]) ?? []);
-  const residualById = new Map(data?.ledger.residualArtifacts.map((artifact) => [artifact.id, artifact]) ?? []);
-  const summary = data ? deriveCoverageSummary(data.registry, data.ledger) : null;
-  const selectedEditions = selectedRecord?.editionIds
-    .map((editionId) => editionById.get(editionId))
-    .filter((edition): edition is SourceCoverageLedger["editions"][number] => Boolean(edition)) ?? [];
-  const selectedOccurrences = data?.ledger.theoremOccurrences.filter((occurrence) => (
-    selectedRecord?.editionIds.includes(occurrence.editionId)
-  )) ?? [];
 
   useEffect(() => {
-    if (!data || !selectedRecord) return;
+    if (!data || !selectedRecord || !selectedEntry) {
+      return;
+    }
+
+    const controller = new AbortController();
+    const load = async () => {
+      try {
+        await Promise.resolve();
+        if (controller.signal.aborted) return;
+        setSelectedGraph(null);
+        setSelectedGraphPath(selectedEntry.path);
+        setSelectedGraphError("");
+        setSelectedGraphLoading(true);
+        const response = await fetch(coverageDataUrl(`books/${selectedEntry.path}`), {
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error(`The graph file ${selectedEntry.path} could not be loaded.`);
+        const file = validateBookGraphFile(await response.json());
+        if (file.identity.sourceSetRevision !== data.registry.sourceSetRevision
+          || file.identity.bookGraphId !== selectedEntry.bookGraphId
+          || file.identity.sourceRecordId !== selectedRecord.id
+          || file.identity.componentId !== selectedEntry.componentId
+          || !entryMetricsMatchFile(selectedEntry, file)) {
+          throw new Error(`The graph file ${selectedEntry.path} does not match its manifest entry.`);
+        }
+        setSelectedGraph(file);
+      } catch (loadError) {
+        if (controller.signal.aborted) return;
+        setSelectedGraphError(loadError instanceof Error ? loadError.message : "The selected graph could not be loaded.");
+      } finally {
+        if (!controller.signal.aborted) setSelectedGraphLoading(false);
+      }
+    };
+    void load();
+    return () => controller.abort();
+  }, [data, selectedEntry, selectedRecord]);
+
+  useEffect(() => {
+    if (!data || !selectedRecord || selectedGraphLoading) return;
     const targetId = hash ? decodeURIComponent(hash.slice(1)) : "selected-source-title";
     const timer = window.setTimeout(() => {
       const target = document.getElementById(targetId);
@@ -113,168 +204,269 @@ export function KnowledgeCoveragePage() {
       target?.focus({ preventScroll: true });
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [data, hash, selectedRecord]);
+  }, [data, hash, selectedGraph, selectedGraphLoading, selectedRecord]);
 
-  const inventoryLabel = (record: SourceRegistry["records"][number]) => {
-    if (record.resolutionState === "unresolved") return "Queued";
-    if (record.resolutionState === "duplicate-record") return `Duplicate of ${record.duplicateOfRecordId}`;
-    const states = record.editionIds.map((editionId) => editionById.get(editionId)?.inventoryState ?? "missing-edition");
-    return states.length ? states.map(humanize).join(" · ") : "Missing edition";
-  };
+  const summary = data?.manifest.summary;
+  const componentCount = data?.manifest.componentFileCount ?? __SOURCE_COMPONENT_COUNT__;
+  const candidateDependencyCount = summary
+    ? summary.dependencyCount - summary.reviewedDependencyCount
+    : 0;
 
   return (
     <div className="coverage-page">
       <header className="coverage-hero page-shell">
         <div>
-          <p className="audit-breadcrumb"><Link to="/knowledge">Knowledge</Link><span>/</span> Source coverage</p>
-          <p className="eyebrow">The non-omission ledger</p>
-          <h1>Every source theorem gets a durable address.</h1>
+          <p className="audit-breadcrumb"><Link to="/knowledge">Knowledge</Link><span>/</span> Source graphs</p>
+          <p className="eyebrow">Phase I · one graph file per required book component</p>
+          <h1>Build the dependency graph before compressing the library.</h1>
           <p>
-            The learner reads one rewritten textbook. Behind it, every theorem-like result in every
-            exact source edition must retain its locator and an explicit mathematical disposition.
+            Each approved source gets its own durable JSON graph. The first job is to identify the
+            exact edition, inventory every theorem-like and supporting node, and record its direct
+            proof dependencies. Compression and simplification remain a later phase.
           </p>
           <div className="coverage-hero-actions">
             <a href="#source-registry">Inspect the source registry</a>
-            <Link to="/knowledge/compression">See how ideas converge</Link>
+            <Link to="/knowledge">Return to Knowledge</Link>
           </div>
         </div>
-        <aside aria-label="Coverage promise">
-          <span>Coverage floor</span>
-          <strong>Nothing disappears during compression.</strong>
-          <p>Theorems, lemmas, propositions, corollaries, named results, and results embedded in exercises are all in scope.</p>
+        <aside aria-label="Phase-I scope">
+          <span>Approved corpus</span>
+          <strong>{data?.registry.records.length ?? __SOURCE_RECORD_COUNT__} records · {componentCount} component files</strong>
+          <p>A multi-volume source has one independently loadable graph file for each required component.</p>
         </aside>
       </header>
 
       <section className="coverage-progress page-shell" aria-labelledby="coverage-progress-title" aria-live="polite">
         <header>
-          <p className="eyebrow">Derived from validated records, never typed by hand</p>
-          <h2 id="coverage-progress-title">Coverage is incomplete—and visibly so.</h2>
+          <p className="eyebrow">Derived from the book-graph manifest</p>
+          <h2 id="coverage-progress-title">Phase-I progress is explicit.</h2>
         </header>
-        {error ? <p className="coverage-load-error">{error}</p> : null}
-        {!summary && !error ? <p className="coverage-loading">Loading the exact source ledger…</p> : null}
-        {summary ? (
+        {error ? <p className="coverage-load-error" role="alert">{error}</p> : null}
+        {!summary && !error ? <p className="coverage-loading">Loading the source registry and graph manifest…</p> : null}
+        {summary && data ? (
           <>
-            <dl aria-label="Theorem coverage status">
-              <div><dt>Source rows resolved</dt><dd>{ratio(summary.resolvedRecords, summary.sourceRecords)}</dd></div>
-              <div><dt>Source rows fully reconciled</dt><dd>{ratio(summary.completeRecords, summary.sourceRecords)}</dd></div>
-              <div><dt>Exact editions fully inventoried</dt><dd>{ratio(summary.completeEditions, summary.editions)}</dd></div>
-              <div><dt>Administrator-verified terminal dispositions</dt><dd>{ratio(summary.terminalOccurrences, summary.theoremOccurrences)}</dd></div>
+            <dl aria-label="Source dependency graph status">
+              <div><dt>Approved source records</dt><dd>{data.registry.records.length.toLocaleString()}</dd></div>
+              <div><dt>Component JSON files</dt><dd>{ratio(data.manifest.entries.length, componentCount)}</dd></div>
+              <div><dt>Exact editions identified</dt><dd>{ratio(summary.exactEditionResolvedCount, componentCount)}</dd></div>
+              <div><dt>Reviewed-complete graphs</dt><dd>{ratio(summary.reviewedCompleteGraphCount, componentCount)}</dd></div>
+              <div><dt>Theorem-like nodes</dt><dd>{summary.theoremNodeCount.toLocaleString()}</dd></div>
+              <div><dt>Theorem nodes without a route</dt><dd>{summary.unroutedTheoremCount.toLocaleString()}</dd></div>
+              <div><dt>Supporting nodes</dt><dd>{summary.supportNodeCount.toLocaleString()}</dd></div>
+              <div><dt>Dependencies · candidate / reviewed</dt><dd>{candidateDependencyCount.toLocaleString()} / {summary.reviewedDependencyCount.toLocaleString()}</dd></div>
+              <div><dt>Unresolved source references</dt><dd>{summary.unresolvedReferenceCount.toLocaleString()}</dd></div>
             </dl>
             <p className="coverage-terminal-breakdown">
-              Verified Knowledge mappings: <strong>{summary.verifiedMappings}</strong>
+              Source units: <strong>{summary.sourceUnitCount.toLocaleString()}</strong>
               <span>·</span>
-              Verified retained residuals: <strong>{summary.verifiedResiduals}</strong>
+              Inventoried / reviewed units: <strong>{summary.inventoriedSourceUnitCount.toLocaleString()} / {summary.reviewedSourceUnitCount.toLocaleString()}</strong>
               <span>·</span>
-              Whole source universe: <strong>{summary.sourceUniverseComplete ? "complete" : "incomplete"}</strong>
+              Reviewed extractions: <strong>{summary.reviewedExtractionCount.toLocaleString()}</strong>
+              <span>·</span>
+              Components awaiting an edition: <strong>{summary.awaitingEditionCount.toLocaleString()}</strong>
             </p>
           </>
         ) : null}
         <p className="coverage-progress-note">
-          The earlier 662-record research pool gained 26 gap-filling entries before approval. The fingerprint-locked target is therefore <strong>{summary?.sourceRecords ?? __SOURCE_RECORD_COUNT__} source records</strong>, not an estimated deduplicated count.
+          The manifest indexes every required component, while this page fetches only the graph file
+          selected below. The 126-chapter Knowledge roadmap is not used as a corpus-coverage count.
         </p>
       </section>
 
       <section className="coverage-model page-shell" aria-labelledby="coverage-model-title">
         <div>
-          <p className="eyebrow">Three separate identities</p>
-          <h2 id="coverage-model-title">Repetition is merged only after the source occurrence survives.</h2>
+          <p className="eyebrow">The source-first data model</p>
+          <h2 id="coverage-model-title">Every book remains inspectable on its own terms.</h2>
         </div>
         <ol>
-          <li><span>01</span><strong>Source occurrence</strong><p>One exact edition, immutable source unit, label, locator, and independently rewritten claim.</p></li>
-          <li><span>02</span><strong>Canonical claim</strong><p>Equivalent hypotheses and conclusions converge; stronger, weaker, and overlapping claims remain related.</p></li>
-          <li><span>03</span><strong>Knowledge node or residual</strong><p>The beginner sees the best tutorial route; distinct mathematics remains as a separately reviewed residual artifact.</p></li>
+          <li><span>01</span><strong>Exact source</strong><p>A pinned edition, source-unit manifest, stable locator, format, license, and artifact fingerprints.</p></li>
+          <li><span>02</span><strong>Local graph</strong><p>Theorem-like and support nodes, direct dependencies, proof routes, external inputs, and source references.</p></li>
+          <li><span>03</span><strong>Independent review</strong><p>Extraction and graph states advance separately; candidate evidence never masquerades as reviewed completion.</p></li>
         </ol>
       </section>
 
       <section className="source-registry page-shell" id="source-registry" aria-labelledby="source-registry-title">
         <header>
           <div>
-            <p className="eyebrow">Exact approved intake</p>
+            <p className="eyebrow">Approved intake · {componentCount} individually addressable files</p>
             <h2 id="source-registry-title">The source registry</h2>
-            <p>This is an accountability index, not a reading list or a Materials shelf.</p>
+            <p>Select a record, then choose one of its required book components.</p>
           </div>
           {data ? <strong>{visibleRecords.length.toLocaleString()} matching records</strong> : null}
         </header>
 
-        {selectedRecord ? (
+        {selectedRecord && selectedEntry ? (
           <aside className="selected-source-record" aria-labelledby="selected-source-title">
-            <div><span>{selectedRecord.id}</span><small>{humanize(selectedRecord.resolutionState)}</small></div>
+            <div><span>{selectedRecord.id}</span><small>{selectedEntries.length} component{selectedEntries.length === 1 ? "" : "s"}</small></div>
             <h3 id="selected-source-title" tabIndex={-1}>{selectedRecord.title}</h3>
             <p>{selectedRecord.authorLine}</p>
             <dl>
               <div><dt>Intake branch</dt><dd>{familyById.get(selectedRecord.familyId)?.title}</dd></div>
-              <div><dt>Required edition components</dt><dd>{selectedRecord.requiredEditionComponents.map((component) => component.label).join(" · ")}</dd></div>
-              <div><dt>Exact editions</dt><dd>{selectedRecord.editionIds.length ? selectedRecord.editionIds.join(" · ") : "Not resolved yet"}</dd></div>
-              <div><dt>Theorem occurrences</dt><dd>{selectedOccurrences.length}</dd></div>
-              <div><dt>Administrator resolution</dt><dd>{selectedRecord.resolutionReview ? `Reviewed by ${selectedRecord.resolutionReview.actorId}` : "Not reviewed"}</dd></div>
+              <div><dt>Selected component</dt><dd>{selectedEntry.componentLabel}</dd></div>
+              <div><dt>Extraction state</dt><dd>{humanize(selectedEntry.extractionStatus)}</dd></div>
+              <div><dt>Graph state</dt><dd>{humanize(selectedEntry.graphStatus)}</dd></div>
+              <div><dt>Graph file</dt><dd>{selectedEntry.path}</dd></div>
             </dl>
 
-            {selectedRecord.resolutionState === "duplicate-record" ? (
-              <p className="selected-source-empty">This row is retained and resolves through {selectedRecord.duplicateOfRecordId}. Its duplicate evidence remains administrator-reviewed.</p>
-            ) : null}
-            {selectedRecord.resolutionState === "unresolved" ? (
-              <p className="selected-source-empty">The theorem inventory cannot begin until all {selectedRecord.requiredEditionComponents.length} required edition component{selectedRecord.requiredEditionComponents.length === 1 ? " is" : "s are"} fixed and fingerprinted.</p>
-            ) : null}
+            <nav className="book-component-choices" aria-label={`Components of ${selectedRecord.title}`}>
+              {selectedEntries.map((entry) => (
+                <Link
+                  className={entry.componentId === selectedEntry.componentId ? "is-current" : undefined}
+                  key={entry.bookGraphId}
+                  to={`/knowledge/coverage?source=${selectedRecord.id}&component=${entry.componentId}`}
+                  aria-current={entry.componentId === selectedEntry.componentId ? "page" : undefined}
+                >
+                  <strong>{entry.componentLabel}</strong>
+                  <span>{humanize(entry.extractionStatus)} · {humanize(entry.graphStatus)}</span>
+                </Link>
+              ))}
+            </nav>
 
-            {selectedEditions.map((edition) => {
-              const occurrences = selectedOccurrences.filter((occurrence) => occurrence.editionId === edition.id);
-              return (
-                <section className="source-edition-audit" key={edition.id} aria-labelledby={`${edition.id}-title`}>
-                  <header>
-                    <div><span>Exact edition</span><strong id={`${edition.id}-title`}>{edition.label}</strong></div>
-                    <small>{humanize(edition.inventoryState)}</small>
-                  </header>
-                  <dl>
-                    <div><dt>Stable locator</dt><dd>{edition.stableLocator}</dd></div>
-                    <div><dt>Required component</dt><dd>{selectedRecord.requiredEditionComponents.find((component) => component.id === edition.sourceComponentId)?.label ?? edition.sourceComponentId}</dd></div>
-                    <div><dt>Immutable source units</dt><dd>{edition.sourceUnits.length}</dd></div>
-                    <div><dt>Inventoried theorem occurrences</dt><dd>{occurrences.length}</dd></div>
+            <div className="selected-book-graph" aria-live="polite">
+              {selectedGraphLoading ? <p className="coverage-loading">Loading {selectedGraphPath}…</p> : null}
+              {selectedGraphError ? <p className="coverage-load-error" role="alert">{selectedGraphError}</p> : null}
+              {selectedGraph ? (
+                <>
+                  <section className="source-edition-audit" aria-labelledby={`${selectedGraph.identity.componentId}-edition-title`}>
+                    <header>
+                      <div>
+                        <span>Exact edition</span>
+                        <strong id={`${selectedGraph.identity.componentId}-edition-title`}>
+                          {selectedGraph.exactEdition?.label ?? "Not identified yet"}
+                        </strong>
+                      </div>
+                      <small>{humanize(selectedGraph.extractionState.status)} · {humanize(selectedGraph.graphState.status)}</small>
+                    </header>
+                    {selectedGraph.exactEdition ? (
+                      <dl>
+                        <div><dt>Stable locator</dt><dd>{selectedGraph.exactEdition.stableLocator}</dd></div>
+                        <div><dt>Publication</dt><dd>{[selectedGraph.exactEdition.publisher, selectedGraph.exactEdition.publicationYear].filter(Boolean).join(" · ") || "Not supplied"}</dd></div>
+                        <div><dt>Format / access</dt><dd>{humanize(selectedGraph.exactEdition.sourceFormat)} · {humanize(selectedGraph.exactEdition.accessKind)}</dd></div>
+                        <div><dt>Source revision</dt><dd>{selectedGraph.exactEdition.sourceRevision ?? "No repository revision"}</dd></div>
+                        <div><dt>Source units</dt><dd>{selectedGraph.sourceUnits.length.toLocaleString()} {humanize(selectedGraph.exactEdition.sourceUnitKind)} units</dd></div>
+                        <div><dt>License</dt><dd>{selectedGraph.exactEdition.licenseSpdx ?? "Not supplied"}</dd></div>
+                        <div><dt>License note</dt><dd>{selectedGraph.exactEdition.licenseNote}</dd></div>
+                      </dl>
+                    ) : (
+                      <p className="selected-source-empty">This component remains queued until an exact edition is fixed and fingerprinted.</p>
+                    )}
+                    <p><strong>Extraction:</strong> {selectedGraph.extractionState.note}</p>
+                    <p><strong>Graph:</strong> {selectedGraph.graphState.note}</p>
+                  </section>
+
+                  <dl className="book-graph-overview" aria-label="Selected component graph counts">
+                    <div><dt>Theorem-like nodes</dt><dd>{selectedEntry.theoremNodeCount}</dd></div>
+                    <div><dt>Theorems without a route</dt><dd>{selectedEntry.unroutedTheoremCount}</dd></div>
+                    <div><dt>Support nodes</dt><dd>{selectedEntry.supportNodeCount}</dd></div>
+                    <div><dt>Inventoried source units</dt><dd>{selectedEntry.inventoriedSourceUnitCount} / {selectedEntry.sourceUnitCount}</dd></div>
+                    <div><dt>Reviewed source units</dt><dd>{selectedEntry.reviewedSourceUnitCount}</dd></div>
+                    <div><dt>Direct dependencies</dt><dd>{selectedEntry.dependencyCount}</dd></div>
+                    <div><dt>Reviewed dependencies</dt><dd>{selectedEntry.reviewedDependencyCount}</dd></div>
+                    <div><dt>Proof routes</dt><dd>{selectedGraph.graph.proofRoutes.length}</dd></div>
+                    <div><dt>External inputs</dt><dd>{selectedGraph.graph.externalInputs.length}</dd></div>
+                    <div><dt>References</dt><dd>{selectedGraph.graph.references.length}</dd></div>
+                    <div><dt>Unresolved references</dt><dd>{selectedEntry.unresolvedReferenceCount}</dd></div>
                   </dl>
-                  {occurrences.length ? (
-                    <div className="theorem-occurrence-list">
-                      {occurrences.map((occurrence) => (
-                        <article id={occurrence.id} key={occurrence.id} tabIndex={-1}>
-                          <header>
-                            <span>{occurrence.id} · {humanize(occurrence.kind)} · {occurrence.sourceLabel} · {occurrence.locator}</span>
-                            <small>{humanize(occurrence.decisionStatus)} · {humanize(occurrence.disposition)}</small>
-                          </header>
-                          <h4>{occurrence.normalizedTitle}</h4>
-                          <p>{occurrence.normalizedClaim}</p>
-                          <dl>
-                            <div><dt>Immutable source unit</dt><dd>{occurrence.sourceUnitId}</dd></div>
-                            <div><dt>Mapping relation</dt><dd>{occurrence.relation ? humanize(occurrence.relation) : "No canonical mapping"}</dd></div>
-                            <div><dt>Reason</dt><dd>{occurrence.reason}</dd></div>
-                            <div><dt>Administrative review</dt><dd>{occurrence.administrativeReview ? `${occurrence.administrativeReview.actorId} · ${occurrence.administrativeReview.reviewedAt}` : "Not reviewed"}</dd></div>
-                            <div><dt>Review evidence</dt><dd>{occurrence.administrativeReview?.evidenceSha256 ?? "Not reviewed"}</dd></div>
-                          </dl>
-                          <div>
-                            {occurrence.targetCanonicalClaimIds.map((claimId) => {
-                              const claim = claimById.get(claimId);
-                              return claim ? (
-                                <section key={claimId}>
-                                  <strong>{claim.id} · {claim.title}</strong>
-                                  <p>{claim.normalizedStatement}</p>
-                                  {claim.knowledgeTargets.map((target) => (
-                                    <Link key={target.knowledgeNodeId} to={`/knowledge?node=${target.knowledgeNodeId}`}>
-                                      {target.knowledgeNodeId} in {target.knowledgeEdition}
-                                    </Link>
-                                  ))}
-                                </section>
-                              ) : null;
-                            })}
-                            {occurrence.targetResidualArtifactIds.map((artifactId) => {
-                              const artifact = residualById.get(artifactId);
-                              return artifact ? <section key={artifactId}><strong>{artifact.title}</strong><p>{artifact.reason}</p></section> : null;
-                            })}
-                          </div>
-                          <Link className="theorem-occurrence-permalink" to={`/knowledge/coverage?source=${selectedRecord.id}#${occurrence.id}`}>Permanent occurrence address</Link>
-                        </article>
-                      ))}
-                    </div>
-                  ) : <p className="selected-source-empty">No theorem occurrence is published for this edition yet.</p>}
-                </section>
-              );
-            })}
+
+                  <section className="book-graph-section" aria-labelledby="selected-graph-nodes-title">
+                    <header><h4 id="selected-graph-nodes-title">Graph nodes</h4><span>{selectedGraph.graph.nodes.length.toLocaleString()}</span></header>
+                    {selectedGraph.graph.nodes.length ? (
+                      <div className="theorem-occurrence-list">
+                        {selectedGraph.graph.nodes.map((node) => (
+                          <article id={node.id} key={node.id} tabIndex={-1}>
+                            <header>
+                              <span>{node.id} · {humanize(node.nodeClass)} · {humanize(node.kind)}</span>
+                              <small>{node.evidence.status}</small>
+                            </header>
+                            <h4>{node.title}</h4>
+                            <p>{node.normalizedStatement}</p>
+                            <dl>
+                              <div><dt>Source label</dt><dd>{node.sourceLabel}</dd></div>
+                              <div><dt>Source locator</dt><dd>{node.sourceLocator}</dd></div>
+                              <div><dt>Source XML ID</dt><dd>{node.sourceXmlId ?? "None"}</dd></div>
+                              <div><dt>Evidence units</dt><dd>{node.evidence.sourceUnitIds.join(" · ") || "Pending"}</dd></div>
+                            </dl>
+                            <Link className="theorem-occurrence-permalink" to={`/knowledge/coverage?source=${selectedRecord.id}&component=${selectedEntry.componentId}#${node.id}`}>Permanent node address</Link>
+                          </article>
+                        ))}
+                      </div>
+                    ) : <p className="selected-source-empty">No theorem-like or supporting nodes have been published for this component yet.</p>}
+                  </section>
+
+                  <section className="book-graph-section" aria-labelledby="selected-external-inputs-title">
+                    <header><h4 id="selected-external-inputs-title">External inputs</h4><span>{selectedGraph.graph.externalInputs.length.toLocaleString()}</span></header>
+                    {selectedGraph.graph.externalInputs.length ? (
+                      <div className="theorem-occurrence-list">
+                        {selectedGraph.graph.externalInputs.map((input) => (
+                          <article id={input.id} key={input.id} tabIndex={-1}>
+                            <header><span>{input.id} · {humanize(input.kind)}</span><small>{input.evidence.status}</small></header>
+                            <h4>{input.label}</h4>
+                            <p>{input.normalizedStatement}</p>
+                            <p><strong>Source:</strong> {input.sourceCitation}</p>
+                          </article>
+                        ))}
+                      </div>
+                    ) : <p className="selected-source-empty">No external inputs are recorded.</p>}
+                  </section>
+
+                  <section className="book-graph-section" aria-labelledby="selected-dependencies-title">
+                    <header><h4 id="selected-dependencies-title">Direct dependencies</h4><span>{selectedGraph.graph.directDependencies.length.toLocaleString()}</span></header>
+                    {selectedGraph.graph.directDependencies.length ? (
+                      <div className="theorem-occurrence-list">
+                        {selectedGraph.graph.directDependencies.map((dependency) => (
+                          <article id={dependency.id} key={dependency.id} tabIndex={-1}>
+                            <header><span>{dependency.id} · {humanize(dependency.role)}</span><small>{dependency.evidence.status}</small></header>
+                            <h4>{targetLabel(selectedGraph, "node", dependency.dependentNodeId)}</h4>
+                            <p>Depends directly on <strong>{targetLabel(selectedGraph, dependency.prerequisite.type, dependency.prerequisite.id)}</strong>.</p>
+                            <p>{dependency.rationale}</p>
+                          </article>
+                        ))}
+                      </div>
+                    ) : <p className="selected-source-empty">No direct dependency edges are recorded yet.</p>}
+                  </section>
+
+                  <section className="book-graph-section" aria-labelledby="selected-proof-routes-title">
+                    <header><h4 id="selected-proof-routes-title">Proof routes</h4><span>{selectedGraph.graph.proofRoutes.length.toLocaleString()}</span></header>
+                    {selectedGraph.graph.proofRoutes.length ? (
+                      <div className="theorem-occurrence-list">
+                        {selectedGraph.graph.proofRoutes.map((route) => (
+                          <article id={route.id} key={route.id} tabIndex={-1}>
+                            <header><span>{route.id} · {humanize(route.routeKind)}</span><small>{route.evidence.status}</small></header>
+                            <h4>{targetLabel(selectedGraph, "node", route.theoremNodeId)}</h4>
+                            <p>{route.summary}</p>
+                            <p><strong>Dependency edges:</strong> {route.dependencyIds.length ? route.dependencyIds.join(" · ") : "None (root attestation)"}</p>
+                          </article>
+                        ))}
+                      </div>
+                    ) : <p className="selected-source-empty">No proof routes or root attestations are recorded yet.</p>}
+                  </section>
+
+                  <section className="book-graph-section" aria-labelledby="selected-references-title">
+                    <header><h4 id="selected-references-title">Source references</h4><span>{selectedGraph.graph.references.length.toLocaleString()}</span></header>
+                    {selectedGraph.graph.references.length ? (
+                      <div className="theorem-occurrence-list">
+                        {selectedGraph.graph.references.map((reference) => (
+                          <article id={reference.id} key={reference.id} tabIndex={-1}>
+                            <header>
+                              <span>{reference.id} · {humanize(reference.basis)} · {reference.ref}</span>
+                              <small>{reference.resolution.status} · {reference.evidence.status}</small>
+                            </header>
+                            <h4>{targetLabel(selectedGraph, "node", reference.ownerNodeId)}</h4>
+                            <p>{reference.context}</p>
+                            <dl>
+                              <div><dt>Source locator</dt><dd>{reference.locator}</dd></div>
+                              <div><dt>Resolution</dt><dd>{reference.resolution.status === "resolved" ? targetLabel(selectedGraph, reference.resolution.target.type, reference.resolution.target.id) : "Unresolved"}</dd></div>
+                              <div><dt>Dependency edge</dt><dd>{reference.resolution.status === "resolved" ? reference.resolution.directDependencyId ?? "Statement reference only" : "None"}</dd></div>
+                              <div><dt>Resolution note</dt><dd>{reference.resolution.note}</dd></div>
+                            </dl>
+                          </article>
+                        ))}
+                      </div>
+                    ) : <p className="selected-source-empty">No proof or statement references are recorded yet.</p>}
+                  </section>
+                </>
+              ) : null}
+            </div>
             <Link to="/knowledge/coverage">Close source detail</Link>
           </aside>
         ) : null}
@@ -296,17 +488,22 @@ export function KnowledgeCoveragePage() {
         {data ? (
           <div className="source-registry-table-wrap">
             <table className="source-registry-table">
-              <thead><tr><th>Record</th><th>Source</th><th>Intake branch</th><th>Exact edition set</th><th>Inventory</th></tr></thead>
+              <thead><tr><th>Record</th><th>Source</th><th>Intake branch</th><th>Component files</th><th>Graph state</th></tr></thead>
               <tbody>
-                {pageRecords.map((record) => (
-                  <tr key={record.id}>
-                    <td><Link to={`/knowledge/coverage?source=${record.id}`}>{record.id}</Link></td>
-                    <td><strong>{record.title}</strong><span>{record.authorLine}</span></td>
-                    <td>{familyById.get(record.familyId)?.title}</td>
-                    <td>{record.editionIds.length ? record.editionIds.join(" · ") : record.resolutionState === "duplicate-record" ? `See ${record.duplicateOfRecordId}` : "Unresolved"}</td>
-                    <td><span data-state={record.resolutionState}>{inventoryLabel(record)}</span></td>
-                  </tr>
-                ))}
+                {pageRecords.map((record) => {
+                  const entries = entriesByRecord.get(record.id) ?? [];
+                  const firstEntry = entries[0];
+                  const exactEditionCount = entries.filter((entry) => entry.exactEditionResolved).length;
+                  return (
+                    <tr key={record.id}>
+                      <td>{firstEntry ? <Link to={`/knowledge/coverage?source=${record.id}&component=${firstEntry.componentId}`}>{record.id}</Link> : record.id}</td>
+                      <td><strong>{record.title}</strong><span>{record.authorLine}</span></td>
+                      <td>{familyById.get(record.familyId)?.title}</td>
+                      <td>{entries.length} file{entries.length === 1 ? "" : "s"} · {exactEditionCount} exact edition{exactEditionCount === 1 ? "" : "s"}</td>
+                      <td><span data-state={entries.every((entry) => entry.graphStatus === "reviewed-complete") ? "reviewed-complete" : "pending"}>{aggregateStatus(entries)}</span></td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
             {!pageRecords.length ? <p className="source-registry-empty">No source matches these filters.</p> : null}
@@ -324,18 +521,18 @@ export function KnowledgeCoveragePage() {
 
       <section className="coverage-gate page-shell" aria-labelledby="coverage-gate-title">
         <div>
-          <p className="eyebrow">The word “complete” has a hard gate</p>
-          <h2 id="coverage-gate-title">A source row is handled only when every exact edition is reconciled.</h2>
-          {data ? <p>Only {data.verificationPolicy.administrators.map((administrator) => administrator.displayName).join(", ")} may approve terminal review records.</p> : null}
+          <p className="eyebrow">The Phase-I completion gate</p>
+          <h2 id="coverage-gate-title">A book graph is complete only when its local proof structure is reviewed.</h2>
+          <p>Compression targets are deliberately absent from this gate. A source graph stands on its own before cross-book simplification begins.</p>
         </div>
         <ul>
-          <li>Every exact volume or version is identified, artifact-fingerprinted, and expanded into an immutable source-unit manifest.</li>
-          <li>Every source unit belongs to exactly one scan segment; no page, section, appendix, or web node may fall outside the manifest.</li>
-          <li>Each segment records occurrences found or an explicit theorem-free attestation, source evidence, and a worker audit.</li>
-          <li>A different authorized administrator reviews every segment and the completed edition.</li>
-          <li>Every occurrence has one locator, independently written claim, visible disposition, reason, and terminal Knowledge or residual target.</li>
-          <li>Verified Knowledge targets must exist in the current Knowledge edition; stale or nonexistent targets fail validation.</li>
-          <li>The complete-universe flag remains false until all {__SOURCE_RECORD_COUNT__} rows resolve through audited editions.</li>
+          <li>The exact edition is identified, stably located, artifact-fingerprinted, and divided into an ordered source-unit manifest.</li>
+          <li>Every theorem-like result and required definition, axiom, notation, construction, example, or calculation is inventoried.</li>
+          <li>Every direct proof dependency points to a local node or an explicitly documented external input.</li>
+          <li>Each theorem-like node has a reviewed proof route or a reviewed root attestation when it has no direct prerequisites.</li>
+          <li>Proof and statement references are preserved, resolved where possible, and never silently converted into edges.</li>
+          <li>Extraction evidence and graph evidence receive independent review, with stale fingerprints rejected.</li>
+          <li>Corpus Phase I completes only when all {componentCount.toLocaleString()} component files reach reviewed-complete graph status.</li>
         </ul>
       </section>
     </div>

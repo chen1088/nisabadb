@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0.0",
+  "phase": "source-dependency-graph",
+  "identity": {
+    "bookGraphId": "S0577:complete-source",
+    "sourceSetRevision": "approved-2026-08-22-r1",
+    "sourceRecordId": "S0577",
+    "sourceOrdinal": 577,
+    "familyId": "F25",
+    "sourceTitle": "Mathematics of Classical and Quantum Physics",
+    "sourceAuthorLine": "Frederick W. Byron Jr., Robert W. Fuller",
+    "sourceRawCitation": "Mathematics of Classical and Quantum Physics — Frederick W. Byron Jr., Robert W. Fuller",
+    "componentId": "complete-source",
+    "componentLabel": "Complete source named by this row"
+  },
+  "exactEdition": null,
+  "sourceUnits": [],
+  "unitInventories": [],
+  "graph": {
+    "nodes": [],
+    "externalInputs": [],
+    "directDependencies": [],
+    "proofRoutes": [],
+    "references": []
+  },
+  "extractionState": {
+    "status": "awaiting-edition",
+    "extractionAudit": null,
+    "independentReview": null,
+    "note": "Awaiting acquisition and identification of the exact edition before theorem extraction."
+  },
+  "graphState": {
+    "status": "not-started",
+    "graphAudit": null,
+    "independentReview": null,
+    "note": "Phase-I source dependency graph has not been extracted."
+  }
+}

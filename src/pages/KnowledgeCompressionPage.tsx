@@ -84,8 +84,8 @@ export function KnowledgeCompressionPage() {
       <header className="compression-atlas-hero page-shell">
         <div>
           <p className="audit-breadcrumb"><Link to="/knowledge">Knowledge</Link><span>/</span> Compression atlas</p>
-          <p className="eyebrow">The rewrite plan for all mathematics</p>
-          <h1>Compress repeated exposition. Keep every mathematical distinction.</h1>
+          <p className="eyebrow">Phase II prototype · frozen</p>
+          <h1>Compression waits for all source-book graphs.</h1>
           <p>{compressionProgram.thesis}</p>
           <div className="compression-atlas-actions">
             <a href="#atlas">Explore the common core</a>
@@ -93,7 +93,7 @@ export function KnowledgeCompressionPage() {
           </div>
         </div>
         <dl aria-label="Compression atlas status">
-          <div><dt>Source records preserved</dt><dd>{__SOURCE_RECORD_COUNT__}</dd></div>
+          <div><dt>Required source graphs</dt><dd>{__SOURCE_COMPONENT_COUNT__}</dd></div>
           <div><dt>Whole-field clusters</dt><dd>{compressionClusters.length}</dd></div>
           <div><dt>Explicit residual decisions</dt><dd>{compressionResiduals.length}</dd></div>
           <div><dt>Administrator-reviewed cluster rewrites</dt><dd>{compressionClusters.filter((cluster) => cluster.status === "reviewed").length}</dd></div>
@@ -103,10 +103,10 @@ export function KnowledgeCompressionPage() {
       <section className="coverage-boundary page-shell" aria-labelledby="coverage-boundary-title">
         <span aria-hidden="true">!</span>
         <div>
-          <h2 id="coverage-boundary-title">A compression design is not a completed extraction.</h2>
-          <p>{compressionProgram.coverageNote}</p>
+          <h2 id="coverage-boundary-title">Blocked until Phase I is complete.</h2>
+          <p>The atlas remains visible as an early hypothesis, but clusters, shortened routes, and the canonical chapter plan will not advance until every source component has its own reviewed theorem dependency graph. {compressionProgram.coverageNote}</p>
         </div>
-        <Link to="/knowledge/coverage">See the exact coverage ledger →</Link>
+        <Link to="/knowledge/coverage">Open the source graph workspace →</Link>
       </section>
 
       <section className="compression-method page-shell" aria-labelledby="compression-method-title">

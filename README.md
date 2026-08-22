@@ -1,8 +1,8 @@
 # NisabaDB
 
-**Map papers. Rewrite their mathematical foundations into one living textbook.**
+**Graph every source theorem. Then compress mathematics into one living textbook.**
 
-NisabaDB is a paper corpus, a collection of proof-bearing paper graphs, and one canonical living mathematics textbook for a person starting with no mathematics background. Its gold corpus currently contains *A Dimension-Free Dictatorship Tester on the Symmetric Group* and Braverman--Khot--Lifshitz--Minzer's *An Invariance Principle for the Multi-slice, with Applications*. The website presents reviewed paper-local mathematics as interactive dependency graphs and rewrites the reusable knowledge behind those papers into a unified exposition with one notation policy. Source books, courses, notes, and software remain editorial evidence and lineage behind the textbook; they are not a public shelf or separate curricula.
+NisabaDB is a source-faithful theorem-graph corpus and, later, one canonical living mathematics textbook for a person starting with no mathematics background. Phase I preserves the uncompressed theorem and proof-dependency structure of every approved source book. Phase II will compare, simplify, and rewrite that mathematics into one notation and exposition. Its current paper prototype contains *A Dimension-Free Dictatorship Tester on the Symmetric Group* and Braverman--Khot--Lifshitz--Minzer's *An Invariance Principle for the Multi-slice, with Applications*.
 
 The Knowledge textbook is organized simultaneously as chapters for reading and as an acyclic prerequisite graph for reuse, search, and alternate routes. The planned paperback is a curated set of important excerpts from this canonical text, not a competing edition or a bundle of source materials.
 
@@ -11,9 +11,11 @@ The intended canonical domain is `nisabadb.org`. Until that domain is configured
 ## What works
 
 - Navigation for Knowledge, Papers, Unsolved, and Train
-- One living Knowledge textbook with chapter reading order, stable knowledge nodes, an acyclic prerequisite DAG, a canonical notation registry, and source lineage kept behind the exposition
-- A nested whole-field compression atlas with 18 candidate mathematical clusters, explicit notation decisions, candidate source-route patterns and minimized-route hypotheses, and a residual ledger for material that must not be silently merged
-- An exact 688-row source registry plus edition- and theorem-occurrence coverage rules; the public counters remain at zero until exact editions are inventoried and mappings are reviewed
+- An exact 688-row registry expanding to 717 required book/volume components
+- One independently validated JSON graph file per required component, plus a small generated manifest for indexing and aggregate counts
+- A Phase-I source graph model for exact editions, chapter/section/page/source-file units, per-unit inventory decisions, theorem and support nodes, proof routes, evidence-bearing direct dependencies, external inputs, and independent review
+- A frozen Phase-II Knowledge prototype with chapter reading order, stable knowledge nodes, an acyclic prerequisite DAG, and a canonical notation registry
+- A frozen Phase-II compression atlas with 18 candidate mathematical clusters and explicit residual hypotheses
 - A bounded, cycle-safe citation-ancestry DAG projection, processing backlog, and paginated paper catalog
 - One expandable dependency DAG per paper, containing every paper-facing result without topic sub-tabs; theorem/result nodes start folded so a paper opens as a readable map rather than a wall of statements
 - Search, status filters, route-sensitive dependency highlighting, and stable deep links
@@ -27,21 +29,58 @@ The intended canonical domain is `nisabadb.org`. Until that domain is configured
 - Validated TypeScript content model and a persistent OpenAlex ingestion queue
 - Responsive, keyboard-accessible React interface with KaTeX rendering
 
-The corpus contains 2,143 paper records: 2 gold rewrites and 2,141 provisional papers, connected by 2,284 citation records. The two reviewed paper graphs contain 93 mathematical nodes. The current Knowledge draft contains 60 independently written nodes across 20 chapters, with 33 canonical notation entries and seven registry-linked references. All 60 lessons remain labeled `initial-rewrite`; none is presented as mathematically or pedagogically reviewed. A separate 126-chapter working map organizes 21 parts, marks the 20 chapter mappings that contain draft lessons, and leaves 106 planned chapters non-clickable. Human-readable compressed paper routes are complete for 36 of 61 theorem-like nodes. Every remaining paper item is labeled as a proof idea or a proof not yet distilled; source-omitted proofs and unresolved source inconsistencies are never promoted to complete routes.
+The corpus contains 2,143 paper records: 2 gold rewrites and 2,141 provisional papers, connected by 2,284 citation records. The two reviewed paper graphs contain 93 mathematical nodes. The current Knowledge draft and its 126-chapter roadmap are frozen Phase-II prototypes: 126 is not a source-chapter count or a corpus-coverage target. Human-readable compressed paper routes are complete for 36 of 61 theorem-like paper nodes; source-omitted proofs and unresolved inconsistencies are never promoted to complete routes.
 
-The agreed whole-field textbook intake contains 688 preserved source records in 31 intake branches. This is the exact post-audit list: the earlier 662-record research pool gained 26 gap-filling entries before consolidation. The ordered list and each row's required volume/part components are fingerprint-locked. All 688 records are currently edition-unresolved, so NisabaDB makes no claim that their theorems have already been extracted. A row becomes complete only after every required component is tied to one exact edition, artifact-fingerprinted, expanded into an immutable source-unit manifest, independently scanned, and administrator-reviewed. Every theorem occurrence must end at a content-fingerprinted node in the current Knowledge edition or an explicit retained residual; stronger or overlapping source statements must preserve their unmatched mathematics as residuals too.
+The agreed whole-field intake contains 688 preserved source rows in 31 branches and 717 required book/volume components. The ordered list and component identities are fingerprint-locked. Each component owns `data/books/S####/<component>.json`; multi-volume rows therefore produce multiple files. A Phase-I graph becomes complete only after its exact edition is fingerprinted, every immutable source unit has a reviewed node inventory or theorem-free attestation, every theorem-like result and needed support node is inventoried, and every direct source dependency or explicit root/external input is independently reviewed. No canonical Knowledge mapping is required for source-graph completion.
 
-## Knowledge is one living textbook
+## Phase I book graph files
+
+`data/knowledge/source-records.json` is the approved index, not the theorem database. `data/books/manifest.json` is a generated summary. The mathematical data is sharded into one file per actual component, for example:
+
+```text
+data/books/S0042/complete-source.json
+data/books/S0074/volume-1.json
+data/books/S0074/volume-2.json
+data/books/S0074/volume-3.json
+```
+
+This boundary keeps each source graph reviewable, allows workers to process different books without editing one giant JSON file, and makes a book's completeness claim depend only on its own immutable evidence. Candidate extractor edges remain visibly distinct from reviewed proof dependencies. Compression mappings will live in a later layer and must never overwrite source-faithful nodes or routes.
+
+The old `data/knowledge/coverage-ledger.json` and its source-to-Knowledge disposition rules are retained only as a frozen Phase-II prototype. They are no longer published by the coverage page and cannot decide whether a Phase-I book graph is complete.
+
+`S0060/complete-source.json` is the first populated pilot. It pins Oscar Levin's official PreTeXt source for *Discrete Mathematics: An Open Introduction, 4th Edition* and currently contains captured inventories for 109 active source files, 38 explicitly tagged theorem-like nodes, 74 definition/notation nodes, and three candidate edges where a theorem proof explicitly cross-references another inventoried result. The pilot remains unreviewed and incomplete: 35 theorem-like nodes have no route, implicit prerequisites and exercise-embedded results are still pending, and the file discloses a conflict between the active edition's license statement and the repository-level license.
+
+The PreTeXt importer defaults to a dry run. It requires a clean checkout at the exact requested commit, derives repository provenance from its GitHub origin, traverses only active comment-stripped includes, validates the candidate against the book schema, and writes only the requested component. A write also refreshes the generated manifest atomically:
+
+```sh
+node scripts/import-pretext-book.mjs \
+  --source <clean-checkout> \
+  --record-id S0060 \
+  --component-id complete-source \
+  --commit 730e5e3b96094148818603041222df6f3d1d96ba \
+  --entry-file source/dmoi.ptx
+
+node scripts/import-pretext-book.mjs \
+  --source <clean-checkout> \
+  --record-id S0060 \
+  --component-id complete-source \
+  --commit 730e5e3b96094148818603041222df6f3d1d96ba \
+  --entry-file source/dmoi.ptx \
+  --captured-at <ISO-8601-time> \
+  --write
+```
+
+## Phase II prototype: one living textbook
 
 `src/data/knowledge.json` is the written textbook source. Each knowledge node belongs to a chapter and section, declares its prerequisite nodes, uses entries from the shared notation registry, and carries registry-linked references for editorial traceability. The validated graph rejects missing relations, duplicate identifiers, self-dependencies, and prerequisite cycles; tests also require the stored direct edges to be transitively reduced. Reader-facing prose, examples, and exercises are NisabaDB rewrites rather than stitched excerpts from the source texts.
 
-`src/data/knowledge-roadmap.ts` is a separate provisional whole-book map. It currently contains 126 chapters in 21 parts. A roadmap chapter marked Draft links to one of the 20 existing draft chapters; a Planned chapter is plain text and makes no completion claim. Candidate roadmap dependencies and compression assignments remain editorial hypotheses, while the 60-node Knowledge graph is the authoritative dependency structure for material that has actually been written.
+`src/data/knowledge-roadmap.ts` is a separate provisional whole-book map. It currently contains 126 chapters in 21 parts, but this Phase-II outline is frozen while source graphs are built. Its size will be reconsidered from the complete source corpus rather than enlarged speculatively.
 
 The chapter order is a curated reading route through that DAG, not the definition of the mathematics itself. A concept can therefore support several later chapters without being duplicated, and alternate reading routes can be generated without changing its canonical statement. The notation registry records one preferred symbol and meaning together with source-specific aliases, allowing material from different traditions to be unified explicitly instead of silently mixing conventions.
 
 Per-node source lineage and internal editorial research still guide extraction, comparison, licensing review, and provenance. They do not appear as a public Materials architecture and are never assignments to read whole books. The published paperback will excerpt selected chapters and results from the same canonical text.
 
-`/knowledge/compression` exposes the read-only compression atlas: candidate common cores, unified notation, source-route patterns, minimized-route hypotheses, candidate residual placements, and 16 cross-cutting comparison lenses whose validated crosswalk names and links all 31 intake branches. `/knowledge/coverage` is the non-omission ledger. It preserves the complete candidate registry and separately reports source resolution, full-edition inventories, theorem dispositions, administrator-verified Knowledge mappings, and reviewed residual targets. Each extracted theorem receives a permanent address. Proposals and extraction records must be approved by a different authorized administrator before becoming terminal. The large registry is fetched only on that nested audit page and is not bundled into ordinary textbook lessons.
+`/knowledge/compression` exposes the frozen Phase-II atlas. `/knowledge/coverage` is the active Phase-I command surface: it loads the small registry and manifest, reports component/file/edition/node/edge/review counts, and lazily fetches only a selected book's graph. Every extracted node receives a permanent address. Extraction and graph evidence must be approved by a different reviewer before becoming reviewed.
 
 Train is separate from textbook navigation. It samples meaningful theorem-like nodes from the paper DAGs and asks a human or AI to reconstruct a proof as an exercise; dependency context, hints, and the reviewed route can be disclosed progressively rather than shown up front.
 
@@ -61,9 +100,11 @@ npm run lint
 npm test
 npm run build
 npm run check
+npm run books:sync
+npm run books:check
 ```
 
-`npm run check` runs linting, all tests, TypeScript compilation, and the production build.
+`books:sync` creates missing component files and refreshes the generated manifest without overwriting a populated book graph. `books:check` rejects missing, extra, misnamed, or internally inconsistent book files. `npm run check` runs linting, all tests, TypeScript compilation, and the production build.
 
 ## Rebuild the mathematical corpus
 

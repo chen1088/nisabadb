@@ -5,12 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && node scripts/copy-spa-fallback.mjs",
+    "build": "npm run books:check && tsc -b && vite build && node scripts/copy-spa-fallback.mjs",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
     "check": "npm run lint && npm run test && npm run build",
     "content:validate": "vitest run src/data/content.test.ts",
+    "books:sync": "node scripts/book-graph-files.mjs",
+    "books:check": "node scripts/book-graph-files.mjs --check && vitest run src/data/book-graph.test.ts",
     "citations:snapshot": "node scripts/build-citation-snapshot.mjs",
     "citations:ingest": "node scripts/ingest-citations.mjs"
   },

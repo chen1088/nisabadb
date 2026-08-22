@@ -6,7 +6,7 @@
   "approvedRecordCount": 688,
   "approvedManifestSha256": "e92d2d91cc02fb2f980be5ed5d63605b8359c12f7d07d1ddef430d0cc672909a",
   "provenance": "Exact row-for-row preservation of the comprehensive source list agreed in the NisabaDB working thread on 2026-08-22.",
-  "coverageTarget": "Every theorem-like result in every exact edition represented by every approved source row must receive an exact locator and an administrator-verified target in the rewritten Knowledge DAG or the retained residual ledger.",
+  "coverageTarget": "Phase I: every theorem-like result in every exact edition represented by every required source component must receive an exact locator and an independently reviewed source-faithful dependency route or explicit root/external-input attestation. Cross-source equivalence, compression, simplification, and mapping into Knowledge or a residual ledger are separate Phase-II work.",
   "families": [
     {
       "id": "F01",

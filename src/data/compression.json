@@ -2,9 +2,9 @@
   "schemaVersion": "1.0.0",
   "updatedAt": "2026-08-22",
   "title": "Nisaba whole-field compression atlas",
-  "thesis": "Mathematics should be rebuilt as a small dependency graph of reusable ideas, while every source theorem remains traceable through a separate occurrence ledger.",
+  "thesis": "After every source component has a reviewed theorem dependency graph, Phase II may rebuild the mathematics as a smaller graph of reusable ideas while preserving links back to the uncompressed source graphs.",
   "rewritePolicy": "We independently rewrite each shared idea in one canonical language. A source-specific presentation survives whenever it carries different mathematics, a useful route, an application, history, or an unresolved editorial choice.",
-  "coverageNote": "The atlas describes the compression design; it does not claim the books are already processed. The fingerprint-locked source ledger preserves all 688 approved rows, and no edition is complete until its immutable unit manifest is fully scanned and every theorem-like occurrence has an administrator-reviewed Knowledge or residual target.",
+  "coverageNote": "The atlas describes a future compression design; it does not claim the books are already processed. Phase I is complete only when every one of the 717 component files pins an exact edition, inventories every source unit, captures every theorem and supporting result, and has an independently reviewed direct dependency graph. Phase-II Knowledge mappings are not part of that gate.",
   "bands": [
     {
       "id": "language-construction",

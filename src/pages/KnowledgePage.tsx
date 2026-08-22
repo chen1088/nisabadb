@@ -108,28 +108,29 @@ export function KnowledgePage() {
     <div className="textbook-page">
       <header className="textbook-masthead page-shell">
         <div>
-          <p className="eyebrow">The rewritten mathematics book</p>
+          <p className="eyebrow">Frozen Phase-II prototype</p>
           <h1>{knowledgeBook.title}</h1>
           <p>{knowledgeBook.subtitle}</p>
         </div>
         <dl aria-label="Textbook status">
           <div><dt>Edition</dt><dd>{knowledgeBook.edition}</dd></div>
-          <div><dt>Draft chapters</dt><dd>{draftRoadmapChapterCount} of {knowledgeRoadmap.workingChapterCount}</dd></div>
+          <div><dt>Source graph files</dt><dd>{__SOURCE_COMPONENT_COUNT__} of {__SOURCE_COMPONENT_COUNT__}</dd></div>
           <div><dt>Written lessons</dt><dd>{knowledgeNodes.length}</dd></div>
           <div><dt>Reviewed lessons</dt><dd>{reviewedKnowledgeNodeCount}</dd></div>
-          <div><dt>Whole-book map</dt><dd>{roadmapParts.length} parts · dependency DAG</dd></div>
+          <div><dt>Phase-II outline</dt><dd>{knowledgeRoadmap.workingChapterCount} provisional chapters</dd></div>
         </dl>
       </header>
 
       <section className="textbook-draft-boundary page-shell" aria-labelledby="textbook-draft-title">
         <div>
-          <p className="eyebrow">Writing status</p>
-          <h2 id="textbook-draft-title">This is the beginning of the book, not a shelf of source titles.</h2>
+          <p className="eyebrow">Phase boundary</p>
+          <h2 id="textbook-draft-title">Build every source theorem graph before compressing the book.</h2>
         </div>
         <p>
-          The first {knowledgeBook.chapters.length} chapters below are independently written lessons.
-          The {knowledgeRoadmap.workingChapterCount}-chapter map is a provisional destination: only chapters
-          marked <strong>Draft</strong> currently contain readable mathematics.
+          These {knowledgeBook.chapters.length} chapters are an early rewrite prototype. The approved intake has
+          {" "}<strong>{__SOURCE_COMPONENT_COUNT__} book or volume components</strong>, each of which must first receive
+          its own complete theorem dependency graph. The {knowledgeRoadmap.workingChapterCount}-chapter outline is
+          frozen and is not a source-coverage count.
         </p>
       </section>
 
@@ -345,13 +346,13 @@ export function KnowledgePage() {
       <section className="book-roadmap page-shell" aria-labelledby="book-roadmap-title">
         <header className="book-roadmap-heading">
           <div>
-            <p className="eyebrow">The whole-book working map</p>
-            <h2 id="book-roadmap-title">{knowledgeRoadmap.workingChapterCount} chapters across {roadmapParts.length} parts</h2>
+            <p className="eyebrow">Frozen Phase-II hypothesis</p>
+            <h2 id="book-roadmap-title">The old {knowledgeRoadmap.workingChapterCount}-chapter outline</h2>
           </div>
           <p>
-            This is a dependency-shaped editorial map, not a claim that every chapter is written.
-            Planned chapters are deliberately not clickable. Candidate prerequisites and cluster
-            assignments may change as compression work finds a shorter route.
+            This outline predates source extraction. It is neither the number of source chapters nor a final
+            size target. It remains visible for provenance, but no planned chapter will be expanded until all
+            {" "}{__SOURCE_COMPONENT_COUNT__} source-component graphs have been built and reviewed.
           </p>
         </header>
 
@@ -472,33 +473,32 @@ export function KnowledgePage() {
 
       <section className="compression-contract page-shell" aria-labelledby="compression-contract-title">
         <div className="compression-contract-copy">
-          <p className="eyebrow">References and non-omission</p>
-          <h2 id="compression-contract-title">The source works remain evidence behind the book.</h2>
+          <p className="eyebrow">Phase I: source-faithful graphs</p>
+          <h2 id="compression-contract-title">Each book owns its own theorem dependency JSON.</h2>
           <p>
-            The {__SOURCE_RECORD_COUNT__} records do not determine this curriculum. They support
-            comparison, theorem inventory, notation translation, and future checks that a rewrite
-            has not silently discarded source mathematics. The current atlas contains candidate
-            compression routes, not completed theorem-level coverage.
+            The {__SOURCE_RECORD_COUNT__} approved rows expand to {__SOURCE_COMPONENT_COUNT__} actual book or
+            volume components. Each component is inventoried and reviewed independently before any equivalent
+            claims are merged or any proof is shortened. The current compression atlas remains a blocked Phase-II prototype.
           </p>
         </div>
         <div className="compression-contract-flow" aria-label="Reference processing status">
-          <div><strong>{__SOURCE_RECORD_COUNT__}</strong><span>reference records preserved</span></div>
+          <div><strong>{__SOURCE_COMPONENT_COUNT__}</strong><span>individual book graph files</span></div>
           <span aria-hidden="true">→</span>
-          <div><strong>{__COMPRESSION_SOURCE_FAMILY_COUNT__}</strong><span>comparison lenses over {__SOURCE_BRANCH_COUNT__} intake branches</span></div>
+          <div><strong>edition</strong><span>resolve and fingerprint</span></div>
           <span aria-hidden="true">→</span>
-          <div><strong>{__COMPRESSION_CLUSTER_COUNT__}</strong><span>candidate common cores</span></div>
-          <span aria-hidden="true">+</span>
-          <div><strong>{__COMPRESSION_RESIDUAL_COUNT__}</strong><span>candidate residual placements</span></div>
+          <div><strong>nodes</strong><span>inventory every result and support item</span></div>
+          <span aria-hidden="true">→</span>
+          <div><strong>edges</strong><span>review every direct dependency</span></div>
         </div>
         <div className="compression-contract-rules">
-          <p><span>01</span><strong>Write the common idea</strong><small>Source prose and chapter order do not control the lesson.</small></p>
-          <p><span>02</span><strong>Unify notation</strong><small>Aliases translate into one stable language instead of creating duplicate knowledge.</small></p>
-          <p><span>03</span><strong>Test the shorter route</strong><small>A proposed compression stays provisional until the dependencies and proofs are reviewed.</small></p>
-          <p><span>04</span><strong>Account for every theorem</strong><small>Future inventories must retain every source occurrence and its exact lineage.</small></p>
+          <p><span>01</span><strong>Resolve the exact book</strong><small>Pin its edition, source artifact, license, and immutable unit manifest.</small></p>
+          <p><span>02</span><strong>Inventory every theorem</strong><small>Include exercise results and every definition, construction, assumption, or imported input they need.</small></p>
+          <p><span>03</span><strong>Extract the source route</strong><small>Keep proof-specific direct dependencies and unresolved references visible.</small></p>
+          <p><span>04</span><strong>Review the graph</strong><small>Compression and simplification begin only after the source graph is independently complete.</small></p>
         </div>
         <div className="compression-contract-links">
-          <Link to="/knowledge/compression">Explore candidate compression routes <span aria-hidden="true">→</span></Link>
-          <Link to="/knowledge/coverage">Audit all {__SOURCE_RECORD_COUNT__} reference records <span aria-hidden="true">→</span></Link>
+          <Link to="/knowledge/coverage">Build and audit all {__SOURCE_COMPONENT_COUNT__} book graphs <span aria-hidden="true">→</span></Link>
+          <Link to="/knowledge/compression">View the frozen Phase-II atlas <span aria-hidden="true">→</span></Link>
         </div>
       </section>
     </div>

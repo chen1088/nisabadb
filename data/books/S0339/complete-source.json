@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0.0",
+  "phase": "source-dependency-graph",
+  "identity": {
+    "bookGraphId": "S0339:complete-source",
+    "sourceSetRevision": "approved-2026-08-22-r1",
+    "sourceRecordId": "S0339",
+    "sourceOrdinal": 339,
+    "familyId": "F17",
+    "sourceTitle": "Probability and Random Processes",
+    "sourceAuthorLine": "Geoffrey Grimmett, David Stirzaker",
+    "sourceRawCitation": "Probability and Random Processes — Geoffrey Grimmett, David Stirzaker",
+    "componentId": "complete-source",
+    "componentLabel": "Complete source named by this row"
+  },
+  "exactEdition": null,
+  "sourceUnits": [],
+  "unitInventories": [],
+  "graph": {
+    "nodes": [],
+    "externalInputs": [],
+    "directDependencies": [],
+    "proofRoutes": [],
+    "references": []
+  },
+  "extractionState": {
+    "status": "awaiting-edition",
+    "extractionAudit": null,
+    "independentReview": null,
+    "note": "Awaiting acquisition and identification of the exact edition before theorem extraction."
+  },
+  "graphState": {
+    "status": "not-started",
+    "graphAudit": null,
+    "independentReview": null,
+    "note": "Phase-I source dependency graph has not been extracted."
+  }
+}

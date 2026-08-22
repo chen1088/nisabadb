@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0.0",
+  "phase": "source-dependency-graph",
+  "identity": {
+    "bookGraphId": "S0187:complete-source",
+    "sourceSetRevision": "approved-2026-08-22-r1",
+    "sourceRecordId": "S0187",
+    "sourceOrdinal": 187,
+    "familyId": "F08",
+    "sourceTitle": "An Introduction to Homological Algebra",
+    "sourceAuthorLine": "Charles A. Weibel",
+    "sourceRawCitation": "An Introduction to Homological Algebra — Charles A. Weibel",
+    "componentId": "complete-source",
+    "componentLabel": "Complete source named by this row"
+  },
+  "exactEdition": null,
+  "sourceUnits": [],
+  "unitInventories": [],
+  "graph": {
+    "nodes": [],
+    "externalInputs": [],
+    "directDependencies": [],
+    "proofRoutes": [],
+    "references": []
+  },
+  "extractionState": {
+    "status": "awaiting-edition",
+    "extractionAudit": null,
+    "independentReview": null,
+    "note": "Awaiting acquisition and identification of the exact edition before theorem extraction."
+  },
+  "graphState": {
+    "status": "not-started",
+    "graphAudit": null,
+    "independentReview": null,
+    "note": "Phase-I source dependency graph has not been extracted."
+  }
+}

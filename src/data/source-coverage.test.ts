@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
+// Regression-lock the frozen Phase-II prototype only; Phase-I book graphs are
+// validated independently in book-graph.test.ts and books:check.
 import rawLedger from "../../data/knowledge/coverage-ledger.json";
 import rawRegistry from "../../data/knowledge/source-records.json";
 import rawVerificationPolicy from "../../data/knowledge/verification-policy.json";
 import { knowledgeBook, knowledgeNodes } from "./knowledge";
 import {
-  assertSourceUniverseComplete,
-  deriveCoverageSummary,
-  validateSourceCoverage,
+  assertLegacyPhaseTwoMappingComplete,
+  deriveLegacyPhaseTwoCoverageSummary,
+  validateLegacyPhaseTwoCoverage,
 } from "./source-coverage-schema";
 
 const targetContext = {
@@ -32,7 +34,7 @@ const proposalAudit = {
 };
 
 function validatedFixture() {
-  return validateSourceCoverage(rawRegistry, rawLedger, rawVerificationPolicy, targetContext);
+  return validateLegacyPhaseTwoCoverage(rawRegistry, rawLedger, rawVerificationPolicy, targetContext);
 }
 
 function addResolvedEdition() {
@@ -85,7 +87,7 @@ function scannedSegment(inventoryResult: { kind: "explicit-none"; theoremOccurre
   };
 }
 
-describe("whole-field source coverage", () => {
+describe("frozen Phase-II source-to-Knowledge mapping prototype", () => {
   it("preserves and fingerprint-locks the agreed source list row for row", () => {
     const { registry, ledger } = validatedFixture();
     expect(registry.records).toHaveLength(688);
@@ -100,7 +102,7 @@ describe("whole-field source coverage", () => {
     expect(registry.approvedManifestSha256)
       .toBe("e92d2d91cc02fb2f980be5ed5d63605b8359c12f7d07d1ddef430d0cc672909a");
 
-    const summary = deriveCoverageSummary(registry, ledger);
+    const summary = deriveLegacyPhaseTwoCoverageSummary(registry, ledger);
     expect(summary).toEqual({
       sourceRecords: 688,
       resolvedRecords: 0,
@@ -115,7 +117,7 @@ describe("whole-field source coverage", () => {
       unresolvedOccurrences: 0,
       sourceUniverseComplete: false,
     });
-    expect(() => assertSourceUniverseComplete(registry, ledger)).toThrow(/0\/688/);
+    expect(() => assertLegacyPhaseTwoMappingComplete(registry, ledger)).toThrow(/0\/688/);
   });
 
   it("cannot call an administratively reviewed empty inventory complete", () => {
@@ -130,7 +132,7 @@ describe("whole-field source coverage", () => {
       theoremOccurrenceIds: [],
       reason: "The extractor claims no theorem-like result exists.",
     }));
-    expect(() => validateSourceCoverage(registry, ledger, rawVerificationPolicy, targetContext))
+    expect(() => validateLegacyPhaseTwoCoverage(registry, ledger, rawVerificationPolicy, targetContext))
       .toThrow(/empty theorem inventory/i);
   });
 
@@ -160,7 +162,7 @@ describe("whole-field source coverage", () => {
       administrativeReview: null,
       auditNote: "Incomplete volume fixture.",
     });
-    expect(() => validateSourceCoverage(registry, ledger, rawVerificationPolicy, targetContext))
+    expect(() => validateLegacyPhaseTwoCoverage(registry, ledger, rawVerificationPolicy, targetContext))
       .toThrow(/every required component/i);
   });
 
@@ -186,7 +188,7 @@ describe("whole-field source coverage", () => {
       decisionAudit: proposalAudit,
       administrativeReview: adminReview,
     });
-    expect(() => validateSourceCoverage(registry, ledger, rawVerificationPolicy, targetContext))
+    expect(() => validateLegacyPhaseTwoCoverage(registry, ledger, rawVerificationPolicy, targetContext))
       .toThrow(/mapped disposition without a canonical target/i);
   });
 
@@ -222,7 +224,7 @@ describe("whole-field source coverage", () => {
       decisionAudit: null,
       administrativeReview: null,
     });
-    expect(() => validateSourceCoverage(registry, ledger, rawVerificationPolicy, targetContext))
+    expect(() => validateLegacyPhaseTwoCoverage(registry, ledger, rawVerificationPolicy, targetContext))
       .toThrow(/exact membership list/i);
   });
 
@@ -231,7 +233,7 @@ describe("whole-field source coverage", () => {
     const edition = ledger.editions[0];
     if (!edition) throw new Error("missing edition fixture");
     edition.sourceRecordId = "S0003";
-    expect(() => validateSourceCoverage(registry, ledger, rawVerificationPolicy, targetContext))
+    expect(() => validateLegacyPhaseTwoCoverage(registry, ledger, rawVerificationPolicy, targetContext))
       .toThrow(/edition owned by that source row/i);
   });
 
@@ -321,8 +323,8 @@ describe("whole-field source coverage", () => {
         administrativeReview: adminReview,
       }],
     };
-    const validated = validateSourceCoverage(registry, ledger, rawVerificationPolicy, targetContext);
-    expect(assertSourceUniverseComplete(validated.registry, validated.ledger)).toMatchObject({
+    const validated = validateLegacyPhaseTwoCoverage(registry, ledger, rawVerificationPolicy, targetContext);
+    expect(assertLegacyPhaseTwoMappingComplete(validated.registry, validated.ledger)).toMatchObject({
       completeRecords: 1,
       terminalOccurrences: 1,
       verifiedMappings: 1,

@@ -7110,6 +7110,104 @@ a:hover {
   grid-column: 1 / -1;
 }
 
+.book-component-choices,
+.selected-book-graph {
+  grid-column: 1 / -1;
+}
+
+.book-component-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+}
+
+.book-component-choices a {
+  display: grid;
+  gap: 0.15rem;
+  min-width: min(100%, 210px);
+  padding: 0.65rem 0.75rem;
+  border: 1px solid rgb(41 88 65 / 22%);
+  border-radius: 0.32rem;
+  background: rgb(255 255 255 / 55%);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.book-component-choices a.is-current {
+  border-color: var(--moss);
+  background: var(--paper);
+  box-shadow: inset 3px 0 var(--moss);
+}
+
+.book-component-choices span {
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+.selected-book-graph {
+  min-width: 0;
+}
+
+.source-edition-audit > p {
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.selected-source-record dl.book-graph-overview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-column: auto;
+  grid-row: auto;
+  gap: 0.5rem;
+  margin: 0.75rem 0 0;
+}
+
+.selected-source-record dl.book-graph-overview > div {
+  display: grid;
+  justify-content: stretch;
+  gap: 0.25rem;
+  padding: 0.65rem;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.selected-source-record dl.book-graph-overview dd {
+  color: var(--clay-dark);
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 720;
+  text-align: left;
+}
+
+.book-graph-section {
+  margin-top: 1.2rem;
+}
+
+.book-graph-section > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: baseline;
+  margin-bottom: 0.55rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgb(41 88 65 / 22%);
+}
+
+.book-graph-section > header h4 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+}
+
+.book-graph-section > header span {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
 .selected-source-empty {
   padding: 0.75rem;
   border: 1px solid rgb(41 88 65 / 18%);
@@ -7476,6 +7574,10 @@ a:hover {
 
   .source-edition-audit > dl {
     grid-template-columns: 1fr;
+  }
+
+  .selected-source-record dl.book-graph-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .theorem-occurrence-list > article > dl {

@@ -45,18 +45,6 @@ for (const record of sourceRegistry.records) {
   verifyReviewDigest(record, "resolutionReview", record.id);
 }
 
-const coverageLedger = JSON.parse(await readFile(join("data", "knowledge", "coverage-ledger.json"), "utf8"));
-for (const edition of coverageLedger.editions) {
-  if (edition.unitManifestSha256 !== digest(edition.sourceUnits)) {
-    throw new Error(`${edition.id} unit-manifest fingerprint does not match its source units.`);
-  }
-  verifyReviewDigest(edition, "administrativeReview", edition.id);
-}
-for (const segment of coverageLedger.scanSegments) verifyReviewDigest(segment, "administrativeReview", segment.id);
-for (const claim of coverageLedger.canonicalClaims) verifyReviewDigest(claim, "administrativeReview", claim.id);
-for (const artifact of coverageLedger.residualArtifacts) verifyReviewDigest(artifact, "administrativeReview", artifact.id);
-for (const occurrence of coverageLedger.theoremOccurrences) verifyReviewDigest(occurrence, "administrativeReview", occurrence.id);
-
 const knowledgeBook = JSON.parse(await readFile(join("src", "data", "knowledge.json"), "utf8"));
 const sourceRecordById = new Map(sourceRegistry.records.map((record) => [record.id, record]));
 for (const source of knowledgeBook.sources) {
@@ -90,8 +78,35 @@ for (const filename of javascriptAssets) {
     throw new Error(`Source-registry data leaked into browser bundle ${filename}.`);
   }
 }
-for (const filename of ["source-records.json", "coverage-ledger.json", "verification-policy.json"]) {
+for (const filename of ["source-records.json", "verification-policy.json"]) {
   await copyFile(join("data", "knowledge", filename), join(knowledgeCoverageDirectory, filename));
+}
+
+const bookManifest = JSON.parse(await readFile(join("data", "books", "manifest.json"), "utf8"));
+if (bookManifest.sourceRecordCount !== sourceRegistry.records.length
+  || bookManifest.componentFileCount !== bookManifest.entries?.length) {
+  throw new Error("The per-book graph manifest does not match the approved source registry.");
+}
+const expectedComponentCount = sourceRegistry.records.reduce(
+  (total, record) => total + record.requiredEditionComponents.length,
+  0,
+);
+if (bookManifest.componentFileCount !== expectedComponentCount) {
+  throw new Error("The per-book graph manifest loses required book or volume components.");
+}
+const publishedBookDirectory = join(knowledgeCoverageDirectory, "books");
+await mkdir(publishedBookDirectory, { recursive: true });
+await copyFile(join("data", "books", "manifest.json"), join(publishedBookDirectory, "manifest.json"));
+const publishedBookPaths = new Set();
+for (const entry of bookManifest.entries) {
+  if (!/^S\d{4}\/[a-z0-9][a-z0-9-]*\.json$/.test(entry.path) || publishedBookPaths.has(entry.path)) {
+    throw new Error(`Unsafe or duplicate per-book graph path: ${entry.path}`);
+  }
+  publishedBookPaths.add(entry.path);
+  const source = join("data", "books", ...entry.path.split("/"));
+  const destination = join(publishedBookDirectory, ...entry.path.split("/"));
+  await mkdir(dirname(destination), { recursive: true });
+  await copyFile(source, destination);
 }
 
 const corpus = JSON.parse(await readFile("src/data/corpus.json", "utf8"));
@@ -133,4 +148,6 @@ for (const route of routes) {
 }
 
 console.log(`Created static entry shells for ${routes.size} canonical client routes.`);
-console.log(`Published ${sourceRegistry.records.length} source records as lazy coverage data.`);
+console.log(
+  `Published ${sourceRegistry.records.length} source records and ${bookManifest.componentFileCount} lazy per-book graphs.`,
+);

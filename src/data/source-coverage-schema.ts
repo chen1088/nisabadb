@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+// The registry schema in this module remains authoritative. The edition/claim/
+// residual ledger below is a frozen Phase-II mapping prototype; it is not the
+// Phase-I source-graph completion gate. Active book graphs are validated by
+// book-graph-schema.ts.
+
 const sha256Schema = z.string().regex(/^[a-f0-9]{64}$/);
 const stableIdSchema = z.string().regex(/^[a-z0-9][a-z0-9-]*$/);
 
@@ -222,7 +227,7 @@ export const theoremOccurrenceSchema = z.object({
   administrativeReview: administrativeReviewSchema.nullable(),
 });
 
-export const sourceCoverageLedgerSchema = z.object({
+export const legacyPhaseTwoCoverageLedgerSchema = z.object({
   schemaVersion: z.literal("1.1.0"),
   updatedAt: z.iso.date(),
   inventoryPolicyVersion: z.string().min(1),
@@ -235,7 +240,7 @@ export const sourceCoverageLedgerSchema = z.object({
 });
 
 export type SourceRegistry = z.infer<typeof sourceRegistrySchema>;
-export type SourceCoverageLedger = z.infer<typeof sourceCoverageLedgerSchema>;
+export type LegacyPhaseTwoCoverageLedger = z.infer<typeof legacyPhaseTwoCoverageLedgerSchema>;
 export type VerificationPolicy = z.infer<typeof verificationPolicySchema>;
 
 export type CoverageTargetContext = {
@@ -270,14 +275,14 @@ function residualDisposition(disposition: z.infer<typeof theoremDispositionSchem
   return ["specialist-extension", "historical-or-corrected"].includes(disposition);
 }
 
-export function validateSourceCoverage(
+export function validateLegacyPhaseTwoCoverage(
   rawRegistry: unknown,
   rawLedger: unknown,
   rawVerificationPolicy: unknown,
   targetContext: CoverageTargetContext,
-): { registry: SourceRegistry; ledger: SourceCoverageLedger; verificationPolicy: VerificationPolicy } {
+): { registry: SourceRegistry; ledger: LegacyPhaseTwoCoverageLedger; verificationPolicy: VerificationPolicy } {
   const registry = sourceRegistrySchema.parse(rawRegistry);
-  const ledger = sourceCoverageLedgerSchema.parse(rawLedger);
+  const ledger = legacyPhaseTwoCoverageLedgerSchema.parse(rawLedger);
   const verificationPolicy = verificationPolicySchema.parse(rawVerificationPolicy);
   const administrators = unique(
     verificationPolicy.administrators.map((administrator) => administrator.actorId),
@@ -397,7 +402,7 @@ export function validateSourceCoverage(
       if (coveredUnits.length !== unitIds.size || coveredUnits.some((unitId) => !unitIds.has(unitId))) {
         throw new Error(`${edition.id} scan does not exactly cover its immutable unit manifest`);
       }
-      if (occurrences.some((occurrence) => !isTerminalOccurrence(occurrence, ledger))) {
+      if (occurrences.some((occurrence) => !isLegacyPhaseTwoTerminalOccurrence(occurrence, ledger))) {
         throw new Error(`${edition.id} has theorem occurrences without verified terminal dispositions`);
       }
     }
@@ -523,7 +528,7 @@ export function validateSourceCoverage(
       if (occurrence.administrativeReview?.actorId === occurrence.decisionAudit.actorId) {
         throw new Error(`${occurrence.id} disposition must be independently reviewed`);
       }
-      if (!isTerminalOccurrence(occurrence, ledger)) throw new Error(`${occurrence.id} lacks a verified terminal target`);
+      if (!isLegacyPhaseTwoTerminalOccurrence(occurrence, ledger)) throw new Error(`${occurrence.id} lacks a verified terminal target`);
     } else if (occurrence.administrativeReview) {
       throw new Error(`${occurrence.id} is not verified but carries an administrative approval`);
     }
@@ -548,9 +553,9 @@ export function validateSourceCoverage(
   return { registry, ledger, verificationPolicy };
 }
 
-export function isTerminalOccurrence(
-  occurrence: SourceCoverageLedger["theoremOccurrences"][number],
-  ledger: SourceCoverageLedger,
+export function isLegacyPhaseTwoTerminalOccurrence(
+  occurrence: LegacyPhaseTwoCoverageLedger["theoremOccurrences"][number],
+  ledger: LegacyPhaseTwoCoverageLedger,
 ) {
   if (occurrence.decisionStatus !== "verified") return false;
   if (mappedDisposition(occurrence.disposition)) {
@@ -580,7 +585,7 @@ export function isTerminalOccurrence(
 function resolvedRecordIsComplete(
   record: SourceRegistry["records"][number],
   registry: SourceRegistry,
-  ledger: SourceCoverageLedger,
+  ledger: LegacyPhaseTwoCoverageLedger,
 ) {
   let resolved = record;
   const seen = new Set<string>();
@@ -598,19 +603,19 @@ function resolvedRecordIsComplete(
     ));
 }
 
-export function deriveCoverageSummary(registry: SourceRegistry, ledger: SourceCoverageLedger) {
+export function deriveLegacyPhaseTwoCoverageSummary(registry: SourceRegistry, ledger: LegacyPhaseTwoCoverageLedger) {
   const resolvedRecords = registry.records.filter((record) => record.resolutionState !== "unresolved").length;
   const completeRecords = registry.records.filter((record) => resolvedRecordIsComplete(record, registry, ledger)).length;
   const completeEditions = ledger.editions.filter((edition) => edition.inventoryState === "audited-complete").length;
   const classifiedOccurrences = ledger.theoremOccurrences.filter((occurrence) => (
     occurrence.disposition !== "unclassified" && occurrence.disposition !== "unresolved"
   )).length;
-  const terminalOccurrences = ledger.theoremOccurrences.filter((occurrence) => isTerminalOccurrence(occurrence, ledger)).length;
+  const terminalOccurrences = ledger.theoremOccurrences.filter((occurrence) => isLegacyPhaseTwoTerminalOccurrence(occurrence, ledger)).length;
   const verifiedMappings = ledger.theoremOccurrences.filter((occurrence) => (
-    isTerminalOccurrence(occurrence, ledger) && mappedDisposition(occurrence.disposition)
+    isLegacyPhaseTwoTerminalOccurrence(occurrence, ledger) && mappedDisposition(occurrence.disposition)
   )).length;
   const verifiedResiduals = ledger.theoremOccurrences.filter((occurrence) => (
-    isTerminalOccurrence(occurrence, ledger) && residualDisposition(occurrence.disposition)
+    isLegacyPhaseTwoTerminalOccurrence(occurrence, ledger) && residualDisposition(occurrence.disposition)
   )).length;
   const unresolvedOccurrences = ledger.theoremOccurrences.filter((occurrence) => (
     occurrence.disposition === "unresolved" || occurrence.disposition === "unclassified"
@@ -631,8 +636,8 @@ export function deriveCoverageSummary(registry: SourceRegistry, ledger: SourceCo
   };
 }
 
-export function assertSourceUniverseComplete(registry: SourceRegistry, ledger: SourceCoverageLedger) {
-  const summary = deriveCoverageSummary(registry, ledger);
+export function assertLegacyPhaseTwoMappingComplete(registry: SourceRegistry, ledger: LegacyPhaseTwoCoverageLedger) {
+  const summary = deriveLegacyPhaseTwoCoverageSummary(registry, ledger);
   if (!summary.sourceUniverseComplete) {
     throw new Error(`Source universe incomplete: ${summary.completeRecords}/${summary.sourceRecords} rows fully reconciled`);
   }

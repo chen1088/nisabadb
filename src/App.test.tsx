@@ -56,13 +56,13 @@ describe("NisabaDB application", () => {
     expect(screen.getByLabelText(/textbook status/i)).toHaveTextContent(
       new RegExp(`written lessons\\s*${knowledgeNodes.length}`, "i"),
     );
-    expect(screen.getByLabelText(/textbook status/i)).toHaveTextContent(/draft chapters\s*20 of 126/i);
+    expect(screen.getByLabelText(/textbook status/i)).toHaveTextContent(/source graph files\s*717 of 717/i);
     expect(screen.getByLabelText(/textbook status/i)).toHaveTextContent(/reviewed lessons\s*0/i);
     expect(screen.getByLabelText(/textbook table of contents/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/local knowledge dependency graph/i)).toBeInTheDocument();
     expect(screen.getByText(/open all 60 written lessons/i).closest("details")).not.toHaveAttribute("open");
-    expect(screen.getByRole("link", { name: /explore candidate compression routes/i })).toHaveAttribute("href", "/knowledge/compression");
-    expect(screen.getByRole("link", { name: /audit all 688 reference records/i })).toHaveAttribute("href", "/knowledge/coverage");
+    expect(screen.getByRole("link", { name: /build and audit all 717 book graphs/i })).toHaveAttribute("href", "/knowledge/coverage");
+    expect(screen.getByRole("link", { name: /view the frozen phase-ii atlas/i })).toHaveAttribute("href", "/knowledge/compression");
     expect(within(navigation).queryByRole("link", { name: /materials|learn/i })).not.toBeInTheDocument();
   });
 
@@ -71,7 +71,7 @@ describe("NisabaDB application", () => {
     expect(screen.getByRole("heading", { name: /a quantity is an attribute reported with a value and a unit/i })).toBeInTheDocument();
     expect(screen.getByText(/what this chapter compresses/i)).toBeInTheDocument();
 
-    const roadmap = screen.getByRole("region", { name: /126 chapters across 21 parts/i });
+    const roadmap = screen.getByRole("region", { name: /the old 126-chapter outline/i });
     expect(within(roadmap).getByLabelText(/whole-book map status/i)).toHaveTextContent(/20\s*draft/i);
     expect(within(roadmap).getByLabelText(/whole-book map status/i)).toHaveTextContent(/106\s*planned/i);
     expect(within(roadmap).getByLabelText(/whole-book map status/i)).toHaveTextContent(/only draft entries open lessons/i);
@@ -83,7 +83,7 @@ describe("NisabaDB application", () => {
     expect(within(plannedChapter as HTMLElement).queryByRole("link")).not.toBeInTheDocument();
 
     const reader = screen.getByRole("article", { name: /a quantity is an attribute/i });
-    const references = screen.getByRole("heading", { name: /source works remain evidence behind the book/i });
+    const references = screen.getByRole("heading", { name: /each book owns its own theorem dependency json/i });
     expect(reader.compareDocumentPosition(references) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
@@ -103,7 +103,7 @@ describe("NisabaDB application", () => {
     expect(screen.getByRole("heading", { name: /what does not disappear/i })).toBeInTheDocument();
   });
 
-  it("shows source coverage as an incomplete theorem ledger, not a bookshelf", async () => {
+  it("loads an individual source-book graph from the manifest", async () => {
     const registry = {
       schemaVersion: "1.1.0",
       updatedAt: "2026-08-22",
@@ -130,39 +130,101 @@ describe("NisabaDB application", () => {
         resolutionReview: null,
       }],
     };
-    const ledger = {
-      schemaVersion: "1.1.0",
-      updatedAt: "2026-08-22",
-      inventoryPolicyVersion: "theorem-floor-v1",
-      inventoryPolicy: "Every theorem is inventoried.",
-      editions: [],
-      scanSegments: [],
-      canonicalClaims: [],
-      residualArtifacts: [],
-      theoremOccurrences: [],
-    };
-    const verificationPolicy = {
+    const manifest = {
       schemaVersion: "1.0.0",
-      updatedAt: "2026-08-22",
-      policyRevision: "fixture-policy",
-      requireIndependentAdministrativeReview: true,
-      administrators: [{ actorId: "admin:fixture", displayName: "Fixture administrator" }],
+      sourceSetRevision: "fixture-r1",
+      sourceRecordCount: 1,
+      componentFileCount: 1,
+      summary: {
+        exactEditionResolvedCount: 0,
+        awaitingEditionCount: 1,
+        reviewedExtractionCount: 0,
+        reviewedCompleteGraphCount: 0,
+        sourceUnitCount: 0,
+        inventoriedSourceUnitCount: 0,
+        reviewedSourceUnitCount: 0,
+        theoremNodeCount: 0,
+        unroutedTheoremCount: 0,
+        supportNodeCount: 0,
+        dependencyCount: 0,
+        reviewedDependencyCount: 0,
+        unresolvedReferenceCount: 0,
+      },
+      entries: [{
+        bookGraphId: "S0001:complete-source",
+        sourceRecordId: "S0001",
+        sourceOrdinal: 1,
+        componentId: "complete-source",
+        componentLabel: "Complete fixture source",
+        path: "S0001/complete-source.json",
+        extractionStatus: "awaiting-edition",
+        graphStatus: "not-started",
+        exactEditionResolved: false,
+        sourceUnitCount: 0,
+        inventoriedSourceUnitCount: 0,
+        reviewedSourceUnitCount: 0,
+        theoremNodeCount: 0,
+        unroutedTheoremCount: 0,
+        supportNodeCount: 0,
+        dependencyCount: 0,
+        reviewedDependencyCount: 0,
+        unresolvedReferenceCount: 0,
+      }],
+    };
+    const graph = {
+      schemaVersion: "1.0.0",
+      phase: "source-dependency-graph",
+      identity: {
+        bookGraphId: "S0001:complete-source",
+        sourceSetRevision: "fixture-r1",
+        sourceRecordId: "S0001",
+        sourceOrdinal: 1,
+        familyId: "F01",
+        sourceTitle: "Fixture Mathematics",
+        sourceAuthorLine: "Ada Example",
+        sourceRawCitation: "Fixture Mathematics — Ada Example",
+        componentId: "complete-source",
+        componentLabel: "Complete fixture source",
+      },
+      exactEdition: null,
+      sourceUnits: [],
+      unitInventories: [],
+      graph: {
+        nodes: [],
+        externalInputs: [],
+        directDependencies: [],
+        proofRoutes: [],
+        references: [],
+      },
+      extractionState: {
+        status: "awaiting-edition",
+        extractionAudit: null,
+        independentReview: null,
+        note: "Awaiting the exact edition.",
+      },
+      graphState: {
+        status: "not-started",
+        graphAudit: null,
+        independentReview: null,
+        note: "The graph has not been extracted.",
+      },
     };
     vi.stubGlobal("fetch", vi.fn(async (input: string | URL | Request) => ({
       ok: true,
       json: async () => String(input).includes("source-records")
         ? registry
-        : String(input).includes("verification-policy")
-          ? verificationPolicy
-          : ledger,
+        : String(input).includes("manifest")
+          ? manifest
+          : graph,
     })));
 
     renderAt("/knowledge/coverage?source=S0001");
-    expect(await screen.findByRole("heading", { name: /every source theorem gets a durable address/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /build the dependency graph before compressing the library/i })).toBeInTheDocument();
     const selectedSourceHeading = await screen.findByRole("heading", { name: "Fixture Mathematics" });
     await waitFor(() => expect(selectedSourceHeading).toHaveFocus());
-    expect(screen.getByText(/coverage is incomplete/i)).toBeInTheDocument();
-    expect(screen.getByText(/not a reading list or a materials shelf/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/source dependency graph status/i)).toHaveTextContent(/component json files\s*1 \/ 1/i);
+    expect(screen.getByText("S0001/complete-source.json")).toBeInTheDocument();
+    expect(screen.getByText(/no theorem-like or supporting nodes have been published/i)).toBeInTheDocument();
   });
 
   it("reads rewritten knowledge with unified notation and searchable chapters", async () => {

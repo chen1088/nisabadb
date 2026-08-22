@@ -1,15 +1,17 @@
 # NisabaDB architecture
 
-## Reviewed paper graphs and one living textbook
+## Source graphs first, compression second
 
-`src/data/corpus.json` is the build-time source for the paper catalog, citation explorer, reviewed paper graphs, canonical theorem pages, distilled-paper view, and Train exercise pool. `src/data/knowledge.json` is the source for the independently rewritten textbook draft. `src/data/knowledge-roadmap.ts` is a separate provisional 126-chapter map; it cannot turn a planned chapter into a lesson, and its Draft mappings must cover the 20 actual draft chapters exactly once. Rendering code never owns mathematical proof text or third-party textbook prose. `src/data/schema.ts`, `src/data/knowledge-schema.ts`, and `src/data/knowledge-roadmap-schema.ts` validate these layers as the application loads and in tests.
+`src/data/corpus.json` is the build-time source for the paper catalog, citation explorer, reviewed paper graphs, canonical theorem pages, distilled-paper view, and Train exercise pool. `src/data/knowledge.json` and the provisional 126-chapter `src/data/knowledge-roadmap.ts` are frozen Phase-II prototypes for a future independently rewritten textbook. The active Phase I is the uncompressed theorem dependency graph of each approved source book or required volume/part component. Rendering code never owns mathematical proof text or third-party textbook prose.
 
-The source-compression control layer is separate from both. `data/knowledge/source-records.json` preserves all 688 approved candidate rows behind an ordered-manifest fingerprint. `data/knowledge/coverage-ledger.json` will hold exact editions, immutable source-unit manifests, scan segments, theorem occurrences, canonical claims, and retained residual artifacts; `data/knowledge/verification-policy.json` names the administrators allowed to approve review records. `src/data/compression.json` is a lightweight public atlas of whole-field convergence decisions. The source registry and audit files are copied as lazy data and are never eagerly imported into ordinary learner lessons.
+The source-graph layer is physically sharded. `data/knowledge/source-records.json` is only the fingerprint-locked index of 688 approved rows and their 717 required components. `data/books/manifest.json` is a generated aggregate. Each `data/books/S####/<component>.json` file owns one component's exact-edition identity, immutable unit manifest, source graph nodes, proof routes, direct dependency records, external inputs, extraction evidence, and graph-review state. This one-file-per-book boundary permits parallel extraction and review without a monolithic merge hotspot.
+
+Source-graph completion is independent of compression. A book can be exhaustively inventoried and its source-faithful graph independently reviewed while every cross-source equivalence or Knowledge mapping remains unclassified. Canonical claims, residual decisions, the legacy `data/knowledge/coverage-ledger.json`, `src/data/compression.json`, and the 126-chapter roadmap belong to Phase II and cannot be required to close a Phase-I graph.
 
 - **Papers** exposes the large provisional corpus, a bounded citation-ancestry projection, processing backlog, and one complete proof-dependency graph for each reviewed paper. Main results and sections are focus points inside that graph, not separate graph tabs. Paper dependency disclosures start folded; readers expand only the result branches they want to inspect.
-- **Knowledge** is one source-independent rewritten textbook rather than a shelf of books. The reader exposes 60 initial-rewrite nodes in 20 draft chapters. `KnowledgeNode.prerequisiteIds` provide the authoritative DAG for written content, while the separate 126-chapter roadmap distinguishes Draft mappings from 106 Planned entries. A shared notation registry fixes one main convention and records source-specific aliases. Per-node source references remain collapsed lineage and comparison evidence behind the exposition.
-- **Knowledge / Compression** is a read-only atlas of candidate common cores, notation resolutions, source-family convergence, candidate source-route patterns, minimized-route hypotheses, and residual dispositions. It is a plan and audit surface, not evidence that extraction is complete.
-- **Knowledge / Coverage** is the non-omission ledger. It preserves every candidate row and exposes separate derived counts for resolved rows, fully reconciled rows, inventoried editions, terminal theorem dispositions, reviewed Knowledge mappings, and reviewed residuals. Selecting a source reveals its exact editions and theorem-level addresses once they exist.
+- **Knowledge** is a frozen Phase-II prototype with 60 initial-rewrite nodes in 20 draft chapters. Its separate 126-chapter roadmap is neither source coverage nor a fixed target for the eventual compressed text.
+- **Knowledge / Compression** is a frozen read-only Phase-II hypothesis atlas. It must not advance while source graphs are the active phase.
+- **Knowledge / Coverage** is the Phase-I command surface. It reports the 688-row / 717-component workload, reads only the small manifest initially, and lazily fetches the selected component's individual graph file.
 - **Unsolved** remains empty until a precise problem passes an administratively reviewed, dated literature audit.
 - **Train** derives proof exercises from meaningful theorem-like nodes in gold paper graphs. An eligible result must have a reviewed, complete proof route and cannot be an imported result. Selection is random, the stored proof begins hidden, and prerequisite, proof-idea, and reviewed-route help is disclosed progressively for either a human or AI trainee.
 - **Materials** and **Learn** are no longer product surfaces. Their legacy URLs remain only as redirects to Knowledge and Train respectively.
@@ -47,16 +49,27 @@ KnowledgeRoadmap
   ├─ Draft ── knowledgeChapterId -> KnowledgeBook.Chapter
   └─ Planned ── no learner link and no completion claim
 
-SourceRecord ── resolves to one or more ──> SourceEdition
-  ├─ exact list row                         ├─ required volume/part component
-  └─ required edition components           ├─ immutable SourceUnit manifest
-                                            ├─ ScanSegment ── exact unit subset + source evidence
-                                └─ TheoremOccurrence
-                                     ├─ exact label and locator
-                                     ├─ normalized claim
-                                     ├─ disposition and mapping relation
-                                     └─ targetCanonicalClaimIds -> CanonicalClaim
-                                                                   └─ knowledgeNodeIds -> KnowledgeNode
+SourceRegistry ── indexes ──> BookGraphManifest
+  └─ SourceRecord               └─ one BookGraph entry per required component
+       └─ required components        └─ path -> data/books/S####/<component>.json
+
+BookGraph
+  ├─ exact SourceEdition identity and artifact fingerprint
+  ├─ ordered SourceUnit manifest: chapter / section / page / source file / web node
+  ├─ SourceUnitInventory ── exact node IDs or reviewed theorem-free attestation per unit
+  ├─ SourceGraphNode
+  │    ├─ theorem-like result or supporting definition / construction / assumption
+  │    ├─ exact source label and locator
+  │    └─ evidence state: pending / captured / independently reviewed
+  ├─ SourceDependencyEdge
+  │    ├─ prerequisite node or external input -> dependent node
+  │    └─ role, rationale, evidence locator, capture audit, and review state
+  ├─ ProofRoute ── theorem node + the dependency IDs used by that route
+  ├─ SourceReference ── proof/statement xref + resolved or unresolved target
+  └─ ExternalInput ── imported theorem, axiom, definition, standard fact, or citation
+
+Phase-II mapping (frozen)
+  SourceGraphNode -> CanonicalClaim -> KnowledgeNode or retained ResidualArtifact
 
 CompressionAtlas
   ├─ comparison SourceFamily
@@ -105,22 +118,22 @@ The Knowledge schema separately rejects:
 
 The roadmap schema separately rejects duplicate or out-of-order part and chapter identities, fewer than 101 working chapters, empty parts, missing or non-earlier candidate prerequisites, cycles, and mismatched working counts. Module-level checks require every candidate compression-cluster ID to exist and every written Knowledge chapter to be mapped exactly once. Tests keep planned chapters non-clickable and guard against redundant direct edges in the written graph.
 
-The source-coverage validator separately requires:
+The per-book source-graph validator separately requires:
 
-- every approved source row to retain its stable sequential ID, exact order, declared count, and ordered-manifest fingerprint;
-- each row to remain unresolved, resolve every declared volume/part component to exactly one owned edition, or name an independently administrator-reviewed non-cyclic duplicate that terminates at a resolved row;
-- every exact edition to carry an artifact fingerprint and an ordered, content-fingerprinted source-unit manifest;
-- complete editions to cover every manifest unit exactly once, contain at least one theorem occurrence, and have independently administrator-reviewed scan segments whose evidence matches the edition artifact;
-- each scan segment to record either a nonempty exact occurrence list or an explicit theorem-free attestation, with machine-checked bidirectional occurrence membership;
-- every theorem occurrence to retain a permanent ID and address, exact source unit, label, locator, normalized claim, and one disposition;
-- verified core/equivalent/alternate/bridge dispositions to reach reviewed canonical claims bound to content-fingerprinted nodes in the current Knowledge edition, while specialist/history dispositions reach reviewed residual artifacts;
-- source-stronger and overlapping mappings to retain all unmatched mathematics in reviewed residual artifacts, while exact and source-weaker mappings cannot carry spurious residuals;
-- a proposal or extraction audit before each source resolution, scan, canonical claim, residual, occurrence decision, or completed edition can be approved, with proposer/extractor and reviewer required to differ; and
-- only actors named in the verification policy to issue administrative approvals.
+- the generated manifest to index all 717 required components exactly once, with a safe unique path and identity matching its immutable source row/component;
+- every individual file to validate independently, so one damaged book cannot be hidden by aggregate counts;
+- exact editions to carry stable locators, access/license notes, artifact fingerprints, and ordered content-fingerprinted source-unit manifests;
+- every extracted source unit to have an evidence-bound inventory listing its theorem/support nodes or explicitly attesting that the unit is theorem-free; reviewed extraction requires independent review of every unit decision;
+- every theorem-like source occurrence and every supporting graph node to retain a permanent local ID, kind, exact label, source unit, and locator;
+- every direct dependency to name an existing dependent node and an existing distinct prerequisite node or external input, plus a role, rationale, evidence locator, capture audit, and review state; duplicate and self edges are rejected;
+- captured candidate edges and source references to remain distinguishable from independently reviewed evidence;
+- a graph-complete theorem-like node to have a reviewed source route with reviewed dependencies, or an explicit reviewed root/external-input attestation;
+- a graph-complete component to cover every immutable source unit, contain every theorem-like result in scope, and carry an independent administrative review by someone other than the extractor; and
+- compression dispositions and canonical Knowledge targets to remain outside the Phase-I completion predicate.
 
-The publication build recomputes the ordered source manifest, every edition unit manifest, every current Knowledge-node content fingerprint, and every administrative review's subject fingerprint. A stale source, target, or approval therefore fails publication instead of inheriting an old reviewed state.
+The publication build recomputes the ordered source manifest, the 717-component book manifest, every edition unit manifest, every current Knowledge-node content fingerprint, and every administrative review's subject fingerprint. A stale source, graph, target, or approval therefore fails publication instead of inheriting an old reviewed state.
 
-The current 688-row registry is intentionally unresolved. The public site may promise that every registered theorem will be accounted for, but it may not claim completed coverage until all exact editions are exhaustively reconciled.
+The current 688-row / 717-component registry is intentionally incomplete. S0060 contains the first pinned candidate extraction; the other 716 component files are placeholders. Creating a placeholder establishes ownership and queue identity only, while a candidate extraction still cannot claim theorem coverage until its inventory and dependency decisions receive independent review.
 
 Required node fields also keep motivation, tutorial prose, a key idea, at least one worked example, a progressively disclosed exercise, source lineage, rewrite status, read time, and tags in the canonical data rather than the React components. Knowledge-node exercises are part of the textbook; the `/train` pool is independently derived from paper results.
 

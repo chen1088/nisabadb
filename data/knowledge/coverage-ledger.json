@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.1.0",
+  "updatedAt": "2026-08-22",
+  "inventoryPolicyVersion": "theorem-floor-v1",
+  "inventoryPolicy": "Inventory every theorem, lemma, proposition, corollary, claim, named result, and result embedded in an exercise for each exact edition. Record definitions, methods, examples, and exercises in the same ledger as extraction expands.",
+  "editions": [],
+  "scanSegments": [],
+  "canonicalClaims": [],
+  "residualArtifacts": [],
+  "theoremOccurrences": []
+}

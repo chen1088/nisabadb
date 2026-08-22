@@ -24,10 +24,12 @@ function RouteEffects() {
   useEffect(() => {
     if (!targetId) return;
     const timer = window.setTimeout(() => {
-      document.getElementById(targetId)?.scrollIntoView({ block: "start" });
+      const target = document.getElementById(targetId);
+      target?.scrollIntoView?.({ block: "start" });
+      target?.focus({ preventScroll: true });
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [pathname, targetId]);
+  }, [pathname, search, targetId]);
 
   return null;
 }

@@ -4,8 +4,12 @@
 
 `src/data/corpus.json` is the build-time source for the paper catalog, citation explorer, reviewed paper graphs, canonical theorem pages, distilled-paper view, and Train exercise pool. `src/data/knowledge.json` is the source for one canonical living textbook whose exposition is independently rewritten into NisabaDB's notation. Rendering code never owns mathematical proof text or third-party textbook prose. `src/data/schema.ts` and `src/data/knowledge-schema.ts` validate the paper and textbook layers as the application loads and in tests.
 
+The source-compression control layer is separate from both. `data/knowledge/source-records.json` preserves all 688 approved candidate rows behind an ordered-manifest fingerprint. `data/knowledge/coverage-ledger.json` will hold exact editions, immutable source-unit manifests, scan segments, theorem occurrences, canonical claims, and retained residual artifacts; `data/knowledge/verification-policy.json` names the administrators allowed to approve review records. `src/data/compression.json` is a lightweight public atlas of whole-field convergence decisions. The source registry and audit files are copied as lazy data and are never eagerly imported into ordinary learner lessons.
+
 - **Papers** exposes the large provisional corpus, a bounded citation-ancestry projection, processing backlog, and one complete proof-dependency graph for each reviewed paper. Main results and sections are focus points inside that graph, not separate graph tabs. Paper dependency disclosures start folded; readers expand only the result branches they want to inspect.
 - **Knowledge** is one source-independent, living rewritten textbook rather than a shelf of books. Chapters provide a conventional reading order, while `KnowledgeNode.prerequisiteIds` provide the canonical dependency DAG. A shared notation registry fixes one main convention and records source-specific aliases. Per-node source references remain collapsed lineage and comparison evidence behind the exposition.
+- **Knowledge / Compression** is a read-only atlas of candidate common cores, notation resolutions, source-family convergence, candidate source-route patterns, minimized-route hypotheses, and residual dispositions. It is a plan and audit surface, not evidence that extraction is complete.
+- **Knowledge / Coverage** is the non-omission ledger. It preserves every candidate row and exposes separate derived counts for resolved rows, fully reconciled rows, inventoried editions, terminal theorem dispositions, reviewed Knowledge mappings, and reviewed residuals. Selecting a source reveals its exact editions and theorem-level addresses once they exist.
 - **Unsolved** remains empty until a precise problem passes an administratively reviewed, dated literature audit.
 - **Train** derives proof exercises from meaningful theorem-like nodes in gold paper graphs. An eligible result must have a reviewed, complete proof route and cannot be an imported result. Selection is random, the stored proof begins hidden, and prerequisite, proof-idea, and reviewed-route help is disclosed progressively for either a human or AI trainee.
 - **Materials** and **Learn** are no longer product surfaces. Their legacy URLs remain only as redirects to Knowledge and Train respectively.
@@ -36,6 +40,24 @@ KnowledgeBook
   │      ├─ firstNodeId -> KnowledgeNode
   │      └─ source-specific aliases and conflict notes
   └─ SourceLineage ── official URL and editorial use note
+
+SourceRecord ── resolves to one or more ──> SourceEdition
+  ├─ exact list row                         ├─ required volume/part component
+  └─ required edition components           ├─ immutable SourceUnit manifest
+                                            ├─ ScanSegment ── exact unit subset + source evidence
+                                └─ TheoremOccurrence
+                                     ├─ exact label and locator
+                                     ├─ normalized claim
+                                     ├─ disposition and mapping relation
+                                     └─ targetCanonicalClaimIds -> CanonicalClaim
+                                                                   └─ knowledgeNodeIds -> KnowledgeNode
+
+CompressionAtlas
+  ├─ comparison SourceFamily
+  ├─ common-core Cluster
+  ├─ candidate source pattern / minimized / reinterpretation Route
+  ├─ canonical notation resolution
+  └─ residual item: bridge, alternate, specialist, history, or unresolved
 
 Published paperback (planned) ── selected excerpts from ──> KnowledgeBook
 ```
@@ -74,6 +96,23 @@ The Knowledge schema separately rejects:
 - missing or repeated notation references;
 - source-lineage references whose source record is missing; and
 - a knowledge node marked `trainable` without a `proofGoal`, or a `proofGoal` on a node not marked `trainable`.
+
+The source-coverage validator separately requires:
+
+- every approved source row to retain its stable sequential ID, exact order, declared count, and ordered-manifest fingerprint;
+- each row to remain unresolved, resolve every declared volume/part component to exactly one owned edition, or name an independently administrator-reviewed non-cyclic duplicate that terminates at a resolved row;
+- every exact edition to carry an artifact fingerprint and an ordered, content-fingerprinted source-unit manifest;
+- complete editions to cover every manifest unit exactly once, contain at least one theorem occurrence, and have independently administrator-reviewed scan segments whose evidence matches the edition artifact;
+- each scan segment to record either a nonempty exact occurrence list or an explicit theorem-free attestation, with machine-checked bidirectional occurrence membership;
+- every theorem occurrence to retain a permanent ID and address, exact source unit, label, locator, normalized claim, and one disposition;
+- verified core/equivalent/alternate/bridge dispositions to reach reviewed canonical claims bound to content-fingerprinted nodes in the current Knowledge edition, while specialist/history dispositions reach reviewed residual artifacts;
+- source-stronger and overlapping mappings to retain all unmatched mathematics in reviewed residual artifacts, while exact and source-weaker mappings cannot carry spurious residuals;
+- a proposal or extraction audit before each source resolution, scan, canonical claim, residual, occurrence decision, or completed edition can be approved, with proposer/extractor and reviewer required to differ; and
+- only actors named in the verification policy to issue administrative approvals.
+
+The publication build recomputes the ordered source manifest, every edition unit manifest, every current Knowledge-node content fingerprint, and every administrative review's subject fingerprint. A stale source, target, or approval therefore fails publication instead of inheriting an old reviewed state.
+
+The current 688-row registry is intentionally unresolved. The public site may promise that every registered theorem will be accounted for, but it may not claim completed coverage until all exact editions are exhaustively reconciled.
 
 Required node fields also keep motivation, tutorial prose, a key idea, at least one worked example, a progressively disclosed exercise, source lineage, rewrite status, read time, and tags in the canonical data rather than the React components. Knowledge-node exercises are part of the textbook; the `/train` pool is independently derived from paper results.
 
@@ -142,6 +181,8 @@ The current application is static-first by design and eagerly loads the committe
 - `/` — project landing page and featured-paper entry
 - `/papers` — paper-corpus command view, rooted citation projection, backlog, and paginated catalog
 - `/knowledge` — the canonical living textbook; `?node=<slug>` selects a stable knowledge node within its chapter and local DAG context
+- `/knowledge/compression` — read-only whole-field compression atlas and residual ledger
+- `/knowledge/coverage` — lazy-loaded source, edition, and theorem-occurrence coverage audit
 - `/papers/:paperId` — metadata, graph, proofs, citations, and formal coverage
 - `/papers/:paperId/distilled` — generated linear reading
 - `/theorems/:globalId` — canonical deep-linked statement

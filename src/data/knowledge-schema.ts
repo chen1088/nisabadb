@@ -36,7 +36,8 @@ export const notationEntrySchema = z.object({
 });
 
 export const knowledgeNodeSchema = z.object({
-  id: z.string().regex(/^K\d{2}$/),
+  id: z.string().regex(/^K\d{2,6}$/),
+  contentSha256: z.string().regex(/^[a-f0-9]{64}$/),
   slug: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
   chapterId: z.string().min(1),
   section: z.string().regex(/^\d+\.\d+$/),

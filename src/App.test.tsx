@@ -1,11 +1,14 @@
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { corpus as browserCorpus } from "./components/content";
 import { knowledgeNodes } from "./data/knowledge";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
 
 function renderAt(path: string) {
   return render(
@@ -55,8 +58,88 @@ describe("NisabaDB application", () => {
     );
     expect(screen.getByLabelText(/textbook table of contents/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/local knowledge dependency graph/i)).toBeInTheDocument();
-    expect(screen.getByText(/open the 30-node dependency dag/i).closest("details")).not.toHaveAttribute("open");
+    expect(screen.getByText(/open all 30 written nodes/i).closest("details")).not.toHaveAttribute("open");
+    expect(screen.getByRole("link", { name: /explore the compression atlas/i })).toHaveAttribute("href", "/knowledge/compression");
+    expect(screen.getByRole("link", { name: /audit all 688 source records/i })).toHaveAttribute("href", "/knowledge/coverage");
     expect(within(navigation).queryByRole("link", { name: /materials|learn/i })).not.toBeInTheDocument();
+  });
+
+  it("keeps the whole-field compression atlas under Knowledge", async () => {
+    renderAt("/knowledge/compression?cluster=linearity-as-common-engine");
+    const selectedClusterHeading = await screen.findByRole("heading", { name: /linearity as a common computational engine/i });
+    await waitFor(() => expect(selectedClusterHeading).toHaveFocus());
+    const navigation = screen.getByRole("navigation", { name: /primary navigation/i });
+    expect(within(navigation).getAllByRole("link").map((link) => link.textContent)).toEqual([
+      "Knowledge",
+      "Papers",
+      "Unsolved",
+      "Train",
+    ]);
+    const originalRoute = screen.getByText("Candidate source-route pattern", { selector: "summary span" }).closest("details");
+    expect(originalRoute).not.toHaveAttribute("open");
+    expect(screen.getByRole("heading", { name: /what does not disappear/i })).toBeInTheDocument();
+  });
+
+  it("shows source coverage as an incomplete theorem ledger, not a bookshelf", async () => {
+    const registry = {
+      schemaVersion: "1.1.0",
+      updatedAt: "2026-08-22",
+      sourceSetName: "Fixture registry",
+      sourceSetRevision: "fixture-r1",
+      approvedRecordCount: 1,
+      approvedManifestSha256: "a".repeat(64),
+      provenance: "Fixture provenance",
+      coverageTarget: "Every theorem remains traceable.",
+      families: [{ id: "F01", number: 1, title: "Elementary mathematics" }],
+      records: [{
+        id: "S0001",
+        ordinal: 1,
+        title: "Fixture Mathematics",
+        authorLine: "Ada Example",
+        rawCitation: "Fixture Mathematics — Ada Example",
+        familyId: "F01",
+        requiredEditionComponents: [{ id: "complete-source", label: "Complete fixture source" }],
+        resolutionState: "unresolved",
+        editionIds: [],
+        duplicateOfRecordId: null,
+        duplicateEvidence: null,
+        resolutionProposalAudit: null,
+        resolutionReview: null,
+      }],
+    };
+    const ledger = {
+      schemaVersion: "1.1.0",
+      updatedAt: "2026-08-22",
+      inventoryPolicyVersion: "theorem-floor-v1",
+      inventoryPolicy: "Every theorem is inventoried.",
+      editions: [],
+      scanSegments: [],
+      canonicalClaims: [],
+      residualArtifacts: [],
+      theoremOccurrences: [],
+    };
+    const verificationPolicy = {
+      schemaVersion: "1.0.0",
+      updatedAt: "2026-08-22",
+      policyRevision: "fixture-policy",
+      requireIndependentAdministrativeReview: true,
+      administrators: [{ actorId: "admin:fixture", displayName: "Fixture administrator" }],
+    };
+    vi.stubGlobal("fetch", vi.fn(async (input: string | URL | Request) => ({
+      ok: true,
+      json: async () => String(input).includes("source-records")
+        ? registry
+        : String(input).includes("verification-policy")
+          ? verificationPolicy
+          : ledger,
+    })));
+
+    renderAt("/knowledge/coverage?source=S0001");
+    expect(await screen.findByRole("heading", { name: /every source theorem gets a durable address/i })).toBeInTheDocument();
+    const selectedSourceHeading = await screen.findByRole("heading", { name: "Fixture Mathematics" });
+    await waitFor(() => expect(selectedSourceHeading).toHaveFocus());
+    expect(screen.getByText(/coverage is incomplete/i)).toBeInTheDocument();
+    expect(screen.getByText(/not a reading list or a materials shelf/i)).toBeInTheDocument();
   });
 
   it("reads rewritten knowledge with unified notation and searchable chapters", () => {

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "updatedAt": "2026-08-22",
+  "policyRevision": "administrator-review-v1",
+  "requireIndependentAdministrativeReview": true,
+  "administrators": [
+    {
+      "actorId": "github:chen1088",
+      "displayName": "NisabaDB administrator"
+    }
+  ]
+}

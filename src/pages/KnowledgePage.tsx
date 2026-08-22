@@ -83,12 +83,39 @@ export function KnowledgePage() {
         </dl>
       </header>
 
+      <section className="compression-contract page-shell" aria-labelledby="compression-contract-title">
+        <div className="compression-contract-copy">
+          <p className="eyebrow">The source-compression program</p>
+          <h2 id="compression-contract-title">Many books become one honest mathematical language.</h2>
+          <p>We independently rewrite shared ideas in one canonical language while keeping every source theorem traceable to an exact edition, locator, and disposition.</p>
+        </div>
+        <div className="compression-contract-flow" aria-label="Textbook compression status">
+          <div><strong>{__SOURCE_RECORD_COUNT__}</strong><span>source records preserved</span></div>
+          <span aria-hidden="true">→</span>
+          <div><strong>{__COMPRESSION_SOURCE_FAMILY_COUNT__}</strong><span>cross-cutting lenses over {__SOURCE_BRANCH_COUNT__} intake branches</span></div>
+          <span aria-hidden="true">→</span>
+          <div><strong>{__COMPRESSION_CLUSTER_COUNT__}</strong><span>whole-field clusters</span></div>
+          <span aria-hidden="true">+</span>
+          <div><strong>{__COMPRESSION_RESIDUAL_COUNT__}</strong><span>explicit residual decisions</span></div>
+        </div>
+        <div className="compression-contract-rules">
+          <p><span>01</span><strong>Rewrite the common idea</strong><small>Source prose and chapter order do not control the canonical lesson.</small></p>
+          <p><span>02</span><strong>Unify notation</strong><small>Aliases translate into one stable language instead of spawning duplicate knowledge.</small></p>
+          <p><span>03</span><strong>Keep honest remainders</strong><small>Distinct mathematics survives as a bridge, route, extension, history, or open editorial question.</small></p>
+          <p><span>04</span><strong>Lose no theorem</strong><small>Compression may merge exposition; it may never erase a source occurrence or its exact lineage.</small></p>
+        </div>
+        <div className="compression-contract-links">
+          <Link to="/knowledge/compression">Explore the compression atlas <span aria-hidden="true">→</span></Link>
+          <Link to="/knowledge/coverage">Audit all {__SOURCE_RECORD_COUNT__} source records <span aria-hidden="true">→</span></Link>
+        </div>
+      </section>
+
       <details className="textbook-global-dag page-shell">
         <summary>
-          <span>Whole-book map</span>
-          <strong>Open the {knowledgeNodes.length}-node dependency DAG</strong>
+          <span>Whole-book dependency index</span>
+          <strong>Open all {knowledgeNodes.length} written nodes and their prerequisites</strong>
         </summary>
-        <div className="textbook-global-dag-body" aria-label="Global knowledge dependency graph">
+        <div className="textbook-global-dag-body" aria-label="Global knowledge dependency index">
           <p>
             Each card names its direct prerequisites. “Needs K04” means the current idea depends
             on K04; chapter order is only a reading convenience and does not create an edge.
@@ -170,7 +197,7 @@ export function KnowledgePage() {
             <span>{selected.readMinutes} min</span>
           </div>
           <p className="textbook-node-kind">{selected.section} · {kindLabels[selected.kind]} · {selected.id}</p>
-          <h2 id="knowledge-node-title">{selected.title}</h2>
+          <h2 id="knowledge-node-title" tabIndex={-1}>{selected.title}</h2>
           <p className="textbook-purpose">{selected.purpose}</p>
 
           <section className="textbook-prerequisite-strip" aria-label="Required knowledge">
@@ -216,6 +243,10 @@ export function KnowledgePage() {
             <section className="textbook-section">
               <h3>Notation used here</h3>
               <div className="notation-table" role="table" aria-label="Canonical notation">
+                <div className="visually-hidden" role="row">
+                  <span role="columnheader">Symbol</span>
+                  <span role="columnheader">Meaning and source aliases</span>
+                </div>
                 {notation.map((entry) => entry ? (
                   <div role="row" key={entry.id}>
                     <div role="cell"><MathMarkdown>{`$${entry.symbol}$`}</MathMarkdown></div>

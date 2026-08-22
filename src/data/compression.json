@@ -1,0 +1,2322 @@
+{
+  "schemaVersion": "1.0.0",
+  "updatedAt": "2026-08-22",
+  "title": "Nisaba whole-field compression atlas",
+  "thesis": "Mathematics should be rebuilt as a small dependency graph of reusable ideas, while every source theorem remains traceable through a separate occurrence ledger.",
+  "rewritePolicy": "We independently rewrite each shared idea in one canonical language. A source-specific presentation survives whenever it carries different mathematics, a useful route, an application, history, or an unresolved editorial choice.",
+  "coverageNote": "The atlas describes the compression design; it does not claim the books are already processed. The fingerprint-locked source ledger preserves all 688 approved rows, and no edition is complete until its immutable unit manifest is fully scanned and every theorem-like occurrence has an administrator-reviewed Knowledge or residual target.",
+  "bands": [
+    {
+      "id": "language-construction",
+      "title": "Language and construction",
+      "summary": "Give a beginner the smallest precise language for building objects, arguments, and recursive structures.",
+      "clusterIds": [
+        "precise-mathematical-language",
+        "numbers-and-algebraic-laws",
+        "induction-recursion-decomposition"
+      ]
+    },
+    {
+      "id": "structure",
+      "title": "Structure",
+      "summary": "Reuse symmetry, linearity, and closeness instead of reteaching their instances.",
+      "clusterIds": [
+        "symmetry-actions-invariants",
+        "linearity-as-common-engine",
+        "topology-continuity-completion"
+      ]
+    },
+    {
+      "id": "analysis-uncertainty",
+      "title": "Analysis and uncertainty",
+      "summary": "Connect size, randomness, approximation, and calculus through controlled limiting arguments.",
+      "clusterIds": [
+        "measure-integration-expectation",
+        "randomness-conditioning-concentration",
+        "approximation-error-stability",
+        "local-to-global-calculus"
+      ]
+    },
+    {
+      "id": "systems-decisions",
+      "title": "Systems and decisions",
+      "summary": "Study changing states, constrained choices, and networks with shared invariants and certificates.",
+      "clusterIds": [
+        "evolution-transitions-flows",
+        "optimization-duality-equilibrium",
+        "networks-paths-flows-laplacians"
+      ]
+    },
+    {
+      "id": "computation-information",
+      "title": "Computation and information",
+      "summary": "Turn descriptions into normal forms and quantify what data, codes, learners, and observers distinguish.",
+      "clusterIds": [
+        "presentations-rewriting-normal-forms",
+        "information-coding-learning"
+      ]
+    },
+    {
+      "id": "unification-verification",
+      "title": "Advanced unification and verification",
+      "summary": "Expose composition, scale, and checkable evidence without equating specialist theories.",
+      "clusterIds": [
+        "composition-gluing-universal-properties",
+        "asymptotics-scale-universality",
+        "proof-certificates-verification"
+      ]
+    }
+  ],
+  "sourceFamilies": [
+    {
+      "id": "elementary-language",
+      "title": "Elementary language",
+      "branch": "Arithmetic, school algebra, geometry, and mathematical literacy",
+      "inventoryState": "section-mapping",
+      "editorialUse": "Find the shortest route from ordinary language to precise symbols, laws, functions, and exact checking.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0007",
+          "citation": "Basic Mathematics — Serge Lang"
+        },
+        {
+          "sourceRecordId": "S0005",
+          "citation": "Prealgebra 2e — Lynn Marecek, MaryAnne Anthony-Smith, Andrea Honeycutt Mathis"
+        },
+        {
+          "sourceRecordId": "S0038",
+          "citation": "Geometry Revisited — H. S. M. Coxeter, S. L. Greitzer"
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F01",
+          "title": "Zero-background and school mathematics"
+        },
+        {
+          "id": "F02",
+          "title": "Proof, reasoning, and problem solving"
+        },
+        {
+          "id": "F31",
+          "title": "History, philosophy, pedagogy, and broad references"
+        }
+      ]
+    },
+    {
+      "id": "proof-foundations",
+      "title": "Proof and foundations",
+      "branch": "Logic, set theory, type theory, and proof practice",
+      "inventoryState": "section-mapping",
+      "editorialUse": "Separate universal proof moves from competing foundational implementations.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0042",
+          "citation": "Book of Proof — Richard Hammack"
+        },
+        {
+          "sourceRecordId": "S0044",
+          "citation": "How to Prove It — Daniel J. Velleman"
+        },
+        {
+          "sourceRecordId": "S0219",
+          "citation": "Homotopy Type Theory — The Univalent Foundations Program"
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F02",
+          "title": "Proof, reasoning, and problem solving"
+        },
+        {
+          "id": "F10",
+          "title": "Categories, homotopy, and higher structures"
+        },
+        {
+          "id": "F15",
+          "title": "Logic, set theory, model theory, and computability"
+        },
+        {
+          "id": "F16",
+          "title": "Formal verification and proof assistants"
+        }
+      ]
+    },
+    {
+      "id": "arithmetic-number-theory",
+      "title": "Numbers and arithmetic structure",
+      "branch": "Number systems and elementary, algebraic, analytic, and computational number theory",
+      "inventoryState": "candidate-list",
+      "editorialUse": "Connect concrete calculation, divisibility, structure, algorithms, and asymptotic questions.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0186",
+          "citation": "A Computational Introduction to Number Theory and Algebra — Victor Shoup"
+        },
+        {
+          "sourceRecordId": "S0267",
+          "citation": "Introduction to Analytic Number Theory — Tom M. Apostol"
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F01",
+          "title": "Zero-background and school mathematics"
+        },
+        {
+          "id": "F08",
+          "title": "Abstract, commutative, computational, and homological algebra"
+        },
+        {
+          "id": "F13",
+          "title": "Number theory"
+        }
+      ]
+    },
+    {
+      "id": "algebra-symmetry",
+      "title": "Algebra and symmetry",
+      "branch": "Groups, rings, fields, modules, representation theory, and invariant theory",
+      "inventoryState": "candidate-list",
+      "editorialUse": "Recast abstract structure as operations, transformations, invariants, presentations, and computations when exact.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0165",
+          "citation": "Abstract Algebra — David S. Dummit, Richard M. Foote"
+        },
+        {
+          "sourceRecordId": "S0193",
+          "citation": "Representation Theory: A First Course — William Fulton, Joe Harris"
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F08",
+          "title": "Abstract, commutative, computational, and homological algebra"
+        },
+        {
+          "id": "F09",
+          "title": "Groups, representation theory, Lie theory, and algebraic combinatorics"
+        },
+        {
+          "id": "F10",
+          "title": "Categories, homotopy, and higher structures"
+        },
+        {
+          "id": "F12",
+          "title": "Algebraic geometry and arithmetic geometry"
+        }
+      ]
+    },
+    {
+      "id": "linear-computation",
+      "title": "Linear structure and computation",
+      "branch": "Linear algebra, matrix analysis, numerical methods, statistics, and optimization",
+      "inventoryState": "section-mapping",
+      "editorialUse": "Unify maps, matrices, algorithms, approximation, and data applications around linear combinations.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0098",
+          "citation": "Linear Algebra Done Right — Sheldon Axler"
+        },
+        {
+          "sourceRecordId": "S0096",
+          "citation": "Introduction to Applied Linear Algebra — Stephen Boyd, Lieven Vandenberghe"
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F05",
+          "title": "Linear algebra and matrix analysis"
+        },
+        {
+          "id": "F18",
+          "title": "Statistics, causal inference, and statistical learning"
+        },
+        {
+          "id": "F21",
+          "title": "Numerical and computational mathematics"
+        },
+        {
+          "id": "F22",
+          "title": "Optimization, operations research, control, and games"
+        }
+      ]
+    },
+    {
+      "id": "topology-geometry",
+      "title": "Geometry and topology",
+      "branch": "Metric, topological, differential, algebraic, and discrete geometry",
+      "inventoryState": "candidate-list",
+      "editorialUse": "Connect shape, distance, neighborhoods, invariance, coordinates, and gluing without erasing hypotheses.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0220",
+          "citation": "Topology — James R. Munkres"
+        },
+        {
+          "sourceRecordId": "S0243",
+          "citation": "Algebraic Topology — Allen Hatcher"
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F10",
+          "title": "Categories, homotopy, and higher structures"
+        },
+        {
+          "id": "F11",
+          "title": "Topology and geometry"
+        },
+        {
+          "id": "F12",
+          "title": "Algebraic geometry and arithmetic geometry"
+        }
+      ]
+    },
+    {
+      "id": "analysis-change",
+      "title": "Change, limits, and approximation",
+      "branch": "Calculus, real, complex, harmonic, functional, and operator analysis",
+      "inventoryState": "section-mapping",
+      "editorialUse": "Replace repeated calculus-to-analysis restarts with one staged account of error, limits, and linearization.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0084",
+          "citation": "Calculus — Michael Spivak"
+        },
+        {
+          "sourceRecordId": "S0108",
+          "citation": "Understanding Analysis — Stephen Abbott"
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F04",
+          "title": "Calculus and vector calculus"
+        },
+        {
+          "id": "F06",
+          "title": "Real, measure, functional, and operator analysis"
+        },
+        {
+          "id": "F07",
+          "title": "Complex, harmonic, asymptotic, and special-function analysis"
+        },
+        {
+          "id": "F21",
+          "title": "Numerical and computational mathematics"
+        }
+      ]
+    },
+    {
+      "id": "measure-probability",
+      "title": "Measure, probability, and statistics",
+      "branch": "Integration, probability, stochastic processes, inference, and statistics",
+      "inventoryState": "candidate-list",
+      "editorialUse": "Build counting, weighted averages, integration, expectation, inference, and concentration as one ladder.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0120",
+          "citation": "Measure, Integration & Real Analysis — Sheldon Axler"
+        },
+        {
+          "sourceRecordId": "S0336",
+          "citation": "Introduction to Probability — Joseph K. Blitzstein, Jessica Hwang"
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F06",
+          "title": "Real, measure, functional, and operator analysis"
+        },
+        {
+          "id": "F17",
+          "title": "Probability and stochastic processes"
+        },
+        {
+          "id": "F18",
+          "title": "Statistics, causal inference, and statistical learning"
+        }
+      ]
+    },
+    {
+      "id": "dynamics-equations",
+      "title": "Equations and evolving systems",
+      "branch": "ODE, PDE, dynamics, stochastic processes, transport, and control",
+      "inventoryState": "candidate-list",
+      "editorialUse": "Expose states, transitions, generators, invariants, and stability before specialized techniques.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0405",
+          "citation": "Ordinary Differential Equations — Vladimir I. Arnold"
+        },
+        {
+          "sourceRecordId": "S0428",
+          "citation": "Partial Differential Equations — Lawrence C. Evans"
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F17",
+          "title": "Probability and stochastic processes"
+        },
+        {
+          "id": "F19",
+          "title": "ODEs, dynamical systems, bifurcation, and ergodic theory"
+        },
+        {
+          "id": "F20",
+          "title": "PDEs, calculus of variations, conservation laws, and transport"
+        },
+        {
+          "id": "F22",
+          "title": "Optimization, operations research, control, and games"
+        }
+      ]
+    },
+    {
+      "id": "optimization-control",
+      "title": "Optimization, games, and control",
+      "branch": "Convexity, operations research, variational methods, games, and control",
+      "inventoryState": "candidate-list",
+      "editorialUse": "Unify feasible choices, objectives, certificates, dual variables, and equilibrium.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0483",
+          "citation": "Convex Optimization — Stephen Boyd, Lieven Vandenberghe"
+        },
+        {
+          "sourceRecordId": "S0490",
+          "citation": "Numerical Optimization — Jorge Nocedal, Stephen J. Wright"
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F20",
+          "title": "PDEs, calculus of variations, conservation laws, and transport"
+        },
+        {
+          "id": "F22",
+          "title": "Optimization, operations research, control, and games"
+        },
+        {
+          "id": "F27",
+          "title": "Finance, economics, actuarial mathematics, and social choice"
+        }
+      ]
+    },
+    {
+      "id": "discrete-networks",
+      "title": "Discrete structures and algorithms",
+      "branch": "Combinatorics, graphs, algorithms, automata, complexity, and networks",
+      "inventoryState": "candidate-list",
+      "editorialUse": "Join construction, induction, counting, paths, cuts, recurrences, and computational cost.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0061",
+          "citation": "Mathematics for Computer Science — Eric Lehman, F. Thomson Leighton, Albert R. Meyer"
+        },
+        {
+          "sourceRecordId": "S0291",
+          "citation": "Graph Theory — Reinhard Diestel"
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F03",
+          "title": "Discrete mathematics and undergraduate combinatorics"
+        },
+        {
+          "id": "F14",
+          "title": "Enumerative, extremal, graph, additive, and probabilistic combinatorics"
+        },
+        {
+          "id": "F23",
+          "title": "Algorithms, automata, computability, and complexity"
+        },
+        {
+          "id": "F28",
+          "title": "Networks and complex systems"
+        }
+      ]
+    },
+    {
+      "id": "computational-algebra",
+      "title": "Symbolic and computational algebra",
+      "branch": "Computer algebra, algebraic geometry, number theory, and automated reasoning",
+      "inventoryState": "candidate-list",
+      "editorialUse": "Use presentations, rewriting, normal forms, certificates, and complexity to make algebra executable.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0184",
+          "citation": "Modern Computer Algebra — Joachim von zur Gathen, Jürgen Gerhard"
+        },
+        {
+          "sourceRecordId": "S0180",
+          "citation": "Ideals, Varieties, and Algorithms — David A. Cox, John Little, Donal O’Shea"
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F08",
+          "title": "Abstract, commutative, computational, and homological algebra"
+        },
+        {
+          "id": "F12",
+          "title": "Algebraic geometry and arithmetic geometry"
+        },
+        {
+          "id": "F13",
+          "title": "Number theory"
+        },
+        {
+          "id": "F21",
+          "title": "Numerical and computational mathematics"
+        }
+      ]
+    },
+    {
+      "id": "information-tcs",
+      "title": "Information and theoretical computation",
+      "branch": "Information, coding, cryptography, learning, property testing, and complexity",
+      "inventoryState": "candidate-list",
+      "editorialUse": "Connect distinguishability, uncertainty, codes, learning, pseudorandomness, and proof complexity.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0542",
+          "citation": "Elements of Information Theory — Thomas M. Cover, Joy A. Thomas"
+        },
+        {
+          "sourceRecordId": "S0559",
+          "citation": "Analysis of Boolean Functions — Ryan O’Donnell"
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F18",
+          "title": "Statistics, causal inference, and statistical learning"
+        },
+        {
+          "id": "F23",
+          "title": "Algorithms, automata, computability, and complexity"
+        },
+        {
+          "id": "F24",
+          "title": "Information, coding, cryptography, learning, and property testing"
+        }
+      ]
+    },
+    {
+      "id": "mathematical-physics",
+      "title": "Mathematical physics",
+      "branch": "Mechanics, quantum theory, relativity, fields, and statistical mechanics",
+      "inventoryState": "candidate-list",
+      "editorialUse": "Reuse shared mathematics while retaining physical modeling assumptions.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0584",
+          "citation": "Quantum Theory for Mathematicians — Brian C. Hall"
+        },
+        {
+          "sourceRecordId": "S0589",
+          "citation": "Statistical Mechanics — James P. Sethna"
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F25",
+          "title": "Mathematical physics"
+        }
+      ]
+    },
+    {
+      "id": "interdisciplinary-modeling",
+      "title": "Interdisciplinary modeling",
+      "branch": "Biology, medicine, economics, finance, climate, networks, and engineering",
+      "inventoryState": "candidate-list",
+      "editorialUse": "Extract reusable modeling moves while keeping units, causal assumptions, and empirical limits explicit.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0607",
+          "citation": "Mathematical Models in Biology — Leah Edelstein-Keshet"
+        },
+        {
+          "sourceRecordId": "S0640",
+          "citation": "Networks: An Introduction — Mark Newman"
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F26",
+          "title": "Mathematical biology, medicine, and ecology"
+        },
+        {
+          "id": "F27",
+          "title": "Finance, economics, actuarial mathematics, and social choice"
+        },
+        {
+          "id": "F28",
+          "title": "Networks and complex systems"
+        },
+        {
+          "id": "F29",
+          "title": "Signals, imaging, inverse problems, and uncertainty"
+        },
+        {
+          "id": "F30",
+          "title": "Geophysical, atmospheric, oceanic, and climate mathematics"
+        }
+      ]
+    },
+    {
+      "id": "formal-verification",
+      "title": "Formal proof and verification",
+      "branch": "Proof assistants, automated reasoning, model checking, and proof systems",
+      "inventoryState": "candidate-list",
+      "editorialUse": "Represent claims, dependencies, artifacts, checkers, and trust boundaries without privileging one backend.",
+      "representativeSources": [
+        {
+          "sourceRecordId": "S0323",
+          "citation": "Theorem Proving in Lean 4 — Jeremy Avigad, Leonardo de Moura, Soonho Kong, Sebastian Ullrich"
+        },
+        {
+          "sourceRecordId": "S0327",
+          "citation": "Software Foundations, Volume 1: Logical Foundations — Benjamin C. Pierce et al."
+        }
+      ],
+      "registryBranches": [
+        {
+          "id": "F15",
+          "title": "Logic, set theory, model theory, and computability"
+        },
+        {
+          "id": "F16",
+          "title": "Formal verification and proof assistants"
+        },
+        {
+          "id": "F23",
+          "title": "Algorithms, automata, computability, and complexity"
+        }
+      ]
+    }
+  ],
+  "clusters": [
+    {
+      "id": "precise-mathematical-language",
+      "slug": "precise-mathematical-language",
+      "title": "Objects, statements, functions, and proofs",
+      "status": "rewriting",
+      "frontierState": "written",
+      "rewritePotential": "high",
+      "sourceFamilyIds": [
+        "elementary-language",
+        "proof-foundations",
+        "discrete-networks"
+      ],
+      "knowledgeNodeIds": [
+        "K01",
+        "K02",
+        "K03",
+        "K04",
+        "K10",
+        "K11",
+        "K12",
+        "K13",
+        "K14",
+        "K15",
+        "K16",
+        "K17",
+        "K18",
+        "K20",
+        "K21",
+        "K22",
+        "K23",
+        "K24",
+        "K26",
+        "K27",
+        "K28",
+        "K29",
+        "K30"
+      ],
+      "canonicalIdea": "Mathematics talks about typed objects. Predicates make statements, functions transform objects, and proof rules establish quantified claims under explicit assumptions.",
+      "rewriteDecision": "Teach this language once. Later branches add structure, but they do not get private definitions of variable, equality, set, function, implication, or proof.",
+      "notationResolutions": [
+        {
+          "concept": "definition versus equality",
+          "canonical": ":= for definition; = for equality",
+          "aliases": [
+            "≔",
+            "≡",
+            "= used definitionally"
+          ],
+          "resolution": "A new name uses :=. Equality compares already meaningful expressions."
+        }
+      ],
+      "routes": [
+        {
+          "id": "precise-mathematical-language-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for objects, statements, functions, and proofs.",
+          "prerequisiteClusterIds": [],
+          "derivedFromRouteId": "precise-mathematical-language-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "precise-mathematical-language-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Set-theoretic and type-theoretic introductions remain source-faithful routes until their foundational equivalence is specified.",
+          "prerequisiteClusterIds": [],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "precise-mathematical-language-residual-1",
+          "title": "Set-theoretic and type-theoretic foundations",
+          "disposition": "alternate-route",
+          "reason": "They support much of the same ordinary mathematics but are not literally the same foundational theory.",
+          "status": "unresolved",
+          "sourceFamilyIds": [
+            "proof-foundations"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "precise-mathematical-language-residual-2",
+          "title": "Author-specific proof templates",
+          "disposition": "merge-into-core",
+          "reason": "Routine presentational variants become examples of the same small library of proof moves.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "elementary-language",
+            "proof-foundations"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Every later cluster",
+        "Formal declarations",
+        "Searchable prerequisites",
+        "Proof training"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "numbers-and-algebraic-laws",
+      "slug": "numbers-and-algebraic-laws",
+      "title": "Numbers, operations, and algebraic laws",
+      "status": "rewriting",
+      "frontierState": "written",
+      "rewritePotential": "high",
+      "sourceFamilyIds": [
+        "elementary-language",
+        "arithmetic-number-theory",
+        "algebra-symmetry",
+        "computational-algebra"
+      ],
+      "knowledgeNodeIds": [
+        "K05",
+        "K06",
+        "K07",
+        "K08",
+        "K09"
+      ],
+      "canonicalIdea": "Expressions are built from typed operations governed by laws. Number systems are connected structures, and equation solving uses transformations that preserve solutions.",
+      "rewriteDecision": "Unify arithmetic and elementary algebra around lawful rewriting, then reveal groups, rings, fields, and algorithms as added structure rather than a restart.",
+      "notationResolutions": [
+        {
+          "concept": "natural numbers",
+          "canonical": "ℕ includes 0",
+          "aliases": [
+            "ℕ starts at 1",
+            "ℕ₀"
+          ],
+          "resolution": "The canonical domain includes 0; positive naturals are stated explicitly."
+        }
+      ],
+      "routes": [
+        {
+          "id": "numbers-and-algebraic-laws-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for numbers, operations, and algebraic laws.",
+          "prerequisiteClusterIds": [
+            "precise-mathematical-language"
+          ],
+          "derivedFromRouteId": "numbers-and-algebraic-laws-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "numbers-and-algebraic-laws-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Computational, geometric, and axiomatic sources retain their examples while translating into the same operation laws.",
+          "prerequisiteClusterIds": [
+            "precise-mathematical-language"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "numbers-and-algebraic-laws-residual-1",
+          "title": "Alternative constructions of number systems",
+          "disposition": "alternate-route",
+          "reason": "Dedekind cuts, Cauchy completions, and type-theoretic constructions have different prerequisites.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "proof-foundations",
+            "analysis-change"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "numbers-and-algebraic-laws-residual-2",
+          "title": "Finite fields and noncommutative rings",
+          "disposition": "specialist-extension",
+          "reason": "They extend the common laws with genuinely new structure.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "algebra-symmetry",
+            "computational-algebra"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Algebraic structures",
+        "Linear combinations",
+        "Limits and error",
+        "Symbolic computation"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "induction-recursion-decomposition",
+      "slug": "induction-recursion-decomposition",
+      "title": "Induction, recursion, and decomposition",
+      "status": "rewriting",
+      "frontierState": "written",
+      "rewritePotential": "high",
+      "sourceFamilyIds": [
+        "proof-foundations",
+        "discrete-networks",
+        "computational-algebra",
+        "arithmetic-number-theory"
+      ],
+      "knowledgeNodeIds": [
+        "K19",
+        "K25"
+      ],
+      "canonicalIdea": "Build an object from base cases and constructors, define procedures along that construction, and prove properties by reducing to smaller pieces.",
+      "rewriteDecision": "Present induction, recursion, loop invariants, recurrences, and well-founded descent as related schemas with explicit differences.",
+      "notationResolutions": [
+        {
+          "concept": "index origin",
+          "canonical": "state the starting index",
+          "aliases": [
+            "n≥0 implied",
+            "n≥1 implied",
+            "zero-based arrays"
+          ],
+          "resolution": "Every indexed family states its domain; implementation indexing is translated."
+        }
+      ],
+      "routes": [
+        {
+          "id": "induction-recursion-decomposition-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for induction, recursion, and decomposition.",
+          "prerequisiteClusterIds": [
+            "precise-mathematical-language",
+            "numbers-and-algebraic-laws"
+          ],
+          "derivedFromRouteId": "induction-recursion-decomposition-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "induction-recursion-decomposition-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Counting and algorithms sources keep their native recursive or invariant routes while sharing the construction schema.",
+          "prerequisiteClusterIds": [
+            "precise-mathematical-language",
+            "numbers-and-algebraic-laws"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "induction-recursion-decomposition-residual-1",
+          "title": "Bijective, recursive, and generating-function counting",
+          "disposition": "alternate-route",
+          "reason": "They can reach the same enumeration with different reusable prerequisites.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "discrete-networks",
+            "analysis-change"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Algorithms",
+        "Combinatorics",
+        "Syntax",
+        "Generating functions"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "symmetry-actions-invariants",
+      "slug": "symmetry-actions-invariants",
+      "title": "Symmetry, actions, invariants, and quotients",
+      "status": "mapped",
+      "frontierState": "unmapped",
+      "rewritePotential": "high",
+      "sourceFamilyIds": [
+        "algebra-symmetry",
+        "topology-geometry",
+        "linear-computation",
+        "information-tcs",
+        "mathematical-physics"
+      ],
+      "knowledgeNodeIds": [],
+      "canonicalIdea": "A symmetry acts on objects. Orbits collect equivalent descriptions, invariants survive the action, quotients remove redundancy, and representations linearize actions.",
+      "rewriteDecision": "Teach action, orbit, stabilizer, invariant, and quotient as the core; connect geometry, algebra, Fourier analysis, and physics through explicit bridges.",
+      "notationResolutions": [
+        {
+          "concept": "group action",
+          "canonical": "g·x",
+          "aliases": [
+            "gx",
+            "x^g",
+            "ρ(g)x"
+          ],
+          "resolution": "Use g·x abstractly and reserve ρ(g)x for a linear representation."
+        }
+      ],
+      "routes": [
+        {
+          "id": "symmetry-actions-invariants-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for symmetry, actions, invariants, and quotients.",
+          "prerequisiteClusterIds": [
+            "precise-mathematical-language",
+            "numbers-and-algebraic-laws",
+            "induction-recursion-decomposition"
+          ],
+          "derivedFromRouteId": "symmetry-actions-invariants-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "symmetry-actions-invariants-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Geometric transformations, Cayley tables, permutation groups, and representation-first texts remain distinct original routes.",
+          "prerequisiteClusterIds": [
+            "precise-mathematical-language",
+            "numbers-and-algebraic-laws",
+            "induction-recursion-decomposition"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "symmetry-actions-invariants-residual-1",
+          "title": "Young diagrams and characters",
+          "disposition": "specialist-extension",
+          "reason": "Valuable compressed knowledge for symmetric problems, but not every action requires it.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "algebra-symmetry",
+            "information-tcs"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "symmetry-actions-invariants-residual-2",
+          "title": "Geometric, algebraic, and probabilistic symmetry",
+          "disposition": "bridge",
+          "reason": "Shared vocabulary transfers only through a specified action and invariant.",
+          "status": "unresolved",
+          "sourceFamilyIds": [
+            "algebra-symmetry",
+            "topology-geometry",
+            "measure-probability"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Representation theory",
+        "Fourier analysis on groups",
+        "Invariant algorithms",
+        "Quantum symmetries"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "linearity-as-common-engine",
+      "slug": "linearity-as-common-engine",
+      "title": "Linearity as a common computational engine",
+      "status": "mapped",
+      "frontierState": "outlined",
+      "rewritePotential": "high",
+      "sourceFamilyIds": [
+        "linear-computation",
+        "algebra-symmetry",
+        "analysis-change",
+        "measure-probability",
+        "optimization-control"
+      ],
+      "knowledgeNodeIds": [],
+      "canonicalIdea": "A linear map preserves linear combinations. Coordinates make matrices; duality makes measurements; decompositions reveal independent modes.",
+      "rewriteDecision": "Introduce preservation before matrix mechanics and reuse it for derivatives, integrals, expectations, Fourier expansions, least squares, and Markov modes.",
+      "notationResolutions": [
+        {
+          "concept": "map versus matrix",
+          "canonical": "T for a map; [T] for a coordinate matrix",
+          "aliases": [
+            "A for both map and matrix",
+            "bold vector conventions"
+          ],
+          "resolution": "State object type and separate a map from a chosen coordinate representation."
+        }
+      ],
+      "routes": [
+        {
+          "id": "linearity-as-common-engine-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for linearity as a common computational engine.",
+          "prerequisiteClusterIds": [
+            "precise-mathematical-language",
+            "numbers-and-algebraic-laws"
+          ],
+          "derivedFromRouteId": "linearity-as-common-engine-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "linearity-as-common-engine-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Matrix-first, geometric, and abstract vector-space books retain their dependency order as alternate routes.",
+          "prerequisiteClusterIds": [
+            "precise-mathematical-language",
+            "numbers-and-algebraic-laws"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "linearity-as-common-engine-residual-1",
+          "title": "Determinants-first organization",
+          "disposition": "alternate-route",
+          "reason": "Useful for some calculations but not the canonical definition of linear structure.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "linear-computation"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "linearity-as-common-engine-residual-2",
+          "title": "Spectra of unbounded operators",
+          "disposition": "specialist-extension",
+          "reason": "Matrix intuition needs domains, closure, and operator theory before transfer.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "analysis-change",
+            "mathematical-physics"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Differential equations",
+        "Fourier analysis",
+        "Optimization",
+        "Statistics and quantum theory"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "topology-continuity-completion",
+      "slug": "topology-continuity-completion",
+      "title": "Closeness, continuity, compactness, and completion",
+      "status": "mapped",
+      "frontierState": "unmapped",
+      "rewritePotential": "high",
+      "sourceFamilyIds": [
+        "analysis-change",
+        "topology-geometry",
+        "measure-probability",
+        "dynamics-equations"
+      ],
+      "knowledgeNodeIds": [],
+      "canonicalIdea": "Neighborhoods encode closeness. Continuity preserves limiting behavior, compactness converts infinite behavior into finite control, and completeness keeps limits inside.",
+      "rewriteDecision": "Build metric intuition once, then compare sequential, open-set, and neighborhood formulations under exact equivalence conditions.",
+      "notationResolutions": [
+        {
+          "concept": "open ball",
+          "canonical": "B(x,r)",
+          "aliases": [
+            "B_r(x)",
+            "D(x,r)"
+          ],
+          "resolution": "Use B(x,r) and state the ambient metric when unclear."
+        }
+      ],
+      "routes": [
+        {
+          "id": "topology-continuity-completion-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for closeness, continuity, compactness, and completion.",
+          "prerequisiteClusterIds": [
+            "precise-mathematical-language",
+            "induction-recursion-decomposition"
+          ],
+          "derivedFromRouteId": "topology-continuity-completion-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "topology-continuity-completion-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Metric-first analysis and open-set-first topology remain original routes with different generality.",
+          "prerequisiteClusterIds": [
+            "precise-mathematical-language",
+            "induction-recursion-decomposition"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "topology-continuity-completion-residual-1",
+          "title": "General-topology pathologies",
+          "disposition": "specialist-extension",
+          "reason": "They test theorem boundaries but are not novice prerequisites.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "topology-geometry"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "topology-continuity-completion-residual-2",
+          "title": "Sequences, nets, and filters",
+          "disposition": "bridge",
+          "reason": "Sequences do not characterize every topology.",
+          "status": "unresolved",
+          "sourceFamilyIds": [
+            "analysis-change",
+            "topology-geometry"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Rigorous analysis",
+        "Manifolds",
+        "Probability convergence",
+        "PDE spaces"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "measure-integration-expectation",
+      "slug": "measure-integration-expectation",
+      "title": "Size, integration, and expectation",
+      "status": "mapped",
+      "frontierState": "unmapped",
+      "rewritePotential": "high",
+      "sourceFamilyIds": [
+        "measure-probability",
+        "analysis-change",
+        "topology-geometry",
+        "mathematical-physics"
+      ],
+      "knowledgeNodeIds": [],
+      "canonicalIdea": "A measure assigns size. An integral extends finite weighted sums; probability is normalized measure and expectation is integration of a random quantity.",
+      "rewriteDecision": "Teach sums, area, weighted averages, integrals, probability, and expectation as a generalization ladder with visible hypotheses.",
+      "notationResolutions": [
+        {
+          "concept": "measure and expectation",
+          "canonical": "μ(A), ∫f dμ, 𝔼[X]",
+          "aliases": [
+            "m(A)",
+            "E(X)",
+            "<X>"
+          ],
+          "resolution": "Use μ generally and 𝔼 for expectation; identify the law when ambiguous."
+        }
+      ],
+      "routes": [
+        {
+          "id": "measure-integration-expectation-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for size, integration, and expectation.",
+          "prerequisiteClusterIds": [
+            "numbers-and-algebraic-laws",
+            "topology-continuity-completion"
+          ],
+          "derivedFromRouteId": "measure-integration-expectation-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "measure-integration-expectation-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Riemann-first, probability-first, and measure-first sources remain traceable original routes.",
+          "prerequisiteClusterIds": [
+            "numbers-and-algebraic-laws",
+            "topology-continuity-completion"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "measure-integration-expectation-residual-1",
+          "title": "Riemann and Lebesgue integration",
+          "disposition": "bridge",
+          "reason": "They agree on a common class but differ in construction and convergence power.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "analysis-change",
+            "measure-probability"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "measure-integration-expectation-residual-2",
+          "title": "Noncommutative integration",
+          "disposition": "specialist-extension",
+          "reason": "It is not a notation variant of measure on sets.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "analysis-change",
+            "mathematical-physics"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Probability",
+        "Statistics",
+        "Fourier analysis",
+        "Ergodic theory"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "randomness-conditioning-concentration",
+      "slug": "randomness-conditioning-concentration",
+      "title": "Randomness, conditioning, and concentration",
+      "status": "mapped",
+      "frontierState": "unmapped",
+      "rewritePotential": "medium",
+      "sourceFamilyIds": [
+        "measure-probability",
+        "discrete-networks",
+        "information-tcs",
+        "interdisciplinary-modeling"
+      ],
+      "knowledgeNodeIds": [],
+      "canonicalIdea": "A probabilistic model weights outcomes; conditioning updates it using information, independence factors joint behavior, and concentration makes averages reliable.",
+      "rewriteDecision": "Merge finite probability rules and variable language, bridge to measure theory, and retain combinatorial, simulation, and analytic routes.",
+      "notationResolutions": [
+        {
+          "concept": "probability and expectation",
+          "canonical": "ℙ(A), 𝔼[X]",
+          "aliases": [
+            "P(A)",
+            "Pr[A]",
+            "E[X]"
+          ],
+          "resolution": "Use ℙ and 𝔼 in mixed contexts and translate compact source aliases."
+        }
+      ],
+      "routes": [
+        {
+          "id": "randomness-conditioning-concentration-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for randomness, conditioning, and concentration.",
+          "prerequisiteClusterIds": [
+            "induction-recursion-decomposition",
+            "measure-integration-expectation"
+          ],
+          "derivedFromRouteId": "randomness-conditioning-concentration-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "randomness-conditioning-concentration-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Counting-first, measure-first, and simulation-first books remain original routes whose scopes are not conflated.",
+          "prerequisiteClusterIds": [
+            "induction-recursion-decomposition",
+            "measure-integration-expectation"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "randomness-conditioning-concentration-residual-1",
+          "title": "Martingales and dependent concentration",
+          "disposition": "specialist-extension",
+          "reason": "Independence intuition needs filtrations and new hypotheses.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "measure-probability",
+            "information-tcs"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "randomness-conditioning-concentration-residual-2",
+          "title": "Repeated games and stories",
+          "disposition": "historical-context",
+          "reason": "Keep examples teaching a distinct model; repeated wrappers are not separate knowledge.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "measure-probability"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Statistics",
+        "Randomized algorithms",
+        "Learning theory",
+        "Stochastic dynamics"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "approximation-error-stability",
+      "slug": "approximation-error-stability",
+      "title": "Approximation, error, conditioning, and stability",
+      "status": "mapped",
+      "frontierState": "unmapped",
+      "rewritePotential": "medium",
+      "sourceFamilyIds": [
+        "analysis-change",
+        "linear-computation",
+        "optimization-control",
+        "interdisciplinary-modeling"
+      ],
+      "knowledgeNodeIds": [],
+      "canonicalIdea": "An approximation needs a target, error notion, and convergence claim. Conditioning belongs to the problem; stability measures error added by the method.",
+      "rewriteDecision": "Use one error vocabulary across analysis, computation, estimation, and perturbation, but never merge convergence modes without a theorem.",
+      "notationResolutions": [
+        {
+          "concept": "size of error",
+          "canonical": "|x| for scalars; ‖x‖ for vectors; d(x,y) for distance",
+          "aliases": [
+            "|x| for every norm",
+            "ρ(x,y)"
+          ],
+          "resolution": "Let notation expose object type and state the norm or metric."
+        }
+      ],
+      "routes": [
+        {
+          "id": "approximation-error-stability-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for approximation, error, conditioning, and stability.",
+          "prerequisiteClusterIds": [
+            "induction-recursion-decomposition",
+            "linearity-as-common-engine",
+            "topology-continuity-completion"
+          ],
+          "derivedFromRouteId": "approximation-error-stability-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "approximation-error-stability-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Analytic convergence, floating-point, approximation-theory, and validated-numerics routes retain their error models.",
+          "prerequisiteClusterIds": [
+            "induction-recursion-decomposition",
+            "linearity-as-common-engine",
+            "topology-continuity-completion"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "approximation-error-stability-residual-1",
+          "title": "Pointwise, uniform, norm, probability, and distributional convergence",
+          "disposition": "bridge",
+          "reason": "They share an error pattern but differ in quantifiers and consequences.",
+          "status": "unresolved",
+          "sourceFamilyIds": [
+            "analysis-change",
+            "measure-probability"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "approximation-error-stability-residual-2",
+          "title": "Floating-point cancellation and pivoting",
+          "disposition": "specialist-extension",
+          "reason": "Machine arithmetic introduces a separate error model.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "linear-computation"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Numerical analysis",
+        "Inverse problems",
+        "Perturbation theory",
+        "Certified estimation"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "local-to-global-calculus",
+      "slug": "local-to-global-calculus",
+      "title": "Local-to-global calculus",
+      "status": "mapped",
+      "frontierState": "unmapped",
+      "rewritePotential": "high",
+      "sourceFamilyIds": [
+        "analysis-change",
+        "linear-computation",
+        "topology-geometry",
+        "dynamics-equations",
+        "mathematical-physics"
+      ],
+      "knowledgeNodeIds": [],
+      "canonicalIdea": "The derivative is the best local linear approximation. Tangent and cotangent objects organize change; integration assembles local quantities; Stokes relates interiors to boundaries.",
+      "rewriteDecision": "Replace separate one-variable, multivariable, vector-calculus, and manifold restarts with a path from approximation to linear maps to forms.",
+      "notationResolutions": [
+        {
+          "concept": "derivative",
+          "canonical": "Df(x) for the derivative map; f'(x) in one dimension",
+          "aliases": [
+            "df/dx",
+            "∇f",
+            "Jac f"
+          ],
+          "resolution": "Distinguish derivative map, gradient after an inner product, and coordinate Jacobian."
+        }
+      ],
+      "routes": [
+        {
+          "id": "local-to-global-calculus-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for local-to-global calculus.",
+          "prerequisiteClusterIds": [
+            "linearity-as-common-engine",
+            "topology-continuity-completion",
+            "measure-integration-expectation"
+          ],
+          "derivedFromRouteId": "local-to-global-calculus-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "local-to-global-calculus-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Formula-first calculus, geometric vector calculus, and differential-forms texts retain their original routes.",
+          "prerequisiteClusterIds": [
+            "linearity-as-common-engine",
+            "topology-continuity-completion",
+            "measure-integration-expectation"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "local-to-global-calculus-residual-1",
+          "title": "Classical vector identities and differential forms",
+          "disposition": "bridge",
+          "reason": "Translation needs orientation, metric, and coordinate choices.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "analysis-change",
+            "topology-geometry"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "local-to-global-calculus-residual-2",
+          "title": "Calculus on singular spaces",
+          "disposition": "specialist-extension",
+          "reason": "Manifold linearization does not automatically cover singularities.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "topology-geometry",
+            "analysis-change"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Differential geometry",
+        "PDE",
+        "Mechanics",
+        "Geometric topology"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "evolution-transitions-flows",
+      "slug": "evolution-transitions-flows",
+      "title": "Evolution: transitions, flows, and generators",
+      "status": "mapped",
+      "frontierState": "unmapped",
+      "rewritePotential": "medium",
+      "sourceFamilyIds": [
+        "dynamics-equations",
+        "measure-probability",
+        "linear-computation",
+        "interdisciplinary-modeling",
+        "mathematical-physics"
+      ],
+      "knowledgeNodeIds": [],
+      "canonicalIdea": "A state evolves under a transition rule. Composition advances time; invariant, stationary, periodic, and stable objects describe long-term behavior.",
+      "rewriteDecision": "Share state, trajectory, composition, invariance, and stability, then preserve distinct existence theories for recurrences, ODE, PDE, and Markov processes.",
+      "notationResolutions": [
+        {
+          "concept": "time evolution",
+          "canonical": "T_t(x)",
+          "aliases": [
+            "φ_t(x)",
+            "P^t",
+            "x(t)"
+          ],
+          "resolution": "Use T_t abstractly and introduce branch notation only after its type is fixed."
+        }
+      ],
+      "routes": [
+        {
+          "id": "evolution-transitions-flows-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for evolution: transitions, flows, and generators.",
+          "prerequisiteClusterIds": [
+            "induction-recursion-decomposition",
+            "linearity-as-common-engine",
+            "topology-continuity-completion",
+            "randomness-conditioning-concentration"
+          ],
+          "derivedFromRouteId": "evolution-transitions-flows-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "evolution-transitions-flows-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Discrete, continuous, deterministic, stochastic, and control texts keep distinct original dependency routes.",
+          "prerequisiteClusterIds": [
+            "induction-recursion-decomposition",
+            "linearity-as-common-engine",
+            "topology-continuity-completion",
+            "randomness-conditioning-concentration"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "evolution-transitions-flows-residual-1",
+          "title": "Discrete, continuous, deterministic, and stochastic evolution",
+          "disposition": "bridge",
+          "reason": "Shared vocabulary is exact only after time and transition semantics are fixed.",
+          "status": "unresolved",
+          "sourceFamilyIds": [
+            "dynamics-equations",
+            "measure-probability"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "evolution-transitions-flows-residual-2",
+          "title": "Chaos, SPDEs, and infinite-dimensional semigroups",
+          "disposition": "specialist-extension",
+          "reason": "Each needs substantial additional structure.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "dynamics-equations",
+            "analysis-change"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "ODE and PDE",
+        "Markov processes",
+        "Control",
+        "Mechanics and population models"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "optimization-duality-equilibrium",
+      "slug": "optimization-duality-equilibrium",
+      "title": "Optimization, duality, and equilibrium",
+      "status": "mapped",
+      "frontierState": "unmapped",
+      "rewritePotential": "medium",
+      "sourceFamilyIds": [
+        "optimization-control",
+        "linear-computation",
+        "analysis-change",
+        "interdisciplinary-modeling",
+        "information-tcs"
+      ],
+      "knowledgeNodeIds": [],
+      "canonicalIdea": "Choose an admissible object to optimize an objective. Bounds, separating objects, and dual variables certify optimality; equilibrium handles interacting objectives.",
+      "rewriteDecision": "Unify feasible set, objective, certificate, duality, and equilibrium, then split convex, dynamic, variational, game, and nonconvex theorems by assumptions.",
+      "notationResolutions": [
+        {
+          "concept": "optimizer",
+          "canonical": "arg min_{x∈F} f(x)",
+          "aliases": [
+            "min_x f",
+            "x*",
+            "opt(f)"
+          ],
+          "resolution": "Distinguish optimal value from the set or point attaining it."
+        }
+      ],
+      "routes": [
+        {
+          "id": "optimization-duality-equilibrium-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for optimization, duality, and equilibrium.",
+          "prerequisiteClusterIds": [
+            "induction-recursion-decomposition",
+            "linearity-as-common-engine",
+            "topology-continuity-completion",
+            "measure-integration-expectation"
+          ],
+          "derivedFromRouteId": "optimization-duality-equilibrium-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "optimization-duality-equilibrium-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Geometric convexity, algorithm-first, variational, dynamic-programming, and game-theory routes remain source-faithful.",
+          "prerequisiteClusterIds": [
+            "induction-recursion-decomposition",
+            "linearity-as-common-engine",
+            "topology-continuity-completion",
+            "measure-integration-expectation"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "optimization-duality-equilibrium-residual-1",
+          "title": "Nonconvex optimization",
+          "disposition": "specialist-extension",
+          "reason": "Convex certificates and global guarantees do not transfer automatically.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "optimization-control",
+            "information-tcs"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "optimization-duality-equilibrium-residual-2",
+          "title": "Single-objective optima and multi-agent equilibria",
+          "disposition": "bridge",
+          "reason": "An equilibrium need not optimize one shared scalar objective.",
+          "status": "unresolved",
+          "sourceFamilyIds": [
+            "optimization-control",
+            "interdisciplinary-modeling"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Operations research",
+        "Machine learning",
+        "Control and games",
+        "Variational PDE"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "networks-paths-flows-laplacians",
+      "slug": "networks-paths-flows-laplacians",
+      "title": "Networks: paths, cuts, flows, and Laplacians",
+      "status": "mapped",
+      "frontierState": "unmapped",
+      "rewritePotential": "high",
+      "sourceFamilyIds": [
+        "discrete-networks",
+        "linear-computation",
+        "optimization-control",
+        "measure-probability",
+        "interdisciplinary-modeling"
+      ],
+      "knowledgeNodeIds": [],
+      "canonicalIdea": "A graph records incidence. Paths express reachability, cuts separation, flows transport, and the Laplacian turns structure into linear and energetic information.",
+      "rewriteDecision": "Build one network object, then connect combinatorial, optimization, electrical, spectral, and random-walk views through exact theorems.",
+      "notationResolutions": [
+        {
+          "concept": "graph type",
+          "canonical": "G=(V,E)",
+          "aliases": [
+            "Γ",
+            "N=(N,A)",
+            "adjacency-only conventions"
+          ],
+          "resolution": "State directedness, weights, loops, and multiplicity as part of the type."
+        }
+      ],
+      "routes": [
+        {
+          "id": "networks-paths-flows-laplacians-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for networks: paths, cuts, flows, and laplacians.",
+          "prerequisiteClusterIds": [
+            "induction-recursion-decomposition",
+            "linearity-as-common-engine",
+            "randomness-conditioning-concentration",
+            "optimization-duality-equilibrium"
+          ],
+          "derivedFromRouteId": "networks-paths-flows-laplacians-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "networks-paths-flows-laplacians-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Graph-theory, network-flow, spectral, random-walk, and applied-network texts retain distinct routes.",
+          "prerequisiteClusterIds": [
+            "induction-recursion-decomposition",
+            "linearity-as-common-engine",
+            "randomness-conditioning-concentration",
+            "optimization-duality-equilibrium"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "networks-paths-flows-laplacians-residual-1",
+          "title": "Flow, electrical, random-walk, and spectral views",
+          "disposition": "bridge",
+          "reason": "Equivalences require capacities, conductances, reversibility, or symmetry.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "discrete-networks",
+            "linear-computation",
+            "measure-probability"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "networks-paths-flows-laplacians-residual-2",
+          "title": "Hypergraphs, directed networks, and graph limits",
+          "disposition": "specialist-extension",
+          "reason": "They change the base incidence or asymptotic object.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "discrete-networks",
+            "interdisciplinary-modeling"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Graph algorithms",
+        "Spectral methods",
+        "Random walks",
+        "Network science"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "presentations-rewriting-normal-forms",
+      "slug": "presentations-rewriting-normal-forms",
+      "title": "Presentations, rewriting, and normal forms",
+      "status": "mapped",
+      "frontierState": "unmapped",
+      "rewritePotential": "high",
+      "sourceFamilyIds": [
+        "computational-algebra",
+        "algebra-symmetry",
+        "discrete-networks",
+        "formal-verification"
+      ],
+      "knowledgeNodeIds": [],
+      "canonicalIdea": "Describe objects by generators and relations, apply equality-preserving reductions, and seek canonical representatives that make questions decidable.",
+      "rewriteDecision": "Unify elimination, polynomial reduction, term rewriting, automata minimization, and simplification at the pattern level, not the algorithm level.",
+      "notationResolutions": [
+        {
+          "concept": "one-step reduction",
+          "canonical": "x → y; x →* y for repeated reduction",
+          "aliases": [
+            "x ↦ y",
+            "x ⇒ y"
+          ],
+          "resolution": "Reserve ↦ for function assignment and distinguish one step from closure."
+        }
+      ],
+      "routes": [
+        {
+          "id": "presentations-rewriting-normal-forms-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for presentations, rewriting, and normal forms.",
+          "prerequisiteClusterIds": [
+            "numbers-and-algebraic-laws",
+            "induction-recursion-decomposition"
+          ],
+          "derivedFromRouteId": "presentations-rewriting-normal-forms-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "presentations-rewriting-normal-forms-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Gaussian elimination, Euclidean algorithms, Gröbner bases, and term rewriting retain their original dependency routes.",
+          "prerequisiteClusterIds": [
+            "numbers-and-algebraic-laws",
+            "induction-recursion-decomposition"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "presentations-rewriting-normal-forms-residual-1",
+          "title": "Complexity and failure of canonicality",
+          "disposition": "specialist-extension",
+          "reason": "Termination, confluence, and feasible computation are separate theorems.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "computational-algebra",
+            "formal-verification"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "presentations-rewriting-normal-forms-residual-2",
+          "title": "Symbolic and numerical methods",
+          "disposition": "alternate-route",
+          "reason": "They answer related questions with different error models and guarantees.",
+          "status": "unresolved",
+          "sourceFamilyIds": [
+            "computational-algebra",
+            "linear-computation"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Computer algebra",
+        "Automated reasoning",
+        "Algebraic geometry",
+        "Verified computation"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "information-coding-learning",
+      "slug": "information-coding-learning",
+      "title": "Information, coding, learning, and pseudorandomness",
+      "status": "mapped",
+      "frontierState": "unmapped",
+      "rewritePotential": "medium",
+      "sourceFamilyIds": [
+        "information-tcs",
+        "measure-probability",
+        "discrete-networks",
+        "algebra-symmetry",
+        "interdisciplinary-modeling"
+      ],
+      "knowledgeNodeIds": [],
+      "canonicalIdea": "Information quantifies distinguishability or uncertainty; codes add redundancy, learners extract prediction, and pseudorandom objects fool bounded observers.",
+      "rewriteDecision": "Share entropy, divergence, coding, estimation, and observer language only within verified scope; retain algebraic, probabilistic, and computational routes.",
+      "notationResolutions": [
+        {
+          "concept": "logarithm base",
+          "canonical": "log₂ for bits; ln for natural units",
+          "aliases": [
+            "log with implicit base",
+            "lg"
+          ],
+          "resolution": "State the base because it changes units."
+        }
+      ],
+      "routes": [
+        {
+          "id": "information-coding-learning-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for information, coding, learning, and pseudorandomness.",
+          "prerequisiteClusterIds": [
+            "induction-recursion-decomposition",
+            "measure-integration-expectation",
+            "randomness-conditioning-concentration",
+            "presentations-rewriting-normal-forms"
+          ],
+          "derivedFromRouteId": "information-coding-learning-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "information-coding-learning-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Information-theoretic, algebraic-coding, cryptographic, learning, and Boolean-analysis texts retain their routes.",
+          "prerequisiteClusterIds": [
+            "induction-recursion-decomposition",
+            "measure-integration-expectation",
+            "randomness-conditioning-concentration",
+            "presentations-rewriting-normal-forms"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "information-coding-learning-residual-1",
+          "title": "Shannon, thermodynamic, algorithmic, min-, and quantum entropy",
+          "disposition": "specialist-extension",
+          "reason": "The analogy is useful, but definitions and data-processing theorems differ.",
+          "status": "unresolved",
+          "sourceFamilyIds": [
+            "information-tcs",
+            "mathematical-physics"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "information-coding-learning-residual-2",
+          "title": "Algebraic, probabilistic, and computational coding",
+          "disposition": "alternate-route",
+          "reason": "Different constructions optimize different regimes.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "information-tcs",
+            "algebra-symmetry"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Coding and cryptography",
+        "Learning theory",
+        "Property testing",
+        "Boolean analysis"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "composition-gluing-universal-properties",
+      "slug": "composition-gluing-universal-properties",
+      "title": "Composition, gluing, and universal properties",
+      "status": "mapped",
+      "frontierState": "unmapped",
+      "rewritePotential": "bounded",
+      "sourceFamilyIds": [
+        "algebra-symmetry",
+        "topology-geometry",
+        "proof-foundations",
+        "computational-algebra"
+      ],
+      "knowledgeNodeIds": [],
+      "canonicalIdea": "Constructions are characterized by how maps compose and by universal mapping behavior; compatible local data may glue globally while invariants record obstructions.",
+      "rewriteDecision": "Reuse concrete universal patterns early, but introduce categorical language only after examples justify its abstraction cost.",
+      "notationResolutions": [
+        {
+          "concept": "composition order",
+          "canonical": "g∘f means first f, then g",
+          "aliases": [
+            "fg with either order",
+            "diagrammatic order"
+          ],
+          "resolution": "Always type maps and state any nonstandard order."
+        }
+      ],
+      "routes": [
+        {
+          "id": "composition-gluing-universal-properties-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for composition, gluing, and universal properties.",
+          "prerequisiteClusterIds": [
+            "precise-mathematical-language",
+            "symmetry-actions-invariants",
+            "topology-continuity-completion"
+          ],
+          "derivedFromRouteId": "composition-gluing-universal-properties-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "composition-gluing-universal-properties-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Elementwise, diagrammatic, topological, and computational texts retain original routes.",
+          "prerequisiteClusterIds": [
+            "precise-mathematical-language",
+            "symmetry-actions-invariants",
+            "topology-continuity-completion"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "composition-gluing-universal-properties-residual-1",
+          "title": "Where category language enters the novice core",
+          "disposition": "open-editorial-question",
+          "reason": "It may compress later knowledge but cost too much before concrete examples.",
+          "status": "unresolved",
+          "sourceFamilyIds": [
+            "algebra-symmetry",
+            "topology-geometry",
+            "proof-foundations"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "composition-gluing-universal-properties-residual-2",
+          "title": "Sheaves, derived methods, and higher categories",
+          "disposition": "specialist-extension",
+          "reason": "They add substantial machinery beyond the common gluing pattern.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "topology-geometry",
+            "algebra-symmetry"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Algebraic topology",
+        "Algebraic geometry",
+        "Homological algebra",
+        "Composable formalization"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "asymptotics-scale-universality",
+      "slug": "asymptotics-scale-universality",
+      "title": "Scale, asymptotics, perturbation, and universality",
+      "status": "mapped",
+      "frontierState": "unmapped",
+      "rewritePotential": "bounded",
+      "sourceFamilyIds": [
+        "analysis-change",
+        "arithmetic-number-theory",
+        "discrete-networks",
+        "measure-probability",
+        "mathematical-physics"
+      ],
+      "knowledgeNodeIds": [],
+      "canonicalIdea": "Choose a limiting regime, compare dominant terms, rescale, and quantify what survives; expansions give leading behavior plus controlled corrections.",
+      "rewriteDecision": "Unify asymptotic notation and comparison logic, then keep rigorous estimates, formal expansions, complexity, and physical scaling distinct until bridged.",
+      "notationResolutions": [
+        {
+          "concept": "asymptotic comparison",
+          "canonical": "O, o, Θ with variable and limit stated",
+          "aliases": [
+            "≲",
+            "~ used informally",
+            "order of"
+          ],
+          "resolution": "Name the limiting variable, regime, and hidden-constant dependence."
+        }
+      ],
+      "routes": [
+        {
+          "id": "asymptotics-scale-universality-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for scale, asymptotics, perturbation, and universality.",
+          "prerequisiteClusterIds": [
+            "induction-recursion-decomposition",
+            "topology-continuity-completion",
+            "measure-integration-expectation",
+            "randomness-conditioning-concentration",
+            "local-to-global-calculus"
+          ],
+          "derivedFromRouteId": "asymptotics-scale-universality-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "asymptotics-scale-universality-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Analytic, combinatorial, algorithmic, perturbative, and physical scaling texts retain original routes.",
+          "prerequisiteClusterIds": [
+            "induction-recursion-decomposition",
+            "topology-continuity-completion",
+            "measure-integration-expectation",
+            "randomness-conditioning-concentration",
+            "local-to-global-calculus"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "asymptotics-scale-universality-residual-1",
+          "title": "Universality and renormalization claims",
+          "disposition": "open-editorial-question",
+          "reason": "A shared picture is not a theorem without a model, topology, and limit.",
+          "status": "unresolved",
+          "sourceFamilyIds": [
+            "measure-probability",
+            "mathematical-physics"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "asymptotics-scale-universality-residual-2",
+          "title": "Formal expansion and rigorous estimate",
+          "disposition": "bridge",
+          "reason": "Formal coefficients can be useful without remainder control.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "analysis-change",
+            "mathematical-physics"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Analytic number theory",
+        "Complexity analysis",
+        "Perturbation theory",
+        "Statistical mechanics"
+      ],
+      "administrativeReview": null
+    },
+    {
+      "id": "proof-certificates-verification",
+      "slug": "proof-certificates-verification",
+      "title": "Proof as checkable evidence",
+      "status": "rewriting",
+      "frontierState": "outlined",
+      "rewritePotential": "high",
+      "sourceFamilyIds": [
+        "formal-verification",
+        "proof-foundations",
+        "computational-algebra",
+        "information-tcs"
+      ],
+      "knowledgeNodeIds": [],
+      "canonicalIdea": "A claim carries assumptions, dependencies, and evidence. A checker validates evidence under an explicit logic and trusted base.",
+      "rewriteDecision": "Use one backend-neutral verification record, then preserve Lean, Coq, Isabelle, Agda, SMT, model checking, and probabilistic systems as certificate routes.",
+      "notationResolutions": [
+        {
+          "concept": "derivability",
+          "canonical": "Γ ⊢ φ",
+          "aliases": [
+            "Γ ⇒ φ",
+            "proof term p : φ",
+            "checker accepts artifact"
+          ],
+          "resolution": "Keep logic, assumptions, proposition, artifact, checker, and trusted base separate."
+        }
+      ],
+      "routes": [
+        {
+          "id": "proof-certificates-verification-minimum",
+          "label": "Minimized canonical route",
+          "kind": "canonical",
+          "dependencyKind": "minimized",
+          "reviewState": "candidate",
+          "equivalence": "editorial-hypothesis",
+          "summary": "Use the smallest currently known dependency set for proof as checkable evidence.",
+          "prerequisiteClusterIds": [
+            "precise-mathematical-language",
+            "induction-recursion-decomposition",
+            "presentations-rewriting-normal-forms"
+          ],
+          "derivedFromRouteId": "proof-certificates-verification-original",
+          "administrativeReview": null
+        },
+        {
+          "id": "proof-certificates-verification-original",
+          "label": "Candidate source-route pattern",
+          "kind": "structural",
+          "dependencyKind": "original",
+          "reviewState": "candidate",
+          "equivalence": "assumption-dependent",
+          "summary": "Every prover and certificate format retains its own original route and trust boundary.",
+          "prerequisiteClusterIds": [
+            "precise-mathematical-language",
+            "induction-recursion-decomposition",
+            "presentations-rewriting-normal-forms"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "residuals": [
+        {
+          "id": "proof-certificates-verification-residual-1",
+          "title": "Multiple prover backends",
+          "disposition": "alternate-route",
+          "reason": "Different logics can certify related claims but artifacts are not interchangeable.",
+          "status": "mapped",
+          "sourceFamilyIds": [
+            "formal-verification"
+          ],
+          "administrativeReview": null
+        },
+        {
+          "id": "proof-certificates-verification-residual-2",
+          "title": "Cross-prover exchange and trusted boundary",
+          "disposition": "open-editorial-question",
+          "reason": "A portable standard must state what is translated and trusted.",
+          "status": "unresolved",
+          "sourceFamilyIds": [
+            "formal-verification",
+            "proof-foundations"
+          ],
+          "administrativeReview": null
+        }
+      ],
+      "unlocks": [
+        "Verified Knowledge nodes",
+        "User-submitted proofs",
+        "Multiple prover backends",
+        "Auditable AI training"
+      ],
+      "administrativeReview": null
+    }
+  ]
+}

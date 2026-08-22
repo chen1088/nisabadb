@@ -8,10 +8,13 @@ import {
 import { Link, useSearchParams } from "react-router-dom";
 import type { Paper, ProofRoute, Statement } from "../data/schema";
 import {
+  dependencyRouteKind,
+  formalProver,
+  formalSourceUrl,
   getDependencyIds,
   getRoute,
   kindLabels,
-  repositoryUrl,
+  routeReviewStatus,
   statementById,
   theoremPath,
   verificationMeta,
@@ -24,16 +27,13 @@ interface GraphExplorerProps {
   statements: Statement[];
 }
 
-type ExpandedByView = Record<string, Set<string>>;
-
 function cloneParameters(parameters: URLSearchParams): URLSearchParams {
   return new URLSearchParams(parameters.toString());
 }
 
-function initialExpansion(paper: Paper): ExpandedByView {
-  return Object.fromEntries(
-    paper.graph.views.map((view) => [view.id, new Set(view.initiallyExpanded)]),
-  );
+function initialExpansion(paper: Paper): Set<string> {
+  const mainView = paper.graph.views.find((view) => view.roots.includes(paper.graph.mainRoot ?? ""));
+  return new Set(mainView?.initiallyExpanded ?? (paper.graph.mainRoot ? [paper.graph.mainRoot] : []));
 }
 
 function formatEnum(value: string): string {
@@ -68,6 +68,11 @@ function routeStatusCopy(route: ProofRoute): string {
   return "Proof not yet distilled";
 }
 
+function routeOptionLabel(route: ProofRoute): string {
+  const review = routeReviewStatus(route) === "candidate" ? " · candidate" : "";
+  return `${formatEnum(dependencyRouteKind(route))} · ${route.label}${review}`;
+}
+
 function ideaHeading(statement: Statement): string {
   if (statement.kind === "conjecture") return "Conjectural rationale";
   if (["definition", "notation"].includes(statement.kind)) return "Intuition";
@@ -76,25 +81,18 @@ function ideaHeading(statement: Statement): string {
 
 export function GraphExplorer({ paper, statements }: GraphExplorerProps) {
   const [parameters, setParameters] = useSearchParams();
-  const [expandedByView, setExpandedByView] = useState<ExpandedByView>(() =>
-    initialExpansion(paper),
-  );
+  const [expanded, setExpanded] = useState<Set<string>>(() => initialExpansion(paper));
   const localById = useMemo(
     () => new Map(statements.map((statement) => [statement.id, statement])),
     [statements],
   );
-  const views = paper.graph.views;
-  const view =
-    views.find((candidate) => candidate.id === parameters.get("view")) ?? views[0];
-
-  if (!view) {
-    return <p className="empty-state">This paper does not yet define a graph view.</p>;
-  }
+  const roots = paper.graph.paperRoots;
 
   const requestedNode = parameters.get("node");
   const selected =
     (requestedNode ? localById.get(requestedNode) : undefined) ??
-    localById.get(view.roots[0] ?? "") ??
+    localById.get(paper.graph.mainRoot ?? "") ??
+    localById.get(roots[0] ?? "") ??
     statements[0];
 
   if (!selected) {
@@ -107,7 +105,6 @@ export function GraphExplorer({ paper, statements }: GraphExplorerProps) {
   const normalizedQuery = query.trim().toLocaleLowerCase();
   const status = parameters.get("status") ?? "all";
   const filtersActive = Boolean(normalizedQuery || status !== "all");
-  const expanded = expandedByView[view.id] ?? new Set<string>();
   const statuses = Array.from(new Set(statements.map((statement) => statement.formalStatus)));
 
   const dependenciesFor = (statement: Statement): string[] =>
@@ -156,13 +153,10 @@ export function GraphExplorer({ paper, statements }: GraphExplorerProps) {
       return undefined;
     };
 
-    for (const root of view.roots) {
+    for (const root of roots) {
       const path = findPath(root, targetId, [], new Set());
       if (!path) continue;
-      setExpandedByView((current) => ({
-        ...current,
-        [view.id]: new Set([...(current[view.id] ?? []), ...path]),
-      }));
+      setExpanded((current) => new Set([...current, ...path]));
       break;
     }
   };
@@ -188,28 +182,12 @@ export function GraphExplorer({ paper, statements }: GraphExplorerProps) {
     if (options?.focus !== false) focusGraphNode(id);
   };
 
-  const changeView = (viewId: string) => {
-    const nextView = views.find((candidate) => candidate.id === viewId);
-    if (!nextView) return;
-    const next = cloneParameters(parameters);
-    next.set("view", nextView.id);
-    const root = localById.get(nextView.roots[0] ?? "");
-    if (root) {
-      next.set("node", root.id);
-      const rootRoute = root.proofRoutes[0];
-      if (rootRoute) next.set("route", rootRoute.id);
-      else next.delete("route");
-    }
-    setParameters(next, { replace: false });
-    window.setTimeout(() => document.getElementById(`view-${nextView.id}`)?.focus(), 0);
-  };
-
   const toggleExpanded = (id: string) => {
-    setExpandedByView((current) => {
-      const nextSet = new Set(current[view.id] ?? []);
+    setExpanded((current) => {
+      const nextSet = new Set(current);
       if (nextSet.has(id)) nextSet.delete(id);
       else nextSet.add(id);
-      return { ...current, [view.id]: nextSet };
+      return nextSet;
     });
   };
 
@@ -223,20 +201,17 @@ export function GraphExplorer({ paper, statements }: GraphExplorerProps) {
       const next = new Set(visiting).add(id);
       dependenciesFor(statement).forEach((dependency) => walk(dependency, next));
     };
-    view.roots.forEach((root) => walk(root, new Set()));
-    setExpandedByView((current) => ({ ...current, [view.id]: visible }));
+    roots.forEach((root) => walk(root, new Set()));
+    setExpanded(visible);
   };
 
   const collapseVisible = () => {
-    setExpandedByView((current) => ({ ...current, [view.id]: new Set() }));
+    setExpanded(new Set());
   };
 
   const changeRoute = (routeId: string) => {
     updateParameter("route", routeId, false);
-    setExpandedByView((current) => ({
-      ...current,
-      [view.id]: new Set([...(current[view.id] ?? []), selected.id]),
-    }));
+    setExpanded((current) => new Set([...current, selected.id]));
   };
 
   const renderTreeNode = (
@@ -344,10 +319,11 @@ export function GraphExplorer({ paper, statements }: GraphExplorerProps) {
     );
   };
 
-  const rootNodes = view.roots
+  const rootNodes = roots
     .map((id) => localById.get(id))
     .filter((statement): statement is Statement => Boolean(statement))
     .filter((statement) => !filtersActive || branchHasMatch(statement));
+  const renderedStatementIds = new Set<string>();
 
   return (
     <section id="explorer" className="explorer-section" aria-labelledby="explorer-title">
@@ -366,20 +342,9 @@ export function GraphExplorer({ paper, statements }: GraphExplorerProps) {
       </div>
 
       <div className="graph-toolbar" aria-label="Dependency graph controls">
-        <div className="view-tabs" role="tablist" aria-label="Graph views">
-          {views.map((candidate) => (
-            <button
-              key={candidate.id}
-              id={`view-${candidate.id}`}
-              type="button"
-              role="tab"
-              aria-selected={candidate.id === view.id}
-              className={candidate.id === view.id ? "is-active" : ""}
-              onClick={() => changeView(candidate.id)}
-            >
-              {candidate.label}
-            </button>
-          ))}
+        <div className="graph-scope" aria-label="Graph scope">
+          <span>Unified paper graph</span>
+          <strong>All results · one dependency space</strong>
         </div>
         <div className="graph-filters">
           <label className="search-control">
@@ -422,7 +387,7 @@ export function GraphExplorer({ paper, statements }: GraphExplorerProps) {
             <strong>{statements.length}</strong> statements
           </span>
           <span>
-            <strong>{view.roots.length}</strong> view roots
+            <strong>{roots.length}</strong> paper roots
           </span>
           <span>
             <strong>
@@ -442,19 +407,19 @@ export function GraphExplorer({ paper, statements }: GraphExplorerProps) {
       <div className="explorer-grid">
         <div
           className="graph-pane"
-          aria-label={`${view.label} dependency graph`}
+          aria-label="Complete paper dependency graph"
           onKeyDown={(event) => handleTreeKeyboard(event, event.currentTarget)}
         >
           <div className="graph-pane-header">
             <div>
               <span className="panel-index">Graph 01</span>
-              <h3>{view.label}</h3>
+              <h3>Complete paper graph</h3>
             </div>
             <p>Lines flow from a result to the prerequisites below it.</p>
           </div>
           {rootNodes.length ? (
             <ul className="graph-root-list">
-              {rootNodes.map((root) => renderTreeNode(root, new Set(), new Set()))}
+              {rootNodes.map((root) => renderTreeNode(root, renderedStatementIds, new Set()))}
             </ul>
           ) : (
             <div className="empty-state">
@@ -468,7 +433,6 @@ export function GraphExplorer({ paper, statements }: GraphExplorerProps) {
           paper={paper}
           statement={selected}
           activeRoute={activeRoute}
-          viewId={view.id}
           onRouteChange={changeRoute}
           onSelectStatement={(id) => selectStatement(id)}
         />
@@ -481,7 +445,6 @@ interface ProofPanelProps {
   paper: Paper;
   statement: Statement;
   activeRoute?: ProofRoute;
-  viewId?: string;
   onRouteChange?: (routeId: string) => void;
   onSelectStatement?: (statementId: string) => void;
   headingLevel?: "h1" | "h2" | "h3";
@@ -492,7 +455,6 @@ export function ProofPanel({
   paper,
   statement,
   activeRoute,
-  viewId,
   onRouteChange,
   onSelectStatement,
   headingLevel = "h3",
@@ -505,6 +467,16 @@ export function ProofPanel({
     .filter((dependency): dependency is Statement => Boolean(dependency));
   const route = activeRoute ?? statement.proofRoutes[0];
   const sourceLocations = statement.sourceLocations;
+  const routeCounts = statement.proofRoutes.reduce(
+    (counts, candidate) => {
+      counts[dependencyRouteKind(candidate)] += 1;
+      return counts;
+    },
+    { original: 0, minimized: 0, reinterpretation: 0 },
+  );
+  const formalSystems = Array.from(new Set(
+    statement.formalDeclarations.map((declaration) => formalProver(declaration).label),
+  ));
 
   const selectReference = (id: string) => {
     if (onSelectStatement) onSelectStatement(id);
@@ -583,11 +555,23 @@ export function ProofPanel({
             >
               {statement.proofRoutes.map((candidate) => (
                 <option key={candidate.id} value={candidate.id}>
-                  {candidate.label}
+                  {routeOptionLabel(candidate)}
                 </option>
               ))}
             </select>
           </section>
+
+          <div className="route-spectrum" aria-label="Available dependency routes">
+            <span className={routeCounts.original ? "is-available" : ""}>
+              <strong>{routeCounts.original}</strong> Original
+            </span>
+            <span className={routeCounts.minimized ? "is-available" : ""}>
+              <strong>{routeCounts.minimized}</strong> Minimized
+            </span>
+            <span className={routeCounts.reinterpretation ? "is-available" : ""}>
+              <strong>{routeCounts.reinterpretation}</strong> Reinterpretations
+            </span>
+          </div>
 
           {route ? (
             <section className="proof-section shortened-proof">
@@ -599,6 +583,14 @@ export function ProofPanel({
               </div>
               <MathMarkdown onStatementReference={selectReference}>{route.proof}</MathMarkdown>
               <dl className="route-metadata">
+                <div>
+                  <dt>Dependency role</dt>
+                  <dd>{formatEnum(dependencyRouteKind(route))}</dd>
+                </div>
+                <div>
+                  <dt>Review state</dt>
+                  <dd>{formatEnum(routeReviewStatus(route))}</dd>
+                </div>
                 <div>
                   <dt>Route type</dt>
                   <dd>{formatEnum(route.type)}</dd>
@@ -612,6 +604,9 @@ export function ProofPanel({
                   <dd>{formatEnum(route.formalAlignment)}</dd>
                 </div>
               </dl>
+              {route.interpretationNote ? (
+                <p className="route-interpretation-note">{route.interpretationNote}</p>
+              ) : null}
             </section>
           ) : null}
 
@@ -642,10 +637,11 @@ export function ProofPanel({
         </Fragment>
       ) : statement.kind === "conjecture" ? (
         <section className="proof-section definition-note">
-          <h4>Open conjecture</h4>
+          <h4>Source conjecture</h4>
           <p>
-            This record states an unproved claim. Its dependencies support the formulation
-            or explain later conditional results; NisabaDB does not claim a proof.
+            The source presents this as an unproved claim. Its dependencies support the
+            formulation or explain later conditional results; NisabaDB does not claim a proof
+            or certify that the problem remains open today.
           </p>
         </section>
       ) : (
@@ -691,8 +687,11 @@ export function ProofPanel({
 
       <section className="proof-section verification-summary">
         <div className="proof-section-heading">
-          <h4>Formal record</h4>
-          <span>{statement.formalDeclarations.length} declarations</span>
+          <h4>Formal verification</h4>
+          <span>
+            {statement.formalDeclarations.length} artifacts · {formalSystems.length} prover
+            {formalSystems.length === 1 ? "" : "s"}
+          </span>
         </div>
         <dl className="formal-facts">
           <div>
@@ -710,20 +709,19 @@ export function ProofPanel({
         </dl>
         {statement.formalDeclarations.length ? (
           <details className="declaration-disclosure">
-            <summary>Inspect Lean declarations</summary>
+            <summary>Inspect prover artifacts</summary>
             <ul>
-              {statement.formalDeclarations.map((declaration) => (
-                <li key={`${declaration.name}-${declaration.lineStart}`}>
+              {statement.formalDeclarations.map((declaration) => {
+                const prover = formalProver(declaration);
+                const unresolved = declaration.unresolvedPlaceholders;
+                return (
+                <li key={`${prover.id}-${declaration.name}-${declaration.lineStart}`}>
                   <a
-                    href={repositoryUrl(
-                      declaration.repository,
-                      declaration.commit,
-                      declaration.file,
-                      declaration.lineStart,
-                    )}
+                    href={formalSourceUrl(declaration)}
                     target="_blank"
                     rel="noreferrer"
                   >
+                    <span className="prover-label">{prover.label}</span>
                     <code>{declaration.name}</code>
                     <span>L{declaration.lineStart}</span>
                   </a>
@@ -737,7 +735,11 @@ export function ProofPanel({
                   </p>
                   <dl className="declaration-audit-facts">
                     <div>
-                      <dt>Kernel checked</dt>
+                      <dt>Checker</dt>
+                      <dd>{prover.checker}</dd>
+                    </div>
+                    <div>
+                      <dt>Checker accepted</dt>
                       <dd>{declaration.kernelChecks ? "Yes" : "No"}</dd>
                     </div>
                     <div>
@@ -747,6 +749,10 @@ export function ProofPanel({
                     <div>
                       <dt>Contains admit</dt>
                       <dd>{declaration.hasAdmit ? "Yes" : "No"}</dd>
+                    </div>
+                    <div>
+                      <dt>Unresolved placeholders</dt>
+                      <dd>{unresolved.length ? unresolved.join(", ") : "None"}</dd>
                     </div>
                     <div>
                       <dt>External input</dt>
@@ -771,11 +777,12 @@ export function ProofPanel({
                   </dl>
                   <p className="declaration-audit-note">{declaration.auditNote}</p>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           </details>
         ) : (
-          <p className="muted-copy">No Lean declaration is attached to this record.</p>
+          <p className="muted-copy">No prover artifact is attached to this record.</p>
         )}
       </section>
 
@@ -797,7 +804,7 @@ export function ProofPanel({
         {standalone ? (
           <Link
             className="button-link subtle-button"
-            to={`/papers/${paper.id}?view=${encodeURIComponent(viewId ?? "main")}&node=${encodeURIComponent(statement.id)}${route ? `&route=${encodeURIComponent(route.id)}` : ""}#explorer`}
+            to={`/papers/${paper.id}?node=${encodeURIComponent(statement.id)}${route ? `&route=${encodeURIComponent(route.id)}` : ""}#explorer`}
           >
             Open in dependency graph
           </Link>

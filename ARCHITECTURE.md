@@ -1,8 +1,13 @@
 # NisabaDB architecture
 
-## One corpus, three readings
+## One corpus, four learner surfaces
 
-`src/data/corpus.json` is the build-time source for the graph explorer, canonical theorem pages, and distilled-paper view. Rendering code never owns mathematical proof text. `src/data/schema.ts` validates the corpus as the application loads and in tests.
+`src/data/corpus.json` is the build-time source for the paper graph explorer, canonical theorem pages, distilled-paper view, the initial Knowledge-candidate catalog, and the local Learn prototype. Rendering code never owns mathematical proof text. `src/data/schema.ts` validates the corpus as the application loads and in tests.
+
+- **Knowledge** currently exposes reviewed paper claims as normalization candidates. A later source-independent `KnowledgeNode` layer will merge equivalent claims only after review.
+- **Papers** use one complete graph per paper. Main results and sections are focus points inside that graph, not separate graph tabs.
+- **Unsolved** remains empty until a precise problem passes an administratively reviewed, dated literature audit.
+- **Learn** computes a prerequisite-first route for a selected target and subtracts locally marked mastery evidence. Its current time estimates are heuristic and device-local.
 
 The core relationships are:
 
@@ -19,6 +24,8 @@ Paper
 ```
 
 A statement may have several proof routes. Each route owns its dependency set, proof, conceptual cost, attribution, verification status, and formal-alignment state. Selecting a route therefore changes both the prose and the graph edges. A complete route must use every displayed dependency, and every proof-step reference must be declared by the route.
+
+Route exposition and route provenance are independent. `type` describes presentation (for example compressed source or pedagogical), while `dependencyKind` records whether the dependency route is the audited `original`, a reviewed `minimized` route, or a `reinterpretation`. `reviewStatus` keeps candidate routes visibly separate from reviewed routes. Every minimized route must identify the route from which it was minimized.
 
 ## Validation invariants
 
@@ -66,7 +73,20 @@ Every paper and statement also carries appendable modification-history records w
 
 ## Formal evidence model
 
-Formal declarations retain repository, 40-character commit, file, declaration name, resolved line, kernel-check result, admitted-term scan, external-input flag, explicit axiom footprint, and audit note. Informal/formal alignment and proof-route alignment are separate review dimensions. This prevents a kernel-checked declaration from being mislabeled as a completely aligned or assumption-free proof.
+Formal declarations retain a prover/checker identity, repository, 40-character commit, file, declaration name, resolved line, checker result, placeholder scan, external-input flag, explicit axiom footprint, and audit note. Informal/formal alignment and proof-route alignment are separate review dimensions. This prevents a checker-accepted declaration from being mislabeled as a completely aligned or assumption-free proof.
+
+Lean 4 is the first populated adapter, not a schema restriction. `FormalProofSubmission` accepts versioned artifacts from any reproducible prover, records content hashes and sandboxed verification runs, and requires a separate admin decision. Submission records belong to the future authenticated control plane; only approved artifacts enter the public corpus.
+
+## Contribution and worker boundary
+
+The public GitHub Pages client never accepts uploads or publishes AI output. The future service boundary is:
+
+```text
+contributor -> control plane -> sandboxed workers -> immutable proposal
+            -> admin review -> deterministic publisher -> public corpus
+```
+
+Workers may resolve sources, extract candidate records, run fixed prompt templates, and execute prover-specific checkers in isolated runners. They must not hold repository publication credentials, edit `src/data/corpus.json`, or execute generated paper-pack code. The publisher consumes only an approved structured changeset and runs the existing validation and build before publication.
 
 ## Citation worker boundary
 
@@ -81,9 +101,12 @@ The current application is static-first by design. A future database or worker c
 ## Route and deployment shape
 
 - `/` — project landing page and featured-paper entry
+- `/knowledge` — source-linked candidates for the canonical Knowledge DAG
 - `/papers` — searchable catalog
 - `/papers/:paperId` — metadata, graph, proofs, citations, and formal coverage
 - `/papers/:paperId/distilled` — generated linear reading
 - `/theorems/:statementId` — canonical deep-linked statement
+- `/unsolved` — administratively confirmed open problems; currently intentionally empty
+- `/learn` — target selection, prerequisite route, mastery marking, and effort estimate
 
 Vite builds a static artifact. The build copies the same validated application shell to every known paper, distilled-paper, catalog, and theorem route, so GitHub Pages serves canonical deep links directly; a copied `404.html` remains as a fallback for unknown client routes. React Router resolves the requested record from that shared shell.

@@ -43,10 +43,10 @@ export function SiteLayout() {
           </span>
         </Link>
         <nav aria-label="Primary navigation">
-          <NavLink to="/" end>
-            Home
-          </NavLink>
+          <NavLink to="/knowledge">Knowledge</NavLink>
           <NavLink to="/papers">Papers</NavLink>
+          <NavLink to="/unsolved">Unsolved</NavLink>
+          <NavLink to="/learn">Learn</NavLink>
         </nav>
       </header>
       <main id="main-content">

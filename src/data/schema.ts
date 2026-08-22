@@ -20,6 +20,18 @@ export const routeTypeSchema = z.enum([
   "historical",
 ]);
 
+export const dependencyRouteKindSchema = z.enum([
+  "original",
+  "minimized",
+  "reinterpretation",
+]);
+
+export const routeReviewStatusSchema = z.enum([
+  "reviewed",
+  "candidate",
+  "rejected",
+]);
+
 export const verificationStatusSchema = z.enum([
   "statement-only",
   "formalization-drafted",
@@ -44,18 +56,102 @@ export const sourceLocationSchema = z.object({
   lineEnd: z.number().int().positive().optional(),
 });
 
+export const formalProverSchema = z.object({
+  id: z.string().regex(/^[a-z0-9][a-z0-9.-]*$/),
+  label: z.string().min(1),
+  version: z.string().min(1).optional(),
+  checker: z.string().min(1),
+});
+
+export const formalVerificationRunSchema = z.object({
+  id: z.string().min(1),
+  checkedAt: z.iso.datetime(),
+  environment: z.string().min(1),
+  checkerVersion: z.string().min(1),
+  result: z.enum(["accepted", "rejected", "error"]),
+  artifactSha256: z.string().regex(/^[0-9a-f]{64}$/i),
+  logUrl: z.url().optional(),
+});
+
+export const formalProofSubmissionSchema = z.object({
+  id: z.string().min(1),
+  statementId: z.string().min(1),
+  submittedBy: z.string().min(1),
+  submittedAt: z.iso.datetime(),
+  prover: formalProverSchema,
+  repository: z.string().min(1),
+  commit: z.string().regex(/^[0-9a-f]{40}$/i),
+  file: z.string().min(1),
+  declaration: z.string().min(1),
+  sourceUrl: z.url().optional(),
+  artifactSha256: z.string().regex(/^[0-9a-f]{64}$/i),
+  status: z.enum([
+    "submitted",
+    "sandbox-queued",
+    "checker-accepted",
+    "checker-rejected",
+    "alignment-review",
+    "admin-approved",
+    "admin-rejected",
+  ]),
+  verificationRuns: z.array(formalVerificationRunSchema),
+  adminDecision: z.object({
+    reviewer: z.string().min(1),
+    reviewedAt: z.iso.datetime(),
+    decision: z.enum(["approved", "rejected"]),
+    note: z.string().min(1),
+  }).optional(),
+}).superRefine((submission, context) => {
+  const terminalDecision = submission.status === "admin-approved"
+    ? "approved"
+    : submission.status === "admin-rejected"
+      ? "rejected"
+      : undefined;
+
+  if (terminalDecision && submission.adminDecision?.decision !== terminalDecision) {
+    context.addIssue({
+      code: "custom",
+      path: ["adminDecision"],
+      message: `${submission.status} requires a matching administrator decision`,
+    });
+  }
+
+  if (!terminalDecision && submission.adminDecision) {
+    context.addIssue({
+      code: "custom",
+      path: ["adminDecision"],
+      message: "administrator decisions are only valid for terminal admin statuses",
+    });
+  }
+
+  if (submission.status === "admin-approved" && !submission.verificationRuns.some((run) =>
+    run.result === "accepted" &&
+    run.artifactSha256.toLowerCase() === submission.artifactSha256.toLowerCase()
+  )) {
+    context.addIssue({
+      code: "custom",
+      path: ["verificationRuns"],
+      message: "admin-approved requires an accepted verification run for the submitted artifact",
+    });
+  }
+});
+
 export const formalDeclarationSchema = z.object({
+  prover: formalProverSchema,
   repository: z.string().min(1),
   commit: z.string().regex(/^[0-9a-f]{40}$/i),
   file: z.string().min(1),
   name: z.string().min(1),
   lineStart: z.number().int().positive(),
+  sourceUrl: z.url().optional(),
   kernelChecks: z.boolean(),
   hasSorry: z.boolean(),
   hasAdmit: z.boolean(),
+  unresolvedPlaceholders: z.array(z.string().min(1)),
   usesExternalInput: z.boolean(),
   axiomFootprint: z.array(z.string().min(1)),
   auditNote: z.string().min(1),
+  verificationRuns: z.array(formalVerificationRunSchema).optional(),
 });
 
 export const proofStepSchema = z.object({
@@ -69,6 +165,10 @@ export const proofRouteSchema = z.object({
   id: z.string().min(1),
   label: z.string().min(1),
   type: routeTypeSchema,
+  dependencyKind: dependencyRouteKindSchema,
+  reviewStatus: routeReviewStatusSchema,
+  derivedFromRouteId: z.string().min(1).optional(),
+  interpretationNote: z.string().min(1).optional(),
   conceptualCost: z.enum(["low", "moderate", "high", "specialist"]),
   dependencies: z.array(z.string().min(1)),
   status: z.enum(["complete", "proof-idea", "proof-not-yet-distilled"]),
@@ -327,6 +427,13 @@ export const corpusSchema = z.object({
       context.addIssue({ code: "custom", message: `${statement.id} top-level dependencies must equal the union of route dependencies` });
     }
 
+    const hasUncertifiedDeclaration = statement.formalDeclarations.some((declaration) =>
+      !declaration.kernelChecks || declaration.hasSorry || declaration.hasAdmit ||
+      declaration.unresolvedPlaceholders.length > 0 ||
+      declaration.usesExternalInput || declaration.axiomFootprint.length > 0 ||
+      !declaration.verificationRuns?.some((run) => run.result === "accepted")
+    );
+
     const routeIds = new Set<string>();
     for (const route of statement.proofRoutes) {
       if (routeIds.has(route.id)) {
@@ -377,9 +484,7 @@ export const corpusSchema = z.object({
           statement.formalStatus !== "fully-certified" ||
           statement.formalAlignment !== "reviewed" ||
           statement.formalDeclarations.length === 0 ||
-          statement.formalDeclarations.some((declaration) =>
-            !declaration.kernelChecks || declaration.hasSorry || declaration.hasAdmit ||
-            declaration.usesExternalInput || declaration.axiomFootprint.length > 0);
+          hasUncertifiedDeclaration;
         if (impossible) {
           context.addIssue({
             code: "custom",
@@ -389,13 +494,53 @@ export const corpusSchema = z.object({
       }
     }
 
+    for (const route of statement.proofRoutes) {
+      if (route.derivedFromRouteId &&
+          (route.derivedFromRouteId === route.id || !routeIds.has(route.derivedFromRouteId))) {
+        context.addIssue({
+          code: "custom",
+          message: `${statement.id}/${route.id} has invalid parent route ${route.derivedFromRouteId}`,
+        });
+      }
+      if (route.dependencyKind === "minimized" && !route.derivedFromRouteId) {
+        context.addIssue({
+          code: "custom",
+          message: `${statement.id}/${route.id} is minimized but does not identify its source route`,
+        });
+      }
+    }
+
+    const routeById = new Map(statement.proofRoutes.map((route) => [route.id, route]));
+    const lineageVisited = new Set<string>();
+    const lineageVisiting = new Set<string>();
+    const visitRouteLineage = (routeId: string, path: string[]) => {
+      if (lineageVisited.has(routeId)) return;
+      if (lineageVisiting.has(routeId)) {
+        const cycleStart = path.indexOf(routeId);
+        const cycle = [...path.slice(cycleStart), routeId];
+        context.addIssue({
+          code: "custom",
+          message: `${statement.id} has cyclic proof route lineage: ${cycle.join(" -> ")}`,
+        });
+        return;
+      }
+      lineageVisiting.add(routeId);
+      const parentId = routeById.get(routeId)?.derivedFromRouteId;
+      if (parentId && routeById.has(parentId)) {
+        visitRouteLineage(parentId, [...path, routeId]);
+      }
+      lineageVisiting.delete(routeId);
+      lineageVisited.add(routeId);
+    };
+    statement.proofRoutes.forEach((route) => visitRouteLineage(route.id, []));
+
     if (["theorem", "lemma", "proposition", "corollary", "imported-result"].includes(statement.kind) && statement.proofRoutes.length === 0) {
       context.addIssue({ code: "custom", message: `${statement.id} is theorem-like but has no proof route` });
     }
 
     if (statement.formalStatus === "fully-certified") {
       const impossible = statement.formalAlignment !== "reviewed" || statement.formalDeclarations.length === 0 ||
-        statement.formalDeclarations.some((declaration) => !declaration.kernelChecks || declaration.hasSorry || declaration.hasAdmit || declaration.usesExternalInput || declaration.axiomFootprint.length > 0);
+        hasUncertifiedDeclaration;
       if (impossible) {
         context.addIssue({ code: "custom", message: `${statement.id} has an impossible fully-certified state` });
       }
@@ -527,6 +672,8 @@ export type Corpus = z.infer<typeof corpusSchema>;
 export type Paper = z.infer<typeof paperSchema>;
 export type Statement = z.infer<typeof statementSchema>;
 export type ProofRoute = z.infer<typeof proofRouteSchema>;
+export type FormalDeclaration = z.infer<typeof formalDeclarationSchema>;
+export type FormalProofSubmission = z.infer<typeof formalProofSubmissionSchema>;
 export type VerificationStatus = z.infer<typeof verificationStatusSchema>;
 
 export function validateCorpus(input: unknown): Corpus {

@@ -8,10 +8,15 @@ The intended canonical domain is `nisabadb.org`. Until that domain is configured
 
 ## What works
 
-- Expandable dependency DAGs with paper-specific main-theorem and topic views
+- Learner-facing navigation for Knowledge, Papers, Unsolved, and Learn, including a target-selectable layered Knowledge DAG
+- One expandable dependency DAG per paper, containing every paper-facing result without topic sub-tabs
 - Search, status filters, route-sensitive dependency highlighting, and stable deep links
+- Explicit original, minimized, and candidate-reinterpretation route roles with independent review state
 - Persistent statement/proof reader with source locations, Lean declarations, and axiom audit
+- Prover-neutral formal-artifact schema and reproducible submission lifecycle; Lean 4 is the first populated adapter
 - Topologically generated distilled-paper view with optional prerequisite expansion
+- Interactive target-to-prerequisite learning paths with local mastery diagnostics and effort estimates
+- An intentionally empty Unsolved surface until a conjecture passes a dated literature-status review
 - Paper catalog plus resumable provisional records for the direct citation neighborhoods of both gold papers
 - Validated TypeScript content model and a persistent OpenAlex ingestion queue
 - Responsive, keyboard-accessible React interface with KaTeX rendering
@@ -81,6 +86,8 @@ Provider responses are cached under `data/citations/cache/` with their URL and r
 Pushes to `main` run the GitHub Pages workflow in `.github/workflows/deploy-pages.yml`. It installs locked dependencies, runs the complete check, builds with the `/nisabadb/` base path, and deploys the `dist` artifact. Client-side route fallbacks are included for deep links.
 
 No `CNAME` is committed yet: configure DNS for `nisabadb.org` first, then add the verified custom domain in GitHub Pages.
+
+The public site remains static. Authenticated contributions, automated prover runs, mathematical review, and admin-only publication require the separate control-plane and worker service described in [ARCHITECTURE.md](ARCHITECTURE.md); they are not simulated by the public client.
 
 ## Provenance and reuse
 

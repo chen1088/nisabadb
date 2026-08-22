@@ -3,6 +3,7 @@ import citationAudit from "../../data/citations/direct-neighborhood-audit.json";
 import rawCorpus from "./corpus.json";
 import {
   corpus,
+  learningRoute,
   paperById,
   proofCoverage,
   statementById,
@@ -98,6 +99,26 @@ describe("NisabaDB content", () => {
     expect(statementById.get("S02_T01")?.proofRoutes[0]?.sourceAttribution).toContain(
       "preserves that discrepancy",
     );
+  });
+
+  it("prefers a reviewed minimized route for learning and ignores candidates", () => {
+    const source = statementById.get("S01_T01");
+    const original = source?.proofRoutes[0];
+    if (!source || !original) throw new Error("Learning-route fixture is incomplete");
+    const statement = structuredClone(source);
+    statement.proofRoutes = [
+      original,
+      { ...structuredClone(original), id: "candidate-shortcut", dependencyKind: "reinterpretation", reviewStatus: "candidate" },
+      { ...structuredClone(original), id: "reviewed-minimum", dependencyKind: "minimized", reviewStatus: "reviewed", derivedFromRouteId: original.id },
+    ];
+
+    expect(learningRoute(statement)?.id).toBe("reviewed-minimum");
+
+    statement.proofRoutes = statement.proofRoutes.map((route) => ({
+      ...route,
+      reviewStatus: "candidate" as const,
+    }));
+    expect(learningRoute(statement)).toBeUndefined();
   });
 
   it("promotes the multislice paper with a complete numbered-result map and honest gaps", () => {

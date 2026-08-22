@@ -1,6 +1,16 @@
 # NisabaDB milestone status
 
-Status date: 2026-08-21
+Status date: 2026-08-22
+
+## Product structure
+
+- The primary navigation is now Knowledge, Papers, Unsolved, and Learn; the brand remains the home link.
+- Each gold paper renders one complete dependency graph. Legacy `view` query parameters remain harmless, but main-theorem and topic graph tabs are no longer user-visible.
+- Proof routes distinguish their dependency role (`original`, `minimized`, or `reinterpretation`) from their review state. The current 61 populated routes are reviewed original/source routes; no minimized or reinterpretation route is claimed yet.
+- The Knowledge surface honestly exposes the 93 reviewed paper claims as normalization candidates, with a target-selectable layered dependency map and selected-node reader. Source-independent canonical merging and minimized tutorials remain future mathematical work.
+- Learn provides a working local prerequisite path, mastery checklist, and heuristic effort estimate. Persistent learner profiles and mastery evidence require the authenticated backend.
+- Unsolved is intentionally empty. The one source conjecture is a literature-review candidate, not a confirmed-current open problem.
+- Formal artifacts are now prover-neutral. The 191 current artifacts are Lean 4 declarations; the schema also validates reproducible submissions from other checkers, but automated submission and execution await the worker service.
 
 ## Gold rewrites
 

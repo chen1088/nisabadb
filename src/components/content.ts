@@ -1,6 +1,7 @@
 import rawCorpus from "../data/corpus.json";
 import type {
   Corpus,
+  FormalDeclaration,
   Paper,
   ProofRoute,
   Statement,
@@ -47,6 +48,27 @@ export const kindLabels: Record<Statement["kind"], string> = {
   "imported-result": "Imported result",
 };
 
+export function dependencyRouteKind(route: ProofRoute): "original" | "minimized" | "reinterpretation" {
+  return route.dependencyKind;
+}
+
+export function routeReviewStatus(route: ProofRoute): "reviewed" | "candidate" | "rejected" {
+  return route.reviewStatus;
+}
+
+export function formalProver(declaration: FormalDeclaration) {
+  return declaration.prover;
+}
+
+export function formalSourceUrl(declaration: FormalDeclaration): string {
+  return declaration.sourceUrl ?? repositoryUrl(
+    declaration.repository,
+    declaration.commit,
+    declaration.file,
+    declaration.lineStart,
+  );
+}
+
 export function getPaperStatements(paperId: string): Statement[] {
   return corpus.statements.filter((statement) => statement.paperId === paperId);
 }
@@ -56,6 +78,19 @@ export function getRoute(statement: Statement, routeId?: string | null): ProofRo
     statement.proofRoutes.find((route) => route.id === routeId) ??
     statement.proofRoutes[0]
   );
+}
+
+export function getLearningRoute(statement: Statement): ProofRoute | undefined {
+  const reviewed = statement.proofRoutes.filter((route) => routeReviewStatus(route) === "reviewed");
+  return reviewed.find((route) => dependencyRouteKind(route) === "minimized") ??
+    reviewed.find((route) => dependencyRouteKind(route) === "original") ??
+    reviewed[0];
+}
+
+export function getLearningDependencyIds(statement: Statement): string[] {
+  const route = getLearningRoute(statement);
+  if (route) return route.dependencies;
+  return statement.proofRoutes.length === 0 ? statement.dependencies : [];
 }
 
 export function getDependencyIds(statement: Statement, routeId?: string | null): string[] {
@@ -72,7 +107,6 @@ export function graphPath(
   options?: { routeId?: string; viewId?: string },
 ): string {
   const parameters = new URLSearchParams({ node: statement.id });
-  if (options?.viewId) parameters.set("view", options.viewId);
   if (options?.routeId) parameters.set("route", options.routeId);
   return `/papers/${paper.id}?${parameters.toString()}#explorer`;
 }

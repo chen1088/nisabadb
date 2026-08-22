@@ -198,6 +198,8 @@ a:hover {
   display: flex;
   align-items: center;
   gap: 0.35rem;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
 .global-header nav a {
@@ -1033,6 +1035,27 @@ a:hover {
   backdrop-filter: blur(16px);
 }
 
+.graph-scope {
+  display: grid;
+  gap: 0.12rem;
+  align-self: center;
+  min-width: 190px;
+}
+
+.graph-scope span {
+  color: var(--clay-dark);
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.graph-scope strong {
+  color: var(--ink-deep);
+  font-family: var(--serif);
+  font-size: 0.86rem;
+}
+
 .view-tabs,
 .toolbar-actions,
 .graph-context {
@@ -1669,6 +1692,38 @@ a:hover {
   background: var(--indigo-soft);
 }
 
+.route-spectrum {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  padding: 0.75rem clamp(1rem, 2.4vw, 1.6rem);
+  border-bottom: 1px solid var(--line);
+  background: #f4f2eb;
+}
+
+.route-spectrum span {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  padding: 0.45rem 0.55rem;
+  border: 1px dashed var(--line-strong);
+  border-radius: 0.3rem;
+  color: var(--muted);
+  font-size: 0.67rem;
+}
+
+.route-spectrum span.is-available {
+  border-style: solid;
+  border-color: #91aa9d;
+  background: var(--moss-soft);
+  color: var(--moss-dark);
+}
+
+.route-spectrum strong {
+  font-family: var(--serif);
+  font-size: 1rem;
+}
+
 .route-control > div {
   display: grid;
 }
@@ -1733,9 +1788,18 @@ a:hover {
 .formal-facts,
 .source-record-block dl {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 0.6rem;
   margin: 1.1rem 0 0;
+}
+
+.route-interpretation-note {
+  margin: 0.75rem 0 0;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--indigo);
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.5;
 }
 
 .route-metadata div,
@@ -1883,6 +1947,17 @@ a:hover {
   align-items: baseline;
   width: fit-content;
   text-decoration: none;
+}
+
+.declaration-disclosure .prover-label {
+  padding: 0.18rem 0.35rem;
+  border-radius: 999px;
+  background: var(--indigo-soft);
+  color: var(--indigo);
+  font-size: 0.6rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .declaration-disclosure a span,
@@ -2257,6 +2332,28 @@ a:hover {
   font-size: 2.5rem;
 }
 
+.prover-intake-note {
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #aabdc1;
+  border-radius: 0.35rem;
+  background: var(--indigo-soft);
+}
+
+.prover-intake-note strong {
+  color: var(--indigo);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.prover-intake-note p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
 /* Canonical theorem */
 
 .theorem-page {
@@ -2500,6 +2597,626 @@ a:hover {
   font-family: var(--sans);
 }
 
+/* Knowledge, Learn, and Unsolved */
+
+.knowledge-page,
+.learn-page,
+.unsolved-page {
+  padding-bottom: clamp(3rem, 7vw, 7rem);
+}
+
+.knowledge-hero h1,
+.learn-hero h1,
+.unsolved-hero h1 {
+  color: var(--ink-deep);
+}
+
+.knowledge-stage,
+.learning-planner,
+.unsolved-empty {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: start;
+  margin: 2rem 0;
+  padding: clamp(1.3rem, 3.5vw, 3rem);
+  border: 1px solid var(--line-strong);
+  border-radius: 0.5rem;
+  background:
+    radial-gradient(circle at 100% 0, rgba(49, 95, 74, 0.09), transparent 36%),
+    var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+
+.knowledge-stage h2,
+.learning-target-summary h2,
+.unsolved-empty h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(2rem, 3.5vw, 3.5rem);
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.knowledge-stage > div > p:last-child,
+.learning-target-summary p,
+.unsolved-empty > div > p:last-child {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.knowledge-stage dl {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+}
+
+.knowledge-stage dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.knowledge-stage dt {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.knowledge-stage dd {
+  margin: 0;
+  color: var(--moss-dark);
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  font-weight: 720;
+  text-align: right;
+}
+
+.knowledge-map {
+  margin: clamp(3rem, 6vw, 6rem) 0;
+}
+
+.knowledge-map > header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.42fr);
+  gap: 2rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+.knowledge-map > header h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 4rem);
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+}
+
+.knowledge-map > header label,
+.knowledge-map > header label > span {
+  display: grid;
+}
+
+.knowledge-map > header label > span {
+  margin-bottom: 0.4rem;
+  color: var(--muted);
+  font-size: 0.65rem;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.knowledge-map > header select {
+  min-height: 46px;
+  width: 100%;
+  padding: 0.55rem 2rem 0.55rem 0.7rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.35rem;
+  background: var(--paper);
+}
+
+.knowledge-map-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+  gap: 1rem;
+  align-items: start;
+  padding: 0.8rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.5rem;
+  background: #eae6da;
+}
+
+.knowledge-dag {
+  display: grid;
+  grid-auto-columns: minmax(220px, 260px);
+  grid-auto-flow: column;
+  gap: 0.8rem;
+  max-height: 720px;
+  padding: 0.4rem 0.3rem 0.8rem;
+  overflow: auto;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.knowledge-dag > section {
+  position: relative;
+  min-width: 0;
+}
+
+.knowledge-dag > section:not(:last-child)::after {
+  position: absolute;
+  top: 1.8rem;
+  right: -0.62rem;
+  width: 0.45rem;
+  border-top: 1px solid var(--clay);
+  content: "";
+}
+
+.knowledge-dag > section > span {
+  display: block;
+  margin: 0 0 0.5rem;
+  color: var(--clay-dark);
+  font-size: 0.61rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.knowledge-dag > section > div {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.knowledge-dag button {
+  display: grid;
+  gap: 0.3rem;
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  background: var(--paper);
+  color: var(--ink);
+  text-align: left;
+}
+
+.knowledge-dag button:hover,
+.knowledge-dag button.is-selected {
+  border-color: var(--moss);
+  background: var(--moss-soft);
+}
+
+.knowledge-dag button small {
+  color: var(--muted);
+  font-size: 0.58rem;
+  text-transform: uppercase;
+}
+
+.knowledge-dag button strong {
+  font-family: var(--serif);
+  font-size: 0.84rem;
+  line-height: 1.15;
+}
+
+.knowledge-node-edges {
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--line);
+  color: var(--clay-dark);
+  font-size: 0.6rem;
+  font-weight: 720;
+  line-height: 1.35;
+}
+
+.knowledge-reader {
+  position: sticky;
+  top: 96px;
+  max-height: calc(100vh - 116px);
+  padding: 1.2rem;
+  overflow: auto;
+  border-radius: 0.38rem;
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+
+.knowledge-reader > span {
+  color: var(--clay-dark);
+  font-size: 0.63rem;
+  font-weight: 820;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.knowledge-reader h3 {
+  margin: 0.35rem 0 1.2rem;
+  font-family: var(--serif);
+  font-size: clamp(1.7rem, 3vw, 2.7rem);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.knowledge-reader > div {
+  padding: 1rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.knowledge-reader h4 {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.knowledge-reader .math-markdown {
+  font-size: 0.84rem;
+}
+
+.knowledge-reader ul {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.knowledge-reader li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.55rem;
+  background: var(--canvas);
+  font-size: 0.66rem;
+  text-transform: capitalize;
+}
+
+.knowledge-reader > a {
+  display: inline-flex;
+  margin-top: 1rem;
+  color: var(--moss-dark);
+  font-size: 0.72rem;
+  font-weight: 780;
+  text-decoration: none;
+}
+
+.knowledge-controls {
+  position: sticky;
+  z-index: 16;
+  top: 88px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  align-items: end;
+  margin: 2rem 0 1rem;
+  padding: 0.9rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.45rem;
+  background: rgba(255, 254, 249, 0.95);
+  backdrop-filter: blur(16px);
+}
+
+.knowledge-controls .search-control {
+  flex: 1 1 320px;
+}
+
+.knowledge-controls > p {
+  margin: 0 0 0.5rem auto;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.knowledge-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.knowledge-card {
+  display: flex;
+  min-width: 0;
+  min-height: 290px;
+  flex-direction: column;
+  padding: 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 0.42rem;
+  background: var(--paper);
+  box-shadow: 0 8px 22px rgba(45, 39, 29, 0.04);
+}
+
+.knowledge-card-topline,
+.knowledge-card footer,
+.knowledge-route-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.knowledge-card-topline {
+  justify-content: space-between;
+  color: var(--clay-dark);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.knowledge-card h2 {
+  margin: 1rem 0 0.65rem;
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  line-height: 1.08;
+}
+
+.knowledge-card h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.knowledge-card h2 a:hover {
+  color: var(--moss-dark);
+}
+
+.knowledge-description {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+.knowledge-route-tags {
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.knowledge-route-tags span,
+.learning-route-label {
+  padding: 0.24rem 0.45rem;
+  border-radius: 999px;
+  background: var(--indigo-soft);
+  color: var(--indigo);
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.knowledge-card footer {
+  justify-content: space-between;
+  margin-top: 0.8rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.64rem;
+}
+
+.knowledge-card footer a {
+  max-width: 62%;
+  overflow: hidden;
+  color: var(--moss-dark);
+  font-weight: 760;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.learning-target > label,
+.learning-target > label > span {
+  display: grid;
+}
+
+.learning-target > label > span {
+  margin-bottom: 0.4rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.learning-target select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.6rem 2rem 0.6rem 0.75rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.35rem;
+  background: var(--paper);
+}
+
+.learning-target-summary {
+  margin-top: 1.5rem;
+}
+
+.learning-target-summary > span:first-child {
+  color: var(--clay-dark);
+  font-size: 0.65rem;
+  font-weight: 820;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.learning-target-summary h2 {
+  margin-top: 0.35rem;
+}
+
+.learning-estimate {
+  padding: 1.25rem;
+  border-radius: 0.42rem;
+  background: var(--ink-deep);
+  color: white;
+}
+
+.learning-estimate > span {
+  color: #cdd7d2;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.learning-estimate > strong {
+  display: block;
+  margin-top: 0.5rem;
+  font-family: var(--serif);
+  font-size: clamp(2.4rem, 5vw, 4.3rem);
+  line-height: 1;
+}
+
+.learning-estimate p {
+  color: #cdd7d2;
+  font-size: 0.75rem;
+}
+
+.learning-meter {
+  height: 7px;
+  margin: 1.2rem 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.learning-meter span {
+  display: block;
+  height: 100%;
+  background: #c2d6c8;
+  transition: width 180ms ease;
+}
+
+.learning-estimate button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 760;
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+}
+
+.learning-path {
+  margin-top: clamp(3rem, 6vw, 6rem);
+}
+
+.learning-path > ol {
+  display: grid;
+  gap: 0.6rem;
+  margin: 1.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.learning-path > ol > li {
+  display: grid;
+  grid-template-columns: 46px 110px minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: start;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  background: var(--paper);
+}
+
+.learning-path > ol > li.is-mastered {
+  opacity: 0.62;
+  background: var(--moss-soft);
+}
+
+.learning-step-number {
+  color: var(--clay);
+  font-family: var(--serif);
+  font-size: 1.2rem;
+}
+
+.learning-path label {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  padding-top: 0.1rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 760;
+}
+
+.learning-path h3 {
+  margin: 0.2rem 0 0.4rem;
+  font-family: var(--serif);
+  font-size: 1.25rem;
+}
+
+.learning-path h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.learning-path li > div > span,
+.learning-path li > strong {
+  color: var(--clay-dark);
+  font-size: 0.64rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.learning-path li p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.unsolved-empty {
+  min-height: 430px;
+  align-items: center;
+  background:
+    radial-gradient(circle at 18% 50%, rgba(164, 94, 63, 0.1), transparent 28%),
+    var(--paper);
+}
+
+.empty-orbit {
+  display: block;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--clay);
+  border-radius: 50%;
+  box-shadow: 18px -7px 0 -16px var(--moss), -11px 14px 0 -16px var(--indigo);
+}
+
+.unsolved-empty ol {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.unsolved-empty li {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: start;
+  padding: 0.8rem;
+  border: 1px solid var(--line);
+  background: var(--canvas);
+}
+
+.unsolved-empty li strong {
+  color: var(--clay);
+  font-family: var(--serif);
+  font-size: 1.1rem;
+}
+
+.unsolved-empty li span {
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
 /* Not found */
 
 .not-found {
@@ -2576,6 +3293,10 @@ a:hover {
   .citation-coverage-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .knowledge-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 900px) {
@@ -2616,8 +3337,22 @@ a:hover {
   }
 
   .catalog-controls,
-  .graph-toolbar {
+  .graph-toolbar,
+  .knowledge-controls {
     position: static;
+  }
+
+  .knowledge-stage,
+  .learning-planner,
+  .unsolved-empty,
+  .knowledge-map > header,
+  .knowledge-map-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .knowledge-reader {
+    position: static;
+    max-height: none;
   }
 
   .paper-facts {
@@ -2656,11 +3391,20 @@ a:hover {
   }
 
   .global-header {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
     min-height: 66px;
     padding-inline: 0.8rem;
   }
 
+  .global-header nav {
+    width: 100%;
+  }
+
   .global-header nav a {
+    flex: 1 0 auto;
+    text-align: center;
     padding-inline: 0.55rem;
     font-size: 0.75rem;
   }
@@ -2693,6 +3437,20 @@ a:hover {
   .paper-fact-counts,
   .corpus-strip {
     grid-template-columns: 1fr;
+  }
+
+  .knowledge-list,
+  .route-spectrum {
+    grid-template-columns: 1fr;
+  }
+
+  .learning-path > ol > li {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+
+  .learning-path label,
+  .learning-path li > strong {
+    grid-column: 2;
   }
 
   .declaration-audit-facts {

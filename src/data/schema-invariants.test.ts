@@ -1,10 +1,37 @@
 import { describe, expect, it } from "vitest";
 import { isTheoremLike, kindLabels } from "../components/content";
 import rawCorpus from "./corpus.json";
-import { validateCorpus, type Corpus, type Statement } from "./schema";
+import {
+  formalProofSubmissionSchema,
+  validateCorpus,
+  type Corpus,
+  type Statement,
+} from "./schema";
 
 function clonedCorpus(): Corpus {
   return structuredClone(validateCorpus(rawCorpus));
+}
+
+function rocqSubmission() {
+  return {
+    id: "submission-1",
+    statementId: "example.statement",
+    submittedBy: "contributor-1",
+    submittedAt: "2026-08-22T12:00:00.000Z",
+    prover: {
+      id: "rocq",
+      label: "Rocq",
+      version: "9.0",
+      checker: "rocqchk",
+    },
+    repository: "example/formalization",
+    commit: "a".repeat(40),
+    file: "Example.v",
+    declaration: "main_theorem",
+    artifactSha256: "b".repeat(64),
+    status: "submitted",
+    verificationRuns: [],
+  };
 }
 
 function conjectureFor(corpus: Corpus, paperId = corpus.papers[0]?.id): Statement {
@@ -108,5 +135,149 @@ describe("paper-local corpus invariants", () => {
     crossPaperRoot.statements.push(external);
     view.roots = [external.id];
     expect(() => validateCorpus(crossPaperRoot)).toThrow(/graph references cross-paper statement/i);
+  });
+});
+
+describe("route provenance and prover-neutral submissions", () => {
+  it("requires minimized dependency routes to name their source route", () => {
+    const corpus = clonedCorpus();
+    const statement = corpus.statements.find((candidate) => candidate.proofRoutes.length > 0);
+    const route = statement?.proofRoutes[0];
+    if (!statement || !route) throw new Error("Proof-route fixture is incomplete");
+    route.dependencyKind = "minimized";
+    route.reviewStatus = "candidate";
+
+    expect(() => validateCorpus(corpus)).toThrow(/does not identify its source route/i);
+  });
+
+  it("accepts a reproducible submission from a non-Lean prover", () => {
+    expect(formalProofSubmissionSchema.parse(rocqSubmission()).prover.id).toBe("rocq");
+  });
+
+  it("requires an accepted matching artifact and administrator decision before approval", () => {
+    const submission = rocqSubmission();
+    const acceptedRun = {
+      id: "run-1",
+      checkedAt: "2026-08-22T12:10:00.000Z",
+      environment: "isolated-worker-1",
+      checkerVersion: "rocqchk 9.0",
+      result: "accepted" as const,
+      artifactSha256: submission.artifactSha256,
+    };
+
+    expect(() => formalProofSubmissionSchema.parse({
+      ...submission,
+      status: "admin-approved",
+    })).toThrow(/matching administrator decision/i);
+
+    expect(() => formalProofSubmissionSchema.parse({
+      ...submission,
+      adminDecision: {
+        reviewer: "admin-1",
+        reviewedAt: "2026-08-22T12:20:00.000Z",
+        decision: "approved",
+        note: "This decision cannot precede the terminal workflow state.",
+      },
+    })).toThrow(/terminal admin statuses/i);
+
+    expect(() => formalProofSubmissionSchema.parse({
+      ...submission,
+      status: "admin-approved",
+      verificationRuns: [{ ...acceptedRun, artifactSha256: "c".repeat(64) }],
+      adminDecision: {
+        reviewer: "admin-1",
+        reviewedAt: "2026-08-22T12:20:00.000Z",
+        decision: "approved",
+        note: "The proof and source alignment were reviewed.",
+      },
+    })).toThrow(/submitted artifact/i);
+
+    expect(() => formalProofSubmissionSchema.parse({
+      ...submission,
+      status: "admin-approved",
+      verificationRuns: [acceptedRun],
+      adminDecision: {
+        reviewer: "admin-1",
+        reviewedAt: "2026-08-22T12:20:00.000Z",
+        decision: "rejected",
+        note: "The proof does not align with the source claim.",
+      },
+    })).toThrow(/matching administrator decision/i);
+
+    expect(() => formalProofSubmissionSchema.parse({
+      ...submission,
+      status: "admin-approved",
+      verificationRuns: [acceptedRun],
+      adminDecision: {
+        reviewer: "admin-1",
+        reviewedAt: "2026-08-22T12:20:00.000Z",
+        decision: "approved",
+        note: "The proof and source alignment were reviewed.",
+      },
+    })).not.toThrow();
+  });
+
+  it("rejects cyclic dependency-route lineage", () => {
+    const corpus = clonedCorpus();
+    const statement = corpus.statements.find((candidate) => candidate.proofRoutes.length > 0);
+    const route = statement?.proofRoutes[0];
+    if (!statement || !route) throw new Error("Proof-route fixture is incomplete");
+    const reinterpretation = {
+      ...structuredClone(route),
+      id: "cycle-route",
+      dependencyKind: "reinterpretation" as const,
+      derivedFromRouteId: route.id,
+    };
+    route.derivedFromRouteId = reinterpretation.id;
+    statement.proofRoutes.push(reinterpretation);
+
+    expect(() => validateCorpus(corpus)).toThrow(/cyclic proof route lineage/i);
+  });
+
+  it("requires accepted, placeholder-free artifacts for full certification", () => {
+    const corpus = clonedCorpus();
+    const statement = corpus.statements.find((candidate) => candidate.formalDeclarations.length > 0);
+    if (!statement) throw new Error("Formal declaration fixture is incomplete");
+    statement.formalStatus = "fully-certified";
+    statement.formalAlignment = "reviewed";
+    for (const declaration of statement.formalDeclarations) {
+      declaration.kernelChecks = true;
+      declaration.hasSorry = false;
+      declaration.hasAdmit = false;
+      declaration.unresolvedPlaceholders = [];
+      declaration.usesExternalInput = false;
+      declaration.axiomFootprint = [];
+      declaration.verificationRuns = [];
+    }
+
+    expect(() => validateCorpus(corpus)).toThrow(/impossible fully-certified state/i);
+
+    for (const declaration of statement.formalDeclarations) {
+      declaration.verificationRuns = [{
+        id: `run-${declaration.name}`,
+        checkedAt: "2026-08-22T12:10:00.000Z",
+        environment: "isolated-worker-1",
+        checkerVersion: declaration.prover.version ?? declaration.prover.checker,
+        result: "accepted",
+        artifactSha256: "d".repeat(64),
+      }];
+    }
+    expect(() => validateCorpus(corpus)).not.toThrow();
+
+    const firstDeclaration = statement.formalDeclarations[0];
+    if (!firstDeclaration) throw new Error("Formal declaration fixture is incomplete");
+    firstDeclaration.unresolvedPlaceholders = ["todo"];
+    expect(() => validateCorpus(corpus)).toThrow(/impossible fully-certified state/i);
+  });
+
+  it("requires every prover adapter to report its generic placeholder scan", () => {
+    const corpus = clonedCorpus();
+    const statement = corpus.statements.find((candidate) => candidate.formalDeclarations.length > 0);
+    const declaration = statement?.formalDeclarations[0];
+    if (!declaration) throw new Error("Formal declaration fixture is incomplete");
+    declaration.prover = { id: "rocq", label: "Rocq", version: "9.0", checker: "rocqchk" };
+    delete (declaration as Partial<typeof declaration>).unresolvedPlaceholders;
+
+    expect(() => validateCorpus(corpus)).toThrow(/unresolvedPlaceholders/i);
   });
 });

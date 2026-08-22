@@ -34,6 +34,57 @@ describe("NisabaDB application", () => {
       "compressed-source",
     );
     expect(within(selectedPanel).getByText(/complete relative to the listed prerequisites/i)).toBeInTheDocument();
+    expect(within(selectedPanel).getByLabelText(/available dependency routes/i)).toHaveTextContent(
+      /original/i,
+    );
+  });
+
+  it("uses the learner-facing information architecture", () => {
+    renderAt("/knowledge");
+    const navigation = screen.getByRole("navigation", { name: /primary navigation/i });
+    expect(within(navigation).getAllByRole("link").map((link) => link.textContent)).toEqual([
+      "Knowledge",
+      "Papers",
+      "Unsolved",
+      "Learn",
+    ]);
+    expect(screen.getByRole("heading", { name: "Knowledge" })).toBeInTheDocument();
+    expect(screen.getByText(/paper claims are becoming reusable knowledge/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/layered prerequisite graph/i)).toBeInTheDocument();
+    expect(screen.getAllByLabelText(/direct prerequisites:/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole("article", { name: /selected knowledge/i })).toHaveTextContent(
+      /minimized description/i,
+    );
+  });
+
+  it("renders one complete paper graph without topic-view tabs", () => {
+    renderAt("/papers/dimension-free-dictatorship-tester");
+    expect(screen.getByRole("heading", { name: /complete paper graph/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/graph scope/i)).toHaveTextContent(/all results.*one dependency space/i);
+    expect(screen.queryByRole("tablist", { name: /graph views/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /expand visible/i }));
+    const graphNodeIds = Array.from(document.querySelectorAll<HTMLElement>("[id^='graph-node-']"))
+      .map((node) => node.id);
+    expect(new Set(graphNodeIds).size).toBe(graphNodeIds.length);
+  });
+
+  it("keeps unreviewed conjectures out of the public Unsolved list", () => {
+    renderAt("/unsolved");
+    expect(screen.getByRole("heading", { name: /the empty list is intentional/i })).toBeInTheDocument();
+    expect(screen.getByText(/none has completed.*confirmed open as of/i)).toBeInTheDocument();
+  });
+
+  it("builds an interactive prerequisite route in Learn", () => {
+    renderAt("/learn");
+    expect(screen.getByRole("heading", { name: /your current route/i })).toBeInTheDocument();
+    const estimate = screen.getByLabelText(/learning estimate/i);
+    expect(within(estimate).getByText(/knowledge units remain/i)).toBeInTheDocument();
+    const masteryChecks = screen.getAllByRole("checkbox", { name: /i know this:/i });
+    const targetMastery = masteryChecks.at(-1);
+    expect(targetMastery).toBeDefined();
+    if (targetMastery) fireEvent.click(targetMastery);
+    expect(targetMastery).toBeChecked();
+    expect(within(estimate).getByText(/0 of 1 knowledge units remain/i)).toBeInTheDocument();
   });
 
   it("serves the multislice gold rewrite and its source-audited main theorem", () => {
@@ -68,7 +119,7 @@ describe("NisabaDB application", () => {
     );
     const coverage = screen.getByRole("region", { name: /evidence, not a blanket badge/i });
     expect(within(coverage).getByText("49")).toBeInTheDocument();
-    expect(within(coverage).getByText(/of 51 statement records kernel checked/i)).toBeInTheDocument();
+    expect(within(coverage).getByText(/of 51 statement records have checker-accepted artifacts/i)).toBeInTheDocument();
     const graphControls = screen.getByLabelText("Dependency graph controls");
     expect(within(graphControls).getByText("49").parentElement).toHaveTextContent(
       /49\s*formally checked/i,

@@ -26,6 +26,13 @@ export function selectedRoute(statement: Statement, routeId?: string): ProofRout
   return statement.proofRoutes.find((route) => route.id === routeId) ?? statement.proofRoutes[0];
 }
 
+export function learningRoute(statement: Statement): ProofRoute | undefined {
+  const reviewed = statement.proofRoutes.filter((route) => route.reviewStatus === "reviewed");
+  return reviewed.find((route) => route.dependencyKind === "minimized") ??
+    reviewed.find((route) => route.dependencyKind === "original") ??
+    reviewed[0];
+}
+
 export function routeDependencies(statement: Statement, routeId?: string): string[] {
   return selectedRoute(statement, routeId)?.dependencies ?? statement.dependencies;
 }

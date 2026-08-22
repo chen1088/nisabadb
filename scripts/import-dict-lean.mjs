@@ -340,6 +340,11 @@ function formalDeclarations(node) {
     : [];
   const axiomFootprint = [...standardLeanAxioms, ...mathematicalAxioms, ...nativeAxioms];
   return (node.leanLinks || []).map((link) => ({
+    prover: {
+      id: "lean4",
+      label: "Lean 4",
+      checker: "Lean kernel",
+    },
     repository: "chen1088/dict_lean",
     commit: sourceCommit,
     file: link.file || node.file,
@@ -348,6 +353,7 @@ function formalDeclarations(node) {
     kernelChecks: true,
     hasSorry: false,
     hasAdmit: false,
+    unresolvedPlaceholders: [],
     usesExternalInput: mathematicalAxioms.length > 0 || nativeAxioms.length > 0,
     axiomFootprint,
     auditNote: `${alignmentCaveatsByStatement[node.id] ? `${alignmentCaveatsByStatement[node.id]} ` : ""}${mathematicalAxioms.length > 0
@@ -380,6 +386,9 @@ function proofRoutes(node, declarations) {
     id: isImported ? "historical-source" : "compressed-source",
     label: isImported ? "Literature source" : "Compressed source",
     type: isImported ? "historical" : "compressed-source",
+    dependencyKind: "original",
+    reviewStatus: "reviewed",
+    interpretationNote: "Source-route dependencies retained from the audited paper and pinned formal graph.",
     conceptualCost: node.section.includes("Section 5") ? "specialist" : node.importance === "hero" ? "moderate" : "low",
     dependencies: [...(node.deps || [])],
     status: override ? "complete" : "proof-not-yet-distilled",

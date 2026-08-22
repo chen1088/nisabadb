@@ -39,7 +39,7 @@ export function PaperPage() {
             <div className="paper-hero-actions">
               {paper.status === "gold" ? (
                 <a className="button-link primary-button" href="#explorer">
-                  Enter proof graph <span aria-hidden="true">↓</span>
+                  Enter unified proof graph <span aria-hidden="true">↓</span>
                 </a>
               ) : null}
               {statements.length ? (

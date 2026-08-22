@@ -29,6 +29,11 @@ export function FormalCoveragePanel({ paper, statements }: FormalCoveragePanelPr
     (total, statement) => total + statement.formalDeclarations.length,
     0,
   );
+  const proverSystems = new Set(
+    statements.flatMap((statement) =>
+      statement.formalDeclarations.map((declaration) => declaration.prover.label),
+    ),
+  );
   const checkedPercent = statements.length ? Math.round((checked / statements.length) * 100) : 0;
 
   return (
@@ -43,16 +48,16 @@ export function FormalCoveragePanel({ paper, statements }: FormalCoveragePanelPr
         </span>
       </div>
       <p>
-        Kernel checking, proof distillation, and human–formal alignment are reported
+        Checker acceptance, proof distillation, and human–formal alignment are reported
         independently. Similar declaration names are not treated as certification.
       </p>
-      <div className="coverage-meter" aria-label={`${checkedPercent}% of statement records kernel checked`}>
+      <div className="coverage-meter" aria-label={`${checkedPercent}% of statement records have checker-accepted artifacts`}>
         <span style={{ width: `${checkedPercent}%` }} />
       </div>
       <div className="coverage-stat-grid">
         <div>
           <strong>{checked}</strong>
-          <span>of {statements.length} statement records kernel checked</span>
+          <span>of {statements.length} statement records have checker-accepted artifacts</span>
         </div>
         <div>
           <strong>{completeRoutes}</strong>
@@ -64,9 +69,17 @@ export function FormalCoveragePanel({ paper, statements }: FormalCoveragePanelPr
         </div>
         <div>
           <strong>{declarations}</strong>
-          <span>Lean declaration links recorded</span>
+          <span>formal artifacts across {proverSystems.size} prover system{proverSystems.size === 1 ? "" : "s"}</span>
         </div>
       </div>
+      <aside className="prover-intake-note" aria-label="Prover-neutral verification intake">
+        <strong>Prover-neutral by design</strong>
+        <p>
+          Lean is the first populated adapter, not a platform restriction. Versioned proof
+          artifacts from Rocq/Coq, Isabelle, Agda, HOL systems, Metamath, Mizar, and other
+          reproducible checkers can enter the same sandboxed verification and admin-review flow.
+        </p>
+      </aside>
     </section>
   );
 }

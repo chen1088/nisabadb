@@ -57,7 +57,7 @@ export function LandingPage() {
             </div>
           </div>
           <p className="hero-graph-note">
-            Exact statements · compressed proofs · Lean declarations · source provenance
+            Exact statements · alternate routes · prover artifacts · source provenance
           </p>
         </div>
       </section>
@@ -122,7 +122,7 @@ export function LandingPage() {
                 <dd>{featuredStatements.length}</dd>
               </div>
               <div>
-                <dt>Kernel checked</dt>
+                <dt>Formally checked</dt>
                 <dd>{checked}</dd>
               </div>
               <div>

@@ -3,18 +3,21 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { paperSchema } from "../src/data/schema.ts";
 import {
+  assertCitationSnapshotIntegrity,
   cacheFileNameForUrl,
   createCacheEnvelope,
   eligibleQueueItems,
   findExactPaperMatch,
+  hasSourceAuthoritativeCitationCoverage,
   integrateOpenAlexNeighborhood,
   mergeCitationEdge,
   mergePaperRecord,
   mergeQueueItem,
   openAlexWorkToPaper,
   outgoingFetchOptions,
+  reconcileResolvedIdentifierQueueItems,
 } from "./citation-lib.mjs";
-import { mergeAuditIntoSnapshot } from "./citation-snapshot-lib.mjs";
+import { FEATURED_PAPER_ID, mergeAuditIntoSnapshot } from "./citation-snapshot-lib.mjs";
 
 const fixture = JSON.parse(await readFile(
   resolve("data/citations/fixtures/openalex-work.json"),
@@ -82,6 +85,22 @@ describe("OpenAlex mapping", () => {
 });
 
 describe("provenance-preserving merges", () => {
+  it("recognizes both reviewed source-bibliography providers on outgoing edges", () => {
+    const paper = { id: "source-paper" };
+    for (const provider of ["author-manuscript", "arXiv source bibliography"]) {
+      expect(hasSourceAuthoritativeCitationCoverage(paper, [{
+        citingPaperId: paper.id,
+        citedPaperId: "cited-paper",
+        provenance: [{ provider }],
+      }])).toBe(true);
+    }
+    expect(hasSourceAuthoritativeCitationCoverage(paper, [{
+      citingPaperId: "another-paper",
+      citedPaperId: paper.id,
+      provenance: [{ provider: "author-manuscript" }],
+    }])).toBe(false);
+  });
+
   it("merges duplicate endpoint edges while retaining distinct evidence", () => {
     const base = {
       id: "citation-a-b",
@@ -143,13 +162,166 @@ describe("provenance-preserving merges", () => {
       retrievedAt: "2026-08-21T20:00:00.000Z",
       body,
     });
-    expect(cacheFileNameForUrl(url)).toMatch(/^[0-9a-f]{64}\.json$/);
+    expect(cacheFileNameForUrl(url)).toMatch(/^[0-9a-f]{64}\.json\.gz$/);
     expect(cacheFileNameForUrl(url)).toBe(cacheFileNameForUrl(url));
     expect(cacheFileNameForUrl(`${url}&page=2`)).not.toBe(cacheFileNameForUrl(url));
   });
 });
 
 describe("resumable neighborhood state", () => {
+  it("builds a referentially self-contained citation baseline", () => {
+    const baseline = mergeAuditIntoSnapshot(directAudit);
+    expect(() => assertCitationSnapshotIntegrity(baseline)).not.toThrow();
+    expect(baseline.papers.some((paper) => paper.id === FEATURED_PAPER_ID)).toBe(true);
+    expect(baseline.papers).toHaveLength(baseline.ingestionQueue.length);
+  });
+
+  it("reactivates a blocked endpoint when ordinary discovery supplies its exact OpenAlex ID", () => {
+    const retrievedAt = "2026-08-21T20:00:00.000Z";
+    const endpointCandidate = openAlexWorkToPaper(fixture, retrievedAt);
+    const blockedPaper = {
+      ...endpointCandidate,
+      id: "blocked-exact-doi-endpoint",
+      identifiers: { doi: endpointCandidate.identifiers.doi },
+      citationCoverage: {
+        ...endpointCandidate.citationCoverage,
+        incomingStatus: "identifier-unresolved",
+        note: "Blocked pending provider identity resolution.",
+      },
+    };
+    const seedWork = {
+      ...fixture,
+      id: "https://openalex.org/W777000333",
+      ids: {
+        openalex: "https://openalex.org/W777000333",
+        doi: "https://doi.org/10.5555/seed.2026.3",
+      },
+      doi: "https://doi.org/10.5555/seed.2026.3",
+      title: "Ordinary seed that discovers a blocked endpoint",
+      referenced_works: [fixture.id],
+    };
+    const seedPaper = openAlexWorkToPaper(seedWork, retrievedAt);
+    const snapshot = {
+      papers: [seedPaper, blockedPaper],
+      citationEdges: [],
+      ingestionQueue: [{
+        paperId: seedPaper.id,
+        state: "metadata-fetched",
+        nextTasks: ["fetch-outgoing", "fetch-incoming", "deduplicate"],
+        attempts: 0,
+        updatedAt: retrievedAt,
+      }, {
+        paperId: blockedPaper.id,
+        state: "blocked",
+        nextTasks: ["resolve-identifiers"],
+        attempts: 2,
+        updatedAt: retrievedAt,
+        lastError: "No provider identity.",
+      }],
+    };
+
+    const result = integrateOpenAlexNeighborhood(snapshot, {
+      paperId: seedPaper.id,
+      seed: { work: seedWork, url: seedWork.id, retrievedAt },
+      outgoing: [{ work: fixture, url: fixture.id, retrievedAt }],
+      incoming: [],
+      completedAt: "2026-08-21T21:00:00.000Z",
+    });
+    const resolvedPaper = result.snapshot.papers.find((paper) => paper.id === blockedPaper.id);
+    const resolvedQueue = result.snapshot.ingestionQueue.find((item) => item.paperId === blockedPaper.id);
+
+    expect(resolvedPaper?.identifiers.openAlex).toBe("W999000111");
+    expect(resolvedPaper?.citationCoverage.incomingStatus).toBe("queued");
+    expect(resolvedQueue).toEqual({
+      paperId: blockedPaper.id,
+      state: "metadata-fetched",
+      nextTasks: ["fetch-outgoing", "fetch-incoming", "deduplicate"],
+      attempts: 2,
+      updatedAt: retrievedAt,
+    });
+  });
+
+  it("reconciles a snapshot that already merged an OpenAlex ID into a blocked paper", () => {
+    const retrievedAt = "2026-08-21T20:00:00.000Z";
+    const paper = {
+      ...openAlexWorkToPaper(fixture, retrievedAt),
+      id: "already-resolved-but-blocked",
+      citationCoverage: {
+        ...openAlexWorkToPaper(fixture, retrievedAt).citationCoverage,
+        incomingStatus: "identifier-unresolved",
+        note: "Stale identity error.",
+      },
+    };
+    const reconciliation = reconcileResolvedIdentifierQueueItems({
+      papers: [paper],
+      citationEdges: [],
+      ingestionQueue: [{
+        paperId: paper.id,
+        state: "blocked",
+        nextTasks: ["resolve-identifiers"],
+        attempts: 3,
+        updatedAt: "2026-08-20T00:00:00.000Z",
+        lastError: "Stale identity error.",
+      }],
+    });
+
+    expect(reconciliation.reactivatedPaperIds).toEqual([paper.id]);
+    expect(reconciliation.snapshot.papers[0].citationCoverage.incomingStatus).toBe("queued");
+    expect(reconciliation.snapshot.ingestionQueue[0]).toEqual({
+      paperId: paper.id,
+      state: "metadata-fetched",
+      nextTasks: ["fetch-outgoing", "fetch-incoming", "deduplicate"],
+      attempts: 3,
+      updatedAt: retrievedAt,
+    });
+  });
+
+  it("does not mistake an audited endpoint record for an audit of its own bibliography", () => {
+    const retrievedAt = "2026-08-21T20:00:00.000Z";
+    const seedWork = {
+      ...fixture,
+      id: "https://openalex.org/W777000222",
+      ids: { ...fixture.ids, openalex: "https://openalex.org/W777000222" },
+      doi: "https://doi.org/10.5555/endpoint.2026.1",
+      title: "Endpoint inherited from a different paper's source audit",
+      referenced_works: [fixture.id],
+    };
+    const seedPaper = openAlexWorkToPaper(seedWork, retrievedAt);
+    seedPaper.modificationHistory = [{
+      version: "citation-source-audit:another-paper",
+      timestamp: retrievedAt,
+      contributors: ["NisabaDB citation audit"],
+      summary: "This paper was an endpoint in another source bibliography.",
+    }];
+    const snapshot = {
+      papers: [seedPaper],
+      citationEdges: [],
+      ingestionQueue: [{
+        paperId: seedPaper.id,
+        state: "metadata-fetched",
+        nextTasks: ["fetch-outgoing", "fetch-incoming", "deduplicate"],
+        attempts: 0,
+        updatedAt: retrievedAt,
+      }],
+    };
+
+    const result = integrateOpenAlexNeighborhood(snapshot, {
+      paperId: seedPaper.id,
+      seed: { work: seedWork, url: seedWork.id, retrievedAt },
+      outgoing: [{ work: fixture, url: fixture.id, retrievedAt }],
+      incoming: [],
+      completedAt: "2026-08-21T21:00:00.000Z",
+    });
+
+    expect(result.stats.providerOutgoingRecordsSkipped).toBe(0);
+    expect(result.stats.canonicalOutgoingPapers).toBe(1);
+    expect(result.snapshot.citationEdges).toHaveLength(1);
+    expect(result.snapshot.ingestionQueue[0]).toMatchObject({
+      state: "complete-direct-neighborhood",
+      nextTasks: [],
+    });
+  });
+
   it("refreshes only outgoing batches that previously retained unresolved IDs", () => {
     expect(outgoingFetchOptions({
       paperId: "paper-a",

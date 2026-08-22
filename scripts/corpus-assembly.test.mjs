@@ -117,6 +117,45 @@ function fixture() {
 }
 
 describe("assembleCorpus", () => {
+  it("promotes a self-contained provisional citation seed into its primary gold paper", () => {
+    const { input } = fixture();
+    const primary = input.primaryPapers[0];
+    const provisionalSeed = {
+      ...paper({ id: primary.id, status: "provisional", identifiers: {} }),
+      sourceLinks: [{ label: "Citation audit", url: "https://example.com/citation-audit" }],
+      importProvenance: [{
+        provider: "author-manuscript citation audit",
+        retrievedAt: "2026-01-01T00:00:00.000Z",
+        recordId: primary.id,
+      }],
+      modificationHistory: [{
+        version: "citation-audit-1",
+        timestamp: "2026-01-01T00:00:00.000Z",
+        contributors: ["Citation auditor"],
+        summary: "Created the citation seed.",
+      }],
+      citationCoverage: {
+        ...primary.citationCoverage,
+        outgoingFound: 17,
+        outgoingResolved: 17,
+      },
+    };
+    input.neighborhood.papers.unshift(provisionalSeed);
+
+    const result = assembleCorpus(input);
+    const assembledPrimary = result.papers.find((item) => item.id === primary.id);
+
+    expect(result.papers.filter((item) => item.id === primary.id)).toHaveLength(1);
+    expect(assembledPrimary).toMatchObject({
+      status: "gold",
+      identifiers: primary.identifiers,
+      citationCoverage: provisionalSeed.citationCoverage,
+    });
+    expect(assembledPrimary.sourceLinks).toHaveLength(1);
+    expect(assembledPrimary.importProvenance).toHaveLength(1);
+    expect(assembledPrimary.modificationHistory).toHaveLength(1);
+  });
+
   it("promotes a provisional paper in place and preserves citation-worker state", () => {
     const { input, provisional, edge, queueItem } = fixture();
     const result = assembleCorpus(input);

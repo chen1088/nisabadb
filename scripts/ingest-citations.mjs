@@ -1,18 +1,24 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { promisify } from "node:util";
+import { gunzip, gzip } from "node:zlib";
 import {
+  assertCitationSnapshotIntegrity,
   cacheFileNameForUrl,
   createCacheEnvelope,
   eligibleQueueItems,
   integrateOpenAlexNeighborhood,
   normalizeOpenAlexId,
   outgoingFetchOptions,
+  reconcileResolvedIdentifierQueueItems,
   recordQueueFailure,
 } from "./citation-lib.mjs";
 
 const SNAPSHOT_PATH = resolve("data/citation-neighborhood.json");
 const CACHE_DIRECTORY = resolve("data/citations/cache");
 const DEFAULT_MAX_ITEMS = 1;
+const gzipAsync = promisify(gzip);
+const gunzipAsync = promisify(gunzip);
 
 function usage() {
   return [
@@ -53,10 +59,19 @@ async function atomicWriteJson(path, value) {
   await rename(temporaryPath, path);
 }
 
+async function atomicWriteCompressedJson(path, value) {
+  const temporaryPath = `${path}.${process.pid}.${Date.now()}.tmp`;
+  const compressed = await gzipAsync(Buffer.from(`${JSON.stringify(value)}\n`, "utf8"), {
+    level: 9,
+  });
+  await writeFile(temporaryPath, compressed);
+  await rename(temporaryPath, path);
+}
+
 async function readCachedEnvelope(url) {
   const path = resolve(CACHE_DIRECTORY, cacheFileNameForUrl(url));
   try {
-    const envelope = JSON.parse(await readFile(path, "utf8"));
+    const envelope = JSON.parse((await gunzipAsync(await readFile(path))).toString("utf8"));
     if (envelope.url !== url || typeof envelope.retrievedAt !== "string" || !("body" in envelope)) {
       throw new Error(`Malformed cache envelope: ${path}`);
     }
@@ -85,7 +100,7 @@ async function fetchJsonWithCache(url, { refresh = false } = {}) {
   const body = await response.json();
   const envelope = createCacheEnvelope(url, new Date().toISOString(), body);
   await mkdir(CACHE_DIRECTORY, { recursive: true });
-  await atomicWriteJson(resolve(CACHE_DIRECTORY, cacheFileNameForUrl(url)), envelope);
+  await atomicWriteCompressedJson(resolve(CACHE_DIRECTORY, cacheFileNameForUrl(url)), envelope);
   return envelope;
 }
 
@@ -146,14 +161,6 @@ async function fetchIncoming(openAlexId) {
   return records;
 }
 
-function assertSnapshotShape(snapshot) {
-  if (!Array.isArray(snapshot?.papers) ||
-      !Array.isArray(snapshot?.citationEdges) ||
-      !Array.isArray(snapshot?.ingestionQueue)) {
-    throw new Error("Citation snapshot must contain papers, citationEdges, and ingestionQueue arrays");
-  }
-}
-
 async function processQueueItem(snapshot, item) {
   const paper = snapshot.papers.find((candidate) => candidate.id === item.paperId);
   const openAlexId = normalizeOpenAlexId(paper?.identifiers?.openAlex);
@@ -176,7 +183,13 @@ async function processQueueItem(snapshot, item) {
 
 async function runLive(maxItems) {
   let snapshot = JSON.parse(await readFile(SNAPSHOT_PATH, "utf8"));
-  assertSnapshotShape(snapshot);
+  assertCitationSnapshotIntegrity(snapshot);
+  const reconciliation = reconcileResolvedIdentifierQueueItems(snapshot);
+  if (reconciliation.reactivatedPaperIds.length) {
+    snapshot = reconciliation.snapshot;
+    await atomicWriteJson(SNAPSHOT_PATH, snapshot);
+    console.log(`Reactivated ${reconciliation.reactivatedPaperIds.length} exact OpenAlex identities that were still blocked.`);
+  }
   const eligible = eligibleQueueItems(snapshot).slice(0, maxItems);
   console.log(`Live ingestion selected ${eligible.length} of ${eligibleQueueItems(snapshot).length} eligible queue items.`);
   console.log(`The ${maxItems}-item invocation cap does not limit recursive graph depth.`);
@@ -186,6 +199,7 @@ async function runLive(maxItems) {
     try {
       const result = await processQueueItem(snapshot, item);
       snapshot = result.snapshot;
+      assertCitationSnapshotIntegrity(snapshot);
       await atomicWriteJson(SNAPSHOT_PATH, snapshot);
       const resolution = result.stats.unresolvedOutgoingIds.length
         ? ` Neighborhood remains queued: ${result.stats.unresolvedOutgoingIds.length} referenced OpenAlex ID(s) were not returned.`

@@ -1,27 +1,28 @@
 # NisabaDB
 
-**The distilled, verified graph of mathematics.**
+**Build the paper graph first. Distill shared mathematical knowledge from evidence.**
 
-NisabaDB is a proof-bearing mathematical dependency graph. Its gold corpus currently contains *A Dimension-Free Dictatorship Tester on the Symmetric Group* and Braverman--Khot--Lifshitz--Minzer's *An Invariance Principle for the Multi-slice, with Applications*. The website presents the same validated mathematical records as interactive dependency graphs, theorem pages, and linearized distilled papers.
+NisabaDB is a paper corpus, proof-bearing paper graph, and future mathematical knowledge graph. Its gold corpus currently contains *A Dimension-Free Dictatorship Tester on the Symmetric Group* and Braverman--Khot--Lifshitz--Minzer's *An Invariance Principle for the Multi-slice, with Applications*. The website presents reviewed paper-local mathematics as interactive dependency graphs, theorem pages, and linearized distilled papers. Canonical cross-paper Knowledge is deliberately withheld until the corpus is broad enough to justify simplification and compression.
 
 The intended canonical domain is `nisabadb.org`. Until that domain is configured, the project is deployable through GitHub Pages.
 
 ## What works
 
-- Learner-facing navigation for Knowledge, Papers, Unsolved, and Learn, including a target-selectable layered Knowledge DAG
+- Paper-first navigation for Papers, Knowledge, Unsolved, and Learn
+- A bounded, cycle-safe citation-ancestry DAG projection, processing backlog, and paginated paper catalog
 - One expandable dependency DAG per paper, containing every paper-facing result without topic sub-tabs
 - Search, status filters, route-sensitive dependency highlighting, and stable deep links
 - Explicit original, minimized, and candidate-reinterpretation route roles with independent review state
 - Persistent statement/proof reader with source locations, Lean declarations, and axiom audit
 - Prover-neutral formal-artifact schema and reproducible submission lifecycle; Lean 4 is the first populated adapter
 - Topologically generated distilled-paper view with optional prerequisite expansion
-- Interactive target-to-prerequisite learning paths with local mastery diagnostics and effort estimates
+- Explicitly gated Knowledge and Learn surfaces, so paper-local claims are not mislabeled as a global curriculum
 - An intentionally empty Unsolved surface until a conjecture passes a dated literature-status review
-- Paper catalog plus resumable provisional records for the direct citation neighborhoods of both gold papers
+- Thousands of provisional paper records discovered through a resumable recursive citation queue
 - Validated TypeScript content model and a persistent OpenAlex ingestion queue
 - Responsive, keyboard-accessible React interface with KaTeX rendering
 
-The corpus contains 92 paper records: 2 gold rewrites and 90 provisional citation neighbors. The gold rewrites contain 93 mathematical nodes. Human-readable compressed routes are complete for 36 of 61 theorem-like nodes. Every remaining item is labeled as a proof idea or a proof not yet distilled; source-omitted proofs and unresolved source inconsistencies are never promoted to complete routes.
+The corpus contains 2,143 paper records: 2 gold rewrites and 2,141 provisional papers, connected by 2,284 citation records. The two reviewed paper graphs contain 93 mathematical nodes. Human-readable compressed routes are complete for 36 of 61 theorem-like nodes. Every remaining item is labeled as a proof idea or a proof not yet distilled; source-omitted proofs and unresolved source inconsistencies are never promoted to complete routes. The canonical Knowledge layer currently contains zero nodes by design.
 
 ## Run locally
 
@@ -67,7 +68,7 @@ The importer verifies that the supplied Lean checkout is at the pinned commit, r
 
 ## Continue citation ingestion
 
-Inspect the next resumable batch without changing files:
+Preview the next safe no-write invocation:
 
 ```sh
 npm run citations:ingest -- --max-items 1
@@ -79,7 +80,11 @@ Fetch and persist one queued paper neighborhood:
 npm run citations:ingest -- --live --max-items 1
 ```
 
-Provider responses are cached under `data/citations/cache/` with their URL and retrieval time. Deduplication uses exact stable identifiers only—never title similarity alone. The batch size limits work per invocation, not graph depth; newly discovered records and unresolved provider IDs remain queued for later runs. The durable queue currently has 92 records: 43 metadata-fetched records ready for neighborhood work, 48 blocked on stable provider identity, and the multislice paper at `neighbors-fetched` pending deduplication/review. After accepting queue updates, regenerate `src/data/corpus.json` using the import command above and run `npm run check`.
+Provider responses are stored as gzip-compressed provenance envelopes under `data/citations/cache/`, including their URL and retrieval time. Deduplication uses exact stable identifiers only—never title similarity alone. The batch size limits work per invocation, not graph depth; newly discovered records and unresolved provider IDs remain queued for later runs.
+
+The first recursive batch processed ten identified papers. The durable queue now has 2,143 records: 2,103 metadata-fetched papers ready for neighborhood work, 36 blocked on stable provider identity, 3 complete direct neighborhoods, and 1 `neighbors-fetched` record awaiting deduplication/review. Twelve initially blocked records were reactivated after the crawl supplied exact OpenAlex identities. After accepting queue updates, regenerate `src/data/corpus.json` using the import command above and run `npm run check`.
+
+Citation records are discovery and provenance evidence, not theorem dependencies. A raw citation network can contain cycles; the Papers page therefore shows a bounded rooted ancestry projection with explicit layer-respecting paper-to-paper relations and disclosed truncation, without claiming that the underlying citation network is itself a DAG.
 
 ## Deployment
 

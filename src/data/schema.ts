@@ -642,6 +642,7 @@ export const corpusSchema = z.object({
 
   const queuePaperIds = new Set<string>();
   const queueByPaperId = new Map<string, typeof corpus.ingestionQueue[number]>();
+  const paperById = new Map(corpus.papers.map((paper) => [paper.id, paper]));
   for (const item of corpus.ingestionQueue) {
     if (queuePaperIds.has(item.paperId)) {
       context.addIssue({ code: "custom", message: `Duplicate queue item for paper ${item.paperId}` });
@@ -657,6 +658,10 @@ export const corpusSchema = z.object({
     }
     if ((item.unresolvedProviderIds?.length ?? 0) > 0 && !item.nextTasks.includes("fetch-outgoing")) {
       context.addIssue({ code: "custom", message: `Queue item ${item.paperId} retains unresolved provider IDs without an outgoing retry` });
+    }
+    if (item.state === "blocked" && item.nextTasks.includes("resolve-identifiers") &&
+        paperById.get(item.paperId)?.identifiers.openAlex) {
+      context.addIssue({ code: "custom", message: `Identity-blocked queue item ${item.paperId} already has an OpenAlex ID` });
     }
   }
 

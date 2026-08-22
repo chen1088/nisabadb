@@ -4,11 +4,12 @@ Status date: 2026-08-22
 
 ## Product structure
 
-- The primary navigation is now Knowledge, Papers, Unsolved, and Learn; the brand remains the home link.
+- The primary navigation is now Papers, Knowledge, Unsolved, and Learn; the brand remains the home link.
+- Papers is the active first phase: 2,143 catalog records, a bounded rooted citation-ancestry projection, a processing backlog, and 50-record catalog pagination.
 - Each gold paper renders one complete dependency graph. Legacy `view` query parameters remain harmless, but main-theorem and topic graph tabs are no longer user-visible.
 - Proof routes distinguish their dependency role (`original`, `minimized`, or `reinterpretation`) from their review state. The current 61 populated routes are reviewed original/source routes; no minimized or reinterpretation route is claimed yet.
-- The Knowledge surface honestly exposes the 93 reviewed paper claims as normalization candidates, with a target-selectable layered dependency map and selected-node reader. Source-independent canonical merging and minimized tutorials remain future mathematical work.
-- Learn provides a working local prerequisite path, mastery checklist, and heuristic effort estimate. Persistent learner profiles and mastery evidence require the authenticated backend.
+- Knowledge contains zero canonical nodes and is deliberately gated. The existing 93 reviewed statements belong to two separate paper-local proof DAGs; there are no cross-paper statement dependencies, so presenting them as a global Knowledge DAG would be premature.
+- Learn is also gated until canonical Knowledge and its reviewed prerequisite DAG exist. The two gold paper graphs remain directly readable.
 - Unsolved is intentionally empty. The one source conjecture is a literature-review candidate, not a confirmed-current open problem.
 - Formal artifacts are now prover-neutral. The 191 current artifacts are Lean 4 declarations; the schema also validates reproducible submissions from other checkers, but automated submission and execution await the worker service.
 
@@ -27,7 +28,7 @@ The featured record is *A Dimension-Free Dictatorship Tester on the Symmetric Gr
 | Admitted-code scan | No `sorry`, `admit`, `opaque`, or `unsafe` declarations found |
 | Direct citation neighborhood | 17/17 actual in-text references represented; 17 provisional pages |
 | Incoming citations | Indeterminate: the featured manuscript is unindexed after five provider searches |
-| Recursive citation closure | Not complete; the combined durable queue has 92 records |
+| Recursive citation closure | Not complete; the combined durable queue has 2,143 records |
 
 The second gold record is *An Invariance Principle for the Multi-slice, with Applications* by Mark Braverman, Subhash Khot, Noam Lifshitz, and Dor Minzer.
 
@@ -73,7 +74,11 @@ The featured manuscript has no DOI, arXiv ID, OpenAlex ID, DataCite record, or S
 
 For the multislice paper, comment-stripped TeX contains 77 citation commands and 48 unique keys; the `.bbl` has exactly the same 48 keys, and Crossref independently reports 48 references. All 48 outgoing endpoints are represented. The canonical journal OpenAlex record reports only 45 references, 23 of whose IDs did not resolve during audit, so it is not allowed to overwrite the source count.
 
-Incoming identity is split across journal, arXiv, and FOCS provider records. The journal and arXiv records returned zero OpenAlex incoming works; the FOCS identity returned 28 non-XPAC records (29 with XPAC, where the extra record is a later-version duplicate). NisabaDB persists the 28 provider records as version-family evidence and labels them `provider-visible-only`, not as a complete deduplicated intellectual-work count. Overall the corpus has 92 papers, 93 citation edges, and 92 queue records: 43 metadata-fetched, 48 blocked on provider identity, and 1 neighbors-fetched record awaiting deduplication/review.
+Incoming identity is split across journal, arXiv, and FOCS provider records. The journal and arXiv records returned zero OpenAlex incoming works; the FOCS identity returned 28 non-XPAC records (29 with XPAC, where the extra record is a later-version duplicate). NisabaDB persists the 28 provider records as version-family evidence and labels them `provider-visible-only`, not as a complete deduplicated intellectual-work count.
+
+The first bounded recursive run processed ten identified papers and expanded the corpus to 2,143 papers and 2,284 citation records. The queue has one record per paper: 2,103 `metadata-fetched`, 36 blocked on stable provider identity, 3 `complete-direct-neighborhood`, and 1 `neighbors-fetched` pending deduplication/review. Twelve initially blocked records were reactivated after exact merged OpenAlex identities made them runnable. Raw provider envelopes are retained in losslessly gzip-compressed form. Exact identifiers—not title similarity—control merging.
+
+These citation records are bibliographic evidence, not mathematical prerequisite edges. The raw directed network may contain cycles; the Papers interface exposes a bounded, cycle-safe ancestry projection for navigation without asserting that the full citation network is a DAG.
 
 ## Remaining mathematical work
 
@@ -85,6 +90,9 @@ Incoming identity is split across journal, arXiv, and FOCS provider records. The
 6. For the multislice paper, independently distill Theorem 3.10, Claim 4.1, and Lemmas 3.11, 3.25, 6.13, 6.16, and 6.21; reconcile the documented source inconsistencies and induced-coupling bridges before marking any of them complete.
 7. Supply the two proofs explicitly omitted by the source (Theorems 5.2 and 6.29), or retain their current gap status.
 8. Supply the exact-statistics connectedness and projection-equivariance bridges in Theorem 6.7, audit the connectedness condition used for Corollary 1.18, and expand Corollary 1.19 beyond the source's proof sketch.
-9. Continue the recursive citation queue and promote additional provisional papers only after source-level review.
+9. Continue the recursive citation queue, resolve the 36 identity-blocked records (starting with exact DOI/arXiv candidates), and promote provisional papers to gold only after source-level mathematical review.
+10. Add process-safe leases/locks, bounded provider pagination, rate budgets, retries, and recovery before distributing queue work across DigitalOcean nodes.
+11. Split the static client artifact or add a catalog service before scaling substantially beyond the current 2,143 records.
+12. Begin cross-paper Knowledge equivalence review only after broad paper processing exposes real repeated concepts; then construct and minimize the canonical Knowledge DAG.
 
 These are labeled gaps, not hidden completion claims.

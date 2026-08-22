@@ -205,12 +205,18 @@ describe("NisabaDB content", () => {
     const multislice = paperById.get(multisliceId);
     const citedIds = new Set(corpus.citationEdges.map((edge) => edge.citedPaperId));
 
-    expect(corpus.papers).toHaveLength(92);
-    expect(corpus.citationEdges).toHaveLength(93);
-    expect(corpus.ingestionQueue).toHaveLength(92);
-    expect(corpus.ingestionQueue.filter((item) => item.state === "metadata-fetched")).toHaveLength(43);
-    expect(corpus.ingestionQueue.filter((item) => item.state === "blocked")).toHaveLength(48);
+    expect(corpus.papers.length).toBeGreaterThanOrEqual(2_000);
+    expect(corpus.papers.filter((paper) => paper.status === "gold")).toHaveLength(2);
+    expect(corpus.citationEdges.length).toBeGreaterThanOrEqual(2_000);
+    expect(corpus.ingestionQueue).toHaveLength(corpus.papers.length);
+    expect(corpus.ingestionQueue.filter((item) => item.state === "metadata-fetched").length)
+      .toBeGreaterThanOrEqual(2_000);
+    expect(corpus.ingestionQueue.filter((item) => item.state === "blocked")).toHaveLength(36);
+    expect(corpus.ingestionQueue.filter((item) => item.state === "blocked")
+      .every((item) => !paperById.get(item.paperId)?.identifiers.openAlex)).toBe(true);
     expect(corpus.ingestionQueue.filter((item) => item.state === "neighbors-fetched")).toHaveLength(1);
+    expect(corpus.ingestionQueue.filter((item) => item.state === "complete-direct-neighborhood").length)
+      .toBeGreaterThanOrEqual(3);
     expect(citationAudit.records).toHaveLength(17);
     expect(citationAudit.records.every((record) => citedIds.has(record.id))).toBe(true);
     expect(featured?.citationCoverage).toMatchObject({

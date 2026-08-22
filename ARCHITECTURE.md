@@ -1,13 +1,13 @@
 # NisabaDB architecture
 
-## One corpus, four learner surfaces
+## Paper corpus first, knowledge compression later
 
-`src/data/corpus.json` is the build-time source for the paper graph explorer, canonical theorem pages, distilled-paper view, the initial Knowledge-candidate catalog, and the local Learn prototype. Rendering code never owns mathematical proof text. `src/data/schema.ts` validates the corpus as the application loads and in tests.
+`src/data/corpus.json` is the build-time source for the paper catalog, citation explorer, reviewed paper graphs, canonical theorem pages, and distilled-paper view. Rendering code never owns mathematical proof text. `src/data/schema.ts` validates the corpus as the application loads and in tests.
 
-- **Knowledge** currently exposes reviewed paper claims as normalization candidates. A later source-independent `KnowledgeNode` layer will merge equivalent claims only after review.
-- **Papers** use one complete graph per paper. Main results and sections are focus points inside that graph, not separate graph tabs.
+- **Papers** is the active first phase. It exposes the large provisional corpus, a bounded citation-ancestry projection, processing backlog, and one complete proof-dependency graph for each reviewed paper. Main results and sections are focus points inside that graph, not separate graph tabs.
+- **Knowledge** has zero canonical nodes until enough papers have been processed to expose genuine repeated concepts. A later source-independent `KnowledgeNode` layer will merge equivalent claims only after cross-paper review, then minimize descriptions, tutorials, and dependencies.
 - **Unsolved** remains empty until a precise problem passes an administratively reviewed, dated literature audit.
-- **Learn** computes a prerequisite-first route for a selected target and subtracts locally marked mastery evidence. Its current time estimates are heuristic and device-local.
+- **Learn** is gated until a reviewed Knowledge DAG exists. Paper-specific graph reading remains available on each gold paper without pretending to be a globally minimized curriculum.
 
 The core relationships are:
 
@@ -21,7 +21,15 @@ Paper
   ├─ CitationEdge -> Paper
   ├─ ModificationRecord
   └─ ingestion queue state
+
+Future KnowledgeNode
+  ├─ evidenceRefs -> Statement across reviewed papers
+  ├─ prerequisiteRefs -> KnowledgeNode
+  ├─ minimized description and tutorial
+  └─ review and verification evidence
 ```
+
+`CitationEdge` and a statement dependency are different relations. Citation edges record bibliographic discovery and provenance; they do not prove logical dependence. The raw citation network can contain cycles. The Papers interface constructs a bounded, rooted ancestry projection by placing a selected paper after the works it cites, assigning every visible paper its earliest breadth layer, and retaining only citation relations that advance exactly one layer toward the selected paper. Same-layer and backward raw edges remain in the corpus but are excluded from this view, so its displayed per-node adjacency is genuinely acyclic. Node and depth limits are disclosed. This projection is a navigation DAG, not a claim that the complete citation network is acyclic. A later whole-corpus hierarchy can condense strongly connected components explicitly.
 
 A statement may have several proof routes. Each route owns its dependency set, proof, conceptual cost, attribution, verification status, and formal-alignment state. Selecting a route therefore changes both the prose and the graph edges. A complete route must use every displayed dependency, and every proof-step reference must be declared by the route.
 
@@ -50,7 +58,7 @@ The main dependency order is computed from the selected route at runtime. The di
 
 `scripts/import-dict-lean.mjs` reads `dict_lean` and the author manuscript without modifying either. It verifies the checkout's exact pinned commit, resolves current Lean declaration lines, adds NisabaDB proof distillations, and passes the primary paper, durable citation snapshot, and reviewed gold packs to `scripts/corpus-assembly.mjs`.
 
-Each gold pack owns one paper's metadata override, theorem graph, and statements. The assembler promotes only an exact provisional paper ID, preserves citation-worker coverage and queue state, unions stable provenance/history, rejects identifier and global-statement collisions, and requires every packed statement to use the paper's global namespace. This prevents a future importer run from erasing a hand-curated second paper.
+Each gold pack owns one paper's metadata override, theorem graph, and statements. The citation snapshot also contains a provisional record for the primary author-manuscript seed, making every edge and queue item referentially valid without an external overlay. The assembler promotes that exact seed into the primary gold paper, then promotes any additional exact gold-pack IDs. Promotion preserves citation-worker coverage and queue state, unions stable provenance/history, rejects identifier and global-statement collisions, and requires every packed statement to use the paper's global namespace. This prevents a future importer run from erasing a hand-curated paper or leaving the worker with dangling endpoints.
 
 The current second pack, `scripts/paper-packs/bklm-invariance.mjs`, pins `arXiv:2110.10725v2` by TeX, source-archive, and PDF hashes. It contains original NisabaDB restatements—not copied paper text—and records all 21 unique numbered results, the three Section 4 claims required by the main theorem, key definitions, external inputs, correction notes, and explicit proof gaps.
 
@@ -90,23 +98,27 @@ Workers may resolve sources, extract candidate records, run fixed prompt templat
 
 ## Citation worker boundary
 
-`data/citation-neighborhood.json` is the durable queue snapshot consumed by the static build. Rebuilding the reviewed baseline is a non-destructive merge by default; an explicit `--reset` is required to discard recursive progress. `scripts/ingest-citations.mjs` processes a bounded number of queued papers per invocation while allowing unbounded recursive depth across invocations. Provider responses are cached as provenance envelopes. Newly discovered papers begin as metadata-only provisional records and are enqueued for their own neighborhoods. If a provider reports references whose records were not retrieved, their IDs remain on the queue for retry rather than being counted as resolved.
+`data/citation-neighborhood.json` is the durable queue snapshot consumed by the static build. Rebuilding the reviewed baseline is a non-destructive merge by default; an explicit `--reset` is required to discard recursive progress. `scripts/ingest-citations.mjs` processes a bounded number of queued papers per invocation while allowing unbounded recursive depth across invocations. Provider responses are cached as gzip-compressed provenance envelopes. Newly discovered papers begin as metadata-only provisional records and are enqueued for their own neighborhoods. If a provider reports references whose records were not retrieved, their IDs remain on the queue for retry rather than being counted as resolved.
+
+Source-authoritative bibliography coverage is determined from explicit author-manuscript or arXiv-source citation edges where the paper is the citing endpoint. A modification marker inherited while discovering an endpoint cannot cause that endpoint's own provider neighborhood to be skipped.
 
 Identity merging requires an exact DOI, arXiv, OpenAlex, Semantic Scholar, ISBN, or internal ID match. Similar titles alone never trigger a merge. Every edge retains its discovery provider, provider record, retrieval time, and confidence.
 
 Reviewed source bibliography counts outrank provider aggregates. For the multislice paper, comment-stripped TeX and the `.bbl` agree on 48 cited works, while the canonical OpenAlex journal record reports 45 and has unresolved/bad endpoints. The source-audited count is therefore durable and cannot be overwritten by a later provider pass. Incoming coverage is separately labeled provider-visible-only because it is discovered through a split FOCS-version identity rather than the journal record.
 
-The current application is static-first by design. A future database or worker can preserve these record shapes and invariants while replacing committed JSON and batch scripts.
+The first recursive batch processed ten identified papers and expanded the corpus to 2,143 papers and 2,284 citation records. The durable queue contains 2,103 metadata-fetched papers, 36 identity-blocked records, 3 complete direct neighborhoods, and 1 fetched neighborhood awaiting review. Queue reconciliation reactivates a blocked record whenever an exact merged OpenAlex identity makes it runnable; the schema rejects a stale `resolve-identifiers` block on a paper that already has that identity.
+
+The current application is static-first by design and eagerly loads the committed corpus. Pagination bounds the rendered paper catalog, but a move toward tens of thousands of records should split the client artifact and move catalog search and queue mutation behind the control plane. A future database or worker can preserve these record shapes and invariants while replacing committed JSON and batch scripts. Multi-worker deployment also requires process-safe leasing, locks, rate budgeting, bounded provider pagination, retries, and recovery before DigitalOcean nodes can run the queue safely.
 
 ## Route and deployment shape
 
 - `/` — project landing page and featured-paper entry
-- `/knowledge` — source-linked candidates for the canonical Knowledge DAG
-- `/papers` — searchable catalog
+- `/papers` — paper-corpus command view, rooted citation projection, backlog, and paginated catalog
+- `/knowledge` — gated future cross-paper compression layer; currently zero canonical nodes
 - `/papers/:paperId` — metadata, graph, proofs, citations, and formal coverage
 - `/papers/:paperId/distilled` — generated linear reading
 - `/theorems/:statementId` — canonical deep-linked statement
 - `/unsolved` — administratively confirmed open problems; currently intentionally empty
-- `/learn` — target selection, prerequisite route, mastery marking, and effort estimate
+- `/learn` — gated future curriculum over reviewed canonical Knowledge
 
 Vite builds a static artifact. The build copies the same validated application shell to every known paper, distilled-paper, catalog, and theorem route, so GitHub Pages serves canonical deep links directly; a copied `404.html` remains as a fallback for unknown client routes. React Router resolves the requested record from that shared shell.

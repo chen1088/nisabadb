@@ -146,12 +146,27 @@ export function assembleCorpus({
   }
   assertNeighborhoodShape(neighborhood);
 
-  const basePapers = [...primaryPapers, ...neighborhood.papers];
-  assertPaperIdentityIntegrity(basePapers);
+  assertPaperIdentityIntegrity(primaryPapers);
+  assertPaperIdentityIntegrity(neighborhood.papers);
+
+  const assembledPrimaryPapers = [];
+  let neighborhoodPapers = [...neighborhood.papers];
+  for (const primaryPaper of primaryPapers) {
+    const existingPaper = neighborhoodPapers.find((paper) => paper.id === primaryPaper.id);
+    if (!existingPaper) {
+      assembledPrimaryPapers.push(primaryPaper);
+      continue;
+    }
+    if (primaryPaper.status !== "gold" || existingPaper.status !== "provisional") {
+      throw new Error(`Duplicate paper ID during corpus assembly: ${primaryPaper.id}`);
+    }
+    assembledPrimaryPapers.push(promotePaper(existingPaper, primaryPaper));
+    neighborhoodPapers = neighborhoodPapers.filter((paper) => paper.id !== primaryPaper.id);
+  }
+  assertPaperIdentityIntegrity([...assembledPrimaryPapers, ...neighborhoodPapers]);
 
   const goldPackIds = new Set();
   const statementsByPack = [];
-  let neighborhoodPapers = [...neighborhood.papers];
 
   for (const pack of goldPacks) {
     const goldPaper = pack?.paper;
@@ -190,7 +205,7 @@ export function assembleCorpus({
     statementsByPack.push(...packStatements);
   }
 
-  const papers = [...primaryPapers, ...neighborhoodPapers];
+  const papers = [...assembledPrimaryPapers, ...neighborhoodPapers];
   assertPaperIdentityIntegrity(papers);
   const statements = [...primaryStatements, ...statementsByPack];
   assertStatementIntegrity(statements, new Set(papers.map((paper) => paper.id)));

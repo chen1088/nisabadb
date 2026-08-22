@@ -1,5 +1,6 @@
 import { readFile, rename, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { assertCitationSnapshotIntegrity } from "./citation-lib.mjs";
 import { mergeAuditIntoSnapshot } from "./citation-snapshot-lib.mjs";
 import { mergeMultisliceCitationAuditIntoSnapshot } from "./multislice-citation-audit-lib.mjs";
 
@@ -28,6 +29,7 @@ const { snapshot, stats: multisliceStats } = mergeMultisliceCitationAuditIntoSna
   multisliceAudit,
   directSnapshot,
 );
+assertCitationSnapshotIntegrity(snapshot);
 const temporaryPath = `${SNAPSHOT_PATH}.${process.pid}.${Date.now()}.tmp`;
 await writeFile(temporaryPath, `${JSON.stringify(snapshot, null, 2)}\n`, "utf8");
 await rename(temporaryPath, SNAPSHOT_PATH);

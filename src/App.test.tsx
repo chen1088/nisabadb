@@ -15,13 +15,13 @@ function renderAt(path: string) {
 }
 
 describe("NisabaDB application", () => {
-  it("presents the canonical branding and featured paper", () => {
+  it("presents the canonical branding and paper-first corpus phase", () => {
     renderAt("/");
     expect(screen.getByRole("heading", { name: /distilled, verified/i })).toBeInTheDocument();
     expect(screen.getByText("The distilled, verified graph of mathematics.")).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: /explore the first paper/i }),
-    ).toHaveAttribute("href", "/papers/dimension-free-dictatorship-tester");
+      screen.getByRole("link", { name: /explore the paper corpus/i }),
+    ).toHaveAttribute("href", "/papers");
   });
 
   it("opens a deep-linked result with its exact statement and active route", () => {
@@ -39,21 +39,35 @@ describe("NisabaDB application", () => {
     );
   });
 
-  it("uses the learner-facing information architecture", () => {
+  it("uses a papers-first information architecture and gates premature Knowledge", () => {
     renderAt("/knowledge");
     const navigation = screen.getByRole("navigation", { name: /primary navigation/i });
     expect(within(navigation).getAllByRole("link").map((link) => link.textContent)).toEqual([
-      "Knowledge",
       "Papers",
+      "Knowledge",
       "Unsolved",
       "Learn",
     ]);
-    expect(screen.getByRole("heading", { name: "Knowledge" })).toBeInTheDocument();
-    expect(screen.getByText(/paper claims are becoming reusable knowledge/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/layered prerequisite graph/i)).toBeInTheDocument();
-    expect(screen.getAllByLabelText(/direct prerequisites:/i).length).toBeGreaterThan(0);
-    expect(screen.getByRole("article", { name: /selected knowledge/i })).toHaveTextContent(
-      /minimized description/i,
+    expect(screen.getByRole("heading", { name: /knowledge comes after corpus coverage/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/knowledge activation status/i)).toHaveTextContent(/canonical knowledge nodes\s*0/i);
+    expect(screen.queryByLabelText(/layered prerequisite graph/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /build the paper corpus first/i })).toHaveAttribute("href", "/papers");
+  });
+
+  it("shows the paper citation DAG, processing backlog, and bounded catalog", () => {
+    renderAt("/papers");
+    expect(screen.getByRole("heading", { name: /papers first/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/rooted paper citation dag/i)).toBeInTheDocument();
+    expect(screen.getByText(/additional raw relations omitted to preserve the dag/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/cited by later in this projection/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole("button", { pressed: true })).toBeInTheDocument();
+    expect(screen.getByRole("searchbox", { name: /find a paper to map/i })).toBeInTheDocument();
+    expect(screen.queryByRole("combobox", { name: /paper at the goal/i })).not.toBeInTheDocument();
+    expect(screen.getByText(/record limit|depth limit/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /what the corpus still needs/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/paper catalog pages/i)).toHaveTextContent(/page 1 of/i);
+    expect(screen.getByLabelText(/paper catalog filters/i)).toHaveTextContent(
+      new RegExp(`${browserCorpus.papers.length.toLocaleString()} records`, "i"),
     );
   });
 
@@ -74,17 +88,12 @@ describe("NisabaDB application", () => {
     expect(screen.getByText(/none has completed.*confirmed open as of/i)).toBeInTheDocument();
   });
 
-  it("builds an interactive prerequisite route in Learn", () => {
+  it("gates global learning routes until Knowledge compression exists", () => {
     renderAt("/learn");
-    expect(screen.getByRole("heading", { name: /your current route/i })).toBeInTheDocument();
-    const estimate = screen.getByLabelText(/learning estimate/i);
-    expect(within(estimate).getByText(/knowledge units remain/i)).toBeInTheDocument();
-    const masteryChecks = screen.getAllByRole("checkbox", { name: /i know this:/i });
-    const targetMastery = masteryChecks.at(-1);
-    expect(targetMastery).toBeDefined();
-    if (targetMastery) fireEvent.click(targetMastery);
-    expect(targetMastery).toBeChecked();
-    expect(within(estimate).getByText(/0 of 1 knowledge units remain/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /training follows compression/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/learning activation status/i)).toHaveTextContent(/active curricula\s*0/i);
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /paper/i }).length).toBeGreaterThan(0);
   });
 
   it("serves the multislice gold rewrite and its source-audited main theorem", () => {

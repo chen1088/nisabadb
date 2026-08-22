@@ -5,6 +5,51 @@ import {
 
 export const FEATURED_PAPER_ID = "dimension-free-dictatorship-tester";
 
+function auditedSeedPaper(audit) {
+  return {
+    id: FEATURED_PAPER_ID,
+    title: audit.targetTitle,
+    authors: ["Chaowen Guan", "Chen Xu", "Xiangyu Guo", "GPT-5.5"],
+    date: "2026-07-15",
+    venue: "STOC 2027 shortened author manuscript; publication status not independently verified",
+    status: "provisional",
+    identifiers: {},
+    sourceLinks: [],
+    contributionSummary: "Provisional seed metadata for the author manuscript whose reviewed references initialize this citation neighborhood.",
+    importProvenance: [{
+      provider: "author-manuscript citation audit",
+      retrievedAt: audit.auditAsOf,
+      recordId: FEATURED_PAPER_ID,
+    }],
+    license: {
+      metadata: "Reviewed project metadata may be redistributed with attribution.",
+      fullText: "No public full-text license was found; the author manuscript is not stored in the citation snapshot.",
+    },
+    rewriteStatus: "metadata-only",
+    theoremExtractionStatus: "not-started",
+    formalizationStatus: "statement-only",
+    citationCoverage: {
+      outgoingFound: audit.records.length,
+      outgoingResolved: audit.records.length,
+      incomingFound: audit.incomingScan.discoveredCount,
+      incomingResolved: audit.incomingScan.discoveredCount,
+      incomingStatus: audit.incomingScan.status,
+      providerSearchesAttempted: audit.incomingScan.queries.length,
+      recursiveClosureComplete: false,
+      note: `All ${audit.records.length} reviewed in-text outgoing citations are resolved. The manuscript has no stable provider identity, so zero provider-visible incoming citations is not evidence that no real incoming citations exist.`,
+    },
+    version: `citation-source-audit:${audit.auditAsOf}`,
+    modificationHistory: [{
+      version: `citation-source-audit:${audit.auditAsOf}`,
+      timestamp: audit.auditAsOf,
+      contributors: ["NisabaDB project"],
+      summary: "Created a self-contained citation-snapshot seed from the reviewed author-manuscript audit.",
+    }],
+    featured: false,
+    graph: { paperRoots: [], views: [] },
+  };
+}
+
 function auditedPaper(record, auditAsOf) {
   const hasOpenAlexIdentity = Boolean(record.identifiers.openAlex);
   return {
@@ -153,6 +198,11 @@ export function mergeAuditIntoSnapshot(audit, existingSnapshot) {
   }
 
   let papers = [...existing.papers];
+  const seedMerge = mergePaperRecord(papers, auditedSeedPaper(audit));
+  papers = seedMerge.papers;
+  if (seedMerge.paperId !== FEATURED_PAPER_ID) {
+    throw new Error(`Featured citation seed merged into unexpected paper ${seedMerge.paperId}`);
+  }
   const auditedIdToCorpusId = new Map();
   for (const record of audit.records) {
     const merged = mergePaperRecord(papers, auditedPaper(record, audit.auditAsOf));

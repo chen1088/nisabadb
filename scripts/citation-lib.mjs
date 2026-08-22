@@ -14,7 +14,16 @@ const QUEUE_TASKS = Object.freeze([
   "fetch-incoming",
   "deduplicate",
 ]);
-const SOURCE_AUDIT_VERSION_PREFIX = "citation-source-audit:";
+const SOURCE_BIBLIOGRAPHY_PROVIDERS = new Set([
+  "author-manuscript",
+  "arXiv source bibliography",
+]);
+
+function hasSourceBibliographyProvenance(edge) {
+  return edge.provenance?.some((entry) =>
+    SOURCE_BIBLIOGRAPHY_PROVIDERS.has(entry.provider)
+  ) ?? false;
+}
 
 function asNonemptyString(value) {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
@@ -82,10 +91,10 @@ export function findExactPaperMatch(papers, candidate) {
   return matches[0];
 }
 
-export function hasSourceAuthoritativeCitationCoverage(paper) {
-  return paper?.modificationHistory?.some(
-    (entry) => entry.version?.startsWith(SOURCE_AUDIT_VERSION_PREFIX),
-  ) ?? false;
+export function hasSourceAuthoritativeCitationCoverage(paper, citationEdges = []) {
+  return Boolean(paper?.id) && citationEdges.some((edge) =>
+    edge.citingPaperId === paper.id && hasSourceBibliographyProvenance(edge)
+  );
 }
 
 function uniqueBy(items, keyFor) {
@@ -243,7 +252,7 @@ export function createCacheEnvelope(url, retrievedAt, body) {
 }
 
 export function cacheFileNameForUrl(url) {
-  return `${createHash("sha256").update(url).digest("hex")}.json`;
+  return `${createHash("sha256").update(url).digest("hex")}.json.gz`;
 }
 
 function provenanceKey(entry) {
@@ -323,6 +332,48 @@ function activateResolvedIdentifierQueueItem(queue, paperId, updatedAt) {
   );
 }
 
+function activateResolvedIdentifierPaper(papers, paperId) {
+  return papers.map((paper) => {
+    if (paper.id !== paperId || paper.citationCoverage?.incomingStatus !== "identifier-unresolved") {
+      return paper;
+    }
+    return {
+      ...paper,
+      citationCoverage: {
+        ...paper.citationCoverage,
+        incomingStatus: "queued",
+        note: "An exact OpenAlex identity was resolved from citation-neighborhood evidence; direct incoming and outgoing neighborhoods are queued.",
+      },
+    };
+  });
+}
+
+export function reconcileResolvedIdentifierQueueItems(snapshot) {
+  const paperById = new Map(snapshot.papers.map((paper) => [paper.id, paper]));
+  const reactivatedPaperIds = snapshot.ingestionQueue
+    .filter((item) => item.state === "blocked" && item.nextTasks.includes("resolve-identifiers"))
+    .filter((item) => normalizeOpenAlexId(paperById.get(item.paperId)?.identifiers?.openAlex))
+    .map((item) => item.paperId);
+
+  let papers = snapshot.papers;
+  let ingestionQueue = snapshot.ingestionQueue;
+  for (const paperId of reactivatedPaperIds) {
+    const paper = paperById.get(paperId);
+    const updatedAt = (paper?.importProvenance ?? [])
+      .filter((entry) => entry.provider === "OpenAlex")
+      .map((entry) => entry.retrievedAt)
+      .sort()
+      .at(-1) ?? ingestionQueue.find((item) => item.paperId === paperId)?.updatedAt;
+    papers = activateResolvedIdentifierPaper(papers, paperId);
+    ingestionQueue = activateResolvedIdentifierQueueItem(ingestionQueue, paperId, updatedAt);
+  }
+
+  return {
+    snapshot: { ...snapshot, papers, ingestionQueue },
+    reactivatedPaperIds,
+  };
+}
+
 function citationEdge(citingPaperId, citedPaperId, discoveredFromPaperId, direction, record) {
   const providerRecordId = normalizeOpenAlexId(record.work?.id ?? record.work?.ids?.openalex);
   return {
@@ -389,12 +440,12 @@ function retainSourceAuditedQueueItem(queue, paperId, completedAt, unresolvedPro
   } : item);
 }
 
-function updatePaperCoverage(papers, paperId, coverage) {
+function updatePaperCoverage(papers, paperId, coverage, citationEdges) {
   const completeForProvider = coverage.unresolvedOutgoingIds.length === 0;
   return papers.map((paper) => {
     if (paper.id !== paperId) return paper;
     const prior = paper.citationCoverage;
-    if (hasSourceAuthoritativeCitationCoverage(paper)) {
+    if (hasSourceAuthoritativeCitationCoverage(paper, citationEdges)) {
       return {
         ...paper,
         citationCoverage: {
@@ -434,9 +485,17 @@ function upsertDiscoveredRecord(state, record) {
     state.queue,
     discoveredQueueItem(paperMerge.paperId, record.retrievedAt),
   );
+  const resolvedBlockedIdentity = state.queue.some((item) =>
+    item.paperId === paperMerge.paperId && item.state === "blocked" &&
+    item.nextTasks.includes("resolve-identifiers")
+  );
   return {
-    papers: paperMerge.papers,
-    queue: queueMerge.queue,
+    papers: resolvedBlockedIdentity
+      ? activateResolvedIdentifierPaper(paperMerge.papers, paperMerge.paperId)
+      : paperMerge.papers,
+    queue: resolvedBlockedIdentity
+      ? activateResolvedIdentifierQueueItem(queueMerge.queue, paperMerge.paperId, record.retrievedAt)
+      : queueMerge.queue,
     paperId: paperMerge.paperId,
     paperAdded: paperMerge.added,
     queueAdded: queueMerge.added,
@@ -447,6 +506,7 @@ export function integrateOpenAlexNeighborhood(snapshot, input) {
   const seedCandidate = openAlexWorkToPaper(input.seed.work, input.seed.retrievedAt);
   const sourceAuthoritativeSeed = hasSourceAuthoritativeCitationCoverage(
     snapshot.papers.find((paper) => paper.id === input.paperId),
+    snapshot.citationEdges,
   );
   let papers = mergeKnownPaper([...snapshot.papers], input.paperId, seedCandidate);
   let edges = [...snapshot.citationEdges];
@@ -460,7 +520,7 @@ export function integrateOpenAlexNeighborhood(snapshot, input) {
   const sourceAuditedOutgoingPaperIds = new Set(
     edges
       .filter((edge) => edge.citingPaperId === input.paperId &&
-        edge.provenance.some((entry) => entry.provider === "arXiv source bibliography"))
+        hasSourceBibliographyProvenance(edge))
       .map((edge) => edge.citedPaperId),
   );
 
@@ -541,7 +601,7 @@ export function integrateOpenAlexNeighborhood(snapshot, input) {
     incomingFound: incomingProviderIds.size,
     incomingResolved: incomingProviderIds.size,
     unresolvedOutgoingIds,
-  });
+  }, edges);
   queue = sourceAuthoritativeSeed
     ? retainSourceAuditedQueueItem(queue, input.paperId, input.completedAt, unresolvedOutgoingIds)
     : unresolvedOutgoingIds.length === 0
@@ -578,6 +638,38 @@ export function outgoingFetchOptions(queueItem) {
   return {
     refresh: (queueItem?.unresolvedProviderIds?.length ?? 0) > 0,
   };
+}
+
+export function assertCitationSnapshotIntegrity(snapshot) {
+  if (!Array.isArray(snapshot?.papers) || !Array.isArray(snapshot?.citationEdges) ||
+      !Array.isArray(snapshot?.ingestionQueue)) {
+    throw new Error("Citation snapshot must contain papers, citationEdges, and ingestionQueue arrays");
+  }
+  const paperIds = new Set();
+  for (const paper of snapshot.papers) {
+    if (!paper?.id || paperIds.has(paper.id)) {
+      throw new Error(`Citation snapshot has a missing or duplicate paper ID: ${paper?.id ?? "missing"}`);
+    }
+    paperIds.add(paper.id);
+  }
+  const queuePaperIds = new Set();
+  for (const item of snapshot.ingestionQueue) {
+    if (!paperIds.has(item.paperId)) {
+      throw new Error(`Citation queue references missing paper ${item.paperId}`);
+    }
+    if (queuePaperIds.has(item.paperId)) {
+      throw new Error(`Citation snapshot has duplicate queue item ${item.paperId}`);
+    }
+    queuePaperIds.add(item.paperId);
+  }
+  for (const edge of snapshot.citationEdges) {
+    for (const endpoint of [edge.citingPaperId, edge.citedPaperId, edge.discoveredFromPaperId]) {
+      if (!paperIds.has(endpoint)) {
+        throw new Error(`Citation edge ${edge.id} references missing paper ${endpoint}`);
+      }
+    }
+  }
+  return snapshot;
 }
 
 export function eligibleQueueItems(snapshot) {

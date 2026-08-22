@@ -14,25 +14,25 @@ export function LandingPage() {
     <div className="landing-page">
       <section className="landing-hero">
         <div className="hero-copy">
-          <p className="eyebrow">A proof-bearing mathematical library</p>
+          <p className="eyebrow">Current phase · map the source literature</p>
           <h1>
             The distilled, verified
             <span>graph of mathematics.</span>
           </h1>
           <p className="hero-lede">
-            NisabaDB rewrites papers as navigable networks of precise statements,
-            shortened proofs, dependencies, and formal evidence—without hiding what remains
-            unaudited.
+            NisabaDB is first building a large, provenance-preserving paper graph. Each
+            processed paper becomes its own proof DAG; shared Knowledge will be simplified
+            only after the corpus is broad enough to reveal genuine overlap.
           </p>
           <div className="hero-actions">
+            <Link className="button-link primary-button" to="/papers">
+              Explore the paper corpus <span aria-hidden="true">→</span>
+            </Link>
             {featured ? (
-              <Link className="button-link primary-button" to={`/papers/${featured.id}`}>
-                Explore the first paper <span aria-hidden="true">→</span>
+              <Link className="button-link subtle-button" to={`/papers/${featured.id}`}>
+                Open the first gold paper
               </Link>
             ) : null}
-            <Link className="button-link subtle-button" to="/papers">
-              Browse the catalog
-            </Link>
           </div>
         </div>
         <div className="hero-graph" aria-label="A theorem connected to its proof prerequisites">

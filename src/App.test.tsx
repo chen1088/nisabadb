@@ -54,14 +54,37 @@ describe("NisabaDB application", () => {
     ]);
     expect(screen.getByRole("heading", { name: /the nisaba mathematics text/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/textbook status/i)).toHaveTextContent(
-      new RegExp(`written knowledge nodes\\s*${knowledgeNodes.length}`, "i"),
+      new RegExp(`written lessons\\s*${knowledgeNodes.length}`, "i"),
     );
+    expect(screen.getByLabelText(/textbook status/i)).toHaveTextContent(/draft chapters\s*20 of 126/i);
+    expect(screen.getByLabelText(/textbook status/i)).toHaveTextContent(/reviewed lessons\s*0/i);
     expect(screen.getByLabelText(/textbook table of contents/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/local knowledge dependency graph/i)).toBeInTheDocument();
-    expect(screen.getByText(/open all 30 written nodes/i).closest("details")).not.toHaveAttribute("open");
-    expect(screen.getByRole("link", { name: /explore the compression atlas/i })).toHaveAttribute("href", "/knowledge/compression");
-    expect(screen.getByRole("link", { name: /audit all 688 source records/i })).toHaveAttribute("href", "/knowledge/coverage");
+    expect(screen.getByText(/open all 60 written lessons/i).closest("details")).not.toHaveAttribute("open");
+    expect(screen.getByRole("link", { name: /explore candidate compression routes/i })).toHaveAttribute("href", "/knowledge/compression");
+    expect(screen.getByRole("link", { name: /audit all 688 reference records/i })).toHaveAttribute("href", "/knowledge/coverage");
     expect(within(navigation).queryByRole("link", { name: /materials|learn/i })).not.toBeInTheDocument();
+  });
+
+  it("separates the actual book draft from its provisional whole-field map", () => {
+    renderAt("/knowledge");
+    expect(screen.getByRole("heading", { name: /a quantity is an attribute reported with a value and a unit/i })).toBeInTheDocument();
+    expect(screen.getByText(/what this chapter compresses/i)).toBeInTheDocument();
+
+    const roadmap = screen.getByRole("region", { name: /126 chapters across 21 parts/i });
+    expect(within(roadmap).getByLabelText(/whole-book map status/i)).toHaveTextContent(/20\s*draft/i);
+    expect(within(roadmap).getByLabelText(/whole-book map status/i)).toHaveTextContent(/106\s*planned/i);
+    expect(within(roadmap).getByLabelText(/whole-book map status/i)).toHaveTextContent(/only draft entries open lessons/i);
+
+    const draftChapter = within(roadmap).getByRole("link", { name: "Quantities, objects, units, and symbols" });
+    expect(draftChapter).toHaveAttribute("href", "/knowledge?node=quantities-objects-and-units");
+    const plannedChapter = within(roadmap).getByText("Scope, binding, and substitution").closest("li");
+    expect(plannedChapter).not.toBeNull();
+    expect(within(plannedChapter as HTMLElement).queryByRole("link")).not.toBeInTheDocument();
+
+    const reader = screen.getByRole("article", { name: /a quantity is an attribute/i });
+    const references = screen.getByRole("heading", { name: /source works remain evidence behind the book/i });
+    expect(reader.compareDocumentPosition(references) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("keeps the whole-field compression atlas under Knowledge", async () => {
@@ -142,12 +165,20 @@ describe("NisabaDB application", () => {
     expect(screen.getByText(/not a reading list or a materials shelf/i)).toBeInTheDocument();
   });
 
-  it("reads rewritten knowledge with unified notation and searchable chapters", () => {
+  it("reads rewritten knowledge with unified notation and searchable chapters", async () => {
     renderAt("/knowledge?node=sets-elements-extensionality");
-    expect(screen.getByRole("heading", { name: /sets, elements, and extensionality/i })).toBeInTheDocument();
+    const lessonHeading = screen.getByRole("heading", { name: /sets, elements, and extensionality/i });
+    expect(lessonHeading).toBeInTheDocument();
+    await waitFor(() => expect(lessonHeading).toHaveFocus());
     expect(screen.getByLabelText(/required knowledge/i)).toBeInTheDocument();
     expect(screen.getByRole("table", { name: /canonical notation/i })).toBeInTheDocument();
-    expect(screen.getByText(/source lineage and rewrite status/i)).toBeInTheDocument();
+    const lineageSummary = screen.getByText(/reference lineage and rewrite status/i);
+    expect(lineageSummary).toBeInTheDocument();
+    fireEvent.click(lineageSummary);
+    expect(screen.getByRole("link", { name: /S0060 · registry record/i })).toHaveAttribute(
+      "href",
+      "/knowledge/coverage?source=S0060",
+    );
 
     fireEvent.change(screen.getByRole("searchbox", { name: /find a knowledge node/i }), {
       target: { value: "quantifiers" },

@@ -4800,7 +4800,7 @@ a:hover {
   }
 }
 
-/* Canonical living textbook */
+/* Rewritten mathematics book */
 
 .textbook-page {
   padding-bottom: clamp(3rem, 7vw, 7rem);
@@ -4874,6 +4874,36 @@ a:hover {
   clip: rect(0, 0, 0, 0) !important;
   white-space: nowrap !important;
   border: 0 !important;
+}
+
+.textbook-draft-boundary {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.3fr);
+  gap: 1rem clamp(2rem, 5vw, 5rem);
+  align-items: end;
+  margin-bottom: 1rem;
+  padding: clamp(1.2rem, 2.5vw, 2rem);
+  border: 1px solid #c8b079;
+  border-radius: 0.5rem;
+  background: var(--amber-soft);
+}
+
+.textbook-draft-boundary h2 {
+  max-width: 18ch;
+  margin: 0.4rem 0 0;
+  font-family: var(--serif);
+  font-size: clamp(1.65rem, 3vw, 2.8rem);
+  font-weight: 620;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.textbook-draft-boundary > p {
+  max-width: 74ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.65;
 }
 
 .compression-contract {
@@ -5014,6 +5044,7 @@ a:hover {
   grid-template-columns: minmax(225px, 0.58fr) minmax(500px, 1.55fr) minmax(235px, 0.62fr);
   gap: 1rem;
   align-items: start;
+  margin-bottom: clamp(4rem, 8vw, 8rem);
 }
 
 .textbook-global-dag {
@@ -5332,6 +5363,32 @@ a:hover {
   line-height: 1.55;
 }
 
+.textbook-chapter-compression {
+  display: grid;
+  gap: 0.32rem;
+  margin: -0.6rem 0 1rem;
+  padding: 0.9rem 1rem;
+  border-left: 3px solid var(--moss);
+  background: var(--moss-soft);
+}
+
+.textbook-chapter-compression > span {
+  color: var(--moss-dark);
+  font-size: 0.61rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.textbook-chapter-compression > p {
+  max-width: 70ch;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
 .textbook-prerequisite-strip {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -5538,6 +5595,12 @@ a:hover {
   gap: 0.15rem;
 }
 
+.textbook-provenance li > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+}
+
 .textbook-provenance a {
   font-weight: 780;
 }
@@ -5665,6 +5728,289 @@ a:hover {
   line-height: 1.5;
 }
 
+.book-roadmap {
+  margin-bottom: clamp(3rem, 7vw, 7rem);
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+  border-block: 1px solid var(--line-strong);
+}
+
+.book-roadmap-heading {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.8fr) minmax(0, 1.2fr);
+  gap: 1rem clamp(2rem, 5vw, 5rem);
+  align-items: end;
+}
+
+.book-roadmap-heading h2 {
+  max-width: 15ch;
+  margin: 0.45rem 0 0;
+  color: var(--ink-deep);
+  font-family: var(--serif);
+  font-size: clamp(2.2rem, 4.5vw, 4.6rem);
+  font-weight: 620;
+  letter-spacing: -0.05em;
+  line-height: 0.96;
+}
+
+.book-roadmap-heading > p {
+  max-width: 76ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.65;
+}
+
+.book-roadmap-controls {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto;
+  gap: 0.8rem 1.5rem;
+  align-items: end;
+  margin-top: 1.5rem;
+  padding: 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 0.42rem;
+  background: var(--paper);
+}
+
+.book-roadmap-controls label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.book-roadmap-controls label > span {
+  color: var(--muted);
+  font-size: 0.61rem;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.book-roadmap-controls input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.3rem;
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+.book-roadmap-controls > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.book-roadmap-controls button {
+  min-height: 42px;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 820;
+  cursor: pointer;
+}
+
+.book-roadmap-controls button[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.book-roadmap-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.85rem 0;
+}
+
+.book-roadmap-summary > span {
+  display: inline-flex;
+  gap: 0.3rem;
+  align-items: baseline;
+  padding: 0.38rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 0.28rem;
+  background: var(--paper);
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+.book-roadmap-summary > span strong {
+  color: var(--clay-dark);
+  font-family: var(--serif);
+  font-size: 1rem;
+}
+
+.book-roadmap-summary > p {
+  margin: 0 0 0 auto;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.book-roadmap-parts {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.book-roadmap-parts > details {
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.42rem;
+  background: var(--paper);
+}
+
+.book-roadmap-parts > details > summary {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr) auto auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.book-roadmap-parts > details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.book-roadmap-parts > details > summary::after {
+  content: "+";
+  color: var(--clay-dark);
+  font-family: var(--serif);
+  font-size: 1.35rem;
+}
+
+.book-roadmap-parts > details[open] > summary::after {
+  content: "−";
+}
+
+.book-roadmap-parts > details > summary > span {
+  color: var(--clay-dark);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.book-roadmap-parts > details > summary > strong {
+  font-family: var(--serif);
+  font-size: 0.92rem;
+}
+
+.book-roadmap-parts > details > summary > small {
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 760;
+}
+
+.book-roadmap-parts > details > p {
+  max-width: 90ch;
+  margin: 0;
+  padding: 0 1rem 0.9rem 7.75rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.book-roadmap-parts ol {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.book-roadmap-parts li {
+  display: grid;
+  gap: 0.28rem;
+  padding: 0.9rem 1rem 0.9rem 1.25rem;
+  border-left: 4px solid var(--line-strong);
+}
+
+.book-roadmap-parts li:not(:last-child) {
+  border-bottom: 1px solid var(--line);
+}
+
+.book-roadmap-parts li.is-draft {
+  border-left-color: var(--moss);
+  background: var(--moss-soft);
+}
+
+.book-roadmap-chapter-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.book-roadmap-chapter-line > span {
+  color: var(--faint);
+  font-size: 0.58rem;
+  font-weight: 820;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.book-roadmap-chapter-line > em {
+  padding: 0.2rem 0.42rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.56rem;
+  font-style: normal;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.book-roadmap-parts li.is-draft .book-roadmap-chapter-line > em {
+  border-color: var(--moss);
+  background: var(--paper);
+  color: var(--moss-dark);
+}
+
+.book-roadmap-parts li > a,
+.book-roadmap-parts li > strong {
+  width: fit-content;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 0.93rem;
+  font-weight: 720;
+  line-height: 1.25;
+}
+
+.book-roadmap-parts li > a {
+  color: var(--moss-dark);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.book-roadmap-parts li > p,
+.book-roadmap-parts li > small {
+  max-width: 95ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.69rem;
+  line-height: 1.45;
+}
+
+.book-roadmap-parts li > small {
+  color: var(--faint);
+  font-size: 0.6rem;
+}
+
+.book-roadmap-empty {
+  margin: 0;
+  padding: 1.2rem;
+  border: 1px dashed var(--line-strong);
+  color: var(--muted);
+  text-align: center;
+}
+
 @media (max-width: 1120px) {
   .compression-contract-rules {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -5707,8 +6053,11 @@ a:hover {
 
 @media (max-width: 820px) {
   .textbook-masthead,
+  .textbook-draft-boundary,
   .compression-contract,
-  .textbook-workspace {
+  .textbook-workspace,
+  .book-roadmap-heading,
+  .book-roadmap-controls {
     grid-template-columns: 1fr;
   }
 
@@ -5781,6 +6130,30 @@ a:hover {
   .compression-contract-rules p:not(:last-child),
   .compression-contract-rules p:nth-child(-n + 2) {
     border-bottom: 1px solid var(--line);
+  }
+
+  .book-roadmap-parts > details > summary {
+    grid-template-columns: 1fr auto;
+  }
+
+  .book-roadmap-parts > details > summary > span,
+  .book-roadmap-parts > details > summary > strong,
+  .book-roadmap-parts > details > summary > small {
+    grid-column: 1;
+  }
+
+  .book-roadmap-parts > details > summary::after {
+    grid-column: 2;
+    grid-row: 1 / 4;
+  }
+
+  .book-roadmap-parts > details > p {
+    padding-left: 1rem;
+  }
+
+  .book-roadmap-summary > p {
+    width: 100%;
+    margin-left: 0;
   }
 }
 

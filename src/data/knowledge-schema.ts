@@ -10,6 +10,7 @@ export const knowledgeNodeKindSchema = z.enum([
 
 export const knowledgeSourceSchema = z.object({
   id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
+  registryRecordId: z.string().regex(/^S\d{4}$/),
   title: z.string().min(1),
   authors: z.array(z.string().min(1)).min(1),
   officialUrl: z.url(),
@@ -21,6 +22,7 @@ export const knowledgeChapterSchema = z.object({
   number: z.number().int().nonnegative(),
   title: z.string().min(1),
   summary: z.string().min(1),
+  compressionGoal: z.string().min(1),
 });
 
 export const notationEntrySchema = z.object({
@@ -70,7 +72,7 @@ export const knowledgeNodeSchema = z.object({
 });
 
 export const knowledgeBookSchema = z.object({
-  schemaVersion: z.literal("1.0.0"),
+  schemaVersion: z.literal("1.1.0"),
   title: z.string().min(1),
   subtitle: z.string().min(1),
   edition: z.string().min(1),
@@ -91,7 +93,9 @@ export const knowledgeBookSchema = z.object({
   };
 
   const sourceIds = unique(book.sources.map((source) => source.id), "knowledge source ID");
+  unique(book.sources.map((source) => source.registryRecordId), "knowledge source registry record");
   const chapterIds = unique(book.chapters.map((chapter) => chapter.id), "knowledge chapter ID");
+  unique(book.chapters.map((chapter) => String(chapter.number)), "knowledge chapter number");
   const notationIds = unique(book.notation.map((entry) => entry.id), "notation ID");
   const nodeIds = unique(book.nodes.map((node) => node.id), "knowledge node ID");
   unique(book.nodes.map((node) => node.slug), "knowledge node slug");
@@ -112,6 +116,10 @@ export const knowledgeBookSchema = z.object({
   for (const node of book.nodes) {
     if (!chapterIds.has(node.chapterId)) {
       context.addIssue({ code: "custom", message: `${node.id} has missing chapter ${node.chapterId}` });
+    }
+    const chapter = book.chapters.find((candidate) => candidate.id === node.chapterId);
+    if (chapter && Number(node.section.split(".")[0]) !== chapter.number) {
+      context.addIssue({ code: "custom", message: `${node.id} section does not match chapter ${chapter.number}` });
     }
     for (const [relation, ids] of [
       ["prerequisite", node.prerequisiteIds],

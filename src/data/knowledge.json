@@ -1,13 +1,14 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "title": "The Nisaba Mathematics Text",
-  "subtitle": "One notation, one dependency graph, from first symbols to research mathematics.",
-  "edition": "Living foundations edition 0.1",
+  "subtitle": "An independently written dependency graph, beginning with quantity and growing toward research mathematics.",
+  "edition": "Common-core draft 0.2",
   "updatedAt": "2026-08-22",
   "notationPolicy": "Use one symbol for one role whenever practical. Equality is reserved for objects already defined; definitions use :=. Every variable carries an explicit domain. The natural numbers include 0. Subset notation is never ambiguous: ⊆ allows equality and ⊊ means proper subset. Complements name their universe as U∖A. Use · for multiplication and × for Cartesian products. Images and preimages use f[S] and f⁻¹[T]; f⁻¹:B→A denotes an inverse function only when f is bijective. Source-specific aliases are recorded but do not control the main exposition.",
   "sources": [
     {
       "id": "openstax-prealgebra",
+      "registryRecordId": "S0005",
       "title": "Prealgebra 2e",
       "authors": [
         "Lynn Marecek",
@@ -19,6 +20,7 @@
     },
     {
       "id": "sundstrom-reasoning",
+      "registryRecordId": "S0043",
       "title": "Mathematical Reasoning: Writing and Proof",
       "authors": [
         "Ted Sundstrom"
@@ -28,6 +30,7 @@
     },
     {
       "id": "mit-mcs",
+      "registryRecordId": "S0061",
       "title": "Mathematics for Computer Science",
       "authors": [
         "Eric Lehman",
@@ -39,6 +42,7 @@
     },
     {
       "id": "levin-discrete",
+      "registryRecordId": "S0060",
       "title": "Discrete Mathematics: An Open Introduction",
       "authors": [
         "Oscar Levin"
@@ -48,6 +52,7 @@
     },
     {
       "id": "judson-algebra",
+      "registryRecordId": "S0164",
       "title": "Abstract Algebra: Theory and Applications",
       "authors": [
         "Thomas W. Judson"
@@ -57,50 +62,165 @@
     },
     {
       "id": "hammack-proof",
+      "registryRecordId": "S0042",
       "title": "Book of Proof",
       "authors": [
         "Richard Hammack"
       ],
       "officialUrl": "https://richardhammack.github.io/BookOfProof/",
       "useNote": "Set notation, logical forms, examples, and proof-writing coverage; no source prose is reproduced."
+    },
+    {
+      "id": "hefferon-linear-algebra",
+      "registryRecordId": "S0093",
+      "title": "Linear Algebra",
+      "authors": [
+        "Jim Hefferon"
+      ],
+      "officialUrl": "https://hefferon.net/linearalgebra/",
+      "useNote": "Linear systems, elimination, vectors, and linear-map comparisons; NisabaDB rewrites the route around computation first."
     }
   ],
   "chapters": [
     {
-      "id": "language",
+      "id": "quantity-units",
       "number": 1,
-      "title": "The language of mathematics",
-      "summary": "Learn what symbols refer to, how definitions create names, and how domains prevent meaningless manipulation."
+      "title": "Quantities, objects, units, and symbols",
+      "summary": "Begin before arithmetic by separating things from attributes, values from units, and mathematical objects from the symbols that name them.",
+      "compressionGoal": "Unify the object, measurement, type, equality, and definition language repeated at the start of nearly every mathematical subject."
+    },
+    {
+      "id": "counting-place-value",
+      "number": 2,
+      "title": "Matching, counting, place value, and order",
+      "summary": "Construct whole numbers from matching and counting, then encode and compare them on a number line.",
+      "compressionGoal": "Replace separate counting, numeral, comparison, and place-value units with one construction from correspondence and order."
+    },
+    {
+      "id": "arithmetic-operations",
+      "number": 3,
+      "title": "Addition, subtraction, and multiplication",
+      "summary": "Understand arithmetic operations as combining, undoing, repeated grouping, and scaling rather than isolated rules.",
+      "compressionGoal": "Give school arithmetic and later algebra one shared operational meaning."
+    },
+    {
+      "id": "division-divisibility",
+      "number": 4,
+      "title": "Division, remainders, and divisibility",
+      "summary": "Separate sharing, measurement, quotient-with-remainder, and exact divisibility while connecting them by multiplication.",
+      "compressionGoal": "Use one quotient-and-remainder model for elementary division, modular arithmetic, algorithms, and number theory."
+    },
+    {
+      "id": "signed-numbers",
+      "number": 5,
+      "title": "Signed numbers and distance",
+      "summary": "Extend arithmetic to directed change and treat absolute value as distance from zero or between points.",
+      "compressionGoal": "Unify debt, temperature, displacement, order, and distance in one number-line model."
+    },
+    {
+      "id": "fractions",
+      "number": 6,
+      "title": "Fractions as numbers",
+      "summary": "Place fractions on the number line, recognize equivalent forms, and compute by choosing compatible units.",
+      "compressionGoal": "Replace separate part-whole tricks with the quotient, scaling, and common-unit ideas reused throughout mathematics."
+    },
+    {
+      "id": "proportional-reasoning",
+      "number": 7,
+      "title": "Decimals, ratios, rates, and percent",
+      "summary": "Connect base-ten fractions, relative comparison, unit rates, proportional scaling, and percent.",
+      "compressionGoal": "Teach five traditionally separate topics as representations of multiplicative comparison."
+    },
+    {
+      "id": "powers-roots-estimation",
+      "number": 8,
+      "title": "Powers, roots, units, and estimation",
+      "summary": "Describe repeated scaling, reverse it with roots, and use units and bounds to reject impossible calculations.",
+      "compressionGoal": "Join exponentiation, inverse operations, order of magnitude, dimensional analysis, and numerical sanity checks."
+    },
+    {
+      "id": "language",
+      "number": 9,
+      "title": "Variables, domains, and collections",
+      "summary": "Extend the initial symbol language with variable domains, substitution, sets, membership, and extensional equality.",
+      "compressionGoal": "Provide one domain-aware collection language used by algebra, logic, formal proof, and computation."
     },
     {
       "id": "numbers-algebra",
-      "number": 2,
-      "title": "Numbers and algebra",
-      "summary": "Work with number domains, operations, algebraic laws, equations, and inequalities as meaning-preserving constructions."
+      "number": 10,
+      "title": "Numbers and algebraic rewriting",
+      "summary": "Work with number domains, algebraic laws, equations, and inequalities as meaning-preserving constructions.",
+      "compressionGoal": "Replace memorized manipulation rules with a small library of domain-sensitive reversible rewrites."
     },
     {
       "id": "logic",
-      "number": 3,
+      "number": 11,
       "title": "Statements and logic",
-      "summary": "Turn ordinary mathematical claims into precise statements whose truth conditions can be inspected."
+      "summary": "Turn ordinary mathematical claims into precise statements whose truth conditions can be inspected.",
+      "compressionGoal": "Use one logical grammar for prose proofs, programs, probability events, and formal verification."
     },
     {
       "id": "proof",
-      "number": 4,
+      "number": 12,
       "title": "Proof as a checkable construction",
-      "summary": "Build direct, case-based, indirect, and inductive arguments from explicit logical goals."
+      "summary": "Build direct, case-based, indirect, and inductive arguments from explicit logical goals.",
+      "compressionGoal": "Organize proof methods by goal shape and evidence type instead of by textbook tradition."
     },
     {
       "id": "sets",
-      "number": 5,
+      "number": 13,
       "title": "Sets without notation drift",
-      "summary": "Use one stable vocabulary for collections, subsets, and the operations that recur throughout mathematics."
+      "summary": "Use one stable vocabulary for collections, subsets, and operations that recur throughout mathematics.",
+      "compressionGoal": "Create one collection language shared by logic, combinatorics, probability, topology, and algebra."
     },
     {
       "id": "functions",
-      "number": 6,
-      "title": "Functions and structure-preserving maps",
-      "summary": "Treat functions as typed assignments, then study images, composition, bijections, and inverses."
+      "number": 14,
+      "title": "Functions and composable maps",
+      "summary": "Treat functions as typed assignments, then study images, composition, bijections, and inverses.",
+      "compressionGoal": "Make typed composition the common interface for formulas, transformations, programs, and morphisms."
+    },
+    {
+      "id": "relations-equivalence",
+      "number": 15,
+      "title": "Relations and equivalence",
+      "summary": "Describe pairwise structure and compress interchangeable objects into equivalence classes.",
+      "compressionGoal": "Unify equality-up-to-symmetry, modular congruence, partitions, order, and graph adjacency."
+    },
+    {
+      "id": "sequences-recursion",
+      "number": 16,
+      "title": "Sequences and recursive construction",
+      "summary": "Define an evolving list from initial data and a rule, then reason about every generated stage.",
+      "compressionGoal": "Share one state-update language among sequences, induction, algorithms, automata, and dynamical systems."
+    },
+    {
+      "id": "algorithms-invariants",
+      "number": 17,
+      "title": "Algorithms, invariants, and termination",
+      "summary": "Specify a process by its state, legal transition, maintained facts, and progress measure.",
+      "compressionGoal": "Make algorithm correctness, proof by induction, descent, and state-machine reasoning instances of one pattern."
+    },
+    {
+      "id": "finite-probability",
+      "number": 18,
+      "title": "Finite counting and probability",
+      "summary": "Count outcomes without duplication and assign probabilities to explicitly weighted finite experiments.",
+      "compressionGoal": "Use the same decomposition of choices for counting, probability, randomized algorithms, and information."
+    },
+    {
+      "id": "graphs",
+      "number": 19,
+      "title": "Graphs as relations",
+      "summary": "Represent connections by vertices and edges so local relationships produce global paths and components.",
+      "compressionGoal": "Give networks, automata, dependencies, molecules, and social connections one discrete relational model."
+    },
+    {
+      "id": "linear-computation",
+      "number": 20,
+      "title": "Vectors and linear systems as computation",
+      "summary": "Represent simultaneous constraints with vectors and solve them by reversible elimination.",
+      "compressionGoal": "Introduce linear algebra through the common computational core behind equations, geometry, data, and dynamics."
     }
   ],
   "notation": [
@@ -134,7 +254,7 @@
       "symbol": "\\mathbb{N}",
       "spokenAs": "the natural numbers",
       "meaning": "The set {0,1,2,...}; NisabaDB always includes 0.",
-      "firstNodeId": "K05",
+      "firstNodeId": "K32",
       "aliases": [
         {
           "form": "\\mathbb{N}_0",
@@ -145,6 +265,14 @@
           "note": "A conflicting convention; translate it explicitly when citing such a source."
         }
       ]
+    },
+    {
+      "id": "integers",
+      "symbol": "\\mathbb{Z}",
+      "spokenAs": "the integers",
+      "meaning": "The whole numbers together with their negative opposites.",
+      "firstNodeId": "K40",
+      "aliases": []
     },
     {
       "id": "logical-not",
@@ -338,36 +466,146 @@
       "meaning": "The function undoing a bijection f:A to B in both composition orders.",
       "firstNodeId": "K30",
       "aliases": []
+    },
+    {
+      "id": "divisibility",
+      "symbol": "d \\mid n",
+      "spokenAs": "d divides n",
+      "meaning": "There is an integer k with n=d\\cdot k.",
+      "firstNodeId": "K39",
+      "aliases": []
+    },
+    {
+      "id": "absolute-value",
+      "symbol": "|x|",
+      "spokenAs": "the absolute value of x",
+      "meaning": "The distance from x to 0 on the real number line.",
+      "firstNodeId": "K41",
+      "aliases": []
+    },
+    {
+      "id": "fraction",
+      "symbol": "\\frac{a}{b}",
+      "spokenAs": "a divided by b",
+      "meaning": "The unique number whose product with nonzero b is a.",
+      "firstNodeId": "K43",
+      "aliases": [
+        {
+          "form": "a/b",
+          "note": "Used in plain text and programs; parentheses may be needed to make the numerator and denominator clear."
+        }
+      ]
+    },
+    {
+      "id": "ratio",
+      "symbol": "a:b",
+      "spokenAs": "the ratio of a to b",
+      "meaning": "A multiplicative comparison; when b is nonzero its numerical value is a/b.",
+      "firstNodeId": "K48",
+      "aliases": [
+        {
+          "form": "a/b",
+          "note": "Use this form when the ratio is being treated directly as a quotient."
+        }
+      ]
+    },
+    {
+      "id": "power",
+      "symbol": "a^n",
+      "spokenAs": "a to the power n",
+      "meaning": "For a nonnegative integer n, repeated multiplication of n copies of a, with a^0=1 when a is nonzero.",
+      "firstNodeId": "K51",
+      "aliases": []
+    },
+    {
+      "id": "root",
+      "symbol": "\\sqrt[n]{a}",
+      "spokenAs": "the nth root of a",
+      "meaning": "The principal number r in the stated domain satisfying r^n=a.",
+      "firstNodeId": "K53",
+      "aliases": []
+    },
+    {
+      "id": "relation",
+      "symbol": "x \\mathrel{R} y",
+      "spokenAs": "x is related by R to y",
+      "meaning": "The ordered pair (x,y) belongs to the relation R.",
+      "firstNodeId": "K55",
+      "aliases": []
+    },
+    {
+      "id": "sequence",
+      "symbol": "(a_n)_{n\\ge 0}",
+      "spokenAs": "the sequence a n for n at least zero",
+      "meaning": "A function whose inputs are successive natural-number indices.",
+      "firstNodeId": "K56",
+      "aliases": []
+    },
+    {
+      "id": "probability",
+      "symbol": "\\Pr(E)",
+      "spokenAs": "the probability of E",
+      "meaning": "The total probability weight assigned to the event E.",
+      "firstNodeId": "K58",
+      "aliases": [
+        {
+          "form": "P(E)",
+          "note": "Common, but NisabaDB uses Pr to distinguish probability from a generic predicate or power set."
+        }
+      ]
+    },
+    {
+      "id": "graph",
+      "symbol": "G=(V,E)",
+      "spokenAs": "the graph G with vertices V and edges E",
+      "meaning": "A set V of vertices together with a specified collection E of connections.",
+      "firstNodeId": "K59",
+      "aliases": []
+    },
+    {
+      "id": "vector",
+      "symbol": "\\mathbf{x}=(x_1,\\ldots,x_n)",
+      "spokenAs": "the vector x with coordinates x one through x n",
+      "meaning": "An ordered list of scalars used as a displacement, state, or collection of unknowns.",
+      "firstNodeId": "K60",
+      "aliases": [
+        {
+          "form": "\\vec{x}",
+          "note": "Common in geometry; boldface is the primary convention here for coordinate vectors."
+        }
+      ]
     }
   ],
   "nodes": [
     {
       "id": "K01",
-      "contentSha256": "4e9864d1e05339a8b15b4bd84ebfd0bf9409f20405fb8cd8b39a77a9a1984026",
+      "contentSha256": "a3fcddd9503f09da2983bb2455ced81e639ee5b3612a13bd55460696e214a30b",
       "slug": "objects-symbols-types",
-      "chapterId": "language",
-      "section": "1.1",
+      "chapterId": "quantity-units",
+      "section": "1.2",
       "title": "Objects, symbols, and types",
       "kind": "language",
       "purpose": "Read a formula as a sentence about objects instead of as a string of marks.",
-      "prerequisiteIds": [],
+      "prerequisiteIds": [
+        "K31"
+      ],
       "notationIds": [],
       "motivation": "Mathematics talks about numbers, sets, functions, shapes, and many other objects. A symbol is only a name or operation sign; it is not the object itself.",
-      "tutorial": "A **mathematical object** is anything the discussion treats as one thing. A **symbol** is a written name for an object or operation. A **type** tells us what sort of object is allowed. The expression $2+3$ is meaningful because $2$ and $3$ are numbers and addition accepts two numbers. The expression $2 \\in 3$ is not ordinary arithmetic: membership expects a set on the right.\n\nBefore manipulating a formula, ask three questions: What does each symbol name? What type of object is it? What kind of output does each operation produce?",
+      "tutorial": "A **mathematical object** is anything the discussion treats as one thing. A **symbol** is a written name for an object or an instruction. A **type** tells us what sort of object is allowed. The numeral $2$ can name a numerical value, while the word metre names a unit of length. Together, “2 metres” reports a length. Replacing metre by second changes the type from length to duration even though the numeral stays the same.\n\nBefore manipulating a formula, ask three questions: What does each symbol name? What type of object is it? What kind of output does each instruction produce?",
       "keyIdea": "Meaning comes before manipulation: every symbol has a role and every operation has an input type.",
       "examples": [
         {
           "title": "A typed reading",
-          "body": "In $2+3=5$, the symbols $2,3,5$ name numbers, $+$ combines two numbers, and $=$ compares the two resulting number objects."
+          "body": "In “2 metres,” the numeral 2 names a numerical value and metre names a length unit. Together they report one quantity of type length."
         }
       ],
       "exercise": {
-        "prompt": "In the statement $x+1=4$, list the symbols and say what type of object each must represent for the statement to make sense.",
+        "prompt": "In the report “the walk lasted 5 minutes,” identify the object under discussion, the numerical symbol, the unit, and the type of quantity.",
         "hints": [
-          "Separate names from operation signs.",
-          "The operation + and the comparison = constrain the possible types."
+          "Separate the name of the object from the value and unit used to describe it.",
+          "Ask which attribute of the walk is being reported."
         ],
-        "solution": "$x$, $1$, and $4$ must represent numbers; $+$ is a binary operation on those numbers; $=$ compares the number $x+1$ with the number $4$."
+        "solution": "The object is the walk, the numerical symbol is 5, the unit is minute, and the reported quantity has type duration."
       },
       "sourceRefs": [
         {
@@ -391,10 +629,10 @@
     },
     {
       "id": "K02",
-      "contentSha256": "3ba460a5ec3656cba3992b607168b0aa6370fca0ffc340d9c72d27989737dd84",
+      "contentSha256": "59cb4874a184abf0034d0eb2c14347383fe6286a1803c2b32f82562844ca8e4f",
       "slug": "equality-and-definition",
-      "chapterId": "language",
-      "section": "1.2",
+      "chapterId": "quantity-units",
+      "section": "1.3",
       "title": "Equality is not definition",
       "kind": "language",
       "purpose": "Separate a claim that two known objects coincide from the act of introducing a new name.",
@@ -405,20 +643,20 @@
         "definition-symbol"
       ],
       "motivation": "Many books use the same symbol for equality and definition. That saves ink but hides whether a line makes a claim or creates terminology.",
-      "tutorial": "Write $a=b$ when $a$ and $b$ already have meanings and you assert that they are the same object. Write $c := a+b$ when you introduce $c$ as a new name for $a+b$. A definition is not proved; later claims using it may need proof.\n\nEquality is symmetric: from $a=b$ we also have $b=a$. Definition has a reading direction: $c := a+b$ introduces $c$; reversing the typography would misdescribe what is new.",
+      "tutorial": "Write $a=b$ when $a$ and $b$ already have meanings and you assert that they are the same object. Write $c:=a$ when you introduce $c$ as a new name for the object already named by $a$. A definition is not proved; later claims using it may need proof.\n\nEquality is symmetric: from $a=b$ we also have $b=a$. Definition has a reading direction: $c:=a$ introduces $c$; reversing the typography would misdescribe what is new.",
       "keyIdea": "Use $=$ for sameness and $:=$ for a new name.",
       "examples": [
         {
           "title": "Name, then claim",
-          "body": "Define $s := 1+2+3$. The later line $s=6$ is a claim justified by arithmetic, not another definition."
+          "body": "Define $h:=$ the height of a particular door. The later line $h=2$ metres is a measured claim, not another definition."
         }
       ],
       "exercise": {
-        "prompt": "Choose $=$ or $:=$ in each blank: (a) introduce $p$ as $xy$; (b) state that $2+2$ and $4$ are the same number.",
+        "prompt": "Choose $=$ or $:=$ in each blank: (a) introduce $w$ as the width of a page; (b) state that the measured width $w$ is 21 centimetres.",
         "hints": [
           "Ask whether the line creates a name or makes a claim."
         ],
-        "solution": "(a) $p := xy$. (b) $2+2=4$."
+        "solution": "(a) $w:=$ the width of the page. (b) $w=21$ centimetres."
       },
       "sourceRefs": [
         {
@@ -441,33 +679,32 @@
     },
     {
       "id": "K03",
-      "contentSha256": "49e27e1d7c9d44e42b76efb525abfb43f24437cbed7456265d4c8b64e8723e2b",
+      "contentSha256": "caa2130783735ec1874a063c2259c0d6cab5eed57d34abb3b61697238e3da18d",
       "slug": "variables-domains-substitution",
       "chapterId": "language",
-      "section": "1.3",
+      "section": "9.1",
       "title": "Variables, domains, and substitution",
       "kind": "language",
       "purpose": "Know what values a variable may take and when replacing it preserves meaning.",
       "prerequisiteIds": [
-        "K01",
-        "K02"
+        "K35"
       ],
       "notationIds": [],
       "motivation": "A formula containing $x$ is incomplete until we know which objects $x$ is allowed to represent.",
-      "tutorial": "A **variable** is a symbol whose value may vary. Its **domain** is the collection of allowed values. Substitution replaces a variable by one allowed object everywhere that variable has the same role.\n\nThe domain can change truth. The equation $x^2=2$ has no rational-number solution but has real-number solutions. NisabaDB therefore declares a domain when a variable first appears and never relies on the reader to guess it.",
+      "tutorial": "A **variable** is a symbol whose value may vary. Its **domain** is the collection of allowed values. Substitution replaces a variable by one allowed object everywhere that variable has the same role. For example, if $x$ is a whole number, substituting $x=2$ into $x+1$ produces $2+1$.\n\nThe domain can change whether a solution is allowed. The equation $x+1=3$ has the whole-number solution $x=2$, but it has no solution if the permitted values are only 0 and 1. NisabaDB therefore declares a domain when a variable first appears and never relies on the reader to guess it.",
       "keyIdea": "A variable without a domain is an unfinished instruction.",
       "examples": [
         {
           "title": "A domain changes the answer",
-          "body": "For integers $x$, the equation $2x=1$ has no solution. For rational numbers $x$, it has the solution $x=1/2$."
+          "body": "If $x$ may be any whole number, $x+2=5$ has the solution $x=3$. If only 0, 1, and 2 are permitted, the same equation has no allowed solution."
         }
       ],
       "exercise": {
-        "prompt": "Compare the solutions of $x^2=4$ when the domain is the natural numbers and when it is the integers.",
+        "prompt": "Compare the solutions of $x+2=4$ when the allowed values are all whole numbers and when the allowed values are only 0 and 1.",
         "hints": [
-          "List the allowed candidates whose square is 4."
+          "Substitute the value that makes the left side equal 4, then check whether the domain allows it."
         ],
-        "solution": "In the natural numbers the solution is $x=2$. In the integers the solutions are $x=2$ and $x=-2$."
+        "solution": "The equation requires $x=2$. It is a solution in the domain of all whole numbers. It is not allowed when the domain contains only 0 and 1, so that restricted problem has no solution."
       },
       "sourceRefs": [
         {
@@ -490,15 +727,14 @@
     },
     {
       "id": "K04",
-      "contentSha256": "1c9db7abfe431e3a24d40d0b8604af3866170408e03f00aa6f779081b82d3e60",
+      "contentSha256": "797fcd9feea9f2543fa9c63dd2b60394157c2b0ab477efddcb51e395799ccb62",
       "slug": "sets-elements-extensionality",
       "chapterId": "language",
-      "section": "1.4",
+      "section": "9.2",
       "title": "Sets, elements, and extensionality",
       "kind": "definition",
       "purpose": "Describe a collection by exactly which objects belong to it, without importing a new set-theory introduction in every subject.",
       "prerequisiteIds": [
-        "K01",
         "K03"
       ],
       "notationIds": [
@@ -546,15 +782,16 @@
     },
     {
       "id": "K05",
-      "contentSha256": "8dc4ce45c304ea8a28f6362df4b2ae6876f68f62dc0e7f73f7a26bb96d2c2821",
+      "contentSha256": "2f6041e3a7a9fc62a799588f61951a77f727ac62b99776f357d2fff0c63b7b19",
       "slug": "number-domains-and-order",
       "chapterId": "numbers-algebra",
-      "section": "2.1",
+      "section": "10.1",
       "title": "Number domains and order",
       "kind": "definition",
       "purpose": "Use one explicit nesting of familiar number systems and one convention for natural numbers.",
       "prerequisiteIds": [
-        "K04"
+        "K04",
+        "K53"
       ],
       "notationIds": [
         "natural-numbers"
@@ -598,15 +835,14 @@
     },
     {
       "id": "K06",
-      "contentSha256": "c38f60817a1c2111b0988667a6af85ac1af8adfcca856ec372b2c39ce6d344b8",
+      "contentSha256": "16eb63d43cdb0997bded606b84d2c2bc5cf88ad3fe19853fb9d8315b0ed878f0",
       "slug": "operations-and-precedence",
       "chapterId": "numbers-algebra",
-      "section": "2.2",
+      "section": "10.2",
       "title": "Operations and precedence",
       "kind": "language",
       "purpose": "Parse an expression unambiguously before computing or rewriting it.",
       "prerequisiteIds": [
-        "K02",
         "K05"
       ],
       "notationIds": [],
@@ -644,19 +880,21 @@
     },
     {
       "id": "K07",
-      "contentSha256": "128e1895d60e60c82c5da6e04f4cb91bad78b0e36004d664f5c13a700ad15a5a",
+      "contentSha256": "db9084011eb3c6ff97b3a37819c219728c8d86a0f0f2599d7d7cd6536e6a7632",
       "slug": "algebraic-laws-and-rewrites",
       "chapterId": "numbers-algebra",
-      "section": "2.3",
+      "section": "10.3",
       "title": "Algebraic laws are legal rewrites",
       "kind": "law",
       "purpose": "Replace memorized symbol-moving tricks by named equalities that justify each transformation.",
       "prerequisiteIds": [
-        "K06"
+        "K06",
+        "K39",
+        "K52"
       ],
       "notationIds": [],
       "motivation": "Computational algebra and abstract algebra share one core idea: operations obey laws, and those laws license algorithms and rewrites.",
-      "tutorial": "For numbers $a,b,c$, addition and multiplication are associative; both are commutative; and multiplication distributes over addition:\n\n$$a(b+c)=ab+ac.$$\n\nA rewrite is legal when it replaces one side of a known equality by the other, within the law's domain. Phrases such as 'move $x$ to the other side' hide the real operation. We instead add, subtract, multiply, or divide both sides under stated conditions.",
+      "tutorial": "For numbers $a,b,c$ in a domain where the displayed operations are defined, addition and multiplication are associative; both are commutative; and multiplication distributes over addition:\n\n$$a(b+c)=ab+ac.$$\n\nA rewrite is legal when it replaces one side of a known equality by the other within the law's domain. Phrases such as 'move $x$ to the other side' hide the real operation. We instead add or subtract the same value from both sides, multiply both sides by the same value, or divide both sides by the same **nonzero** value. Division by zero is never a legal rewrite.",
       "keyIdea": "A symbolic transformation is an application of a named law, not motion on the page.",
       "examples": [
         {
@@ -693,15 +931,14 @@
     },
     {
       "id": "K08",
-      "contentSha256": "a9b441652e0eb5772d8240c43a50bd71d9c20d838e72caeb4f475429de00eec9",
+      "contentSha256": "b486d6a28ed958adc3ffa31b4605ea1a4263747a9a152f6deda1bceffbd9c9ee",
       "slug": "equations-and-solution-checking",
       "chapterId": "numbers-algebra",
-      "section": "2.4",
+      "section": "10.4",
       "title": "Equations and solution checking",
       "kind": "method",
       "purpose": "Treat solving as preserving a solution set and verify candidates by substitution.",
       "prerequisiteIds": [
-        "K03",
         "K07"
       ],
       "notationIds": [],
@@ -711,7 +948,7 @@
       "examples": [
         {
           "title": "A transparent solution",
-          "body": "$3x-5=7 \\Rightarrow 3x=12 \\Rightarrow x=4$, using the same reversible operation on both sides at each step."
+          "body": "$3x-5=7 \\Longleftrightarrow 3x=12 \\Longleftrightarrow x=4$. Each arrow is reversible because the same quantity is added to both sides and then both sides are divided by the nonzero number 3."
         }
       ],
       "exercise": {
@@ -743,16 +980,14 @@
     },
     {
       "id": "K09",
-      "contentSha256": "81972b58a2500a8dcc29d3fa583de3ee0c0342631b5ca57b8275e2638324f100",
+      "contentSha256": "537b51e29733db5dcb00fcf2bed68482121d83adaa01175a6897a362b147ec2c",
       "slug": "inequalities-and-intervals",
       "chapterId": "numbers-algebra",
-      "section": "2.5",
+      "section": "10.5",
       "title": "Inequalities and intervals",
       "kind": "method",
       "purpose": "Describe ordered ranges and solve inequalities without losing the direction of comparison.",
       "prerequisiteIds": [
-        "K05",
-        "K07",
         "K08"
       ],
       "notationIds": [
@@ -797,15 +1032,14 @@
     },
     {
       "id": "K10",
-      "contentSha256": "e5cb22fb56b75011aa1d3790a8633c9f594b31193c3644a81a7837137b535593",
+      "contentSha256": "052245658670fd536bec0836fc23471fc453f043b2c2404ee58e06bf5eda32bf",
       "slug": "statements-truth-predicates",
       "chapterId": "logic",
-      "section": "3.1",
+      "section": "11.1",
       "title": "Statements, truth, and predicates",
       "kind": "definition",
       "purpose": "Distinguish a complete true-or-false claim from an expression that still has a free variable.",
       "prerequisiteIds": [
-        "K02",
         "K03"
       ],
       "notationIds": [],
@@ -847,10 +1081,10 @@
     },
     {
       "id": "K11",
-      "contentSha256": "3f388b8e7defc200808f63dd0dc421da13002d993bd99c81c33746c33ee15862",
+      "contentSha256": "a61f72f62238abc8b2951e95665e2d936317269b18198bc647b0e1863ea1b9cb",
       "slug": "logical-connectives",
       "chapterId": "logic",
-      "section": "3.2",
+      "section": "11.2",
       "title": "Not, and, or",
       "kind": "definition",
       "purpose": "Build compound statements with explicit truth conditions.",
@@ -900,10 +1134,10 @@
     },
     {
       "id": "K12",
-      "contentSha256": "01e5c3f1aec8875f90a31a0e06db88ed07200029b63f38252da6a44b497d7bf9",
+      "contentSha256": "d2d7c61fcfb6bd591bde4c274f297f18d6c257e22e49e9061357d0aea01ca5de",
       "slug": "implication-converse-iff",
       "chapterId": "logic",
-      "section": "3.3",
+      "section": "11.3",
       "title": "Implication, converse, and if-and-only-if",
       "kind": "definition",
       "purpose": "Read one-way and two-way claims without silently reversing them.",
@@ -952,10 +1186,10 @@
     },
     {
       "id": "K13",
-      "contentSha256": "a7ddb8a36c9122f493d915e53416df506a1757d015f7fbf17ee8100984c90665",
+      "contentSha256": "7156d8ba146ca18e375998630a0208d53c860a859a1a6d83f1e70641e16e5a85",
       "slug": "quantifiers-and-domains",
       "chapterId": "logic",
-      "section": "3.4",
+      "section": "11.4",
       "title": "Quantifiers always have domains",
       "kind": "definition",
       "purpose": "State whether a claim concerns every object or at least one object, and say where those objects come from.",
@@ -974,7 +1208,7 @@
       "examples": [
         {
           "title": "Order matters",
-          "body": "Over the integers, $\\forall x\\,\\exists y, y>x$ is true. But $\\exists y\\,\\forall x, y>x$ is false: no integer exceeds every integer."
+          "body": "Over the integers, $\\forall x\\in\\mathbb Z,\\,\\exists y\\in\\mathbb Z,\\ y>x$ is true. But $\\exists y\\in\\mathbb Z,\\,\\forall x\\in\\mathbb Z,\\ y>x$ is false: no integer exceeds every integer."
         }
       ],
       "exercise": {
@@ -1006,15 +1240,14 @@
     },
     {
       "id": "K14",
-      "contentSha256": "beb695255c2934fcfea3b03b419e8d9aa0a3a860e537d2c796a1bedf6042ba21",
+      "contentSha256": "1f752966f346b5bc2ed901adce6c03ee0636c8b5227d5374ef2a78284ec95aef",
       "slug": "negating-compound-statements",
       "chapterId": "logic",
-      "section": "3.5",
+      "section": "11.5",
       "title": "Negating compound statements",
       "kind": "law",
       "purpose": "Produce the exact opposite of a logical claim instead of a vaguely contrary sentence.",
       "prerequisiteIds": [
-        "K11",
         "K12",
         "K13"
       ],
@@ -1063,10 +1296,10 @@
     },
     {
       "id": "K15",
-      "contentSha256": "3d87dafc3004c9dd19a228600d589f36618e9f32c52047bd0ec889194c4b06ae",
+      "contentSha256": "6219425bb1df7cf5c0d46d040ba01845e31343b1147149bed563d3ad853ef659",
       "slug": "direct-proof-and-witnesses",
       "chapterId": "proof",
-      "section": "4.1",
+      "section": "12.1",
       "title": "Direct proof and explicit witnesses",
       "kind": "method",
       "purpose": "Turn a quantified claim into a short sequence of checkable obligations.",
@@ -1128,10 +1361,10 @@
     },
     {
       "id": "K16",
-      "contentSha256": "990c1e24a544460f8fee7aeb3dfc05b1a05c1ba159a6dc941b3ecddb8da07fe9",
+      "contentSha256": "7cc3d3a54832d9624fa17d26895bb4ea941da595ee9013ada6f1b3d14b3042a7",
       "slug": "counterexamples-and-disproof",
       "chapterId": "proof",
-      "section": "4.2",
+      "section": "12.2",
       "title": "Counterexamples and disproof",
       "kind": "method",
       "purpose": "Refute a universal claim with one relevant object while recognizing that examples alone do not establish universality.",
@@ -1184,17 +1417,15 @@
     },
     {
       "id": "K17",
-      "contentSha256": "160e38a136a26246575ca28c6d4dbe189455403377c90e80326fce758301232e",
+      "contentSha256": "4b356d53766f62cdc6bcf325a8ccfe391c8dffce09b5342dd2befc41266c320d",
       "slug": "proof-by-cases",
       "chapterId": "proof",
-      "section": "4.3",
+      "section": "12.3",
       "title": "Proof by cases",
       "kind": "method",
       "purpose": "Split an argument into possibilities that together cover every allowed input.",
       "prerequisiteIds": [
         "K09",
-        "K11",
-        "K12",
         "K15"
       ],
       "notationIds": [
@@ -1242,17 +1473,15 @@
     },
     {
       "id": "K18",
-      "contentSha256": "8b35787804f10417ba4cbc990dd76f28fec7f90958014940a8a072190a59c5ae",
+      "contentSha256": "d09f84cbf83e70edf86f2975f2c1a6c18bbbb7ffd1dd0b69044fb0013c662d80",
       "slug": "indirect-proof",
       "chapterId": "proof",
-      "section": "4.4",
+      "section": "12.4",
       "title": "Indirect proof",
       "kind": "method",
       "purpose": "Use contraposition or contradiction when assuming failure exposes the useful structure.",
       "prerequisiteIds": [
-        "K12",
         "K14",
-        "K15",
         "K17"
       ],
       "notationIds": [
@@ -1303,19 +1532,16 @@
     },
     {
       "id": "K19",
-      "contentSha256": "01f1f22cb24a6daab9cf3c24fc557176d60ff4ccd1a72c5342c4bfed9abbd525",
+      "contentSha256": "455743546a82ef66023155dc5489807ef7b56dd23f06026ac95793add50700a3",
       "slug": "mathematical-induction",
       "chapterId": "proof",
-      "section": "4.5",
+      "section": "12.5",
       "title": "Mathematical induction",
       "kind": "method",
       "purpose": "Prove a claim for every natural number by establishing a starting point and a successor step.",
       "prerequisiteIds": [
-        "K05",
-        "K06",
-        "K12",
-        "K13",
-        "K15"
+        "K15",
+        "K56"
       ],
       "notationIds": [
         "natural-numbers",
@@ -1366,15 +1592,14 @@
     },
     {
       "id": "K20",
-      "contentSha256": "5d6586b22b052a749a73a68f62950531e984d4a2ff69a55d4fca02edbb571e58",
+      "contentSha256": "7b4379920f70811adb52dbec4c8c065db4abec6e26b1b396689ed37690a58b28",
       "slug": "set-builder-notation",
       "chapterId": "sets",
-      "section": "5.1",
+      "section": "13.1",
       "title": "Set-builder notation",
       "kind": "language",
       "purpose": "Define a set by a domain and one precise membership condition.",
       "prerequisiteIds": [
-        "K04",
         "K13"
       ],
       "notationIds": [
@@ -1418,15 +1643,14 @@
     },
     {
       "id": "K21",
-      "contentSha256": "17b04333ef11787fda0a894dea2a65726eab5a3451c3b4362a3425354537bc4c",
+      "contentSha256": "2332a41280a075e5ef9293d44136c50a6905e3bd9f2124fe7ddb719691773573",
       "slug": "subsets-and-proper-subsets",
       "chapterId": "sets",
-      "section": "5.2",
+      "section": "13.2",
       "title": "Subsets without ambiguity",
       "kind": "definition",
       "purpose": "Express containment with separate symbols for inclusive and strict containment.",
       "prerequisiteIds": [
-        "K04",
         "K12",
         "K13"
       ],
@@ -1437,7 +1661,7 @@
         "implication"
       ],
       "motivation": "The symbol $\\subset$ means inclusive subset in some books and proper subset in others. A unified textbook cannot inherit both conventions.",
-      "tutorial": "$A\\subseteq B$ means every element of $A$ belongs to $B$:\n\n$$A\\subseteq B \\Longleftrightarrow \\forall x,\\,(x\\in A\\Rightarrow x\\in B).$$\n\nEquality is allowed. Write $A\\subsetneq B$ when $A\\subseteq B$ and $A\\ne B$. NisabaDB never uses bare $\\subset$ because its meaning is not stable across sources.",
+      "tutorial": "$A\\subseteq B$ means every element of $A$ belongs to $B$:\n\n$$A\\subseteq B \\Longleftrightarrow \\forall x\\in A,\\ x\\in B.$$\n\nEquality is allowed. Write $A\\subsetneq B$ when $A\\subseteq B$ and $A\\ne B$. NisabaDB never uses bare $\\subset$ because its meaning is not stable across sources.",
       "keyIdea": "$\\subseteq$ allows equality; $\\subsetneq$ requires a missing element.",
       "examples": [
         {
@@ -1478,16 +1702,14 @@
     },
     {
       "id": "K22",
-      "contentSha256": "75b77e8a8dbd78a985d1829a3769865fc7dba968ed74a26fa06c61e500042031",
+      "contentSha256": "81e837e42e56ff637203f64e71fa89e0f9ade63523c944f1253afbf2825082f1",
       "slug": "set-operations",
       "chapterId": "sets",
-      "section": "5.3",
+      "section": "13.3",
       "title": "Union, intersection, and difference",
       "kind": "definition",
       "purpose": "Build new sets with operations whose membership rules are just logical connectives.",
       "prerequisiteIds": [
-        "K04",
-        "K11",
         "K20",
         "K21"
       ],
@@ -1541,15 +1763,14 @@
     },
     {
       "id": "K23",
-      "contentSha256": "ad39e2b58e91f05f267f58aafd3e74ed88b809343175ba216c977e9e88b145d9",
+      "contentSha256": "9c534afe6f635058abfa22ddc21034e0831e323ea032f1362a0e46f819d4441b",
       "slug": "power-sets",
       "chapterId": "sets",
-      "section": "5.4",
+      "section": "13.4",
       "title": "Power sets",
       "kind": "definition",
       "purpose": "Collect all subsets of one set into a new set whose elements are themselves sets.",
       "prerequisiteIds": [
-        "K04",
         "K20",
         "K21"
       ],
@@ -1558,7 +1779,7 @@
         "power-set"
       ],
       "motivation": "Mathematics often needs to choose or compare possible subcollections. A power set turns those choices into ordinary elements of one larger collection.",
-      "tutorial": "The **power set** of $A$ is\n\n$$\\mathcal{P}(A):=\\{S:S\\subseteq A\\},$$\n\nwhere the variable $S$ ranges over sets. Its elements are subsets, not the original elements of $A$. The empty set belongs to every power set because $\\varnothing\\subseteq A$, and $A$ itself belongs because $A\\subseteq A$. Do not confuse $a\\in A$ with $\\{a\\}\\in\\mathcal{P}(A)$: the first relates an object to $A$, while the second treats a singleton set as an element of the power set.",
+      "tutorial": "The **power set** of $A$ is\n\n$$\\mathcal{P}(A):=\\{S:S\\subseteq A\\},$$\n\nwhere the variable $S$ ranges over sets. Its elements are subsets, not the original elements of $A$. The **empty set** $\\varnothing$ is the set with no elements. It belongs to every power set because $\\varnothing\\subseteq A$, and $A$ itself belongs because $A\\subseteq A$. Do not confuse $a\\in A$ with $\\{a\\}\\in\\mathcal{P}(A)$: the first relates an object to $A$, while the second treats a singleton set as an element of the power set.",
       "keyIdea": "Elements of $\\mathcal{P}(A)$ are sets selected from $A$.",
       "examples": [
         {
@@ -1600,15 +1821,14 @@
     },
     {
       "id": "K24",
-      "contentSha256": "030858b1a15e3d594c69222593a6d9ec365aa5ad883c3972cd28b0a262130646",
+      "contentSha256": "414e92b43bc3ec07b9099f0082d98bb89aa6caf42579d3ab4c16b2854855a99d",
       "slug": "ordered-pairs-and-products",
       "chapterId": "sets",
-      "section": "5.5",
+      "section": "13.5",
       "title": "Ordered pairs and Cartesian products",
       "kind": "definition",
       "purpose": "Represent two-coordinate data whose first and second positions have different roles.",
       "prerequisiteIds": [
-        "K04",
         "K20"
       ],
       "notationIds": [
@@ -1658,17 +1878,16 @@
     },
     {
       "id": "K25",
-      "contentSha256": "4bb144cf072855ca96579ed613939e0a6fd0e216095b722a1ff086a68c677ecd",
+      "contentSha256": "b67b8b5bd88136cdc399a4023e6d31209a33701630f2633091f0ada108df02c6",
       "slug": "set-identities-by-elements",
       "chapterId": "sets",
-      "section": "5.6",
+      "section": "13.6",
       "title": "Set identities by following an element",
       "kind": "theorem",
       "purpose": "Prove two constructed sets equal by translating membership into logic and back again.",
       "prerequisiteIds": [
         "K14",
         "K15",
-        "K21",
         "K22"
       ],
       "notationIds": [
@@ -1721,17 +1940,14 @@
     },
     {
       "id": "K26",
-      "contentSha256": "778fbd6043478fa2c5706be17f8fa806e04c72df20a0f37947c5369355170b1d",
+      "contentSha256": "32e5fc77c94616c0d7206a6ac2d5543c27daf348982e2412565492de8303a873",
       "slug": "functions-domain-codomain-equality",
       "chapterId": "functions",
-      "section": "6.1",
+      "section": "14.1",
       "title": "Functions, domains, and codomains",
       "kind": "definition",
       "purpose": "Treat a function as a typed assignment with exactly one output for every allowed input.",
       "prerequisiteIds": [
-        "K02",
-        "K04",
-        "K13",
         "K24"
       ],
       "notationIds": [
@@ -1744,16 +1960,16 @@
       "examples": [
         {
           "title": "A finite typed function",
-          "body": "The declaration $f:\\{0,1,2\\}\\to\\mathbb Z$ with $f(x):=x^2-1$ gives the values $-1,0,3$. Each domain element receives one integer output."
+          "body": "Let $A=\\{r,b,g\\}$ and $B=\\{\\text{circle},\\text{square}\\}$. The assignments $f(r)=\\text{circle}$, $f(b)=\\text{square}$, and $f(g)=\\text{circle}$ define a function $f:A\\to B$. Each element of $A$ receives exactly one element of $B$; outputs are allowed to repeat."
         }
       ],
       "exercise": {
-        "prompt": "Does the rule 'send each real $x$ to a real $y$ satisfying $y^2=x$' define a function $\\mathbb R\\to\\mathbb R$? Explain both possible failures.",
+        "prompt": "Let $A=\\{a,b,c\\}$ and $B=\\{u,v\\}$. Does the proposed assignment $\\{(a,u),(b,u),(b,v)\\}$ define a function $A\\to B$? Explain both failures.",
         "hints": [
-          "Test a negative input.",
-          "For a positive input, count the real square roots."
+          "Check whether every element of $A$ appears as a first coordinate.",
+          "Check whether any first coordinate is paired with two outputs."
         ],
-        "solution": "No. A negative real input has no real output satisfying the rule, so the assignment is not total. A positive input such as 4 has two possible outputs, 2 and $-2$, so the rule is also not single-valued."
+        "solution": "No. The input $c$ has no assigned output, so the assignment is not total on $A$. The input $b$ is paired with both $u$ and $v$, so the assignment is not single-valued. Either failure is enough to prevent a function $A\\to B$."
       },
       "sourceRefs": [
         {
@@ -1781,15 +1997,14 @@
     },
     {
       "id": "K27",
-      "contentSha256": "2217748c0b00a4d3b0d3fc69d94aaa3e5c299d19d6671b05b6db8dcbee279fe3",
+      "contentSha256": "835448f425743a316cad62ecc6485a833413a04e2d9abc19938f54136adb3a81",
       "slug": "images-and-preimages",
       "chapterId": "functions",
-      "section": "6.2",
+      "section": "14.2",
       "title": "Images and preimages",
       "kind": "definition",
       "purpose": "Move whole sets forward or backward through a function without pretending that the function is invertible.",
       "prerequisiteIds": [
-        "K20",
         "K21",
         "K26"
       ],
@@ -1842,10 +2057,10 @@
     },
     {
       "id": "K28",
-      "contentSha256": "386571f7bd76f736dd4a55d81a9a59803eb2894d83a4ed667b61f5ff36b93def",
+      "contentSha256": "90b8e8abafb94a51a22b5cb9b6ed924e3bf7e63d3f6bf6570e7140283bccdbd2",
       "slug": "composition-and-identity",
       "chapterId": "functions",
-      "section": "6.3",
+      "section": "14.3",
       "title": "Composition and identity functions",
       "kind": "definition",
       "purpose": "Combine compatible functions in the correct order and recognize the function that changes nothing.",
@@ -1899,17 +2114,17 @@
     },
     {
       "id": "K29",
-      "contentSha256": "7eef438be8aba3c0407f1ce5df0b8645428e6f3ef323436d1327a6182b738560",
+      "contentSha256": "ac6797bb0f07330d77cb7b2bfb686fae4d845b1be9251e9f4db6634071db1630",
       "slug": "injective-surjective-bijective",
       "chapterId": "functions",
-      "section": "6.4",
+      "section": "14.4",
       "title": "Injective, surjective, and bijective functions",
       "kind": "definition",
       "purpose": "Separate loss of input information from failure to reach the whole codomain.",
       "prerequisiteIds": [
         "K12",
-        "K13",
-        "K26"
+        "K26",
+        "K53"
       ],
       "notationIds": [
         "implication",
@@ -1960,10 +2175,10 @@
     },
     {
       "id": "K30",
-      "contentSha256": "d0b93e334d6b010b6bc8217a35371859a64e3aa19c6dae1078d0a042d18ade1f",
+      "contentSha256": "c5d79941ba4fd2189293dce45045e9d8217d62070cffbb2b5b8ec80b3aabdb67",
       "slug": "inverse-functions-and-bijections",
       "chapterId": "functions",
-      "section": "6.5",
+      "section": "14.5",
       "title": "A function is invertible exactly when it is bijective",
       "kind": "theorem",
       "purpose": "Characterize when a function can be undone in both directions and show that the undoing function is unique.",
@@ -2019,6 +2234,1654 @@
         "bijection",
         "theorem",
         "uniqueness"
+      ]
+    },
+    {
+      "id": "K31",
+      "contentSha256": "25044a822f942e558ec75c2b686d25efed8b6b54913917b34d39321c820d2ad1",
+      "slug": "quantities-objects-and-units",
+      "chapterId": "quantity-units",
+      "section": "1.1",
+      "title": "A quantity is an attribute reported with a value and a unit",
+      "kind": "definition",
+      "purpose": "Separate the object being studied from what is measured, the numerical value, and the unit used to report it.",
+      "prerequisiteIds": [],
+      "notationIds": [],
+      "motivation": "Before calculating, we must know what the numbers describe. The same numeral can mean a count, a length, a duration, or a price, and those claims cannot be exchanged without explanation.",
+      "tutorial": "An object is a thing under discussion. An attribute is a feature of that object that we choose to compare, such as length, mass, duration, or number of pieces. A quantity is the result of making that comparison precise. We report a measured quantity using a numerical value together with a unit. In the statement “the board is 2 metres long,” the board is the object, length is the attribute, 2 is the numerical value, and metre is the unit. A count such as “2 boards” has a counting unit—boards—even when it is left unspoken. Units are part of the mathematical meaning: 2 metres and 2 centimetres have the same numerical value but different lengths. Only quantities of the same kind can be directly added or compared after their units have been made compatible.",
+      "keyIdea": "A bare number does not describe a measurement; meaning comes from the attribute and unit attached to it.",
+      "examples": [
+        {
+          "title": "One numeral, different quantities",
+          "body": "The reports “3 apples,” “3 kilograms,” and “3 minutes” all contain the numeral 3, but they answer different questions and cannot be substituted for one another."
+        },
+        {
+          "title": "Compatible units",
+          "body": "A 2-metre board and a 50-centimetre offcut are both lengths. Using the stated conversion $1$ metre $=100$ centimetres, the board can be reported as 200 centimetres. A later lesson will define how compatible lengths are added."
+        }
+      ],
+      "exercise": {
+        "prompt": "In the statement “the bottle contains 750 millilitres of water,” identify the object, attribute, numerical value, and unit. Explain why adding 2 kilograms to this quantity would be meaningless without more information.",
+        "hints": [
+          "Ask which thing is being described and which feature of it is measured.",
+          "Millilitres measure volume, while kilograms measure mass."
+        ],
+        "solution": "The object is the water in the bottle, the attribute is volume, the numerical value is 750, and the unit is millilitre. Two kilograms is a mass, not a volume. A relationship such as the density of the material would be needed to convert between them, so they cannot simply be added."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial comparison for elementary quantities, measurement, and unit language; the lesson is independently written."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 7,
+      "tags": [
+        "quantity",
+        "measurement",
+        "units",
+        "meaning"
+      ]
+    },
+    {
+      "id": "K32",
+      "contentSha256": "2766c0cc8ab3657664c76db339afbe1fa0412daeb202c885c8f86b5f86f8e97b",
+      "slug": "matching-and-counting",
+      "chapterId": "counting-place-value",
+      "section": "2.1",
+      "title": "Counting records one-to-one matching",
+      "kind": "definition",
+      "purpose": "Construct whole-number counts from the act of matching objects with a fixed ordered list of number words.",
+      "prerequisiteIds": [
+        "K02"
+      ],
+      "notationIds": [
+        "natural-numbers"
+      ],
+      "motivation": "A person can decide whether two small collections have the same size without already knowing their sizes: pair each object in one collection with exactly one object in the other.",
+      "tutorial": "Two finite collections have the same number of objects when their objects can be paired so that every object belongs to exactly one pair. Counting is a standard way to build such a pairing. For a finite nonempty collection, point to one previously uncounted object for each word in the ordered list one, two, three, and so on; the last word used reports the number of objects. The empty collection has count zero. The result must not depend on the order in which the objects are visited: changing the route changes the pairings but not how many pairings are completed. We use the symbol $\\mathbb N$ for the whole-number counts $0,1,2,3,\\ldots$. Each next count is obtained by adjoining one new object. Counting therefore compresses two ideas into one: a finite collection’s size and its position in an endless ordered sequence. Infinite collections require a later notion of cardinality; this procedure defines finite counting only.",
+      "keyIdea": "A finite count is stable because it records how many one-to-one pairings with the counting sequence can be completed before the objects run out.",
+      "examples": [
+        {
+          "title": "Matching without numerals",
+          "body": "Place one cup beside each plate. If neither cups nor plates remain, the two collections have equal size even if nobody says the number."
+        },
+        {
+          "title": "Zero",
+          "body": "A shelf with no books has count 0. Zero is a number reporting that the counting process uses no positive counting word."
+        }
+      ],
+      "exercise": {
+        "prompt": "Describe a procedure for checking whether a row of seven chairs and a group of seven people have the same size without recounting either group. What observation shows that the sizes differ if one person remains standing?",
+        "hints": [
+          "Pair one person with one chair.",
+          "A complete one-to-one match must leave nothing on either side."
+        ],
+        "solution": "Seat at most one person in each chair and assign at most one chair to each person. If every person is seated and every chair is occupied, the groups have the same size. If one person remains after every chair is occupied, no complete one-to-one pairing exists, so there are more people than chairs."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for whole-number foundations and counting vocabulary."
+        },
+        {
+          "sourceId": "levin-discrete",
+          "note": "Editorial reference for one-to-one correspondence as a common language for finite size."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 8,
+      "tags": [
+        "counting",
+        "matching",
+        "natural numbers",
+        "zero"
+      ]
+    },
+    {
+      "id": "K33",
+      "contentSha256": "1bf1d75c7beb8e08ac2bb0e02b657de179b929f8082caa447b35a5759aad842c",
+      "slug": "base-ten-place-value",
+      "chapterId": "counting-place-value",
+      "section": "2.2",
+      "title": "Place value is a compressed count of groups",
+      "kind": "method",
+      "purpose": "Read and build decimal numerals by repeatedly grouping ten units of one size into one unit of the next size.",
+      "prerequisiteIds": [
+        "K32"
+      ],
+      "notationIds": [
+        "natural-numbers"
+      ],
+      "motivation": "Writing one mark for every object becomes unusable for large counts. Place value stores the same information in a short sequence of digits.",
+      "tutorial": "The decimal system uses ten digits, $0$ through $9$. A digit’s place tells which bundle it counts. Moving one place left makes the bundle ten times as large: ones, tens, hundreds, thousands, and so on. Thus $4{,}072$ means four thousand-bundles, no hundred-bundles, seven ten-bundles, and two single units. Reading a numeral in this expanded verbal form makes the hidden groups visible without yet calculating with them. The zero is essential because it holds an empty place. Regrouping changes the description but not the count: one hundred-bundle can be exchanged for ten ten-bundles, and one ten-bundle for ten single units. Later addition, subtraction, multiplication, decimals, and scientific notation all reuse this positional idea.",
+      "keyIdea": "A numeral is not the number itself; it is a code whose positions count successively larger bundles.",
+      "examples": [
+        {
+          "title": "Decode a numeral",
+          "body": "$305$ represents three hundred-bundles, no ten-bundles, and five single units. The zero keeps the tens place visible."
+        },
+        {
+          "title": "Regroup without changing value",
+          "body": "$24$ can be described as 2 tens and 4 ones, or as 1 ten and 14 ones. Both descriptions count the same total."
+        }
+      ],
+      "exercise": {
+        "prompt": "Write $6{,}091$ in expanded form. Then regroup one thousand as hundreds and describe the same number using 5 thousands, hundreds, tens, and ones.",
+        "hints": [
+          "Keep the zero hundreds place visible in expanded form.",
+          "One thousand equals ten hundreds."
+        ],
+        "solution": "$6{,}091$ means six thousand-bundles, no hundred-bundles, nine ten-bundles, and one single unit. Regrouping one thousand gives five thousand-bundles, ten hundred-bundles, nine ten-bundles, and one single unit."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for decimal notation, place value, and regrouping."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Decode a base-ten numeral into an explicit sum of digit values and justify a regrouping as an equality.",
+      "readMinutes": 8,
+      "tags": [
+        "numerals",
+        "place value",
+        "base ten",
+        "regrouping"
+      ]
+    },
+    {
+      "id": "K34",
+      "contentSha256": "3f852fcb637fbdb541e70fbe206509c27e1e0f657e6edc07988248347eb2f7cd",
+      "slug": "order-and-number-line",
+      "chapterId": "counting-place-value",
+      "section": "2.3",
+      "title": "Order places numbers on a line",
+      "kind": "definition",
+      "purpose": "Connect greater-than comparison, counting order, and position on a number line.",
+      "prerequisiteIds": [
+        "K33"
+      ],
+      "notationIds": [
+        "natural-numbers"
+      ],
+      "motivation": "Numbers report not only how many but also which quantities are larger and how far apart they lie.",
+      "tutorial": "On a number line, equal steps represent equal changes in value. For whole numbers, start at 0 and place each next count one step to the right. Let the letters $a$ and $b$ stand for whole numbers. If $a$ lies to the left of $b$, write $a<b$; equivalently, $b>a$. The symbols $a\\le b$ and $b\\ge a$ allow equality as well. A comparison is about values, not numeral length alone: place value explains why $305>99$. Exactly one of $a<b$, $a=b$, or $a>b$ holds for any two whole numbers. Distance asks a different question from order: it measures the number of equal steps between positions and never becomes negative.",
+      "keyIdea": "Order is position relative to another value; distance is the nonnegative separation between positions.",
+      "examples": [
+        {
+          "title": "Compare by the first differing place",
+          "body": "$4{,}218<4{,}281$ because the thousands and hundreds match, while 1 ten is less than 8 tens."
+        },
+        {
+          "title": "Order versus distance",
+          "body": "$2<7$, while the distance from 2 to 7 is 5 steps. Reversing the endpoints changes the direction but not the distance."
+        }
+      ],
+      "exercise": {
+        "prompt": "Place $0$, $4$, $6$, and $9$ in order. Which pair is 3 steps apart? Give all answers.",
+        "hints": [
+          "Read from left to right for increasing order.",
+          "Check the gap in both directions; distance itself is not directed."
+        ],
+        "solution": "The order is $0<4<6<9$. Among the listed values, only 6 and 9 are 3 steps apart."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for whole-number comparison and number-line models."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 8,
+      "tags": [
+        "order",
+        "comparison",
+        "number line",
+        "distance"
+      ]
+    },
+    {
+      "id": "K35",
+      "contentSha256": "a6e6f0758331f526344cca5396906239f964fd7eee8e11c2f3f08fd51f7a4aab",
+      "slug": "addition-combining-translating",
+      "chapterId": "arithmetic-operations",
+      "section": "3.1",
+      "title": "Addition combines amounts and records forward change",
+      "kind": "definition",
+      "purpose": "Give addition one meaning that covers joining collections, translating on a number line, and accumulating compatible quantities.",
+      "prerequisiteIds": [
+        "K34"
+      ],
+      "notationIds": [
+        "natural-numbers"
+      ],
+      "motivation": "The same operation appears when objects are joined, distances are traveled in succession, and repeated changes accumulate.",
+      "tutorial": "For whole numbers, $a+b$ is the count obtained by starting with $a$ objects and adjoining $b$ new objects, with no object counted twice. On the number line it is the position reached by starting at $a$ and moving $b$ unit steps to the right. These views agree because each added object advances the count by one. Addition has an identity, $a+0=a$. The order of joining does not matter, so $a+b=b+a$. Grouping also does not matter: $(a+b)+c=a+(b+c)$. These laws describe the operation; they are not permissions to ignore units. Three metres plus two metres is five metres, while three metres plus two seconds is not defined as a length.",
+      "keyIdea": "Addition accumulates like quantities, and its laws express that the final total ignores joining order and grouping.",
+      "examples": [
+        {
+          "title": "Disjoint groups",
+          "body": "A tray with 8 red counters and 5 blue counters has $8+5=13$ counters when no counter belongs to both groups."
+        },
+        {
+          "title": "Successive movement",
+          "body": "Starting at 4 and moving 3 steps right reaches 7, so $4+3=7$."
+        }
+      ],
+      "exercise": {
+        "prompt": "Explain using grouped objects why $(2+3)+4$ and $2+(3+4)$ must give the same total. Then compute it.",
+        "hints": [
+          "Imagine three distinguishable piles.",
+          "Changing parentheses changes which piles are joined first, not which objects are present."
+        ],
+        "solution": "Both expressions join the same three nonoverlapping piles of sizes 2, 3, and 4. Parentheses only specify the first joining. Therefore the totals agree by associativity, and both equal 9."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for whole-number addition, models, and operation laws."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 8,
+      "tags": [
+        "addition",
+        "combining",
+        "number line",
+        "units"
+      ]
+    },
+    {
+      "id": "K36",
+      "contentSha256": "576d9998c64d2ead0c069e0245c5e25cc9941c005123dca6dbd62da201563b68",
+      "slug": "subtraction-inverse-distance",
+      "chapterId": "arithmetic-operations",
+      "section": "3.2",
+      "title": "Subtraction finds a missing addend or a directed change",
+      "kind": "definition",
+      "purpose": "Unify take-away, comparison, and missing-addend interpretations while preserving their different questions.",
+      "prerequisiteIds": [
+        "K35"
+      ],
+      "notationIds": [
+        "natural-numbers"
+      ],
+      "motivation": "“How many remain?”, “How much larger?”, and “What must be added?” look different, but each can be expressed by undoing addition.",
+      "tutorial": "For whole numbers $a,b,c$ with $a\\ge b$, the equation $a-b=c$ means $c+b=a$. Thus subtraction asks for a missing addend. It can also describe removing $b$ objects from $a$, leaving $c$. On a number line, $a-b$ measures the forward distance from $b$ to $a$ when $a\\ge b$. Subtraction is not commutative: $8-3=5$, but $3-8$ is not a whole number. It is also not associative. Distance between whole numbers is obtained by subtracting the smaller from the larger, so distance is nonnegative. A later signed-number extension will define subtraction when the first value is smaller.",
+      "keyIdea": "Subtraction is defined by addition: $a-b$ is the value that must be added to $b$ to recover $a$.",
+      "examples": [
+        {
+          "title": "Missing addend",
+          "body": "$12-7=5$ because $5+7=12$. This verifies the subtraction without relying on a memorized fact in isolation."
+        },
+        {
+          "title": "Comparison",
+          "body": "A 12-centimetre strip is 5 centimetres longer than a 7-centimetre strip because $12-7=5$."
+        }
+      ],
+      "exercise": {
+        "prompt": "A tank contains 18 litres and later contains 11 litres. Express the amount removed as a subtraction and verify the answer with addition.",
+        "hints": [
+          "For the amount removed, subtract the later amount from the earlier amount.",
+          "Your answer plus 11 should equal 18."
+        ],
+        "solution": "The amount removed is $18-11=7$ litres. The check is $7+11=18$. If one instead reports final minus initial, the directed change is $11-18$, which requires negative numbers introduced later."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for subtraction models and inverse-operation checks."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 8,
+      "tags": [
+        "subtraction",
+        "inverse operation",
+        "difference",
+        "distance"
+      ]
+    },
+    {
+      "id": "K37",
+      "contentSha256": "40fdaa3b3e2a3c5cb146f799cc099bbf5cc1003fc5230cf9f4214cdc28b19e0d",
+      "slug": "multiplication-arrays-scaling",
+      "chapterId": "arithmetic-operations",
+      "section": "3.3",
+      "title": "Multiplication counts equal groups and scales quantities",
+      "kind": "definition",
+      "purpose": "Connect repeated equal groups, rectangular arrays, and scaling as manifestations of multiplication.",
+      "prerequisiteIds": [
+        "K35"
+      ],
+      "notationIds": [
+        "natural-numbers"
+      ],
+      "motivation": "Repeated addition is common, but the deeper reusable idea is that one quantity controls how many equal copies of another are taken.",
+      "tutorial": "For whole numbers, $a\\cdot b$ counts $a$ groups with $b$ objects in every group. A rectangular array with $a$ rows and $b$ columns displays the same product. Rotating the array shows $a\\cdot b=b\\cdot a$. Combining adjacent rectangles explains distribution: $a(b+c)=ab+ac$. The identities are $1\\cdot a=a$ and $0\\cdot a=0$. Multiplication also scales: $3\\cdot 5$ metres means three copies of a 5-metre length. This scaling interpretation survives when the multiplier is a fraction or negative number, where “repeated addition” becomes inadequate. Units reveal another distinction: 3 groups times 5 metres per group gives 15 metres, while 3 metres times 5 metres gives 15 square metres.",
+      "keyIdea": "Multiplication applies a scale factor or counts a grid of equal choices; repeated addition is its first finite model.",
+      "examples": [
+        {
+          "title": "Array and commutativity",
+          "body": "Four rows of 6 dots contain 24 dots. Rotating the array gives 6 rows of 4, showing $4\\cdot6=6\\cdot4=24$."
+        },
+        {
+          "title": "Distribute a rectangle",
+          "body": "$7\\cdot13=7(10+3)=7\\cdot10+7\\cdot3=91$. The split creates two nonoverlapping rectangles with the same total area."
+        }
+      ],
+      "exercise": {
+        "prompt": "Use an array or area argument to explain why $5\\cdot(8+2)=5\\cdot8+5\\cdot2$, then evaluate both sides.",
+        "hints": [
+          "Draw a rectangle 5 units high and 10 units wide.",
+          "Cut its width after 8 units."
+        ],
+        "solution": "The $5$-by-$10$ rectangle splits into a $5$-by-$8$ rectangle and a $5$-by-$2$ rectangle without overlap or gaps. Therefore $5(8+2)=5\\cdot8+5\\cdot2=40+10=50$."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for multiplication models, properties, and unit interpretation."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 9,
+      "tags": [
+        "multiplication",
+        "arrays",
+        "scaling",
+        "distributive law"
+      ]
+    },
+    {
+      "id": "K38",
+      "contentSha256": "33d72c4efdac4fab3d7c2fa6b57f7b251a0f69c4e199f97bc1574bbbaa3175c6",
+      "slug": "division-quotient-remainder",
+      "chapterId": "division-divisibility",
+      "section": "4.1",
+      "title": "Division reverses multiplication and records remainders",
+      "kind": "method",
+      "purpose": "Distinguish equal sharing, measurement division, and whole-number quotient with remainder through one equation.",
+      "prerequisiteIds": [
+        "K36",
+        "K37"
+      ],
+      "notationIds": [
+        "natural-numbers"
+      ],
+      "motivation": "A division problem may ask for the size of each group or the number of groups. Both are solved by finding a missing factor.",
+      "tutorial": "Let $a$ be a whole-number amount and let $b$ be a positive whole-number group size. Dividing $a$ by $b$ asks how many complete groups of size $b$ fit into $a$. The quotient $q$ and remainder $r$ satisfy $a=bq+r$ with $0\\le r<b$. The bound on $r$ matters: if $r\\ge b$, another complete group still fits. For $17$ objects grouped by $5$, we obtain $17=5\\cdot3+2$, so the quotient is 3 and the remainder is 2. Equal sharing asks for group size instead, but multiplication connects the two questions. Division by zero is undefined: there is no unique number $q$ satisfying $a=0\\cdot q$, and for nonzero $a$ there is none at all. Always check division by reconstructing the original amount from divisor, quotient, and remainder.",
+      "keyIdea": "Whole-number division is summarized by $a=bq+r$ with $b>0$ and $0\\le r<b$.",
+      "examples": [
+        {
+          "title": "Exact division",
+          "body": "$24=6\\cdot4+0$, so $24$ divided by $6$ has quotient 4 and remainder 0."
+        },
+        {
+          "title": "A remainder",
+          "body": "$29=4\\cdot7+1$, so seven complete groups of 4 fit into 29 and one object remains."
+        }
+      ],
+      "exercise": {
+        "prompt": "Find the quotient and remainder when 53 is divided by 8, and verify all required conditions.",
+        "hints": [
+          "Find the largest multiple of 8 not exceeding 53.",
+          "The remainder must be at least 0 and less than 8."
+        ],
+        "solution": "$8\\cdot6=48$ and $53-48=5$, so $53=8\\cdot6+5$. The quotient is 6, the remainder is 5, and $0\\le5<8$."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for division models, quotient language, and checking by multiplication."
+        },
+        {
+          "sourceId": "mit-mcs",
+          "note": "Editorial comparison for the quotient-remainder equation reused in discrete mathematics."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Given a whole-number division, produce quotient and remainder, verify $a=bq+r$, and verify $0\\le r<b$.",
+      "readMinutes": 9,
+      "tags": [
+        "division",
+        "quotient",
+        "remainder",
+        "inverse operation"
+      ]
+    },
+    {
+      "id": "K39",
+      "contentSha256": "b08a3e21db9e2d7ea21880a4d38fc3922e5154559091934de4fa3050e05b023b",
+      "slug": "factors-multiples-divisibility",
+      "chapterId": "division-divisibility",
+      "section": "4.2",
+      "title": "Divisibility means exact whole-number scaling",
+      "kind": "theorem",
+      "purpose": "Define factors and multiples algebraically and derive the transitivity of divisibility.",
+      "prerequisiteIds": [
+        "K38"
+      ],
+      "notationIds": [
+        "natural-numbers",
+        "divisibility"
+      ],
+      "motivation": "Remainder zero is the signal behind evenness, factorization, common denominators, modular arithmetic, and many algorithms.",
+      "tutorial": "For a positive whole number $a$ and a whole number $b$, we say $a$ divides $b$, written $a\\mid b$, when there is a whole number $k$ such that $b=ak$. Then $a$ is a factor of $b$, and $b$ is a multiple of $a$. Equivalently, division of $b$ by $a$ has remainder zero. Every positive whole number divides 0 because $0=a\\cdot0$. Divisibility is transitive. If $a\\mid b$ and $b\\mid c$, choose whole numbers $m,n$ with $b=am$ and $c=bn$. Substitution gives $c=(am)n=a(mn)$, and $mn$ is a whole number, so $a\\mid c$. The proof is a reusable pattern: unpack an existence definition, name its witnesses, combine them, and repack the conclusion. Signed divisibility will use the same definition after negative integers are available.",
+      "keyIdea": "$a\\mid b$ is an existence claim: $b$ is a whole-number-scaled copy of $a$.",
+      "examples": [
+        {
+          "title": "An exact factor",
+          "body": "$4\\mid28$ because the whole-number witness 7 satisfies $28=4\\cdot7$."
+        },
+        {
+          "title": "Nonexample",
+          "body": "$6\\nmid20$ because no whole number $k$ satisfies $20=6k$; division leaves remainder 2."
+        }
+      ],
+      "exercise": {
+        "prompt": "Let $a$ be positive and let $b,c$ be whole numbers. Prove: if $a\\mid b$ and $a\\mid c$, then $a\\mid(b+c)$.",
+        "hints": [
+          "Introduce whole-number witnesses $m$ and $n$.",
+          "Factor $a$ from the sum."
+        ],
+        "solution": "Because $a\\mid b$, there is a whole number $m$ with $b=am$. Because $a\\mid c$, there is a whole number $n$ with $c=an$. Hence $b+c=am+an=a(m+n)$. Since $m+n$ is a whole number, the definition gives $a\\mid(b+c)$."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for factor and multiple vocabulary."
+        },
+        {
+          "sourceId": "sundstrom-reasoning",
+          "note": "Editorial reference for witness-based proofs from the definition of divisibility."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Prove a closure or transitivity statement about divisibility by explicitly composing whole-number witnesses.",
+      "readMinutes": 10,
+      "tags": [
+        "divisibility",
+        "factors",
+        "multiples",
+        "witness"
+      ]
+    },
+    {
+      "id": "K40",
+      "contentSha256": "aa040bfc5a295200cbad6dea3a0a7c404fb0f628641e65b2d5ace0f7f3e38634",
+      "slug": "negative-integers-directed-change",
+      "chapterId": "signed-numbers",
+      "section": "5.1",
+      "title": "Negative integers record opposite direction",
+      "kind": "definition",
+      "purpose": "Extend whole numbers so every whole-number subtraction has an answer and direction is encoded by sign.",
+      "prerequisiteIds": [
+        "K36"
+      ],
+      "notationIds": [
+        "integers"
+      ],
+      "motivation": "A temperature can fall below zero, a balance can become debt, and a motion can reverse direction. Whole numbers alone cannot record these changes.",
+      "tutorial": "For every positive whole number $a$, introduce an opposite $-a$ so that $a+(-a)=0$. The integers are $\\mathbb Z=\\{\\ldots,-2,-1,0,1,2,\\ldots\\}$. On the number line, positive values lie right of 0 and negative values lie left. The minus sign has two related roles: in $-5$ it names the opposite of 5; in $a-b$ it asks to add the opposite of $b$. Thus $3-8=3+(-8)=-5$. A sign describes direction relative to zero, not physical badness: a negative change can be useful, and a negative coordinate is simply a location. Opposites have equal separation from zero and sum to zero.",
+      "keyIdea": "Adding an opposite extends the number line so subtraction becomes addition of a directed quantity.",
+      "examples": [
+        {
+          "title": "Debt",
+          "body": "If a balance of 3 dollars is charged 8 dollars, the new balance is $3-8=-5$ dollars, representing a 5-dollar debt."
+        },
+        {
+          "title": "Opposite directions",
+          "body": "If east is positive, a displacement of $-4$ kilometres means 4 kilometres west."
+        }
+      ],
+      "exercise": {
+        "prompt": "A temperature is $2^\\circ\\mathrm C$ and falls by $7^\\circ\\mathrm C$. Write the calculation as addition of an opposite and locate the result relative to zero.",
+        "hints": [
+          "A fall of 7 is a change of $-7$.",
+          "Move seven steps left from 2."
+        ],
+        "solution": "$2+(-7)=-5$. The result is 5 units to the left of zero, so the temperature is $-5^\\circ\\mathrm C$."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for integer models, opposites, and signed change."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 8,
+      "tags": [
+        "integers",
+        "negative numbers",
+        "opposites",
+        "directed change"
+      ]
+    },
+    {
+      "id": "K41",
+      "contentSha256": "e4b137b0f11f349c33ceb4202e7cc4ea16bc5c04a9ee6941d18c80392c0679e4",
+      "slug": "absolute-value-distance",
+      "chapterId": "signed-numbers",
+      "section": "5.2",
+      "title": "Absolute value is distance from zero",
+      "kind": "definition",
+      "purpose": "Define absolute value geometrically and distinguish magnitude from sign.",
+      "prerequisiteIds": [
+        "K40"
+      ],
+      "notationIds": [
+        "absolute-value"
+      ],
+      "motivation": "Many questions care about how far a value is from a reference point, not which side it lies on.",
+      "tutorial": "For an integer $x$, the absolute value $|x|$ is the distance from $x$ to 0 on the integer number line. Therefore $|x|\\ge0$, $|5|=5$, and $|-5|=5$. It does not mean “delete a minus sign”; its definition is distance. The distance between integers $a$ and $b$ is $|a-b|$. This works in either order because $a-b$ and $b-a$ are opposites and opposites have the same absolute value. The equation $|x|=3$ has the integer solutions $x=3$ and $x=-3$, because both points are three units from zero. The inequality $|x|<3$ selects the integers $-2,-1,0,1,2$.",
+      "keyIdea": "Sign gives direction; absolute value forgets direction and keeps nonnegative distance.",
+      "examples": [
+        {
+          "title": "Distance between two values",
+          "body": "The distance from $-2$ to 5 is $|5-(-2)|=|7|=7$."
+        },
+        {
+          "title": "Two positions, one distance",
+          "body": "$|x|=4$ means that $x$ is four units from 0, so $x=4$ or $x=-4$."
+        }
+      ],
+      "exercise": {
+        "prompt": "Find all integers $x$ satisfying $|x-2|=5$ and explain the answer on a number line.",
+        "hints": [
+          "The expression measures the distance from $x$ to 2.",
+          "Move five units in each direction from 2."
+        ],
+        "solution": "The points five units from 2 are $2+5=7$ and $2-5=-3$. Thus $x=7$ or $x=-3$."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for absolute value and distance on the number line."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 8,
+      "tags": [
+        "absolute value",
+        "distance",
+        "magnitude",
+        "number line"
+      ]
+    },
+    {
+      "id": "K42",
+      "contentSha256": "3909d572859019e25b95fa7ee49d97f1e55159f35744b052cb093dbb96b449e1",
+      "slug": "signed-arithmetic",
+      "chapterId": "signed-numbers",
+      "section": "5.3",
+      "title": "Signed arithmetic follows direction and inverse laws",
+      "kind": "law",
+      "purpose": "Derive reliable rules for adding and multiplying signed integers from opposites and distributivity.",
+      "prerequisiteIds": [
+        "K37",
+        "K41"
+      ],
+      "notationIds": [
+        "integers",
+        "absolute-value"
+      ],
+      "motivation": "Sign rules are easy to forget when taught as slogans. They become necessary consequences when operations must continue to obey the same laws.",
+      "tutorial": "To add integers with the same sign, combine their magnitudes and keep the direction. To add opposite signs, cancel opposite pairs; the uncancelled magnitude keeps the direction of the larger magnitude. Subtraction is addition of an opposite: $a-b=a+(-b)$. Multiplication by $-1$ takes an opposite. Distributivity forces the product rules. Since $0=(-1)\\cdot0=(-1)(1+(-1))=(-1)\\cdot1+(-1)(-1)=-1+(-1)(-1)$, adding 1 gives $(-1)(-1)=1$. Consequently equal signs give a positive product and opposite signs a negative product. These rules apply to integers and later to real numbers; they do not license dropping signs from additions.",
+      "keyIdea": "Signed rules are consequences of opposites, cancellation, and distributivity, not independent memorization.",
+      "examples": [
+        {
+          "title": "Cancellation in addition",
+          "body": "$-7+3=-4$: three positive units cancel three of the seven negative units, leaving four negative units."
+        },
+        {
+          "title": "Product signs",
+          "body": "$(-4)(-3)=12$ and $(-4)(3)=-12$. In both cases the magnitude is $4\\cdot3$; the signs determine direction."
+        }
+      ],
+      "exercise": {
+        "prompt": "Evaluate $-6-(-9)$ and $(-6)(-9)$, explaining why the two sign patterns lead to different operations.",
+        "hints": [
+          "Replace subtraction by addition of an opposite.",
+          "For the product, use the rule forced by distributivity."
+        ],
+        "solution": "$-6-(-9)=-6+9=3$. This is addition after reversing the sign of the subtracted number. The product is $(-6)(-9)=54$ because a product of two negatives is positive."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for integer operations and signed-number models."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Derive a signed multiplication identity from distributivity, additive inverses, and previously established identities.",
+      "readMinutes": 10,
+      "tags": [
+        "signed arithmetic",
+        "integers",
+        "distributivity",
+        "opposites"
+      ]
+    },
+    {
+      "id": "K43",
+      "contentSha256": "0d0f6c53c7843a738846ab085cc1213da27fcfb54815f9197a5811f085016379",
+      "slug": "fractions-numbers-quotients",
+      "chapterId": "fractions",
+      "section": "6.1",
+      "title": "A fraction is a number determined by a quotient",
+      "kind": "definition",
+      "purpose": "Place fractions on the number line and unify partition, quotient, and scaling interpretations.",
+      "prerequisiteIds": [
+        "K38",
+        "K42"
+      ],
+      "notationIds": [
+        "integers",
+        "fraction"
+      ],
+      "motivation": "Whole numbers cannot name every measurement or every result of equal sharing. Fractions fill those gaps without changing the meaning of arithmetic.",
+      "tutorial": "Let $a$ and $b$ be integers with $b\\ne0$. We extend the number line by defining the fraction $a/b$ to be the number $x$ satisfying $b\\cdot x=a$. The number $a$ is the numerator and $b$ is the denominator. We use a positive denominator as the canonical written form: if $b<0$, rewrite $a/b$ as $(-a)/(-b)$. When the denominator is positive, divide one unit into $b$ equal parts; $a/b$ is the signed length of $a$ such parts. The same number answers the sharing problem of distributing $a$ units equally among $b$ groups when that interpretation is meaningful. A fraction is therefore a number, not two unrelated integers stacked together. It may be less than, equal to, or greater than 1. A zero denominator is forbidden because multiplication by zero cannot single out a unique quotient.",
+      "keyIdea": "$a/b$ names the unique scale that turns $b$ into $a$, provided $b\\ne0$.",
+      "examples": [
+        {
+          "title": "Equal sharing",
+          "body": "Sharing 3 identical litres equally among 4 containers puts $3/4$ litre in each because $4\\cdot(3/4)=3$."
+        },
+        {
+          "title": "More than one",
+          "body": "$7/4$ is seven quarter-units, so it equals one whole plus three quarters and lies between 1 and 2."
+        }
+      ],
+      "exercise": {
+        "prompt": "Explain why $5/2$ lies between 2 and 3, and verify its defining multiplication equation.",
+        "hints": [
+          "Four halves make 2 and six halves make 3.",
+          "Multiply the proposed quotient by the denominator."
+        ],
+        "solution": "$5/2$ is five half-units. Since $4/2=2$ and $6/2=3$, it lies strictly between 2 and 3. Its defining equation is $2\\cdot(5/2)=5$."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for fraction models, notation, and number-line placement."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 9,
+      "tags": [
+        "fractions",
+        "quotient",
+        "number line",
+        "sharing"
+      ]
+    },
+    {
+      "id": "K44",
+      "contentSha256": "263d92c111b5894acf6586cac3d250f5ea63491a540b090484356ff6f2971408",
+      "slug": "equivalent-fractions-comparison",
+      "chapterId": "fractions",
+      "section": "6.2",
+      "title": "Equivalent fractions are the same number at different scales",
+      "kind": "theorem",
+      "purpose": "Explain fraction equivalence and comparison by scaling numerator and denominator together.",
+      "prerequisiteIds": [
+        "K43"
+      ],
+      "notationIds": [
+        "fraction"
+      ],
+      "motivation": "Calculations with fractions depend on recognizing that many written fractions occupy exactly the same point on the number line.",
+      "tutorial": "Let $a$ be an integer and let $b,k$ be positive whole numbers. Then $a/b=(ka)/(kb)$. Both numerator and denominator were scaled by the same positive factor, so the quotient is unchanged: $(kb)\\cdot(a/b)=k(b\\cdot(a/b))=ka$. More generally, for integer numerators $a,c$ and positive denominators $b,d$, the equality $a/b=c/d$ holds exactly when $ad=bc$. This cross-product test follows by multiplying both sides by the positive product $bd$; it is a consequence, not a new meaning of fractions. To compare fractions with positive denominators, rewrite them with a common denominator or compare the cross products while tracking the direction of inequality. Never multiply only one part of a fraction and call the result equivalent.",
+      "keyIdea": "Changing the size of the named pieces and the number of pieces by the same factor preserves the total point on the number line.",
+      "examples": [
+        {
+          "title": "Equivalent forms",
+          "body": "$2/3=8/12$ because numerator and denominator were multiplied by 4; also $2\\cdot12=3\\cdot8=24$."
+        },
+        {
+          "title": "Compare without decimals",
+          "body": "$5/8<2/3$ because $5\\cdot3=15<16=2\\cdot8$, and both denominators are positive."
+        }
+      ],
+      "exercise": {
+        "prompt": "Let $a$ be an integer and let $b,k$ be positive whole numbers. Prove that $a/b=(ka)/(kb)$ by showing that both expressions satisfy the same defining multiplication equation.",
+        "hints": [
+          "Let $x=a/b$, so $bx=a$.",
+          "Multiply the equation by $k$."
+        ],
+        "solution": "Let $x=a/b$, so $bx=a$. Multiplying by $k$ gives $(kb)x=ka$. Since $kb\\ne0$, the unique number whose product with $kb$ is $ka$ is $(ka)/(kb)$. Therefore $x=(ka)/(kb)$, and hence $a/b=(ka)/(kb)$."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for equivalent fractions, common denominators, and comparison."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Prove a fraction equivalence by scaling or by the cross-product criterion under explicit nonzero-denominator conditions.",
+      "readMinutes": 10,
+      "tags": [
+        "fractions",
+        "equivalence",
+        "scaling",
+        "comparison"
+      ]
+    },
+    {
+      "id": "K45",
+      "contentSha256": "093e6a4ec92cbb6590c48c37a1e738213e370c31dba83e9b92f3d58510b5ae6b",
+      "slug": "adding-subtracting-fractions",
+      "chapterId": "fractions",
+      "section": "6.3",
+      "title": "Fraction addition requires a common unit",
+      "kind": "method",
+      "purpose": "Derive addition and subtraction of fractions from the need to count pieces of one shared size.",
+      "prerequisiteIds": [
+        "K44"
+      ],
+      "notationIds": [
+        "fraction"
+      ],
+      "motivation": "Adding numerators works only when the fractions already count pieces of the same size. A common denominator makes that shared unit explicit.",
+      "tutorial": "Fractions with denominator $b$ count pieces of size $1/b$. Therefore $a/b+c/b=(a+c)/b$: only the number of equal pieces changes. For different nonzero denominators, convert to a common unit. One always available choice is $bd$: $a/b=ad/(bd)$ and $c/d=bc/(bd)$, so $a/b+c/d=(ad+bc)/(bd)$. Subtraction uses the same conversion and subtracts the piece counts. The product $bd$ need not be the smallest common denominator, but it is valid. Afterward, an equivalent simpler form may be chosen. The invalid shortcut $(a+c)/(b+d)$ changes both the piece count and the piece size and generally does not preserve either input.",
+      "keyIdea": "Addition counts like-sized pieces; common denominators express every term in one unit before counts are combined.",
+      "examples": [
+        {
+          "title": "Already common",
+          "body": "$3/8+2/8=5/8$ because both terms count eighths."
+        },
+        {
+          "title": "Build a common unit",
+          "body": "$1/3+1/4=4/12+3/12=7/12$. Twelfths can represent both thirds and fourths exactly."
+        }
+      ],
+      "exercise": {
+        "prompt": "Compute $5/6-1/4$. State the common unit and check that the result is positive and smaller than $5/6$.",
+        "hints": [
+          "Twelfths form a common unit.",
+          "Rewrite both fractions before subtracting numerators."
+        ],
+        "solution": "$5/6=10/12$ and $1/4=3/12$, so $5/6-1/4=7/12$. The result is positive, and $7/12<10/12=5/6$, as subtraction of a positive amount requires."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for fraction arithmetic and common-denominator methods."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Derive a fraction sum or difference by rewriting every term in one explicitly named common unit.",
+      "readMinutes": 10,
+      "tags": [
+        "fractions",
+        "addition",
+        "subtraction",
+        "common denominator"
+      ]
+    },
+    {
+      "id": "K46",
+      "contentSha256": "8da133256c4e512995d8d048df5432ad5ef774f9acf1e3850844a865698e0db5",
+      "slug": "multiplying-dividing-fractions",
+      "chapterId": "fractions",
+      "section": "6.4",
+      "title": "Fraction multiplication composes scales",
+      "kind": "method",
+      "purpose": "Interpret multiplication of fractions as successive scaling and division as multiplication by a reciprocal.",
+      "prerequisiteIds": [
+        "K44"
+      ],
+      "notationIds": [
+        "fraction"
+      ],
+      "motivation": "“A fraction of a fraction” is not a new operation. It is the composition of two ordinary scale changes.",
+      "tutorial": "Multiplying by $a/b$ scales a quantity by the number $a/b$. Applying $c/d$ and then $a/b$ gives the combined scale $(a/b)(c/d)=ac/(bd)$. Numerators multiply because the selected counts combine; denominators multiply because the unit partitions combine. Division by a nonzero fraction asks for a missing scale. When $c\\ne0$ and $d\\ne0$, the fraction $c/d$ is nonzero and $(c/d)(d/c)=1$, so the reciprocal $d/c$ undoes multiplication by $c/d$. Therefore $(a/b)\\div(c/d)=(a/b)(d/c)$, with $b,c,d\\ne0$. Cancellation before multiplication is justified by fraction equivalence, not by erasing symbols: a common nonzero factor may be divided from a numerator and a denominator because both are scaled together.",
+      "keyIdea": "Products compose scale factors; dividing by a nonzero scale applies the reciprocal scale that undoes it.",
+      "examples": [
+        {
+          "title": "A fraction of a quantity",
+          "body": "Two thirds of three quarters is $(2/3)(3/4)=6/12=1/2$. The factor 3 cancels because the same scale occurs above and below."
+        },
+        {
+          "title": "Measurement division",
+          "body": "The number of $3/4$-litre portions in 6 litres is $6\\div(3/4)=6\\cdot(4/3)=8$."
+        }
+      ],
+      "exercise": {
+        "prompt": "Compute $(5/6)\\div(10/9)$ and verify the result by multiplying it by $10/9$.",
+        "hints": [
+          "Multiply by the reciprocal $9/10$.",
+          "Cancel common factors before multiplying."
+        ],
+        "solution": "$(5/6)\\div(10/9)=(5/6)(9/10)=45/60=3/4$. The check is $(3/4)(10/9)=30/36=5/6$, so multiplication by the divisor recovers the dividend."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for fraction multiplication, reciprocals, and division."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Justify a fraction product or quotient as composition or inversion of scale factors, including all nonzero conditions.",
+      "readMinutes": 10,
+      "tags": [
+        "fractions",
+        "multiplication",
+        "division",
+        "reciprocal",
+        "scaling"
+      ]
+    },
+    {
+      "id": "K47",
+      "contentSha256": "20e8f77dc01ba6720bc6abe9e79a6982e372cc78690fddd3305fd8e1a1414f2f",
+      "slug": "decimals-base-ten-fractions",
+      "chapterId": "proportional-reasoning",
+      "section": "7.1",
+      "title": "Decimals extend place value to fractional units",
+      "kind": "definition",
+      "purpose": "Connect decimal notation to fractions whose denominators are powers of ten.",
+      "prerequisiteIds": [
+        "K45"
+      ],
+      "notationIds": [
+        "fraction"
+      ],
+      "motivation": "Decimals are often taught as a second number system. They are instead the same base-ten place-value code continued to the right of the ones place.",
+      "tutorial": "Each move one place to the right divides the place value by 10. After ones come tenths, hundredths, thousandths, and so on. Thus $3.407=3+4/10+0/100+7/1000$. A terminating decimal is a fraction whose denominator is 10, 100, 1000, or another repeated product of tens. Appending a zero does not change the number: $0.5=0.50$ because $5/10=50/100$. To compare decimals, align place values and append zeros if useful; compare from the leftmost differing place. Addition and subtraction likewise align equal units. A calculator display is a numeral, and it may be a rounded approximation rather than the exact number being studied.",
+      "keyIdea": "Decimal notation is positional fraction notation: every place has one tenth the value of the place to its left.",
+      "examples": [
+        {
+          "title": "Expand a decimal",
+          "body": "$12.035=12+3/100+5/1000$; the zero holds the tenths place."
+        },
+        {
+          "title": "Compare by place",
+          "body": "$0.47>0.405$ because $0.470$ and $0.405$ agree in the tenths place, then 7 hundredths exceeds 0 hundredths."
+        }
+      ],
+      "exercise": {
+        "prompt": "Write $5.082$ as a sum of place values and as one fraction with denominator 1000. Explain the role of the zero.",
+        "hints": [
+          "The first three places after the point are tenths, hundredths, and thousandths.",
+          "The zero says there are no tenths."
+        ],
+        "solution": "$5.082=5+0/10+8/100+2/1000=5082/1000$. The zero keeps 8 in the hundredths place rather than the tenths place."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for decimal place value and fraction conversion."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 8,
+      "tags": [
+        "decimals",
+        "place value",
+        "fractions",
+        "base ten"
+      ]
+    },
+    {
+      "id": "K48",
+      "contentSha256": "d970bc3fee8c8a40da551f23da5ab9de445e851d16a75bba6ac3b50f4e11252b",
+      "slug": "ratios-and-unit-rates",
+      "chapterId": "proportional-reasoning",
+      "section": "7.2",
+      "title": "A ratio compares quantities multiplicatively",
+      "kind": "definition",
+      "purpose": "Distinguish multiplicative comparison from difference and normalize a ratio into a unit rate.",
+      "prerequisiteIds": [
+        "K43"
+      ],
+      "notationIds": [
+        "fraction",
+        "ratio"
+      ],
+      "motivation": "Saying one quantity is 6 larger than another answers a different question from saying it is 1.5 times as large.",
+      "tutorial": "For quantities $a$ and $b$ with $b\\ne0$, the ratio of $a$ to $b$ is the quotient $a/b$. It tells which scale turns $b$ into $a$. When the quantities have the same kind and compatible units, those units cancel and the ratio is a pure scale factor. When they have different kinds, the quotient retains units and is called a rate, such as 150 kilometres in 3 hours. Dividing both quantities by 3 gives the unit rate 50 kilometres per hour. The units are part of the result: $150/3=50$ alone does not say what was compared. Ratios scale together: 2 cups of flour for 3 loaves has the same flour-to-loaf ratio as 4 cups for 6 loaves. An additive change need not preserve a ratio.",
+      "keyIdea": "A ratio is the scale factor between quantities; a unit rate chooses one unit of the denominator quantity as the reference.",
+      "examples": [
+        {
+          "title": "Unit price",
+          "body": "If 5 notebooks cost 15 dollars, the unit rate is $15/5=3$ dollars per notebook."
+        },
+        {
+          "title": "Difference is not ratio",
+          "body": "12 is 4 more than 8, but it is $12/8=3/2$ times as large. The comparisons encode different information."
+        }
+      ],
+      "exercise": {
+        "prompt": "A machine makes 84 parts in 6 minutes. Find the unit rate, include its units, and predict the number of parts made in 9 minutes if the rate stays constant.",
+        "hints": [
+          "First divide both quantities by 6.",
+          "Then take nine copies of the one-minute output."
+        ],
+        "solution": "The unit rate is $84/6=14$ parts per minute. At that constant rate, 9 minutes produces $14\\cdot9=126$ parts."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for ratios, rates, and unit-rate interpretation."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 9,
+      "tags": [
+        "ratio",
+        "rate",
+        "unit rate",
+        "multiplicative comparison"
+      ]
+    },
+    {
+      "id": "K49",
+      "contentSha256": "9ed21fd61d4224c21e96f278aa4924b1e4f8ff0773031e81c0262106211a006a",
+      "slug": "proportional-scaling",
+      "chapterId": "proportional-reasoning",
+      "section": "7.3",
+      "title": "Proportional relationships preserve one scale factor",
+      "kind": "theorem",
+      "purpose": "Characterize direct proportion by a constant ratio and connect tables, equations, and graphs.",
+      "prerequisiteIds": [
+        "K44",
+        "K48"
+      ],
+      "notationIds": [
+        "fraction",
+        "ratio"
+      ],
+      "motivation": "Recipes, maps, constant-speed motion, unit conversion, and similar figures all reuse the same idea: every input is scaled by one fixed factor.",
+      "tutorial": "Two varying quantities $x$ and $y$ are directly proportional when there is a constant $k$ such that $y=kx$ for every allowed pair. For nonzero $x$, this is equivalent to saying the ratio $y/x$ always equals $k$. The number $k$ is the constant of proportionality and carries output units per input unit. Multiplying $x$ by a factor $t$ multiplies $y$ by the same factor: $k(tx)=t(kx)$. When zero is allowed, a proportional table includes the pair $(0,0)$. A rule such as $y=3x+2$ is not proportional because it gives $y=2$ rather than $0$ when $x=0$. Tables and equations are two representations of this same structure.",
+      "keyIdea": "Proportion is not merely two equal fractions; it is an entire relationship governed by one fixed multiplier.",
+      "examples": [
+        {
+          "title": "Scale a recipe",
+          "body": "At $3/2$ cups of water per batch, $b$ batches require $w=(3/2)b$ cups. Doubling batches doubles water."
+        },
+        {
+          "title": "A nonproportional rule",
+          "body": "The rule $y=4+2d$ for a taxi fare has a constant per-kilometre increase but is not proportional to distance because $d=0$ gives $y=4$, not 0."
+        }
+      ],
+      "exercise": {
+        "prompt": "A map uses 2 centimetres for 15 kilometres. Write a proportional equation for real distance $d$ from map length $m$, then find the distance represented by 7 centimetres.",
+        "hints": [
+          "The constant is real kilometres per map centimetre.",
+          "Compute $15/2$ before substituting 7."
+        ],
+        "solution": "The constant is $15/2$ kilometres per centimetre, so $d=(15/2)m$. For $m=7$, $d=(15/2)\\cdot7=105/2=52.5$ kilometres."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for proportions, scale factors, and applications."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Show that a proposed relationship is or is not proportional by identifying a single valid constant of proportionality or a decisive counterexample.",
+      "readMinutes": 10,
+      "tags": [
+        "proportion",
+        "scaling",
+        "constant of proportionality",
+        "modeling"
+      ]
+    },
+    {
+      "id": "K50",
+      "contentSha256": "eed7a56e210ad08c2e8aa50fbcffe5a59610e7c3ebd3b4999ceaea5710df3ae2",
+      "slug": "percent-relative-change",
+      "chapterId": "proportional-reasoning",
+      "section": "7.4",
+      "title": "Percent is a ratio measured per hundred",
+      "kind": "method",
+      "purpose": "Translate percentages into scale factors and distinguish a percentage of a quantity from percentage change.",
+      "prerequisiteIds": [
+        "K47",
+        "K49"
+      ],
+      "notationIds": [
+        "fraction",
+        "ratio"
+      ],
+      "motivation": "Percentages put ratios on a common denominator of 100, making comparisons easy—but the reference quantity must still be named.",
+      "tutorial": "$p$ percent means the ratio $p/100$. Thus 35% is $35/100=0.35$, and 35% of a quantity $x$ is $0.35x$. For a positive original value, relative change compares the change with that explicitly chosen base: $\\text{relative change}=(\\text{new}-\\text{old})/\\text{old}$. Multiplying by 100 reports it as a percentage. Increasing by 20% multiplies by $1.20$; decreasing by 20% multiplies by $0.80$. These operations do not undo each other because the second percentage uses a different base: $100\\to120\\to96$. Percentage points are different again: moving from 40% to 50% is an increase of 10 percentage points but a relative increase of 25%.",
+      "keyIdea": "Every percentage is relative to a base; converting it to a multiplier makes that dependence visible.",
+      "examples": [
+        {
+          "title": "Find a percentage",
+          "body": "15% of 80 is $(15/100)80=12$."
+        },
+        {
+          "title": "Relative increase",
+          "body": "A value rising from 40 to 50 changes by 10, and $10/40=0.25$, so the increase is 25%."
+        }
+      ],
+      "exercise": {
+        "prompt": "A price of 60 dollars is discounted by 25% and then taxed by 8%. Find the final price and explain why treating this as a net 17% discount is incorrect.",
+        "hints": [
+          "A 25% discount multiplies by 0.75.",
+          "The tax is applied to the discounted price."
+        ],
+        "solution": "The discounted price is $60\\cdot0.75=45$ dollars. Tax gives $45\\cdot1.08=48.60$ dollars. The two percentages use different bases and represent successive multipliers, so they cannot be combined as a 17% discount from the original price."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for percent, percent change, and applied proportional reasoning."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 9,
+      "tags": [
+        "percent",
+        "ratio",
+        "relative change",
+        "scale factor"
+      ]
+    },
+    {
+      "id": "K51",
+      "contentSha256": "b014603aa4332dd61c40433b42d29d8c9fa1326903c49234e7c6419ccc4e9821",
+      "slug": "powers-repeated-scaling",
+      "chapterId": "powers-roots-estimation",
+      "section": "8.1",
+      "title": "A power records repeated multiplication",
+      "kind": "definition",
+      "purpose": "Define nonnegative integer powers and distinguish the base from the exponent.",
+      "prerequisiteIds": [
+        "K42"
+      ],
+      "notationIds": [
+        "natural-numbers",
+        "power"
+      ],
+      "motivation": "Repeated multiplication appears in area, volume, compound growth, counting choices, algorithms, and scientific notation.",
+      "tutorial": "For a number $a$ and positive whole number $n$, the power $a^n$ is the product of $n$ copies of $a$. The number $a$ is the base and $n$ is the exponent. Thus $a^3=a\\cdot a\\cdot a$, not $3a$. For $a\\ne0$, define $a^0=1$ as the empty product; this preserves the product law when an exponent drops to zero. The expression $0^0$ is left undefined here. Parentheses control the base: $(-2)^4=16$, whereas $-2^4=-(2^4)=-16$ under the usual order of operations. Powers compress notation, but expansions remain the safest way to rediscover laws and detect sign errors.",
+      "keyIdea": "The exponent counts multiplicative copies of the entire base named by the notation.",
+      "examples": [
+        {
+          "title": "Repeated doubling",
+          "body": "$2^5=2\\cdot2\\cdot2\\cdot2\\cdot2=32$."
+        },
+        {
+          "title": "Parentheses change the base",
+          "body": "$(-3)^2=9$, but $-3^2=-9$ because only 3 is squared in the second expression."
+        }
+      ],
+      "exercise": {
+        "prompt": "Expand and evaluate $(-2)^3$, $-2^3$, and $(-2)^4$. Explain each sign.",
+        "hints": [
+          "Write every factor explicitly.",
+          "An even number of negative factors pair into positives."
+        ],
+        "solution": "$(-2)^3=(-2)(-2)(-2)=-8$. Also $-2^3=-(2\\cdot2\\cdot2)=-8$. Finally $(-2)^4=16$ because four negative factors form two positive pairs."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for exponent notation, evaluation, and order of operations."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 8,
+      "tags": [
+        "powers",
+        "exponents",
+        "repeated multiplication",
+        "notation"
+      ]
+    },
+    {
+      "id": "K52",
+      "contentSha256": "cf6dd8a30443c9a8a70a5ef6a9fa3ab2a0c2e823e184de775944588ea6979123",
+      "slug": "exponent-laws-conditions",
+      "chapterId": "powers-roots-estimation",
+      "section": "8.2",
+      "title": "Exponent laws count and cancel factors",
+      "kind": "law",
+      "purpose": "Derive exponent laws from expanded products and state the domain conditions that make them valid.",
+      "prerequisiteIds": [
+        "K46",
+        "K51"
+      ],
+      "notationIds": [
+        "fraction",
+        "power"
+      ],
+      "motivation": "Exponent rules are reliable only when their matching bases, operations, and nonzero conditions are visible.",
+      "tutorial": "For positive integers $m,n$, multiplying powers with the same base concatenates factor lists: $a^m a^n=a^{m+n}$. Raising a power to a power repeats the whole list: $(a^m)^n=a^{mn}$. Products distribute through a positive power: $(ab)^n=a^n b^n$. These identities also allow a zero exponent when every resulting $0^0$ expression is avoided; in particular, the same-base product law is valid for nonnegative $m,n$ when $a\\ne0$. If $a\\ne0$ and $m\\ge n$, cancellation gives $a^m/a^n=a^{m-n}$. Extending the same equation defines $a^{-n}=1/a^n$ for $a\\ne0$. None of these says $a^m+b^m=(a+b)^m$; powers do not generally distribute over addition.",
+      "keyIdea": "Exponent laws are bookkeeping for repeated factors; their restrictions say when that bookkeeping can be reversed.",
+      "examples": [
+        {
+          "title": "Combine matching bases",
+          "body": "$x^3x^4=x^{7}$ because the product contains seven copies of $x$."
+        },
+        {
+          "title": "A false distribution",
+          "body": "$(2+3)^2=25$, while $2^2+3^2=13$. Squaring a sum creates cross terms, so the expressions differ."
+        }
+      ],
+      "exercise": {
+        "prompt": "Prove $(a^m)^n=a^{mn}$ for positive integers $m,n$ by counting factors. Then state what must be true before writing $a^{-n}=1/a^n$.",
+        "hints": [
+          "There are $n$ groups, each containing $m$ factors.",
+          "A denominator may not be zero."
+        ],
+        "solution": "Expanding $(a^m)^n$ gives $n$ copies of a product containing $m$ copies of $a$, for a total of $mn$ factors. Hence $(a^m)^n=a^{mn}$. The definition $a^{-n}=1/a^n$ requires $a\\ne0$."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for exponent laws and common error patterns."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Derive an exponent identity by expanding and counting factors, while stating every needed nonzero or exponent condition.",
+      "readMinutes": 10,
+      "tags": [
+        "exponents",
+        "laws",
+        "conditions",
+        "counterexample"
+      ]
+    },
+    {
+      "id": "K53",
+      "contentSha256": "e0e362efe1048854a7e92fbfb28e73b0c9f87bb4201a77ab72479324be462dde",
+      "slug": "square-roots-equations",
+      "chapterId": "powers-roots-estimation",
+      "section": "8.3",
+      "title": "The square root is the nonnegative inverse of squaring",
+      "kind": "definition",
+      "purpose": "Define the principal square root and separate it from the two solutions of a quadratic equation.",
+      "prerequisiteIds": [
+        "K47",
+        "K51"
+      ],
+      "notationIds": [
+        "root",
+        "power",
+        "absolute-value"
+      ],
+      "motivation": "Area determines side length by reversing a square, but reversing loses sign information and must be stated carefully.",
+      "tutorial": "For a nonnegative number $a$, when the current number system contains a nonnegative number $r$ satisfying $r^2=a$, we write $\\sqrt a=r$. This is the principal square root. Thus $\\sqrt{25}=5$, not $\\pm5$. The equation $x^2=25$ has two integer solutions, $x=5$ and $x=-5$, because both squares equal 25. These are different claims: the radical symbol names one nonnegative value, while solving an equation asks for every value that works. Every integer square is nonnegative by the signed multiplication laws. A later construction of the real numbers will guarantee a principal square root for every nonnegative real input. Whenever the principal root exists, $\\sqrt{x^2}=|x|$, not always $x$.",
+      "keyIdea": "The radical $\\sqrt a$ chooses the nonnegative root; an equation such as $x^2=a$ may have two signed solutions.",
+      "examples": [
+        {
+          "title": "Principal value versus solution set",
+          "body": "$\\sqrt{49}=7$, while $x^2=49$ has solutions $x=7$ and $x=-7$."
+        },
+        {
+          "title": "A fractional perfect square",
+          "body": "$\\sqrt{2.25}=1.5$ because $1.5$ is nonnegative and $1.5^2=2.25$."
+        }
+      ],
+      "exercise": {
+        "prompt": "Evaluate $\\sqrt{(-6)^2}$ and solve $x^2=36$. Explain why the answers are written differently.",
+        "hints": [
+          "A principal square root is nonnegative.",
+          "An equation solution list must include every value whose square is 36."
+        ],
+        "solution": "$\\sqrt{(-6)^2}=\\sqrt{36}=6=|-6|$. The equation $x^2=36$ has two solutions, $x=6$ and $x=-6$. The radical names one nonnegative value, whereas the equation requests all valid inputs."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for roots, perfect squares, and equation-solving distinctions."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 9,
+      "tags": [
+        "square root",
+        "inverse operation",
+        "equations",
+        "absolute value"
+      ]
+    },
+    {
+      "id": "K54",
+      "contentSha256": "40be14bc62f075797a8f4ab5fde625b64d51ddd5d71a4dcf0f21255e79a993e3",
+      "slug": "units-dimensional-consistency",
+      "chapterId": "powers-roots-estimation",
+      "section": "8.4",
+      "title": "Units are algebraic type checks",
+      "kind": "method",
+      "purpose": "Use units to guide conversions and reject expressions that combine incompatible quantities.",
+      "prerequisiteIds": [
+        "K47",
+        "K48"
+      ],
+      "notationIds": [
+        "fraction",
+        "ratio"
+      ],
+      "motivation": "Many incorrect calculations have plausible numbers but impossible units. Dimensional checking catches them before detailed arithmetic matters.",
+      "tutorial": "A unit conversion multiplies by a ratio equal to 1. Since $100\\text{ cm}=1\\text{ m}$, the factors $100\\text{ cm}/1\\text{ m}$ and $1\\text{ m}/100\\text{ cm}$ both equal 1, but only one orientation cancels the starting unit. For example, $2.5\\text{ m}\\cdot(100\\text{ cm}/1\\text{ m})=250\\text{ cm}$. Multiplication and division combine units: distance divided by time has units of speed, and length times length has square-length units. Addition and equality require compatible dimensions. A formula claiming length equals length plus time is malformed regardless of the inserted numerical values. Dimensional consistency cannot prove a formula correct, because two wrong formulas may share units, but inconsistency proves that something is wrong.",
+      "keyIdea": "Treat units like types that multiply, divide, and cancel; an allowed calculation must produce the kind of quantity the question asks for.",
+      "examples": [
+        {
+          "title": "Convert by cancellation",
+          "body": "$3\\text{ h}\\cdot(60\\text{ min}/1\\text{ h})=180\\text{ min}$; hours cancel and minutes remain."
+        },
+        {
+          "title": "Detect an impossible sum",
+          "body": "$5\\text{ m}+2\\text{ s}$ is not a length or a duration. A physical relationship would be needed before the quantities could interact."
+        }
+      ],
+      "exercise": {
+        "prompt": "A cyclist travels 36 kilometres in 1.5 hours. Compute the average speed in kilometres per hour, then convert it to metres per hour using a unit factor.",
+        "hints": [
+          "Speed is distance divided by time.",
+          "Use $1000\\text{ m}/1\\text{ km}$."
+        ],
+        "solution": "The speed is $36\\text{ km}/1.5\\text{ h}=24\\text{ km/h}$. Multiplying by $1000\\text{ m}/1\\text{ km}$ gives $24{,}000\\text{ m/h}$, with kilometres cancelled."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "openstax-prealgebra",
+          "note": "Editorial reference for unit rates and conversion factors."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Construct and verify a conversion chain in which equal-to-one factors cancel every unwanted unit and leave the requested unit.",
+      "readMinutes": 9,
+      "tags": [
+        "units",
+        "dimensional analysis",
+        "conversion",
+        "type checking"
+      ]
+    },
+    {
+      "id": "K55",
+      "contentSha256": "5a2a92549fe53eb449264d0c0172d8628b6f487b2079e0a5cfb93df7d6a02dd5",
+      "slug": "relations-and-equivalence-classes",
+      "chapterId": "relations-equivalence",
+      "section": "15.1",
+      "title": "An equivalence relation turns interchangeable objects into classes",
+      "kind": "theorem",
+      "purpose": "Define binary relations and show why reflexivity, symmetry, and transitivity produce a partition into nonoverlapping equivalence classes.",
+      "prerequisiteIds": [
+        "K21",
+        "K24",
+        "K39",
+        "K42"
+      ],
+      "notationIds": [
+        "membership",
+        "set-builder",
+        "cartesian-product",
+        "relation",
+        "divisibility",
+        "integers"
+      ],
+      "motivation": "Mathematics constantly treats distinct descriptions as the same for a chosen purpose: equivalent fractions, congruent shapes, equal remainders, or isomorphic structures.",
+      "tutorial": "A binary relation $R$ from $A$ to $B$ is a subset of $A\\times B$. Writing $aRb$ means $(a,b)\\in R$. A relation on $A$ is an equivalence relation when it is reflexive ($aRa$ for every $a$), symmetric ($aRb$ implies $bRa$), and transitive ($aRb$ and $bRc$ imply $aRc$). The equivalence class of $a$ is $[a]=\\{x\\in A:xRa\\}$. Every object belongs to its own class by reflexivity. If two classes overlap, choose $z$ in both. Symmetry and transitivity then show every member of one class belongs to the other, so the classes are equal. Hence equivalence classes form a partition. For the integer examples below, extend divisibility by defining $a\\mid b$ when an integer witness $k$ satisfies $b=ak$; this is the signed version of K39.",
+      "keyIdea": "Equivalence axioms are exactly what is needed for “same for this purpose” to divide a universe into coherent, nonoverlapping classes.",
+      "examples": [
+        {
+          "title": "Same parity",
+          "body": "On the integers, let $aRb$ when $2\\mid(a-b)$. The two classes are the even integers and the odd integers."
+        },
+        {
+          "title": "A relation that fails",
+          "body": "On people, “is a sibling of” may be symmetric but is not reflexive, so it is not an equivalence relation."
+        }
+      ],
+      "exercise": {
+        "prompt": "Define $aRb$ on the integers by $3\\mid(a-b)$. Verify reflexivity, symmetry, and transitivity, then name the three classes using possible remainders after division by 3.",
+        "hints": [
+          "$a-a=0$ and every integer divides 0.",
+          "For transitivity, add $(a-b)$ and $(b-c)$."
+        ],
+        "solution": "Reflexivity holds because $3\\mid0=a-a$. If $3\\mid(a-b)$, then $3\\mid-(a-b)=b-a$, giving symmetry. If $3\\mid(a-b)$ and $3\\mid(b-c)$, then $3$ divides their sum $a-c$, giving transitivity. The three classes are the integers of the forms $3k$, $3k+1$, and $3k+2$, where $k$ ranges over all integers."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "judson-algebra",
+          "note": "Editorial reference for equivalence relations, classes, and partitions."
+        },
+        {
+          "sourceId": "sundstrom-reasoning",
+          "note": "Editorial reference for quantified proofs of the three equivalence axioms."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Verify all three equivalence axioms for a concrete relation and derive its partition into classes.",
+      "readMinutes": 12,
+      "tags": [
+        "relations",
+        "equivalence",
+        "partitions",
+        "quotients"
+      ]
+    },
+    {
+      "id": "K56",
+      "contentSha256": "e94a027cd014c5946f4d7311fc3b061e808750ac178731ed0101eef3e4b05d3b",
+      "slug": "sequences-recursive-definitions",
+      "chapterId": "sequences-recursion",
+      "section": "16.1",
+      "title": "A recursive definition specifies initial state and update rule",
+      "kind": "definition",
+      "purpose": "Model sequences as functions on ordered time steps and define them from base values plus state transitions.",
+      "prerequisiteIds": [
+        "K26",
+        "K51"
+      ],
+      "notationIds": [
+        "natural-numbers",
+        "function-map",
+        "sequence",
+        "power"
+      ],
+      "motivation": "A long or infinite list can be generated by a short rule, but the rule is meaningless unless the starting state and valid indices are specified.",
+      "tutorial": "A sequence in a set $A$ is a function $a:\\mathbb N\\to A$; its value at index $n$ is written $a_n$. A recursive definition gives one or more initial values and a rule for constructing later values from earlier ones. For example, $a_0=3$ and $a_{n+1}=2a_n$ for every $n\\in\\mathbb N$ generates $3,6,12,24,\\ldots$. The initial value anchors the process, the update rule advances it, and the index condition states where the update is legal. Omitting any one of these can leave multiple sequences possible. A closed formula such as $a_n=3\\cdot2^n$ gives direct access to a term; the recursive form exposes the process. Proving the two descriptions agree usually uses induction.",
+      "keyIdea": "Recursion is compressed process description: initial data plus a rule determine every reachable stage.",
+      "examples": [
+        {
+          "title": "Constant difference",
+          "body": "$b_0=5$ and $b_{n+1}=b_n+4$ generates $5,9,13,17,\\ldots$."
+        },
+        {
+          "title": "Why a start is necessary",
+          "body": "The rule $c_{n+1}=c_n+1$ alone allows $0,1,2,\\ldots$, $10,11,12,\\ldots$, and infinitely many other sequences."
+        }
+      ],
+      "exercise": {
+        "prompt": "Let $a_0=2$ and $a_{n+1}=3a_n-1$. Compute $a_1,a_2,a_3$, carefully naming which previous state each calculation uses.",
+        "hints": [
+          "Substitute $n=0$ first.",
+          "Use the newly computed value at each next step."
+        ],
+        "solution": "$a_1=3a_0-1=3\\cdot2-1=5$. Then $a_2=3a_1-1=14$, and $a_3=3a_2-1=41$. Each term depends on the immediately preceding term."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "mit-mcs",
+          "note": "Editorial reference for recursive definitions, sequences, and induction-ready indexing."
+        },
+        {
+          "sourceId": "levin-discrete",
+          "note": "Editorial reference for sequence notation and recursive examples."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 9,
+      "tags": [
+        "sequences",
+        "recursion",
+        "state",
+        "update rule"
+      ]
+    },
+    {
+      "id": "K57",
+      "contentSha256": "46cf9dc97a0de56a5e249ddee70c26164aa16191c2e21bb19160dba5f8a55f7d",
+      "slug": "algorithms-invariants-termination",
+      "chapterId": "algorithms-invariants",
+      "section": "17.1",
+      "title": "Correct algorithms preserve truth and make progress",
+      "kind": "method",
+      "purpose": "Organize algorithm proofs around state, invariant, progress measure, and terminal condition.",
+      "prerequisiteIds": [
+        "K16",
+        "K56"
+      ],
+      "notationIds": [
+        "implication",
+        "forall",
+        "sequence"
+      ],
+      "motivation": "Testing many inputs can reveal bugs but cannot establish that a procedure works and stops for every allowed input.",
+      "tutorial": "An algorithm is a finite description of state transitions. To prove partial correctness, choose an invariant: a statement about the current state that is true initially and remains true after every legal transition. Induction then makes it true at every reached state. To prove termination, choose a variant or progress measure taking values in a set with no infinite strictly descending chain, often the nonnegative integers. Show that each nonterminal step strictly decreases it. At termination, combine the invariant with the stopping condition to derive the promised output property. These are separate obligations: a procedure may preserve a useful invariant forever without stopping, or stop quickly with a wrong answer. A full correctness proof needs both.",
+      "keyIdea": "Invariant proves that nothing essential is lost; a decreasing progress measure proves that the process cannot continue forever.",
+      "examples": [
+        {
+          "title": "Move counters without changing total",
+          "body": "If each step moves one counter from box A to box B, the invariant is $A+B=T$, the initial total. The variant $A$ decreases until A is empty."
+        },
+        {
+          "title": "Termination alone is insufficient",
+          "body": "An algorithm that immediately returns 0 always terminates, but it does not correctly compute every requested quantity."
+        }
+      ],
+      "exercise": {
+        "prompt": "Consider repeated subtraction for positive integers: while $a\\ge b$, replace $a$ by $a-b$; then return $a$. Prove termination and state an invariant that shows the returned value has the same remainder upon division by $b$ as the input.",
+        "hints": [
+          "Use the current nonnegative value of $a$ as a progress measure.",
+          "Subtracting $b$ does not change the remainder after division by $b$."
+        ],
+        "solution": "While the loop runs, $a$ is a nonnegative integer and decreases by the positive integer $b$, so it cannot decrease forever; the loop terminates with $0\\le a<b$. The difference between the initial and current values is always a whole-number multiple of $b$, so their remainders modulo $b$ agree. The terminal $a$ is therefore the input remainder."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "mit-mcs",
+          "note": "Editorial reference for invariants, well-founded descent, and algorithm correctness."
+        },
+        {
+          "sourceId": "levin-discrete",
+          "note": "Editorial reference for induction as repeated-state reasoning."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Prove an iterative procedure correct by separately establishing initialization, preservation, termination, and the final postcondition.",
+      "readMinutes": 11,
+      "tags": [
+        "algorithms",
+        "invariant",
+        "termination",
+        "correctness"
+      ]
+    },
+    {
+      "id": "K58",
+      "contentSha256": "42f113d2f35cca0b2633e2f65ff2492bcfd80f87c3c56739e131bcc4de76d5f1",
+      "slug": "finite-counting-probability",
+      "chapterId": "finite-probability",
+      "section": "18.1",
+      "title": "Finite probability is normalized weight on outcomes",
+      "kind": "method",
+      "purpose": "Build finite probability from an explicit sample space, nonnegative weights, and counting without overlap.",
+      "prerequisiteIds": [
+        "K22",
+        "K23",
+        "K26",
+        "K43"
+      ],
+      "notationIds": [
+        "membership",
+        "set-operations",
+        "fraction",
+        "probability"
+      ],
+      "motivation": "The familiar formula “favorable over total” works only when outcomes are equally likely and counted exactly once.",
+      "tutorial": "A finite sample space $\\Omega$ is a nonempty set listing all possible outcomes of an experiment. Assign each outcome $\\omega$ a nonnegative weight $w(\\omega)$ so that all weights together total 1. For an event $E\\subseteq\\Omega$, define $\\Pr(E)$ to be the sum of the weights $w(\\omega)$ for outcomes $\\omega$ in $E$. Then $\\Pr(\\Omega)=1$, $\\Pr(\\varnothing)=0$, and disjoint events add: if $E\\cap F=\\varnothing$, then $\\Pr(E\\cup F)=\\Pr(E)+\\Pr(F)$. When all $N$ outcomes have equal weight $1/N$, this becomes $\\Pr(E)=|E|/N$, where $|E|$ counts the outcomes in $E$. Counting choices uses the same no-omission, no-duplication discipline. If a first choice has $m$ possibilities and every first choice permits exactly $n$ second choices, ordered pairs total $mn$.",
+      "keyIdea": "Probability is counting only in the equal-weight case; the general finite object is normalized nonnegative weight.",
+      "examples": [
+        {
+          "title": "A fair die",
+          "body": "For $\\Omega=\\{1,2,3,4,5,6\\}$ with equal weights, the event “even” has three outcomes, so its probability is $3/6=1/2$."
+        },
+        {
+          "title": "Unequal outcomes",
+          "body": "If a machine outputs A with weight $3/4$ and B with weight $1/4$, counting one label out of two would incorrectly give $1/2$ for A."
+        }
+      ],
+      "exercise": {
+        "prompt": "A fair coin is tossed twice independently, and the tosses are recorded in order. List the sample space, assign weights, and compute the probability of exactly one head. Explain why the outcomes H and T alone are not a valid sample space for the full experiment.",
+        "hints": [
+          "Record both tosses in each outcome.",
+          "The four ordered pairs have equal weight."
+        ],
+        "solution": "$\\Omega=\\{HH,HT,TH,TT\\}$, with weight $1/4$ on each outcome. Exactly one head occurs in $HT$ or $TH$, so the probability is $2/4=1/2$. The labels H and T omit which toss produced each result and cannot distinguish the four complete outcomes."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "mit-mcs",
+          "note": "Editorial reference for finite sample spaces, counting rules, and probability axioms."
+        },
+        {
+          "sourceId": "levin-discrete",
+          "note": "Editorial reference for product counting and equally likely outcomes."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Specify a finite probability model, justify that its weights sum to 1, and compute an event without omission or double counting.",
+      "readMinutes": 12,
+      "tags": [
+        "probability",
+        "counting",
+        "sample space",
+        "normalization"
+      ]
+    },
+    {
+      "id": "K59",
+      "contentSha256": "2cf43e7de05c7614bf99a8a1c5c67742b437454e1603d618b51fd09ade20ba54",
+      "slug": "graphs-relations-paths",
+      "chapterId": "graphs",
+      "section": "19.1",
+      "title": "A graph stores pairwise connections",
+      "kind": "theorem",
+      "purpose": "Define vertices, edges, adjacency, paths, and connected components as a reusable relational model.",
+      "prerequisiteIds": [
+        "K55",
+        "K56"
+      ],
+      "notationIds": [
+        "membership",
+        "set-builder",
+        "relation",
+        "graph"
+      ],
+      "motivation": "Roads, friendships, dependencies, state transitions, and molecular bonds differ in subject matter but share the same mathematical skeleton.",
+      "tutorial": "A finite simple undirected graph is a pair $G=(V,E)$. The set $V$ contains vertices. Each edge in $E$ is an unordered pair $\\{u,v\\}$ of distinct vertices from $V$; unordered means $\\{u,v\\}=\\{v,u\\}$. Two vertices are adjacent when their pair is an edge. The degree of a vertex is the number of edges containing it. A path is a sequence of vertices in which consecutive vertices are adjacent. Two vertices are connected when some path joins them. Connectedness is an equivalence relation: a length-zero path gives reflexivity, reversing a path gives symmetry, and concatenating paths gives transitivity. Its equivalence classes are the connected components. A drawing is only a representation: moving a vertex or bending an edge does not change $V$ or $E$.",
+      "keyIdea": "A graph forgets irrelevant geometry and keeps only which objects are connected; paths turn local adjacency into global reachability.",
+      "examples": [
+        {
+          "title": "Road connections",
+          "body": "Towns can be vertices and two-way roads can be edges. Repositioning town labels on a drawing does not change which pairs are joined."
+        },
+        {
+          "title": "Two components",
+          "body": "With vertices $\\{a,b,c,d\\}$ and edges $\\{\\{a,b\\},\\{b,c\\}\\}$, the components are $\\{a,b,c\\}$ and $\\{d\\}$."
+        }
+      ],
+      "exercise": {
+        "prompt": "Let $V=\\{1,2,3,4,5\\}$ and $E=\\{\\{1,2\\},\\{2,3\\},\\{4,1\\}\\}$. List every vertex degree, give a path from 4 to 3, and identify the connected components.",
+        "hints": [
+          "Count each edge at both endpoints.",
+          "Vertex 5 has no incident edge."
+        ],
+        "solution": "The degrees are $\\deg(1)=2$, $\\deg(2)=2$, $\\deg(3)=1$, $\\deg(4)=1$, and $\\deg(5)=0$. A path from 4 to 3 is $4,1,2,3$. The components are $\\{1,2,3,4\\}$ and $\\{5\\}$."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "mit-mcs",
+          "note": "Editorial reference for graph language, paths, and connectedness."
+        },
+        {
+          "sourceId": "levin-discrete",
+          "note": "Editorial reference for introductory graph examples and degree counting."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Prove a reachability or component claim from explicit paths and the equivalence-relation laws of connectedness.",
+      "readMinutes": 11,
+      "tags": [
+        "graphs",
+        "relations",
+        "paths",
+        "components"
+      ]
+    },
+    {
+      "id": "K60",
+      "contentSha256": "09ad4a0822fca5e4ffb91e2eea18de7540c1174c0a9206633ebf06664323626d",
+      "slug": "vectors-linear-systems-elimination",
+      "chapterId": "linear-computation",
+      "section": "20.1",
+      "title": "Linear systems are solved by reversible row operations",
+      "kind": "method",
+      "purpose": "Introduce vectors and systems of linear equations through computation that preserves the complete solution set.",
+      "prerequisiteIds": [
+        "K08"
+      ],
+      "notationIds": [
+        "vector"
+      ],
+      "motivation": "Many constraints in geometry, data, networks, optimization, and differential equations become simultaneous linear equations. One elimination method serves them all.",
+      "tutorial": "Work over the rational or real numbers. A vector is an ordered list such as $\\mathbf{x}=(x,y)$. A linear equation in $x,y$ has the form $ax+by=c$, and a linear system asks for every vector satisfying all listed equations at once. Three operations preserve exactly the same solutions: swap two equations; multiply one equation by a nonzero scalar; or replace one equation by itself plus a multiple of another equation. Gaussian elimination applies these reversible operations until variables can be read or substituted back. For example, from $x+y=5$ and $x-y=1$, adding the second equation to the first gives $2x=6$, hence $x=3$ and $y=2$. A contradiction such as $0=1$ means no solution. A missing constraint can leave a parameter and infinitely many solutions.",
+      "keyIdea": "Elimination is safe because every allowed row operation is reversible and therefore neither loses nor invents solutions.",
+      "examples": [
+        {
+          "title": "Unique solution",
+          "body": "For $x+2y=7$ and $x-y=1$, subtract the second from the first to get $3y=6$, so $y=2$ and the solution vector is $\\mathbf{x}=(3,2)$."
+        },
+        {
+          "title": "No solution",
+          "body": "$x+y=2$ and $x+y=5$ imply $0=3$ after subtraction, so no vector satisfies both equations."
+        }
+      ],
+      "exercise": {
+        "prompt": "Solve $2x+y=7$ and $x-y=2$ by a reversible elimination step. Check the resulting vector in both original equations.",
+        "hints": [
+          "Adding the equations eliminates $y$.",
+          "Substitute the resulting $x$ into either original equation."
+        ],
+        "solution": "Adding the equations gives $3x=9$, so $x=3$. Substituting into $x-y=2$ gives $3-y=2$, so $y=1$. The vector $\\mathbf{x}=(3,1)$ checks: $2\\cdot3+1=7$ and $3-1=2$."
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "hefferon-linear-algebra",
+          "note": "Editorial reference for systems, row reduction, vectors, and solution-set classification; the computation-first route is independently written."
+        }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Solve and classify a small linear system using only reversible row operations, then verify the result in the original equations.",
+      "readMinutes": 12,
+      "tags": [
+        "linear algebra",
+        "vectors",
+        "systems",
+        "Gaussian elimination"
       ]
     }
   ]

@@ -2,12 +2,12 @@
 
 ## Reviewed paper graphs and one living textbook
 
-`src/data/corpus.json` is the build-time source for the paper catalog, citation explorer, reviewed paper graphs, canonical theorem pages, distilled-paper view, and Train exercise pool. `src/data/knowledge.json` is the source for one canonical living textbook whose exposition is independently rewritten into NisabaDB's notation. Rendering code never owns mathematical proof text or third-party textbook prose. `src/data/schema.ts` and `src/data/knowledge-schema.ts` validate the paper and textbook layers as the application loads and in tests.
+`src/data/corpus.json` is the build-time source for the paper catalog, citation explorer, reviewed paper graphs, canonical theorem pages, distilled-paper view, and Train exercise pool. `src/data/knowledge.json` is the source for the independently rewritten textbook draft. `src/data/knowledge-roadmap.ts` is a separate provisional 126-chapter map; it cannot turn a planned chapter into a lesson, and its Draft mappings must cover the 20 actual draft chapters exactly once. Rendering code never owns mathematical proof text or third-party textbook prose. `src/data/schema.ts`, `src/data/knowledge-schema.ts`, and `src/data/knowledge-roadmap-schema.ts` validate these layers as the application loads and in tests.
 
 The source-compression control layer is separate from both. `data/knowledge/source-records.json` preserves all 688 approved candidate rows behind an ordered-manifest fingerprint. `data/knowledge/coverage-ledger.json` will hold exact editions, immutable source-unit manifests, scan segments, theorem occurrences, canonical claims, and retained residual artifacts; `data/knowledge/verification-policy.json` names the administrators allowed to approve review records. `src/data/compression.json` is a lightweight public atlas of whole-field convergence decisions. The source registry and audit files are copied as lazy data and are never eagerly imported into ordinary learner lessons.
 
 - **Papers** exposes the large provisional corpus, a bounded citation-ancestry projection, processing backlog, and one complete proof-dependency graph for each reviewed paper. Main results and sections are focus points inside that graph, not separate graph tabs. Paper dependency disclosures start folded; readers expand only the result branches they want to inspect.
-- **Knowledge** is one source-independent, living rewritten textbook rather than a shelf of books. Chapters provide a conventional reading order, while `KnowledgeNode.prerequisiteIds` provide the canonical dependency DAG. A shared notation registry fixes one main convention and records source-specific aliases. Per-node source references remain collapsed lineage and comparison evidence behind the exposition.
+- **Knowledge** is one source-independent rewritten textbook rather than a shelf of books. The reader exposes 60 initial-rewrite nodes in 20 draft chapters. `KnowledgeNode.prerequisiteIds` provide the authoritative DAG for written content, while the separate 126-chapter roadmap distinguishes Draft mappings from 106 Planned entries. A shared notation registry fixes one main convention and records source-specific aliases. Per-node source references remain collapsed lineage and comparison evidence behind the exposition.
 - **Knowledge / Compression** is a read-only atlas of candidate common cores, notation resolutions, source-family convergence, candidate source-route patterns, minimized-route hypotheses, and residual dispositions. It is a plan and audit surface, not evidence that extraction is complete.
 - **Knowledge / Coverage** is the non-omission ledger. It preserves every candidate row and exposes separate derived counts for resolved rows, fully reconciled rows, inventoried editions, terminal theorem dispositions, reviewed Knowledge mappings, and reviewed residuals. Selecting a source reveals its exact editions and theorem-level addresses once they exist.
 - **Unsolved** remains empty until a precise problem passes an administratively reviewed, dated literature audit.
@@ -41,6 +41,12 @@ KnowledgeBook
   │      └─ source-specific aliases and conflict notes
   └─ SourceLineage ── official URL and editorial use note
 
+KnowledgeRoadmap
+  ├─ Part ── groups ──> RoadmapChapter
+  ├─ RoadmapChapter ── candidatePrerequisiteChapterIds -> earlier RoadmapChapter
+  ├─ Draft ── knowledgeChapterId -> KnowledgeBook.Chapter
+  └─ Planned ── no learner link and no completion claim
+
 SourceRecord ── resolves to one or more ──> SourceEdition
   ├─ exact list row                         ├─ required volume/part component
   └─ required edition components           ├─ immutable SourceUnit manifest
@@ -68,7 +74,7 @@ A statement may have several proof routes. Each route owns its dependency set, p
 
 Route exposition and route provenance are independent. `type` describes presentation (for example compressed source or pedagogical), while `dependencyKind` records whether the dependency route is the audited `original`, a reviewed `minimized` route, or a `reinterpretation`. `reviewStatus` keeps candidate routes visibly separate from reviewed routes. Every minimized route must identify the route from which it was minimized.
 
-Knowledge has two compatible orders over the same canonical records. Chapter and section numbers support ordinary previous/next reading; prerequisite edges support local “know first” and “immediately unlocks” views, dependency closure, and later alternate reading paths. The source-lineage layer records where ideas and notation were compared, but source containers are not reader-facing chapters and their wording is not copied into the textbook. A future paperback selects important portions of these same nodes instead of creating a second mathematical authority.
+Written Knowledge has two compatible orders over the same records. Chapter and section numbers support ordinary previous/next reading; prerequisite edges support local “know first” and “immediately unlocks” views, dependency closure, and later alternate reading paths. Those stored direct edges are transitively reduced. The whole-book roadmap is a third, explicitly provisional planning layer and does not masquerade as written content. The source-lineage layer records where ideas and notation were compared, but source containers are not reader-facing chapters and their wording is not copied into the textbook. A future paperback selects important portions of these same nodes instead of creating a second mathematical authority.
 
 ## Validation invariants
 
@@ -96,6 +102,8 @@ The Knowledge schema separately rejects:
 - missing or repeated notation references;
 - source-lineage references whose source record is missing; and
 - a knowledge node marked `trainable` without a `proofGoal`, or a `proofGoal` on a node not marked `trainable`.
+
+The roadmap schema separately rejects duplicate or out-of-order part and chapter identities, fewer than 101 working chapters, empty parts, missing or non-earlier candidate prerequisites, cycles, and mismatched working counts. Module-level checks require every candidate compression-cluster ID to exist and every written Knowledge chapter to be mapped exactly once. Tests keep planned chapters non-clickable and guard against redundant direct edges in the written graph.
 
 The source-coverage validator separately requires:
 
@@ -180,7 +188,7 @@ The current application is static-first by design and eagerly loads the committe
 
 - `/` — project landing page and featured-paper entry
 - `/papers` — paper-corpus command view, rooted citation projection, backlog, and paginated catalog
-- `/knowledge` — the canonical living textbook; `?node=<slug>` selects a stable knowledge node within its chapter and local DAG context
+- `/knowledge` — the rewritten textbook draft and provisional whole-book map; `?node=<slug>` selects a stable written node within its chapter and local DAG context
 - `/knowledge/compression` — read-only whole-field compression atlas and residual ledger
 - `/knowledge/coverage` — lazy-loaded source, edition, and theorem-occurrence coverage audit
 - `/papers/:paperId` — metadata, graph, proofs, citations, and formal coverage

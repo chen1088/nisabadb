@@ -58,6 +58,16 @@ for (const artifact of coverageLedger.residualArtifacts) verifyReviewDigest(arti
 for (const occurrence of coverageLedger.theoremOccurrences) verifyReviewDigest(occurrence, "administrativeReview", occurrence.id);
 
 const knowledgeBook = JSON.parse(await readFile(join("src", "data", "knowledge.json"), "utf8"));
+const sourceRecordById = new Map(sourceRegistry.records.map((record) => [record.id, record]));
+for (const source of knowledgeBook.sources) {
+  const registryRecord = sourceRecordById.get(source.registryRecordId);
+  if (!registryRecord) {
+    throw new Error(`Knowledge reference ${source.id} has missing registry record ${source.registryRecordId}.`);
+  }
+  if (registryRecord.title !== source.title) {
+    throw new Error(`Knowledge reference ${source.id} does not match registry title ${source.registryRecordId}.`);
+  }
+}
 for (const node of knowledgeBook.nodes) {
   const { contentSha256, ...content } = node;
   if (contentSha256 !== digest(content)) {

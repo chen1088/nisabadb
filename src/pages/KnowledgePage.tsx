@@ -14,6 +14,14 @@ import {
   notationById,
   previousKnowledgeNode,
 } from "../data/knowledge";
+import {
+  knowledgeRoadmap,
+  roadmapChapterById,
+  roadmapChapters,
+  roadmapChaptersForPart,
+  roadmapParts,
+  draftChapterCountForPart,
+} from "../data/knowledge-roadmap";
 import type { KnowledgeNode } from "../data/knowledge-schema";
 
 const kindLabels: Record<KnowledgeNode["kind"], string> = {
@@ -24,16 +32,31 @@ const kindLabels: Record<KnowledgeNode["kind"], string> = {
   theorem: "Theorem",
 };
 
+type RoadmapScope = "all" | "draft" | "planned";
+
+const draftRoadmapChapterCount = roadmapChapters.filter(
+  (chapter) => chapter.publication.state === "draft",
+).length;
+const reviewedKnowledgeNodeCount = knowledgeNodes.filter((node) => node.status === "reviewed").length;
+
 function nodePath(node: KnowledgeNode): string {
   return `/knowledge?node=${encodeURIComponent(node.slug)}`;
+}
+
+function firstNodePathForKnowledgeChapter(chapterId: string): string | undefined {
+  const firstNode = knowledgeNodesForChapter(chapterId)[0];
+  return firstNode ? nodePath(firstNode) : undefined;
 }
 
 export function KnowledgePage() {
   const [parameters] = useSearchParams();
   const [query, setQuery] = useState("");
+  const [roadmapQuery, setRoadmapQuery] = useState("");
+  const [roadmapScope, setRoadmapScope] = useState<RoadmapScope>("all");
   const requestedNode = parameters.get("node") ?? undefined;
   const selected = getKnowledgeNode(requestedNode) ?? knowledgeNodes[0];
   const normalizedQuery = query.trim().toLocaleLowerCase();
+  const normalizedRoadmapQuery = roadmapQuery.trim().toLocaleLowerCase();
 
   const visibleNodeIds = useMemo(() => {
     if (!normalizedQuery) return new Set(knowledgeNodes.map((node) => node.id));
@@ -48,6 +71,18 @@ export function KnowledgePage() {
         .map((node) => node.id),
     );
   }, [normalizedQuery]);
+
+  const visibleRoadmapParts = useMemo(() => roadmapParts.map((part) => ({
+    part,
+    chapters: roadmapChaptersForPart(part.id).filter((candidate) => {
+      if (roadmapScope !== "all" && candidate.publication.state !== roadmapScope) return false;
+      if (!normalizedRoadmapQuery) return true;
+      return [part.title, part.summary, candidate.id, candidate.title, candidate.goal]
+        .join(" ")
+        .toLocaleLowerCase()
+        .includes(normalizedRoadmapQuery);
+    }),
+  })).filter(({ chapters }) => chapters.length > 0), [normalizedRoadmapQuery, roadmapScope]);
 
   if (!selected) return null;
 
@@ -67,95 +102,49 @@ export function KnowledgePage() {
       source: knowledgeSourceById.get(reference.sourceId),
     }))
     .filter((reference) => Boolean(reference.source));
+  const forceRoadmapPartsOpen = Boolean(normalizedRoadmapQuery) || roadmapScope !== "all";
 
   return (
     <div className="textbook-page">
       <header className="textbook-masthead page-shell">
         <div>
-          <p className="eyebrow">The canonical living textbook</p>
+          <p className="eyebrow">The rewritten mathematics book</p>
           <h1>{knowledgeBook.title}</h1>
           <p>{knowledgeBook.subtitle}</p>
         </div>
         <dl aria-label="Textbook status">
           <div><dt>Edition</dt><dd>{knowledgeBook.edition}</dd></div>
-          <div><dt>Written knowledge nodes</dt><dd>{knowledgeNodes.length}</dd></div>
-          <div><dt>Organization</dt><dd>Dependency DAG</dd></div>
+          <div><dt>Draft chapters</dt><dd>{draftRoadmapChapterCount} of {knowledgeRoadmap.workingChapterCount}</dd></div>
+          <div><dt>Written lessons</dt><dd>{knowledgeNodes.length}</dd></div>
+          <div><dt>Reviewed lessons</dt><dd>{reviewedKnowledgeNodeCount}</dd></div>
+          <div><dt>Whole-book map</dt><dd>{roadmapParts.length} parts · dependency DAG</dd></div>
         </dl>
       </header>
 
-      <section className="compression-contract page-shell" aria-labelledby="compression-contract-title">
-        <div className="compression-contract-copy">
-          <p className="eyebrow">The source-compression program</p>
-          <h2 id="compression-contract-title">Many books become one honest mathematical language.</h2>
-          <p>We independently rewrite shared ideas in one canonical language while keeping every source theorem traceable to an exact edition, locator, and disposition.</p>
+      <section className="textbook-draft-boundary page-shell" aria-labelledby="textbook-draft-title">
+        <div>
+          <p className="eyebrow">Writing status</p>
+          <h2 id="textbook-draft-title">This is the beginning of the book, not a shelf of source titles.</h2>
         </div>
-        <div className="compression-contract-flow" aria-label="Textbook compression status">
-          <div><strong>{__SOURCE_RECORD_COUNT__}</strong><span>source records preserved</span></div>
-          <span aria-hidden="true">→</span>
-          <div><strong>{__COMPRESSION_SOURCE_FAMILY_COUNT__}</strong><span>cross-cutting lenses over {__SOURCE_BRANCH_COUNT__} intake branches</span></div>
-          <span aria-hidden="true">→</span>
-          <div><strong>{__COMPRESSION_CLUSTER_COUNT__}</strong><span>whole-field clusters</span></div>
-          <span aria-hidden="true">+</span>
-          <div><strong>{__COMPRESSION_RESIDUAL_COUNT__}</strong><span>explicit residual decisions</span></div>
-        </div>
-        <div className="compression-contract-rules">
-          <p><span>01</span><strong>Rewrite the common idea</strong><small>Source prose and chapter order do not control the canonical lesson.</small></p>
-          <p><span>02</span><strong>Unify notation</strong><small>Aliases translate into one stable language instead of spawning duplicate knowledge.</small></p>
-          <p><span>03</span><strong>Keep honest remainders</strong><small>Distinct mathematics survives as a bridge, route, extension, history, or open editorial question.</small></p>
-          <p><span>04</span><strong>Lose no theorem</strong><small>Compression may merge exposition; it may never erase a source occurrence or its exact lineage.</small></p>
-        </div>
-        <div className="compression-contract-links">
-          <Link to="/knowledge/compression">Explore the compression atlas <span aria-hidden="true">→</span></Link>
-          <Link to="/knowledge/coverage">Audit all {__SOURCE_RECORD_COUNT__} source records <span aria-hidden="true">→</span></Link>
-        </div>
+        <p>
+          The first {knowledgeBook.chapters.length} chapters below are independently written lessons.
+          The {knowledgeRoadmap.workingChapterCount}-chapter map is a provisional destination: only chapters
+          marked <strong>Draft</strong> currently contain readable mathematics.
+        </p>
       </section>
-
-      <details className="textbook-global-dag page-shell">
-        <summary>
-          <span>Whole-book dependency index</span>
-          <strong>Open all {knowledgeNodes.length} written nodes and their prerequisites</strong>
-        </summary>
-        <div className="textbook-global-dag-body" aria-label="Global knowledge dependency index">
-          <p>
-            Each card names its direct prerequisites. “Needs K04” means the current idea depends
-            on K04; chapter order is only a reading convenience and does not create an edge.
-          </p>
-          <div>
-            {knowledgeBook.chapters.map((candidateChapter) => (
-              <section key={candidateChapter.id}>
-                <header>
-                  <span>Chapter {candidateChapter.number}</span>
-                  <strong>{candidateChapter.title}</strong>
-                </header>
-                {knowledgeNodesForChapter(candidateChapter.id).map((node) => (
-                  <Link
-                    key={node.id}
-                    className={node.id === selected.id ? "is-current" : undefined}
-                    to={nodePath(node)}
-                  >
-                    <span>{node.id} · {node.section}</span>
-                    <strong>{node.title}</strong>
-                    <small>{node.prerequisiteIds.length ? `Needs ${node.prerequisiteIds.join(", ")}` : "Entry node"}</small>
-                  </Link>
-                ))}
-              </section>
-            ))}
-          </div>
-        </div>
-      </details>
 
       <div className="textbook-workspace page-shell">
         <aside className="textbook-contents" aria-label="Textbook table of contents">
           <div className="textbook-pane-heading">
-            <span>Contents</span>
-            <strong>Read in dependency order</strong>
+            <span>Written contents</span>
+            <strong>{knowledgeBook.chapters.length} chapters · follow “Know first” edges</strong>
           </div>
           <label className="textbook-search">
             <span>Find a knowledge node</span>
             <input
               type="search"
               value={query}
-              placeholder="Sets, equality, quantifiers…"
+              placeholder="Counting, fractions, proof…"
               onChange={(event) => setQuery(event.target.value)}
             />
           </label>
@@ -187,7 +176,7 @@ export function KnowledgePage() {
             })}
           </nav>
           {normalizedQuery && visibleNodeIds.size === 0 ? (
-            <p className="textbook-no-results">No knowledge node matches “{query}”.</p>
+            <p className="textbook-no-results">No written lesson matches “{query}”.</p>
           ) : null}
         </aside>
 
@@ -196,9 +185,18 @@ export function KnowledgePage() {
             <span>{chapter ? `Chapter ${chapter.number} · ${chapter.title}` : "Knowledge"}</span>
             <span>{selected.readMinutes} min</span>
           </div>
-          <p className="textbook-node-kind">{selected.section} · {kindLabels[selected.kind]} · {selected.id}</p>
+          <p className="textbook-node-kind">
+            {selected.section} · {kindLabels[selected.kind]} · {selected.id} · {selected.status === "reviewed" ? "Reviewed" : "Initial rewrite"}
+          </p>
           <h2 id="knowledge-node-title" tabIndex={-1}>{selected.title}</h2>
           <p className="textbook-purpose">{selected.purpose}</p>
+
+          {chapter ? (
+            <aside className="textbook-chapter-compression">
+              <span>What this chapter compresses</span>
+              <p>{chapter.compressionGoal}</p>
+            </aside>
+          ) : null}
 
           <section className="textbook-prerequisite-strip" aria-label="Required knowledge">
             <span>Know first</span>
@@ -287,15 +285,23 @@ export function KnowledgePage() {
           </section>
 
           <details className="textbook-provenance">
-            <summary>Source lineage and rewrite status</summary>
+            <summary>Reference lineage and rewrite status</summary>
             <p>
-              This explanation is independently rewritten into NisabaDB’s notation. The sources
-              below are evidence and comparison points, not chapters pasted into this book.
+              This lesson is independently written in NisabaDB’s notation. The records below are
+              comparison references, not chapters copied into this book. Exact theorem-occurrence
+              mappings remain pending until the source editions are inventoried.
             </p>
             <ul>
               {sources.map((reference) => reference.source ? (
                 <li key={reference.sourceId}>
-                  <a href={reference.source.officialUrl} target="_blank" rel="noreferrer">{reference.source.title}</a>
+                  <div>
+                    <Link to={`/knowledge/coverage?source=${encodeURIComponent(reference.source.registryRecordId)}`}>
+                      {reference.source.registryRecordId} · registry record
+                    </Link>
+                    <a href={reference.source.officialUrl} target="_blank" rel="noreferrer">
+                      {reference.source.title}
+                    </a>
+                  </div>
                   <span>{reference.note}</span>
                 </li>
               ) : null)}
@@ -330,11 +336,171 @@ export function KnowledgePage() {
             <p>{knowledgeBook.notationPolicy}</p>
           </details>
           <p className="textbook-print-note">
-            The web text is canonical. A future paperback will excerpt important learning paths
-            from this same graph, not become a second competing textbook.
+            The web text is the working book. A future paperback will excerpt important learning
+            paths from this graph rather than become a competing curriculum.
           </p>
         </aside>
       </div>
+
+      <section className="book-roadmap page-shell" aria-labelledby="book-roadmap-title">
+        <header className="book-roadmap-heading">
+          <div>
+            <p className="eyebrow">The whole-book working map</p>
+            <h2 id="book-roadmap-title">{knowledgeRoadmap.workingChapterCount} chapters across {roadmapParts.length} parts</h2>
+          </div>
+          <p>
+            This is a dependency-shaped editorial map, not a claim that every chapter is written.
+            Planned chapters are deliberately not clickable. Candidate prerequisites and cluster
+            assignments may change as compression work finds a shorter route.
+          </p>
+        </header>
+
+        <div className="book-roadmap-controls" aria-label="Whole-book map filters">
+          <label>
+            <span>Search the working map</span>
+            <input
+              type="search"
+              value={roadmapQuery}
+              placeholder="Calculus, symmetry, proof assistants…"
+              onChange={(event) => setRoadmapQuery(event.target.value)}
+            />
+          </label>
+          <div>
+            {(["all", "draft", "planned"] as const).map((scope) => (
+              <button
+                key={scope}
+                type="button"
+                aria-pressed={roadmapScope === scope}
+                onClick={() => setRoadmapScope(scope)}
+              >
+                {scope === "all" ? "All chapters" : scope === "draft" ? "Draft only" : "Planned only"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="book-roadmap-summary" aria-label="Whole-book map status">
+          <span><strong>{draftRoadmapChapterCount}</strong> draft</span>
+          <span><strong>{knowledgeRoadmap.workingChapterCount - draftRoadmapChapterCount}</strong> planned</span>
+          <span><strong>{reviewedKnowledgeNodeCount}</strong> reviewed lessons</span>
+          <p>Only <strong>Draft</strong> entries open lessons.</p>
+        </div>
+
+        <div className="book-roadmap-parts">
+          {visibleRoadmapParts.map(({ part, chapters: candidateChapters }) => (
+            <details key={part.id} open={forceRoadmapPartsOpen || part.number === 1 ? true : undefined}>
+              <summary>
+                <span>Part {String(part.number).padStart(2, "0")}</span>
+                <strong>{part.title}</strong>
+                <small>{draftChapterCountForPart(part.id)} of {roadmapChaptersForPart(part.id).length} drafted</small>
+              </summary>
+              <p>{part.summary}</p>
+              <ol>
+                {candidateChapters.map((candidate) => {
+                  const draftKnowledgeChapterId = candidate.publication.state === "draft"
+                    ? candidate.publication.knowledgeChapterId
+                    : undefined;
+                  const isDraft = Boolean(draftKnowledgeChapterId);
+                  const draftPath = draftKnowledgeChapterId
+                    ? firstNodePathForKnowledgeChapter(draftKnowledgeChapterId)
+                    : undefined;
+                  const prerequisiteTitles = candidate.candidatePrerequisiteChapterIds.map(
+                    (id) => roadmapChapterById.get(id)?.title ?? id,
+                  );
+                  return (
+                    <li key={candidate.id} className={isDraft ? "is-draft" : "is-planned"}>
+                      <div className="book-roadmap-chapter-line">
+                        <span>{candidate.id} · Chapter {candidate.number}</span>
+                        <em>{isDraft ? "Draft" : "Planned"}</em>
+                      </div>
+                      {draftPath ? (
+                        <Link to={draftPath}>{candidate.title}</Link>
+                      ) : (
+                        <strong>{candidate.title}</strong>
+                      )}
+                      <p>{candidate.goal}</p>
+                      <small>
+                        {prerequisiteTitles.length
+                          ? `Candidate prerequisite: ${prerequisiteTitles.join("; ")}`
+                          : "Candidate entry point"}
+                      </small>
+                    </li>
+                  );
+                })}
+              </ol>
+            </details>
+          ))}
+          {visibleRoadmapParts.length === 0 ? (
+            <p className="book-roadmap-empty">No working-map chapter matches the current filters.</p>
+          ) : null}
+        </div>
+      </section>
+
+      <details className="textbook-global-dag page-shell">
+        <summary>
+          <span>Written knowledge-node DAG</span>
+          <strong>Open all {knowledgeNodes.length} written lessons and their prerequisites</strong>
+        </summary>
+        <div className="textbook-global-dag-body" aria-label="Written knowledge dependency index">
+          <p>
+            Each card names its direct prerequisites. “Needs K04” is a real edge in the written
+            lesson graph; chapter order is a reading convenience and does not create an edge.
+          </p>
+          <div>
+            {knowledgeBook.chapters.map((candidateChapter) => (
+              <section key={candidateChapter.id}>
+                <header>
+                  <span>Chapter {candidateChapter.number}</span>
+                  <strong>{candidateChapter.title}</strong>
+                </header>
+                {knowledgeNodesForChapter(candidateChapter.id).map((node) => (
+                  <Link
+                    key={node.id}
+                    className={node.id === selected.id ? "is-current" : undefined}
+                    to={nodePath(node)}
+                  >
+                    <span>{node.id} · {node.section}</span>
+                    <strong>{node.title}</strong>
+                    <small>{node.prerequisiteIds.length ? `Needs ${node.prerequisiteIds.join(", ")}` : "Entry node"}</small>
+                  </Link>
+                ))}
+              </section>
+            ))}
+          </div>
+        </div>
+      </details>
+
+      <section className="compression-contract page-shell" aria-labelledby="compression-contract-title">
+        <div className="compression-contract-copy">
+          <p className="eyebrow">References and non-omission</p>
+          <h2 id="compression-contract-title">The source works remain evidence behind the book.</h2>
+          <p>
+            The {__SOURCE_RECORD_COUNT__} records do not determine this curriculum. They support
+            comparison, theorem inventory, notation translation, and future checks that a rewrite
+            has not silently discarded source mathematics. The current atlas contains candidate
+            compression routes, not completed theorem-level coverage.
+          </p>
+        </div>
+        <div className="compression-contract-flow" aria-label="Reference processing status">
+          <div><strong>{__SOURCE_RECORD_COUNT__}</strong><span>reference records preserved</span></div>
+          <span aria-hidden="true">→</span>
+          <div><strong>{__COMPRESSION_SOURCE_FAMILY_COUNT__}</strong><span>comparison lenses over {__SOURCE_BRANCH_COUNT__} intake branches</span></div>
+          <span aria-hidden="true">→</span>
+          <div><strong>{__COMPRESSION_CLUSTER_COUNT__}</strong><span>candidate common cores</span></div>
+          <span aria-hidden="true">+</span>
+          <div><strong>{__COMPRESSION_RESIDUAL_COUNT__}</strong><span>candidate residual placements</span></div>
+        </div>
+        <div className="compression-contract-rules">
+          <p><span>01</span><strong>Write the common idea</strong><small>Source prose and chapter order do not control the lesson.</small></p>
+          <p><span>02</span><strong>Unify notation</strong><small>Aliases translate into one stable language instead of creating duplicate knowledge.</small></p>
+          <p><span>03</span><strong>Test the shorter route</strong><small>A proposed compression stays provisional until the dependencies and proofs are reviewed.</small></p>
+          <p><span>04</span><strong>Account for every theorem</strong><small>Future inventories must retain every source occurrence and its exact lineage.</small></p>
+        </div>
+        <div className="compression-contract-links">
+          <Link to="/knowledge/compression">Explore candidate compression routes <span aria-hidden="true">→</span></Link>
+          <Link to="/knowledge/coverage">Audit all {__SOURCE_RECORD_COUNT__} reference records <span aria-hidden="true">→</span></Link>
+        </div>
+      </section>
     </div>
   );
 }

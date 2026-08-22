@@ -93,7 +93,7 @@ export function PaperPage() {
       </header>
 
       {paper.status === "gold" ? (
-        <GraphExplorer paper={paper} statements={statements} />
+        <GraphExplorer key={paper.id} paper={paper} statements={statements} />
       ) : (
         <section className="provisional-notice page-shell">
           <p className="eyebrow">Metadata-level inclusion</p>

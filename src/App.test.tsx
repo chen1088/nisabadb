@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it } from "vitest";
 import App from "./App";
 import { corpus as browserCorpus } from "./components/content";
+import { knowledgeNodes } from "./data/knowledge";
 
 afterEach(cleanup);
 
@@ -15,13 +16,13 @@ function renderAt(path: string) {
 }
 
 describe("NisabaDB application", () => {
-  it("presents the canonical branding and paper-first corpus phase", () => {
+  it("presents the canonical branding and living textbook", () => {
     renderAt("/");
     expect(screen.getByRole("heading", { name: /from first steps/i })).toBeInTheDocument();
     expect(screen.getByText("From first arithmetic to research proofs.")).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: /browse the first source map/i }),
-    ).toHaveAttribute("href", "/materials");
+      screen.getByRole("link", { name: /start the living textbook/i }),
+    ).toHaveAttribute("href", "/knowledge");
   });
 
   it("opens a deep-linked result with its exact statement and active route", () => {
@@ -39,41 +40,38 @@ describe("NisabaDB application", () => {
     );
   });
 
-  it("uses a papers-first information architecture and gates premature Knowledge", () => {
+  it("uses the one-book information architecture", () => {
     renderAt("/knowledge");
     const navigation = screen.getByRole("navigation", { name: /primary navigation/i });
     expect(within(navigation).getAllByRole("link").map((link) => link.textContent)).toEqual([
-      "Papers",
-      "Materials",
       "Knowledge",
+      "Papers",
       "Unsolved",
-      "Learn",
+      "Train",
     ]);
-    expect(screen.getByRole("heading", { name: /knowledge is what survives compression/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/knowledge activation status/i)).toHaveTextContent(/canonical knowledge nodes\s*0/i);
-    expect(screen.queryByLabelText(/layered prerequisite graph/i)).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /inspect the source collection/i })).toHaveAttribute("href", "/materials");
+    expect(screen.getByRole("heading", { name: /the nisaba mathematics text/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/textbook status/i)).toHaveTextContent(
+      new RegExp(`written knowledge nodes\\s*${knowledgeNodes.length}`, "i"),
+    );
+    expect(screen.getByLabelText(/textbook table of contents/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/local knowledge dependency graph/i)).toBeInTheDocument();
+    expect(screen.getByText(/open the 30-node dependency dag/i).closest("details")).not.toHaveAttribute("open");
+    expect(within(navigation).queryByRole("link", { name: /materials|learn/i })).not.toBeInTheDocument();
   });
 
-  it("maps checked materials from a zero-background start without calling them Knowledge", () => {
-    renderAt("/materials");
-    expect(screen.getByRole("heading", { name: /start at zero/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/materials collection status/i)).toHaveTextContent(/canonical knowledge nodes\s*0/i);
-    expect(screen.getByLabelText(/candidate source route for/i)).toBeInTheDocument();
-    expect(screen.getByText(/not a demand to read/i)).toBeInTheDocument();
+  it("reads rewritten knowledge with unified notation and searchable chapters", () => {
+    renderAt("/knowledge?node=sets-elements-extensionality");
+    expect(screen.getByRole("heading", { name: /sets, elements, and extensionality/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/required knowledge/i)).toBeInTheDocument();
+    expect(screen.getByRole("table", { name: /canonical notation/i })).toBeInTheDocument();
+    expect(screen.getByText(/source lineage and rewrite status/i)).toBeInTheDocument();
 
-    fireEvent.change(screen.getByRole("combobox", { name: /mathematics destination/i }), {
-      target: { value: "young-diagrams" },
+    fireEvent.change(screen.getByRole("searchbox", { name: /find a knowledge node/i }), {
+      target: { value: "quantifiers" },
     });
-    const route = screen.getByLabelText(/candidate source route for.*young diagrams/i);
-    expect(within(route).getByText("The Symmetric Group")).toBeInTheDocument();
-    expect(within(route).queryByText("Young Tableaux")).not.toBeInTheDocument();
-
-    fireEvent.change(screen.getByRole("searchbox", { name: /search materials/i }), {
-      target: { value: "fractions" },
-    });
-    expect(screen.getByRole("heading", { name: "Prealgebra 2e" })).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "The Symmetric Group" })).not.toBeInTheDocument();
+    const contents = screen.getByLabelText(/textbook table of contents/i);
+    expect(within(contents).getByRole("link", { name: /quantifiers always have domains/i })).toBeInTheDocument();
+    expect(within(contents).queryByRole("link", { name: /equality is not definition/i })).not.toBeInTheDocument();
   });
 
   it("shows the paper citation DAG, processing backlog, and bounded catalog", () => {
@@ -110,12 +108,22 @@ describe("NisabaDB application", () => {
     expect(screen.getByText(/none has completed.*confirmed open as of/i)).toBeInTheDocument();
   });
 
-  it("gates global learning routes until Knowledge compression exists", () => {
-    renderAt("/learn");
-    expect(screen.getByRole("heading", { name: /training follows compression/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/learning activation status/i)).toHaveTextContent(/active curricula\s*0/i);
-    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
-    expect(screen.getAllByRole("link", { name: /paper/i }).length).toBeGreaterThan(0);
+  it("trains a human or AI by re-proving a random reviewed paper node", () => {
+    renderAt("/train");
+    expect(screen.getByRole("heading", { name: /train by rebuilding a result/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /re-prove this statement/i })).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: /your proof attempt/i })).toBeInTheDocument();
+    expect(screen.queryByText(/^Reviewed route/i)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /reveal prerequisites/i }));
+    expect(screen.getByText(/hint 1.*permitted inputs/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /reveal proof idea/i }));
+    expect(screen.getByText(/hint 2.*proof idea/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /compare with the reviewed proof/i }));
+    expect(screen.getByText(/^Reviewed route/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "AI" }));
+    expect(screen.getByText(/act as a rigorous proof trainee/i)).toBeInTheDocument();
   });
 
   it("serves the multislice gold rewrite and its source-audited main theorem", () => {

@@ -1,98 +1,309 @@
-import { Link } from "react-router-dom";
-import { corpus } from "../components/content";
-import { materials } from "../data/materials";
+import { useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { MathMarkdown } from "../components/MathMarkdown";
+import {
+  getKnowledgeNode,
+  knowledgeBook,
+  knowledgeChapterById,
+  knowledgeDependents,
+  knowledgeNodeById,
+  knowledgeNodes,
+  knowledgeNodesForChapter,
+  knowledgeSourceById,
+  nextKnowledgeNode,
+  notationById,
+  previousKnowledgeNode,
+} from "../data/knowledge";
+import type { KnowledgeNode } from "../data/knowledge-schema";
 
-const goldPapers = corpus.papers.filter((paper) => paper.status === "gold").length;
-const provisionalPapers = corpus.papers.length - goldPapers;
+const kindLabels: Record<KnowledgeNode["kind"], string> = {
+  language: "Language",
+  definition: "Definition",
+  law: "Law",
+  method: "Method",
+  theorem: "Theorem",
+};
+
+function nodePath(node: KnowledgeNode): string {
+  return `/knowledge?node=${encodeURIComponent(node.slug)}`;
+}
 
 export function KnowledgePage() {
+  const [parameters] = useSearchParams();
+  const [query, setQuery] = useState("");
+  const requestedNode = parameters.get("node") ?? undefined;
+  const selected = getKnowledgeNode(requestedNode) ?? knowledgeNodes[0];
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+
+  const visibleNodeIds = useMemo(() => {
+    if (!normalizedQuery) return new Set(knowledgeNodes.map((node) => node.id));
+    return new Set(
+      knowledgeNodes
+        .filter((node) =>
+          [node.id, node.title, node.purpose, node.kind, ...node.tags]
+            .join(" ")
+            .toLocaleLowerCase()
+            .includes(normalizedQuery),
+        )
+        .map((node) => node.id),
+    );
+  }, [normalizedQuery]);
+
+  if (!selected) return null;
+
+  const chapter = knowledgeChapterById.get(selected.chapterId);
+  const prerequisites = selected.prerequisiteIds
+    .map((id) => knowledgeNodeById.get(id))
+    .filter((node): node is KnowledgeNode => Boolean(node));
+  const dependents = knowledgeDependents(selected.id);
+  const previous = previousKnowledgeNode(selected.id);
+  const next = nextKnowledgeNode(selected.id);
+  const notation = selected.notationIds
+    .map((id) => notationById.get(id))
+    .filter((entry) => Boolean(entry));
+  const sources = selected.sourceRefs
+    .map((reference) => ({
+      ...reference,
+      source: knowledgeSourceById.get(reference.sourceId),
+    }))
+    .filter((reference) => Boolean(reference.source));
+
   return (
-    <div className="knowledge-page page-shell">
-      <header className="page-hero compact-page-hero knowledge-hero knowledge-hero-gated">
-        <p className="eyebrow">Canonical layer · deliberately gated</p>
-        <h1>Knowledge is what survives compression.</h1>
-        <p>
-          A textbook, chapter, or paper is not one piece of Knowledge. NisabaDB must extract
-          the small ideas they use, forge beginner-friendly bridges between them, and compare
-          alternate routes before claiming a minimum prerequisite graph.
-        </p>
+    <div className="textbook-page">
+      <header className="textbook-masthead page-shell">
+        <div>
+          <p className="eyebrow">The canonical living textbook</p>
+          <h1>{knowledgeBook.title}</h1>
+          <p>{knowledgeBook.subtitle}</p>
+        </div>
+        <dl aria-label="Textbook status">
+          <div><dt>Edition</dt><dd>{knowledgeBook.edition}</dd></div>
+          <div><dt>Written knowledge nodes</dt><dd>{knowledgeNodes.length}</dd></div>
+          <div><dt>Organization</dt><dd>Dependency DAG</dd></div>
+        </dl>
       </header>
 
-      <section className="knowledge-gate" aria-labelledby="knowledge-gate-title">
-        <div className="knowledge-gate-counts" aria-label="Knowledge activation status">
-          <div>
-            <span>Canonical knowledge nodes</span>
-            <strong>0</strong>
-            <small>No cross-paper merges claimed</small>
-          </div>
-          <div>
-            <span>Checked learning sources</span>
-            <strong>{materials.length}</strong>
-            <small>Evidence containers, not curriculum nodes</small>
-          </div>
-          <div>
-            <span>Processed source papers</span>
-            <strong>{goldPapers}</strong>
-            <small>Too little overlap for compression</small>
-          </div>
-          <div>
-            <span>Provisional paper records</span>
-            <strong>{provisionalPapers}</strong>
-            <small>Corpus expansion is the active phase</small>
-          </div>
-        </div>
-
-        <div className="knowledge-gate-copy">
-          <p className="eyebrow">Why the graph is withheld</p>
-          <h2 id="knowledge-gate-title">A source map is not yet a learning path.</h2>
+      <details className="textbook-global-dag page-shell">
+        <summary>
+          <span>Whole-book map</span>
+          <strong>Open the {knowledgeNodes.length}-node dependency DAG</strong>
+        </summary>
+        <div className="textbook-global-dag-body" aria-label="Global knowledge dependency graph">
           <p>
-            The current Materials DAG shows where useful explanations may be found. The paper
-            DAGs show how two research results are proved. A canonical Knowledge node needs a
-            minimized description, a tutorial for someone arriving with exactly its listed
-            prerequisites, reviewed equivalence boundaries, and evidence that every edge is used.
+            Each card names its direct prerequisites. “Needs K04” means the current idea depends
+            on K04; chapter order is only a reading convenience and does not create an edge.
           </p>
-          <Link className="button-link primary-action" to="/materials">
-            Inspect the source collection <span aria-hidden="true">→</span>
-          </Link>
+          <div>
+            {knowledgeBook.chapters.map((candidateChapter) => (
+              <section key={candidateChapter.id}>
+                <header>
+                  <span>Chapter {candidateChapter.number}</span>
+                  <strong>{candidateChapter.title}</strong>
+                </header>
+                {knowledgeNodesForChapter(candidateChapter.id).map((node) => (
+                  <Link
+                    key={node.id}
+                    className={node.id === selected.id ? "is-current" : undefined}
+                    to={nodePath(node)}
+                  >
+                    <span>{node.id} · {node.section}</span>
+                    <strong>{node.title}</strong>
+                    <small>{node.prerequisiteIds.length ? `Needs ${node.prerequisiteIds.join(", ")}` : "Entry node"}</small>
+                  </Link>
+                ))}
+              </section>
+            ))}
+          </div>
         </div>
-      </section>
+      </details>
 
-      <section className="knowledge-activation" aria-labelledby="knowledge-activation-title">
-        <header>
-          <p className="eyebrow">Activation sequence</p>
-          <h2 id="knowledge-activation-title">How the real Knowledge DAG will be earned</h2>
-        </header>
-        <ol>
-          <li>
-            <span>01</span>
-            <div>
-              <h3>Collect the source universe</h3>
-              <p>Map research papers and basic-to-advanced learning materials with precise provenance and reuse boundaries.</p>
+      <div className="textbook-workspace page-shell">
+        <aside className="textbook-contents" aria-label="Textbook table of contents">
+          <div className="textbook-pane-heading">
+            <span>Contents</span>
+            <strong>Read in dependency order</strong>
+          </div>
+          <label className="textbook-search">
+            <span>Find a knowledge node</span>
+            <input
+              type="search"
+              value={query}
+              placeholder="Sets, equality, quantifiers…"
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </label>
+          <nav aria-label="Knowledge chapters">
+            {knowledgeBook.chapters.map((candidateChapter) => {
+              const chapterNodes = knowledgeNodesForChapter(candidateChapter.id).filter((node) =>
+                visibleNodeIds.has(node.id),
+              );
+              if (!chapterNodes.length) return null;
+              return (
+                <section key={candidateChapter.id}>
+                  <p><span>Chapter {candidateChapter.number}</span><strong>{candidateChapter.title}</strong></p>
+                  <ol>
+                    {chapterNodes.map((node) => (
+                      <li key={node.id}>
+                        <Link
+                          className={node.id === selected.id ? "is-current" : undefined}
+                          to={nodePath(node)}
+                          aria-current={node.id === selected.id ? "page" : undefined}
+                        >
+                          <span>{node.section}</span>
+                          {node.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+              );
+            })}
+          </nav>
+          {normalizedQuery && visibleNodeIds.size === 0 ? (
+            <p className="textbook-no-results">No knowledge node matches “{query}”.</p>
+          ) : null}
+        </aside>
+
+        <article className="textbook-reader" aria-labelledby="knowledge-node-title">
+          <div className="textbook-section-line">
+            <span>{chapter ? `Chapter ${chapter.number} · ${chapter.title}` : "Knowledge"}</span>
+            <span>{selected.readMinutes} min</span>
+          </div>
+          <p className="textbook-node-kind">{selected.section} · {kindLabels[selected.kind]} · {selected.id}</p>
+          <h2 id="knowledge-node-title">{selected.title}</h2>
+          <p className="textbook-purpose">{selected.purpose}</p>
+
+          <section className="textbook-prerequisite-strip" aria-label="Required knowledge">
+            <span>Know first</span>
+            {prerequisites.length ? (
+              <div>
+                {prerequisites.map((node) => (
+                  <Link key={node.id} to={nodePath(node)}>{node.section} {node.title}</Link>
+                ))}
+              </div>
+            ) : <strong>Nothing. This is an entry point.</strong>}
+          </section>
+
+          <section className="textbook-section">
+            <h3>Why this exists</h3>
+            <MathMarkdown>{selected.motivation}</MathMarkdown>
+          </section>
+
+          <aside className="textbook-key-idea">
+            <span>The one idea to keep</span>
+            <MathMarkdown>{selected.keyIdea}</MathMarkdown>
+          </aside>
+
+          <section className="textbook-section textbook-tutorial">
+            <h3>Tutorial</h3>
+            <MathMarkdown>{selected.tutorial}</MathMarkdown>
+          </section>
+
+          <section className="textbook-section">
+            <h3>Worked examples</h3>
+            <div className="textbook-examples">
+              {selected.examples.map((example, index) => (
+                <article key={example.title}>
+                  <span>Example {index + 1}</span>
+                  <h4>{example.title}</h4>
+                  <MathMarkdown>{example.body}</MathMarkdown>
+                </article>
+              ))}
             </div>
-          </li>
-          <li>
-            <span>02</span>
-            <div>
-              <h3>Extract small ideas</h3>
-              <p>Break papers and books into definitions, algorithms, examples, exact claims, and the dependencies they actually use.</p>
-            </div>
-          </li>
-          <li>
-            <span>03</span>
-            <div>
-              <h3>Forge and compare bridges</h3>
-              <p>Write independent beginner tutorials, computational reinterpretations, and alternate routes; measure their prerequisite cost.</p>
-            </div>
-          </li>
-          <li>
-            <span>04</span>
-            <div>
-              <h3>Verify and compress</h3>
-              <p>Administrators approve source-independent nodes only after mathematical, pedagogical, and formal evidence survives review.</p>
-            </div>
-          </li>
-        </ol>
-      </section>
+          </section>
+
+          {notation.length ? (
+            <section className="textbook-section">
+              <h3>Notation used here</h3>
+              <div className="notation-table" role="table" aria-label="Canonical notation">
+                {notation.map((entry) => entry ? (
+                  <div role="row" key={entry.id}>
+                    <div role="cell"><MathMarkdown>{`$${entry.symbol}$`}</MathMarkdown></div>
+                    <div role="cell">
+                      <strong>{entry.spokenAs}</strong>
+                      <span>{entry.meaning}</span>
+                      {entry.aliases.length ? (
+                        <details>
+                          <summary>Other books may write this differently</summary>
+                          <ul>
+                            {entry.aliases.map((alias) => (
+                              <li key={alias.form}><MathMarkdown>{`$${alias.form}$ — ${alias.note}`}</MathMarkdown></li>
+                            ))}
+                          </ul>
+                        </details>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : null)}
+              </div>
+            </section>
+          ) : null}
+
+          <section className="textbook-section textbook-exercise">
+            <p className="eyebrow">Check your understanding</p>
+            <h3>Try it before opening the help</h3>
+            <MathMarkdown>{selected.exercise.prompt}</MathMarkdown>
+            <details>
+              <summary>Show {selected.exercise.hints.length === 1 ? "a hint" : "hints"}</summary>
+              <ol>
+                {selected.exercise.hints.map((hint) => <li key={hint}><MathMarkdown>{hint}</MathMarkdown></li>)}
+              </ol>
+            </details>
+            <details>
+              <summary>Show the solution</summary>
+              <MathMarkdown>{selected.exercise.solution}</MathMarkdown>
+            </details>
+          </section>
+
+          <details className="textbook-provenance">
+            <summary>Source lineage and rewrite status</summary>
+            <p>
+              This explanation is independently rewritten into NisabaDB’s notation. The sources
+              below are evidence and comparison points, not chapters pasted into this book.
+            </p>
+            <ul>
+              {sources.map((reference) => reference.source ? (
+                <li key={reference.sourceId}>
+                  <a href={reference.source.officialUrl} target="_blank" rel="noreferrer">{reference.source.title}</a>
+                  <span>{reference.note}</span>
+                </li>
+              ) : null)}
+            </ul>
+          </details>
+
+          <nav className="textbook-pagination" aria-label="Textbook pages">
+            {previous ? <Link to={nodePath(previous)}><span>Previous</span><strong>{previous.section} {previous.title}</strong></Link> : <span />}
+            {next ? <Link to={nodePath(next)}><span>Next</span><strong>{next.section} {next.title}</strong></Link> : <span />}
+          </nav>
+        </article>
+
+        <aside className="textbook-context" aria-label="Local knowledge dependency graph">
+          <div className="textbook-pane-heading"><span>Local DAG</span><strong>What this needs and unlocks</strong></div>
+          <section>
+            <h3>Prerequisites</h3>
+            {prerequisites.length ? prerequisites.map((node) => (
+              <Link key={node.id} to={nodePath(node)}><span>{node.id}</span><strong>{node.title}</strong></Link>
+            )) : <p>Entry point</p>}
+          </section>
+          <div className="textbook-dag-arrow" aria-hidden="true">↓</div>
+          <div className="textbook-current-node"><span>{selected.id} · selected</span><strong>{selected.title}</strong></div>
+          <div className="textbook-dag-arrow" aria-hidden="true">↓</div>
+          <section>
+            <h3>Immediately unlocks</h3>
+            {dependents.length ? dependents.map((node) => (
+              <Link key={node.id} to={nodePath(node)}><span>{node.id}</span><strong>{node.title}</strong></Link>
+            )) : <p>End of the written frontier</p>}
+          </section>
+          <details className="textbook-policy">
+            <summary>One-book notation policy</summary>
+            <p>{knowledgeBook.notationPolicy}</p>
+          </details>
+          <p className="textbook-print-note">
+            The web text is canonical. A future paperback will excerpt important learning paths
+            from this same graph, not become a second competing textbook.
+          </p>
+        </aside>
+      </div>
     </div>
   );
 }

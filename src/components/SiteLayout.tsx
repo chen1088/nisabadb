@@ -17,6 +17,8 @@ function RouteEffects() {
     ? decodeURIComponent(hash.slice(1))
     : pathname.startsWith("/papers/") && new URLSearchParams(search).has("node")
       ? "explorer"
+      : pathname === "/knowledge" && new URLSearchParams(search).has("node")
+        ? "knowledge-node-title"
       : "";
 
   useEffect(() => {
@@ -43,11 +45,10 @@ export function SiteLayout() {
           </span>
         </Link>
         <nav aria-label="Primary navigation">
-          <NavLink to="/papers">Papers</NavLink>
-          <NavLink to="/materials">Materials</NavLink>
           <NavLink to="/knowledge">Knowledge</NavLink>
+          <NavLink to="/papers">Papers</NavLink>
           <NavLink to="/unsolved">Unsolved</NavLink>
-          <NavLink to="/learn">Learn</NavLink>
+          <NavLink to="/train">Train</NavLink>
         </nav>
       </header>
       <main id="main-content">
@@ -62,8 +63,8 @@ export function SiteLayout() {
           </span>
         </div>
         <p>
-          Papers and learning materials remain attributed source evidence. Knowledge appears
-          only after overlap, dependencies, and independently written explanations are reviewed.
+          One unified mathematics text, connected to inspectable paper evidence. Every explanation
+          is rewritten; every prerequisite remains open to compression.
         </p>
       </footer>
     </div>

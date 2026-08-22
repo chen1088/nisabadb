@@ -31,11 +31,6 @@ function cloneParameters(parameters: URLSearchParams): URLSearchParams {
   return new URLSearchParams(parameters.toString());
 }
 
-function initialExpansion(paper: Paper): Set<string> {
-  const mainView = paper.graph.views.find((view) => view.roots.includes(paper.graph.mainRoot ?? ""));
-  return new Set(mainView?.initiallyExpanded ?? (paper.graph.mainRoot ? [paper.graph.mainRoot] : []));
-}
-
 function formatEnum(value: string): string {
   return value.replaceAll("-", " ").replace(/^./, (letter) => letter.toUpperCase());
 }
@@ -81,7 +76,7 @@ function ideaHeading(statement: Statement): string {
 
 export function GraphExplorer({ paper, statements }: GraphExplorerProps) {
   const [parameters, setParameters] = useSearchParams();
-  const [expanded, setExpanded] = useState<Set<string>>(() => initialExpansion(paper));
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const localById = useMemo(
     () => new Map(statements.map((statement) => [statement.id, statement])),
     [statements],

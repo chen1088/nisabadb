@@ -4,13 +4,15 @@ Status date: 2026-08-22
 
 ## Product structure
 
-- The primary navigation is now Papers, Materials, Knowledge, Unsolved, and Learn; the brand remains the home link.
+- The primary navigation is Knowledge, Papers, Unsolved, and Train; the brand remains the home link.
 - Papers is the active first phase: 2,143 catalog records, a bounded rooted citation-ancestry projection, a processing backlog, and 50-record catalog pagination.
-- Materials is a separate source-evidence layer for a learner starting with no mathematics background. It contains 25 official-source-checked books, courses, notes, software labs, and an interactive tool, connected into six provisional goal routes.
-- Each gold paper renders one complete dependency graph. Legacy `view` query parameters remain harmless, but main-theorem and topic graph tabs are no longer user-visible.
+- There is no public Materials/source-shelf architecture. Books, courses, notes, software labs, and other sources are retained only as editorial evidence and per-node lineage behind NisabaDB's rewritten textbook.
+- Each gold paper renders one complete dependency graph. Legacy `view` query parameters remain harmless, but main-theorem and topic graph tabs are no longer user-visible. Theorem/result nodes are initially folded so readers choose which statements and proofs to inspect.
 - Proof routes distinguish their dependency role (`original`, `minimized`, or `reinterpretation`) from their review state. The current 61 populated routes are reviewed original/source routes; no minimized or reinterpretation route is claimed yet.
-- Knowledge contains zero canonical nodes and is deliberately gated. The 25 material records are evidence containers, and the existing 93 reviewed statements belong to two separate paper-local proof DAGs; neither source collection is a global Knowledge DAG.
-- Learn is also gated until canonical Knowledge and its reviewed prerequisite DAG exist. The six candidate material routes and two gold paper graphs remain directly inspectable without being presented as finished curricula.
+- Knowledge is one canonical living textbook, not a catalog of textbooks. Its initial foundations edition contains 30 independently written nodes in six chapters, arranged both in reading order and by a validated prerequisite DAG, with 21 canonical notation entries and six source-lineage records. All 30 nodes currently have `initial-rewrite` status pending mathematical and pedagogical review.
+- The 93 reviewed paper-local statements remain distinct from the canonical textbook nodes. Reusable content can be rewritten into Knowledge with explicit source lineage, notation normalization, and prerequisite review rather than copied or automatically promoted.
+- Train is the re-proving exercise surface. It randomly selects meaningful theorem-like nodes from the paper DAGs for a human or AI to prove, with dependency context and reviewed proof routes available for progressive disclosure.
+- A future published paperback is a curated excerpt of important parts of the same canonical Knowledge text, not a separate source collection.
 - Unsolved is intentionally empty. The one source conjecture is a literature-review candidate, not a confirmed-current open problem.
 - Formal artifacts are now prover-neutral. The 191 current artifacts are Lean 4 declarations; the schema also validates reproducible submissions from other checkers, but automated submission and execution await the worker service.
 
@@ -81,18 +83,20 @@ The first bounded recursive run processed ten identified papers and expanded the
 
 These citation records are bibliographic evidence, not mathematical prerequisite edges. The raw directed network may contain cycles; the Papers interface exposes a bounded, cycle-safe ancestry projection for navigation without asserting that the full citation network is a DAG.
 
-## Materials source collection
+## Editorial source lineage and notation
 
-The first collection spans arithmetic diagnostics, algebra and functions, proof, calculus, discrete mathematics, linear algebra, probability, algorithms, complexity, computational group theory, representation theory, Young diagrams, Boolean-function analysis, property testing, and PCPs. The current candidate destinations are first proof, mathematical common core, computational algebra, Young diagrams, dictatorship testing, and multislice invariance.
+The initial textbook records six official source-lineage entries spanning arithmetic, proof, discrete mathematics, sets, functions, and abstract-algebra notation. They are internal extraction and comparison evidence attached to rewritten nodes, not a public library, a list of assignments, or the architecture of Knowledge. Broader calculus, linear-algebra, probability, algorithms, complexity, representation-theory, Boolean-analysis, property-testing, and PCP source intake remains future editorial work.
 
-Each route is a DAG of source containers, not a list of books to read and not a graph of canonical concepts. Alternate sources and on-demand references stay outside the selected route unless explicitly chosen. The initial compression hypotheses are:
+The initial compression hypotheses remain editorial questions:
 
 1. selected algebra/functions, one proof bridge, and the MIT discrete-math core may replace repeated portions of several conventional introductory courses;
 2. algebra may admit a smaller common language organized around executable structures, structure-preserving maps, invariants, and decomposition;
 3. representation-first and tableaux-first routes to Young diagrams should be compared rather than accumulated;
 4. much finite Boolean analysis may avoid making a full measure-theory course a mandatory ancestor.
 
-Access and derivative rights are displayed as separate facts. OpenStax records also disclose its current permission requirement for generative-AI ingestion. Free-to-read, no-derivatives, mixed-license, and commercial sources are link-and-cite evidence only; NisabaDB must write independent tutorials and examples rather than reproduce their exposition.
+The current source-lineage entries are citations and comparison points, not permission claims. Any future ingestion or adaptation must review access and derivative rights separately. NisabaDB writes independent tutorials and examples rather than assuming that free-to-read material may be reproduced.
+
+The living textbook has one notation registry. Each entry records NisabaDB's canonical symbol and meaning, its first knowledge node, and aliases or conflicts found in source traditions. Knowledge nodes point to those entries and to their source lineage, while their main exposition uses only the canonical convention.
 
 ## Remaining mathematical work
 
@@ -107,7 +111,8 @@ Access and derivative rights are displayed as separate facts. OpenStax records a
 9. Continue the recursive citation queue, resolve the 36 identity-blocked records (starting with exact DOI/arXiv candidates), and promote provisional papers to gold only after source-level mathematical review.
 10. Add process-safe leases/locks, bounded provider pagination, rate budgets, retries, and recovery before distributing queue work across DigitalOcean nodes.
 11. Split the static client artifact or add a catalog service before scaling substantially beyond the current 2,143 records.
-12. Extract concept-level candidates from both material sources and paper proof DAGs, then compare overlaps, alternative routes, and prerequisite costs.
-13. Begin canonical Knowledge review only after those cross-source equivalences and independently written beginner bridges have been mathematically and pedagogically audited.
+12. Expand the canonical textbook by rewriting reusable concepts from source evidence and paper proof DAGs, comparing overlaps, notation conflicts, alternate routes, and actual prerequisite costs before merging nodes.
+13. Mathematically and pedagogically review the 30 initial Knowledge nodes, then extend the chapter and prerequisite DAG without duplicating concepts that already have canonical homes.
+14. Define and audit Train eligibility so random exercises select meaningful paper results with enough exposed context to be attempted and never present a missing or source-omitted proof as a solved reference route.
 
 These are labeled gaps, not hidden completion claims.

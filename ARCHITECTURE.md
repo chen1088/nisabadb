@@ -1,14 +1,14 @@
 # NisabaDB architecture
 
-## Source evidence first, knowledge compression later
+## Reviewed paper graphs and one living textbook
 
-`src/data/corpus.json` is the build-time source for the paper catalog, citation explorer, reviewed paper graphs, canonical theorem pages, and distilled-paper view. `src/data/materials.json` is the separate checked collection of beginner-to-research books, courses, notes, software labs, and tools. Rendering code never owns mathematical proof text or third-party textbook prose. `src/data/schema.ts` and `src/data/material-schema.ts` validate the two source layers as the application loads and in tests.
+`src/data/corpus.json` is the build-time source for the paper catalog, citation explorer, reviewed paper graphs, canonical theorem pages, distilled-paper view, and Train exercise pool. `src/data/knowledge.json` is the source for one canonical living textbook whose exposition is independently rewritten into NisabaDB's notation. Rendering code never owns mathematical proof text or third-party textbook prose. `src/data/schema.ts` and `src/data/knowledge-schema.ts` validate the paper and textbook layers as the application loads and in tests.
 
-- **Papers** is the active first phase. It exposes the large provisional corpus, a bounded citation-ancestry projection, processing backlog, and one complete proof-dependency graph for each reviewed paper. Main results and sections are focus points inside that graph, not separate graph tabs.
-- **Materials** maps useful sources from an arithmetic diagnostic through current research bridges. Its prerequisite relations are candidate source-preparation edges, not learner assignments or canonical mathematical dependencies. Whole books never become Knowledge nodes.
-- **Knowledge** has zero canonical nodes until enough paper and material content has been extracted to expose genuine repeated concepts. A later source-independent `KnowledgeNode` layer will merge equivalent claims only after cross-source review, then minimize descriptions, tutorials, and dependencies.
+- **Papers** exposes the large provisional corpus, a bounded citation-ancestry projection, processing backlog, and one complete proof-dependency graph for each reviewed paper. Main results and sections are focus points inside that graph, not separate graph tabs. Paper dependency disclosures start folded; readers expand only the result branches they want to inspect.
+- **Knowledge** is one source-independent, living rewritten textbook rather than a shelf of books. Chapters provide a conventional reading order, while `KnowledgeNode.prerequisiteIds` provide the canonical dependency DAG. A shared notation registry fixes one main convention and records source-specific aliases. Per-node source references remain collapsed lineage and comparison evidence behind the exposition.
 - **Unsolved** remains empty until a precise problem passes an administratively reviewed, dated literature audit.
-- **Learn** is gated until a reviewed Knowledge DAG exists. Paper-specific graph reading remains available on each gold paper without pretending to be a globally minimized curriculum.
+- **Train** derives proof exercises from meaningful theorem-like nodes in gold paper graphs. An eligible result must have a reviewed, complete proof route and cannot be an imported result. Selection is random, the stored proof begins hidden, and prerequisite, proof-idea, and reviewed-route help is disclosed progressively for either a human or AI trainee.
+- **Materials** and **Learn** are no longer product surfaces. Their legacy URLs remain only as redirects to Knowledge and Train respectively.
 
 The core relationships are:
 
@@ -18,23 +18,26 @@ Paper
   │      │              │            ├─ dependencyRefs -> Statement
   │      │              │            └─ formalDeclarationRefs
   │      ├─ SourceLocation
-  │      └─ FormalDeclaration
+  │      ├─ FormalDeclaration
+  │      └─ reviewed + complete theorem-like route -> Train exercise
   ├─ CitationEdge -> Paper
   ├─ ModificationRecord
   └─ ingestion queue state
 
-Material source
-  ├─ prerequisiteIds -> Material source
-  ├─ alternativeIds -> Material source
-  ├─ extractFocus
-  ├─ access and derivative-rights evidence
-  └─ provisional compression question
+KnowledgeBook
+  ├─ Chapter ── reading order ──> KnowledgeNode
+  ├─ KnowledgeNode
+  │      ├─ prerequisiteIds -> KnowledgeNode
+  │      ├─ notationIds -> NotationEntry
+  │      ├─ sourceRefs -> SourceLineage
+  │      └─ motivation, tutorial, examples, exercise, status
+  ├─ NotationEntry
+  │      ├─ canonical symbol, spoken form, and meaning
+  │      ├─ firstNodeId -> KnowledgeNode
+  │      └─ source-specific aliases and conflict notes
+  └─ SourceLineage ── official URL and editorial use note
 
-Future KnowledgeNode
-  ├─ evidenceRefs -> Statements and extracted material locations
-  ├─ prerequisiteRefs -> KnowledgeNode
-  ├─ minimized description and tutorial
-  └─ review and verification evidence
+Published paperback (planned) ── selected excerpts from ──> KnowledgeBook
 ```
 
 `CitationEdge` and a statement dependency are different relations. Citation edges record bibliographic discovery and provenance; they do not prove logical dependence. The raw citation network can contain cycles. The Papers interface constructs a bounded, rooted ancestry projection by placing a selected paper after the works it cites, assigning every visible paper its earliest breadth layer, and retaining only citation relations that advance exactly one layer toward the selected paper. Same-layer and backward raw edges remain in the corpus but are excluded from this view, so its displayed per-node adjacency is genuinely acyclic. Node and depth limits are disclosed. This projection is a navigation DAG, not a claim that the complete citation network is acyclic. A later whole-corpus hierarchy can condense strongly connected components explicitly.
@@ -43,9 +46,11 @@ A statement may have several proof routes. Each route owns its dependency set, p
 
 Route exposition and route provenance are independent. `type` describes presentation (for example compressed source or pedagogical), while `dependencyKind` records whether the dependency route is the audited `original`, a reviewed `minimized` route, or a `reinterpretation`. `reviewStatus` keeps candidate routes visibly separate from reviewed routes. Every minimized route must identify the route from which it was minimized.
 
+Knowledge has two compatible orders over the same canonical records. Chapter and section numbers support ordinary previous/next reading; prerequisite edges support local “know first” and “immediately unlocks” views, dependency closure, and later alternate reading paths. The source-lineage layer records where ideas and notation were compared, but source containers are not reader-facing chapters and their wording is not copied into the textbook. A future paperback selects important portions of these same nodes instead of creating a second mathematical authority.
+
 ## Validation invariants
 
-The Zod schema and cross-record checks reject:
+The paper-corpus Zod schema and cross-record checks reject:
 
 - duplicate paper, statement, global-statement, proof-route, proof-step, or citation IDs, and duplicate queue entries for one paper;
 - duplicate stable paper identifiers or citation endpoint pairs;
@@ -60,7 +65,19 @@ The Zod schema and cross-record checks reject:
 - impossible citation coverage, recursive-closure, or completed-queue claims;
 - `fully-certified` statement or route claims without reviewed alignment and a clean, input-free formal audit.
 
-The material schema separately rejects duplicate source or goal IDs, missing prerequisite or alternate sources, self-links, repeated relations, prerequisite cycles, and compression hypotheses with missing evidence. Alternative-route cycles are allowed because they express comparison, not precedence. Access availability and derivative rights are separate displayed facts: a free PDF is not assumed to permit adaptation or AI ingestion.
+The Knowledge schema separately rejects:
+
+- duplicate source, chapter, notation, or node IDs, plus duplicate node slugs or section numbers;
+- empty chapters and missing chapter targets;
+- notation entries whose first-use node is missing;
+- missing, repeated, or self-referential prerequisite edges and any cycle in the Knowledge prerequisite graph;
+- missing or repeated notation references;
+- source-lineage references whose source record is missing; and
+- a knowledge node marked `trainable` without a `proofGoal`, or a `proofGoal` on a node not marked `trainable`.
+
+Required node fields also keep motivation, tutorial prose, a key idea, at least one worked example, a progressively disclosed exercise, source lineage, rewrite status, read time, and tags in the canonical data rather than the React components. Knowledge-node exercises are part of the textbook; the `/train` pool is independently derived from paper results.
+
+Derived-behavior tests enforce that Train contains only theorem-like, non-imported results from gold papers with reviewed complete routes, and that a new random choice avoids the current result whenever the selected pool permits it. Paper-graph tests enforce an empty initial expansion set so every dependency disclosure is folded on first render.
 
 The main dependency order is computed from the selected route at runtime. The distilled paper is therefore a topological reading of the same records—not a second manuscript.
 
@@ -124,12 +141,13 @@ The current application is static-first by design and eagerly loads the committe
 
 - `/` — project landing page and featured-paper entry
 - `/papers` — paper-corpus command view, rooted citation projection, backlog, and paginated catalog
-- `/materials` — checked learning-source collection and interactive candidate source DAGs
-- `/knowledge` — gated future cross-source compression layer; currently zero canonical nodes
+- `/knowledge` — the canonical living textbook; `?node=<slug>` selects a stable knowledge node within its chapter and local DAG context
 - `/papers/:paperId` — metadata, graph, proofs, citations, and formal coverage
 - `/papers/:paperId/distilled` — generated linear reading
-- `/theorems/:statementId` — canonical deep-linked statement
+- `/theorems/:globalId` — canonical deep-linked statement
 - `/unsolved` — administratively confirmed open problems; currently intentionally empty
-- `/learn` — gated future curriculum over reviewed canonical Knowledge
+- `/train` — random re-proving exercises drawn from reviewed complete paper-result routes
+- `/materials` — legacy redirect to `/knowledge`; no Materials page or source shelf
+- `/learn` — legacy redirect to `/train`; no Learn page
 
-Vite builds a static artifact. The build copies the same validated application shell to every known paper, distilled-paper, catalog, and theorem route, so GitHub Pages serves canonical deep links directly; a copied `404.html` remains as a fallback for unknown client routes. React Router resolves the requested record from that shared shell.
+Vite builds a static artifact. The build copies the same validated application shell to every known paper, distilled-paper, catalog, theorem, Knowledge, Train, and legacy-redirect route, so GitHub Pages serves canonical deep links directly; a copied `404.html` remains as a fallback for unknown client routes. React Router resolves the requested record or redirect from that shared shell.

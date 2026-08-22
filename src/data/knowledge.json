@@ -1,0 +1,1195 @@
+{
+  "schemaVersion": "1.0.0",
+  "title": "The Nisaba Mathematics Text",
+  "subtitle": "One notation, one dependency graph, from first symbols to research mathematics.",
+  "edition": "Living foundations edition 0.1",
+  "updatedAt": "2026-08-22",
+  "notationPolicy": "Use one symbol for one role whenever practical. Equality is reserved for objects already defined; definitions use :=. Every variable carries an explicit domain. The natural numbers include 0. Subset notation is never ambiguous: ⊆ allows equality and ⊊ means proper subset. Complements name their universe as U∖A. Use · for multiplication and × for Cartesian products. Images and preimages use f[S] and f⁻¹[T]; f⁻¹:B→A denotes an inverse function only when f is bijective. Source-specific aliases are recorded but do not control the main exposition.",
+  "sources": [
+    {
+      "id": "openstax-prealgebra",
+      "title": "Prealgebra 2e",
+      "authors": ["Lynn Marecek", "MaryAnne Anthony-Smith", "Andrea Honeycutt Mathis"],
+      "officialUrl": "https://openstax.org/details/books/prealgebra-2e",
+      "useNote": "Arithmetic language, equality, operations, and equation-solving coverage; NisabaDB prose and examples are independently written."
+    },
+    {
+      "id": "sundstrom-reasoning",
+      "title": "Mathematical Reasoning: Writing and Proof",
+      "authors": ["Ted Sundstrom"],
+      "officialUrl": "https://scholarworks.gvsu.edu/books/24/",
+      "useNote": "Logic, sets, quantifiers, functions, and proof-language coverage."
+    },
+    {
+      "id": "mit-mcs",
+      "title": "Mathematics for Computer Science",
+      "authors": ["Eric Lehman", "F. Thomson Leighton", "Albert R. Meyer"],
+      "officialUrl": "https://ocw.mit.edu/courses/6-1200j-mathematics-for-computer-science-spring-2024/pages/readings/",
+      "useNote": "Discrete mathematical language, logical equivalence, proof patterns, and set constructions."
+    },
+    {
+      "id": "levin-discrete",
+      "title": "Discrete Mathematics: An Open Introduction",
+      "authors": ["Oscar Levin"],
+      "officialUrl": "https://discrete.openmathbooks.org/dmoi4.html",
+      "useNote": "Online-textbook organization, investigations, definitions, logic, sets, functions, and exercises."
+    },
+    {
+      "id": "judson-algebra",
+      "title": "Abstract Algebra: Theory and Applications",
+      "authors": ["Thomas W. Judson"],
+      "officialUrl": "https://judsonbooks.org/abstract-algebra-theory-and-applications/",
+      "useNote": "Canonical set, function, equivalence, and algebra notation needed by later computational-algebra chapters."
+    },
+    {
+      "id": "hammack-proof",
+      "title": "Book of Proof",
+      "authors": ["Richard Hammack"],
+      "officialUrl": "https://richardhammack.github.io/BookOfProof/",
+      "useNote": "Set notation, logical forms, examples, and proof-writing coverage; no source prose is reproduced."
+    }
+  ],
+  "chapters": [
+    {
+      "id": "language",
+      "number": 1,
+      "title": "The language of mathematics",
+      "summary": "Learn what symbols refer to, how definitions create names, and how domains prevent meaningless manipulation."
+    },
+    {
+      "id": "numbers-algebra",
+      "number": 2,
+      "title": "Numbers and algebra",
+      "summary": "Work with number domains, operations, algebraic laws, equations, and inequalities as meaning-preserving constructions."
+    },
+    {
+      "id": "logic",
+      "number": 3,
+      "title": "Statements and logic",
+      "summary": "Turn ordinary mathematical claims into precise statements whose truth conditions can be inspected."
+    },
+    {
+      "id": "proof",
+      "number": 4,
+      "title": "Proof as a checkable construction",
+      "summary": "Build direct, case-based, indirect, and inductive arguments from explicit logical goals."
+    },
+    {
+      "id": "sets",
+      "number": 5,
+      "title": "Sets without notation drift",
+      "summary": "Use one stable vocabulary for collections, subsets, and the operations that recur throughout mathematics."
+    },
+    {
+      "id": "functions",
+      "number": 6,
+      "title": "Functions and structure-preserving maps",
+      "summary": "Treat functions as typed assignments, then study images, composition, bijections, and inverses."
+    }
+  ],
+  "notation": [
+    {
+      "id": "definition-symbol",
+      "symbol": ":=",
+      "spokenAs": "is defined to be",
+      "meaning": "Introduces a new name for an expression or object.",
+      "firstNodeId": "K02",
+      "aliases": [
+        { "form": "=", "note": "Some texts use equality for definitions; NisabaDB keeps the roles separate." },
+        { "form": "≔ or \u2261", "note": "Seen in the literature; not used as the primary definition symbol here." }
+      ]
+    },
+    {
+      "id": "membership",
+      "symbol": "\\in",
+      "spokenAs": "is an element of",
+      "meaning": "States that an object belongs to a set.",
+      "firstNodeId": "K04",
+      "aliases": []
+    },
+    {
+      "id": "natural-numbers",
+      "symbol": "\\mathbb{N}",
+      "spokenAs": "the natural numbers",
+      "meaning": "The set {0,1,2,...}; NisabaDB always includes 0.",
+      "firstNodeId": "K05",
+      "aliases": [
+        { "form": "\\mathbb{N}_0", "note": "Used by authors who reserve natural numbers for positive integers." },
+        { "form": "\\{1,2,3,\\ldots\\}", "note": "A conflicting convention; translate it explicitly when citing such a source." }
+      ]
+    },
+    {
+      "id": "logical-not",
+      "symbol": "\\neg P",
+      "spokenAs": "not P",
+      "meaning": "The statement with the opposite truth value from P.",
+      "firstNodeId": "K11",
+      "aliases": [{ "form": "\\sim P", "note": "Older texts sometimes use a tilde for logical negation." }]
+    },
+    {
+      "id": "logical-and",
+      "symbol": "P \\land Q",
+      "spokenAs": "P and Q",
+      "meaning": "True exactly when both P and Q are true.",
+      "firstNodeId": "K11",
+      "aliases": []
+    },
+    {
+      "id": "logical-or",
+      "symbol": "P \\lor Q",
+      "spokenAs": "P or Q",
+      "meaning": "Inclusive or: true when at least one of P and Q is true.",
+      "firstNodeId": "K11",
+      "aliases": []
+    },
+    {
+      "id": "implication",
+      "symbol": "P \\Rightarrow Q",
+      "spokenAs": "P implies Q",
+      "meaning": "Rules out the case where P is true and Q is false.",
+      "firstNodeId": "K12",
+      "aliases": [{ "form": "P \\to Q", "note": "Common in logic; NisabaDB reserves the thin arrow for functions." }]
+    },
+    {
+      "id": "iff",
+      "symbol": "P \\Longleftrightarrow Q",
+      "spokenAs": "P if and only if Q",
+      "meaning": "Both implications hold: P implies Q and Q implies P.",
+      "firstNodeId": "K12",
+      "aliases": [{ "form": "P \\iff Q", "note": "A convenient textual macro with the same meaning." }]
+    },
+    {
+      "id": "forall",
+      "symbol": "\\forall x \\in X",
+      "spokenAs": "for every x in X",
+      "meaning": "The following claim holds for each element of the stated domain.",
+      "firstNodeId": "K13",
+      "aliases": []
+    },
+    {
+      "id": "exists",
+      "symbol": "\\exists x \\in X",
+      "spokenAs": "there exists an x in X",
+      "meaning": "At least one element of the stated domain satisfies the claim.",
+      "firstNodeId": "K13",
+      "aliases": []
+    },
+    {
+      "id": "exists-unique",
+      "symbol": "\\exists! x \\in X",
+      "spokenAs": "there exists exactly one x in X",
+      "meaning": "One element of the stated domain satisfies the claim, and no second element does.",
+      "firstNodeId": "K13",
+      "aliases": []
+    },
+    {
+      "id": "interval",
+      "symbol": "[a,b], (a,b), [a,b), (a,b]",
+      "spokenAs": "closed, open, and half-open intervals",
+      "meaning": "Parentheses exclude an endpoint and square brackets include it.",
+      "firstNodeId": "K09",
+      "aliases": []
+    },
+    {
+      "id": "set-builder",
+      "symbol": "\\{x \\in X : P(x)\\}",
+      "spokenAs": "the x in X such that P of x",
+      "meaning": "The subset of X consisting exactly of elements satisfying P.",
+      "firstNodeId": "K20",
+      "aliases": [{ "form": "\\{x \\in X \\mid P(x)\\}", "note": "A vertical bar is common; NisabaDB uses a colon to avoid collision with divisibility and conditioning." }]
+    },
+    {
+      "id": "subset",
+      "symbol": "A \\subseteq B",
+      "spokenAs": "A is a subset of B",
+      "meaning": "Every element of A is also an element of B; equality is allowed.",
+      "firstNodeId": "K21",
+      "aliases": [{ "form": "A \\subset B", "note": "Ambiguous across books; NisabaDB does not use it." }]
+    },
+    {
+      "id": "set-operations",
+      "symbol": "A \\cup B, A \\cap B, A \\setminus B",
+      "spokenAs": "union, intersection, and set difference",
+      "meaning": "Combine membership by inclusive or, and, and and-not, respectively.",
+      "firstNodeId": "K22",
+      "aliases": [
+        { "form": "A^c", "note": "Used only when a universe has already been fixed; NisabaDB writes U \\setminus A so the universe remains visible." }
+      ]
+    },
+    {
+      "id": "power-set",
+      "symbol": "\\mathcal{P}(A)",
+      "spokenAs": "the power set of A",
+      "meaning": "The set whose elements are exactly the subsets of A.",
+      "firstNodeId": "K23",
+      "aliases": [{ "form": "2^A", "note": "Common in combinatorics; not used as the primary notation here." }]
+    },
+    {
+      "id": "cartesian-product",
+      "symbol": "A \\times B",
+      "spokenAs": "A cross B",
+      "meaning": "The set of ordered pairs with first coordinate in A and second coordinate in B.",
+      "firstNodeId": "K24",
+      "aliases": []
+    },
+    {
+      "id": "function-map",
+      "symbol": "f:A \\to B,\\quad x \\mapsto f(x)",
+      "spokenAs": "f maps A to B; x maps to f of x",
+      "meaning": "Names the domain and codomain of a function and then describes its value at an input.",
+      "firstNodeId": "K26",
+      "aliases": [{ "form": "f(x):A \\to B", "note": "A type-unclear hybrid sometimes seen informally; NisabaDB separates the function declaration from evaluation." }]
+    },
+    {
+      "id": "image-preimage",
+      "symbol": "f[S],\\quad f^{-1}[T]",
+      "spokenAs": "the image of S; the preimage of T",
+      "meaning": "Moves a set of inputs forward or collects all inputs whose outputs lie in a target set.",
+      "firstNodeId": "K27",
+      "aliases": [
+        { "form": "f(S)", "note": "Common for images; brackets distinguish a set image from evaluation at one input." },
+        { "form": "f^{-1}(T)", "note": "Common for preimages; brackets prevent confusion with an inverse function." }
+      ]
+    },
+    {
+      "id": "composition",
+      "symbol": "g \\circ f",
+      "spokenAs": "g after f",
+      "meaning": "Apply f first and then apply g to the result.",
+      "firstNodeId": "K28",
+      "aliases": []
+    },
+    {
+      "id": "inverse-function",
+      "symbol": "f^{-1}:B \\to A",
+      "spokenAs": "the inverse function of f",
+      "meaning": "The function undoing a bijection f:A to B in both composition orders.",
+      "firstNodeId": "K30",
+      "aliases": []
+    }
+  ],
+  "nodes": [
+    {
+      "id": "K01",
+      "slug": "objects-symbols-types",
+      "chapterId": "language",
+      "section": "1.1",
+      "title": "Objects, symbols, and types",
+      "kind": "language",
+      "purpose": "Read a formula as a sentence about objects instead of as a string of marks.",
+      "prerequisiteIds": [],
+      "notationIds": [],
+      "motivation": "Mathematics talks about numbers, sets, functions, shapes, and many other objects. A symbol is only a name or operation sign; it is not the object itself.",
+      "tutorial": "A **mathematical object** is anything the discussion treats as one thing. A **symbol** is a written name for an object or operation. A **type** tells us what sort of object is allowed. The expression $2+3$ is meaningful because $2$ and $3$ are numbers and addition accepts two numbers. The expression $2 \\in 3$ is not ordinary arithmetic: membership expects a set on the right.\n\nBefore manipulating a formula, ask three questions: What does each symbol name? What type of object is it? What kind of output does each operation produce?",
+      "keyIdea": "Meaning comes before manipulation: every symbol has a role and every operation has an input type.",
+      "examples": [
+        { "title": "A typed reading", "body": "In $2+3=5$, the symbols $2,3,5$ name numbers, $+$ combines two numbers, and $=$ compares the two resulting number objects." }
+      ],
+      "exercise": {
+        "prompt": "In the statement $x+1=4$, list the symbols and say what type of object each must represent for the statement to make sense.",
+        "hints": ["Separate names from operation signs.", "The operation + and the comparison = constrain the possible types."],
+        "solution": "$x$, $1$, and $4$ must represent numbers; $+$ is a binary operation on those numbers; $=$ compares the number $x+1$ with the number $4$."
+      },
+      "sourceRefs": [
+        { "sourceId": "openstax-prealgebra", "note": "Elementary expression language." },
+        { "sourceId": "mit-mcs", "note": "Typed mathematical objects and discrete structures." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 4,
+      "tags": ["language", "objects", "symbols", "types"]
+    },
+    {
+      "id": "K02",
+      "slug": "equality-and-definition",
+      "chapterId": "language",
+      "section": "1.2",
+      "title": "Equality is not definition",
+      "kind": "language",
+      "purpose": "Separate a claim that two known objects coincide from the act of introducing a new name.",
+      "prerequisiteIds": ["K01"],
+      "notationIds": ["definition-symbol"],
+      "motivation": "Many books use the same symbol for equality and definition. That saves ink but hides whether a line makes a claim or creates terminology.",
+      "tutorial": "Write $a=b$ when $a$ and $b$ already have meanings and you assert that they are the same object. Write $c := a+b$ when you introduce $c$ as a new name for $a+b$. A definition is not proved; later claims using it may need proof.\n\nEquality is symmetric: from $a=b$ we also have $b=a$. Definition has a reading direction: $c := a+b$ introduces $c$; reversing the typography would misdescribe what is new.",
+      "keyIdea": "Use $=$ for sameness and $:=$ for a new name.",
+      "examples": [
+        { "title": "Name, then claim", "body": "Define $s := 1+2+3$. The later line $s=6$ is a claim justified by arithmetic, not another definition." }
+      ],
+      "exercise": {
+        "prompt": "Choose $=$ or $:=$ in each blank: (a) introduce $p$ as $xy$; (b) state that $2+2$ and $4$ are the same number.",
+        "hints": ["Ask whether the line creates a name or makes a claim."],
+        "solution": "(a) $p := xy$. (b) $2+2=4$."
+      },
+      "sourceRefs": [
+        { "sourceId": "sundstrom-reasoning", "note": "Definitions and mathematical statements." },
+        { "sourceId": "judson-algebra", "note": "Later algebraic definitions motivate a stable definition symbol." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 4,
+      "tags": ["equality", "definition", "notation"]
+    },
+    {
+      "id": "K03",
+      "slug": "variables-domains-substitution",
+      "chapterId": "language",
+      "section": "1.3",
+      "title": "Variables, domains, and substitution",
+      "kind": "language",
+      "purpose": "Know what values a variable may take and when replacing it preserves meaning.",
+      "prerequisiteIds": ["K01", "K02"],
+      "notationIds": [],
+      "motivation": "A formula containing $x$ is incomplete until we know which objects $x$ is allowed to represent.",
+      "tutorial": "A **variable** is a symbol whose value may vary. Its **domain** is the collection of allowed values. Substitution replaces a variable by one allowed object everywhere that variable has the same role.\n\nThe domain can change truth. The equation $x^2=2$ has no rational-number solution but has real-number solutions. NisabaDB therefore declares a domain when a variable first appears and never relies on the reader to guess it.",
+      "keyIdea": "A variable without a domain is an unfinished instruction.",
+      "examples": [
+        { "title": "A domain changes the answer", "body": "For integers $x$, the equation $2x=1$ has no solution. For rational numbers $x$, it has the solution $x=1/2$." }
+      ],
+      "exercise": {
+        "prompt": "Compare the solutions of $x^2=4$ when the domain is the natural numbers and when it is the integers.",
+        "hints": ["List the allowed candidates whose square is 4."],
+        "solution": "In the natural numbers the solution is $x=2$. In the integers the solutions are $x=2$ and $x=-2$."
+      },
+      "sourceRefs": [
+        { "sourceId": "openstax-prealgebra", "note": "Variables, expressions, and solution domains." },
+        { "sourceId": "sundstrom-reasoning", "note": "Domains of discourse in statements." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 5,
+      "tags": ["variables", "domains", "substitution"]
+    },
+    {
+      "id": "K04",
+      "slug": "sets-elements-extensionality",
+      "chapterId": "language",
+      "section": "1.4",
+      "title": "Sets, elements, and extensionality",
+      "kind": "definition",
+      "purpose": "Describe a collection by exactly which objects belong to it, without importing a new set-theory introduction in every subject.",
+      "prerequisiteIds": ["K01", "K03"],
+      "notationIds": ["membership"],
+      "motivation": "Sets are the common container language of modern mathematics. The same small core should be learned once and reused everywhere.",
+      "tutorial": "A **set** is determined by which objects are its **elements**. Write $x \\in A$ when $x$ is an element of $A$, and $x \\notin A$ otherwise. Order and repetition do not change a set: $\\{1,2,2\\}=\\{2,1\\}$.\n\n**Extensionality** is the equality rule for sets: two sets are equal exactly when they have the same elements. This gives a standard proof method later—take an arbitrary object and compare membership in the two sets.",
+      "keyIdea": "A set has no hidden order or duplicates; its identity is exactly its membership condition.",
+      "examples": [
+        { "title": "Different lists, one set", "body": "$A:=\\{1,2,3\\}$ and $B:=\\{3,2,1,1\\}$ are equal because every object belongs to $A$ exactly when it belongs to $B$." }
+      ],
+      "exercise": {
+        "prompt": "Are $\\{0,1\\}$ and $\\{0,1,0\\}$ equal? Explain using membership rather than list length.",
+        "hints": ["Check which distinct objects belong to each set."],
+        "solution": "Yes. Both sets have exactly the elements 0 and 1; repetition in a roster does not create a new element."
+      },
+      "sourceRefs": [
+        { "sourceId": "levin-discrete", "note": "Sets and membership as introductory mathematical language." },
+        { "sourceId": "hammack-proof", "note": "Roster notation and set equality." },
+        { "sourceId": "sundstrom-reasoning", "note": "Extensional equality and later element arguments." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 6,
+      "tags": ["sets", "elements", "membership", "extensionality"]
+    },
+    {
+      "id": "K05",
+      "slug": "number-domains-and-order",
+      "chapterId": "numbers-algebra",
+      "section": "2.1",
+      "title": "Number domains and order",
+      "kind": "definition",
+      "purpose": "Use one explicit nesting of familiar number systems and one convention for natural numbers.",
+      "prerequisiteIds": ["K04"],
+      "notationIds": ["natural-numbers"],
+      "motivation": "Authors disagree about whether 0 is natural. Unmarked disagreement causes false edge cases, especially in induction and counting.",
+      "tutorial": "NisabaDB fixes $\\mathbb N:=\\{0,1,2,\\ldots\\}$. The integers $\\mathbb Z$ add negative whole numbers. The rationals $\\mathbb Q$ are fractions of integers with nonzero denominator. The reals $\\mathbb R$ include limits such as $\\sqrt2$. Thus\n\n$$\\mathbb N \\subseteq \\mathbb Z \\subseteq \\mathbb Q \\subseteq \\mathbb R.$$\n\nThe symbols $<$ and $\\le$ describe order. Writing $a<b$ is a statement; it is not an instruction to move symbols across an inequality.",
+      "keyIdea": "Always name the number domain, and always state whether the natural numbers include 0.",
+      "examples": [
+        { "title": "One number, several domains", "body": "$3$ belongs to all four displayed domains. $-3$ belongs to $\\mathbb Z,\\mathbb Q,\\mathbb R$ but not $\\mathbb N$." }
+      ],
+      "exercise": {
+        "prompt": "Place each number in the smallest displayed domain containing it: $0$, $-5$, $2/3$, $\\sqrt2$.",
+        "hints": ["Use the nesting of the four domains."],
+        "solution": "$0\\in\\mathbb N$, $-5\\in\\mathbb Z$, $2/3\\in\\mathbb Q$, and $\\sqrt2\\in\\mathbb R$."
+      },
+      "sourceRefs": [
+        { "sourceId": "openstax-prealgebra", "note": "Elementary number systems and order." },
+        { "sourceId": "mit-mcs", "note": "The explicit zero-including natural-number convention used here." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 5,
+      "tags": ["numbers", "natural numbers", "integers", "rationals", "reals"]
+    },
+    {
+      "id": "K06",
+      "slug": "operations-and-precedence",
+      "chapterId": "numbers-algebra",
+      "section": "2.2",
+      "title": "Operations and precedence",
+      "kind": "language",
+      "purpose": "Parse an expression unambiguously before computing or rewriting it.",
+      "prerequisiteIds": ["K02", "K05"],
+      "notationIds": [],
+      "motivation": "Most elementary mistakes are not deep; they come from silently changing the grouping or type of an expression.",
+      "tutorial": "An operation takes input objects and returns an output object. Parentheses state grouping explicitly. Without parentheses, exponentiation is read before multiplication and division, which are read before addition and subtraction; operations at the same level are read from left to right.\n\nPrefer explicit grouping whenever a reader could hesitate. The expression $a/(b+c)$ is different from $a/b+c$, and typography should make that difference impossible to miss.",
+      "keyIdea": "Parsing is part of mathematics: preserve grouping before applying any law.",
+      "examples": [
+        { "title": "Grouping changes value", "body": "$2(3+4)=14$, while $2\\cdot3+4=10$. The parentheses change which operation receives which inputs." }
+      ],
+      "exercise": {
+        "prompt": "Insert parentheses to express 'subtract the product of 3 and 4 from 20', then evaluate it.",
+        "hints": ["Form the product first."],
+        "solution": "$20-(3\\cdot4)=20-12=8$."
+      },
+      "sourceRefs": [
+        { "sourceId": "openstax-prealgebra", "note": "Operation language and order of operations." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 4,
+      "tags": ["operations", "expressions", "precedence", "parentheses"]
+    },
+    {
+      "id": "K07",
+      "slug": "algebraic-laws-and-rewrites",
+      "chapterId": "numbers-algebra",
+      "section": "2.3",
+      "title": "Algebraic laws are legal rewrites",
+      "kind": "law",
+      "purpose": "Replace memorized symbol-moving tricks by named equalities that justify each transformation.",
+      "prerequisiteIds": ["K06"],
+      "notationIds": [],
+      "motivation": "Computational algebra and abstract algebra share one core idea: operations obey laws, and those laws license algorithms and rewrites.",
+      "tutorial": "For numbers $a,b,c$, addition and multiplication are associative; both are commutative; and multiplication distributes over addition:\n\n$$a(b+c)=ab+ac.$$\n\nA rewrite is legal when it replaces one side of a known equality by the other, within the law's domain. Phrases such as 'move $x$ to the other side' hide the real operation. We instead add, subtract, multiply, or divide both sides under stated conditions.",
+      "keyIdea": "A symbolic transformation is an application of a named law, not motion on the page.",
+      "examples": [
+        { "title": "Expose the law", "body": "$3(x+2)=3x+6$ follows by distributivity, with $a=3$, $b=x$, and $c=2$." }
+      ],
+      "exercise": {
+        "prompt": "Rewrite $5y+5z$ as a product and name the law used.",
+        "hints": ["Read distributivity in the reverse direction."],
+        "solution": "$5y+5z=5(y+z)$ by the distributive law."
+      },
+      "sourceRefs": [
+        { "sourceId": "openstax-prealgebra", "note": "Arithmetic properties and equation transformations." },
+        { "sourceId": "judson-algebra", "note": "The same law-centered viewpoint scales to algebraic structures." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 6,
+      "tags": ["algebra", "laws", "rewriting", "distributivity"]
+    },
+    {
+      "id": "K08",
+      "slug": "equations-and-solution-checking",
+      "chapterId": "numbers-algebra",
+      "section": "2.4",
+      "title": "Equations and solution checking",
+      "kind": "method",
+      "purpose": "Treat solving as preserving a solution set and verify candidates by substitution.",
+      "prerequisiteIds": ["K03", "K07"],
+      "notationIds": [],
+      "motivation": "An equation is a statement containing variables. Solving it means finding every allowed substitution that makes the statement true.",
+      "tutorial": "The **solution set** of an equation is the set of domain values that make it true. A reversible operation applied to both sides preserves that set. Some operations, such as squaring, may introduce extra candidates, so the final candidates must be checked in the original equation.\n\nFor $2x+3=11$, subtract 3 from both sides and divide both sides by 2 to obtain $x=4$. Substitution checks $2(4)+3=11$.",
+      "keyIdea": "Solving preserves truth conditions; checking returns to the original statement.",
+      "examples": [
+        { "title": "A transparent solution", "body": "$3x-5=7 \\Rightarrow 3x=12 \\Rightarrow x=4$, using the same reversible operation on both sides at each step." }
+      ],
+      "exercise": {
+        "prompt": "Solve $5x+2=17$ over the real numbers and verify your answer by substitution.",
+        "hints": ["Subtract 2 from both sides, then divide by 5."],
+        "solution": "$5x=15$, so $x=3$. Checking: $5(3)+2=17$."
+      },
+      "sourceRefs": [
+        { "sourceId": "openstax-prealgebra", "note": "Equation solving and solution checking." },
+        { "sourceId": "sundstrom-reasoning", "note": "Equations as statements with domains." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 6,
+      "tags": ["equations", "solutions", "checking", "algebra"]
+    },
+    {
+      "id": "K09",
+      "slug": "inequalities-and-intervals",
+      "chapterId": "numbers-algebra",
+      "section": "2.5",
+      "title": "Inequalities and intervals",
+      "kind": "method",
+      "purpose": "Describe ordered ranges and solve inequalities without losing the direction of comparison.",
+      "prerequisiteIds": ["K05", "K07", "K08"],
+      "notationIds": ["interval"],
+      "motivation": "An equation asks when two quantities meet. An inequality asks which values lie on one side of a boundary, so its answer is usually a whole interval rather than one number.",
+      "tutorial": "The statement $a<b$ places $a$ to the left of $b$ on the real number line. Adding the same real number to both sides preserves the order. Multiplying both sides by a positive number also preserves it. Multiplying by a negative number reverses it, because reflection across zero swaps left and right. Thus $-2x<6$ becomes $x>-3$ after division by $-2$.\n\nIntervals record endpoint choices compactly. A square bracket includes a finite endpoint and a parenthesis excludes it. Infinity is never an endpoint value, so it always receives a parenthesis: $x>-3$ is the interval $(-3,\\infty)$.",
+      "keyIdea": "An inequality describes a region; a negative scaling reflects that region and reverses its comparison sign.",
+      "examples": [
+        { "title": "Keep the boundary visible", "body": "$2x+1\\le7$ gives $x\\le3$, so the solution set is $(-\\infty,3]$. Substituting 3 confirms that the endpoint is included." }
+      ],
+      "exercise": {
+        "prompt": "Solve $5-3x>11$ over the real numbers and write the answer as an interval.",
+        "hints": ["Subtract 5 first.", "Dividing by $-3$ reverses the inequality."],
+        "solution": "$-3x>6$, hence $x<-2$. The solution interval is $(-\\infty,-2)$."
+      },
+      "sourceRefs": [
+        { "sourceId": "openstax-prealgebra", "note": "Elementary inequality transformations and interval notation." },
+        { "sourceId": "sundstrom-reasoning", "note": "Inequalities as statements over an explicit domain." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 7,
+      "tags": ["inequalities", "intervals", "order", "algebra"]
+    },
+    {
+      "id": "K10",
+      "slug": "statements-truth-predicates",
+      "chapterId": "logic",
+      "section": "3.1",
+      "title": "Statements, truth, and predicates",
+      "kind": "definition",
+      "purpose": "Distinguish a complete true-or-false claim from an expression that still has a free variable.",
+      "prerequisiteIds": ["K02", "K03"],
+      "notationIds": [],
+      "motivation": "Proof applies to statements. Before proving anything, we must know exactly what claim has a truth value.",
+      "tutorial": "A **statement** is a complete claim that is either true or false. A **predicate** such as $P(x)$ becomes a statement only after $x$ is given a value or bound by a quantifier. For example, '$3$ is even' is a false statement. '$x$ is even' is a predicate whose truth depends on $x$.\n\nQuestions, commands, and bare expressions are not statements. The expression $x+1$ denotes an object once $x$ is known; it does not assert anything.",
+      "keyIdea": "A proof target must be a complete claim with all variables assigned or quantified.",
+      "examples": [
+        { "title": "Close the variable", "body": "$P(x):='x+1>0'$ is a predicate on real numbers. Substituting $x=2$ gives a true statement; substituting $x=-2$ gives a false one." }
+      ],
+      "exercise": {
+        "prompt": "Classify each as statement, predicate, or neither: (a) $2+2=4$; (b) $x^2>0$; (c) $3x+1$.",
+        "hints": ["Ask whether it makes a complete true-or-false claim."],
+        "solution": "(a) statement; (b) predicate until a domain and value or quantifier for $x$ are supplied; (c) an expression, so neither."
+      },
+      "sourceRefs": [
+        { "sourceId": "sundstrom-reasoning", "note": "Statements, open sentences, and truth values." },
+        { "sourceId": "levin-discrete", "note": "Friendly introduction to mathematical statements." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 5,
+      "tags": ["statements", "truth", "predicates", "logic"]
+    },
+    {
+      "id": "K11",
+      "slug": "logical-connectives",
+      "chapterId": "logic",
+      "section": "3.2",
+      "title": "Not, and, or",
+      "kind": "definition",
+      "purpose": "Build compound statements with explicit truth conditions.",
+      "prerequisiteIds": ["K10"],
+      "notationIds": ["logical-not", "logical-and", "logical-or"],
+      "motivation": "Ordinary language uses 'or' and 'unless' inconsistently. Mathematics needs one stable meaning before arguments can be checked.",
+      "tutorial": "$\\neg P$ is true exactly when $P$ is false. $P\\land Q$ is true exactly when both statements are true. $P\\lor Q$ uses **inclusive or**: it is true when either statement or both statements are true.\n\nThese truth conditions are definitions, not stylistic suggestions. More complicated statements can be parsed like expressions: parentheses record which connective acts first.",
+      "keyIdea": "Logical connectives are operations on truth values with fixed definitions.",
+      "examples": [
+        { "title": "Inclusive or", "body": "The statement '$6$ is even or positive' is true, and both parts happen to be true; mathematical or does not exclude that case." }
+      ],
+      "exercise": {
+        "prompt": "Let $P$ be true and $Q$ be false. Determine the truth values of $\\neg P$, $P\\land Q$, and $P\\lor Q$.",
+        "hints": ["Apply each connective's definition separately."],
+        "solution": "$\\neg P$ is false, $P\\land Q$ is false, and $P\\lor Q$ is true."
+      },
+      "sourceRefs": [
+        { "sourceId": "mit-mcs", "note": "Propositional connectives and truth tables." },
+        { "sourceId": "sundstrom-reasoning", "note": "Compound statements and precise negation." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 6,
+      "tags": ["logic", "negation", "conjunction", "disjunction"]
+    },
+    {
+      "id": "K12",
+      "slug": "implication-converse-iff",
+      "chapterId": "logic",
+      "section": "3.3",
+      "title": "Implication, converse, and if-and-only-if",
+      "kind": "definition",
+      "purpose": "Read one-way and two-way claims without silently reversing them.",
+      "prerequisiteIds": ["K11"],
+      "notationIds": ["implication", "iff"],
+      "motivation": "Confusing a statement with its converse is one of the most common reasoning errors in mathematics and everyday arguments.",
+      "tutorial": "$P\\Rightarrow Q$ says that whenever $P$ is true, $Q$ must be true. It does not claim that $Q$ causes $P$, or that $Q\\Rightarrow P$. The **converse** is the separately testable statement $Q\\Rightarrow P$.\n\n$P\\Longleftrightarrow Q$ means both directions hold. In a definition, an if-and-only-if boundary tells us exactly which objects have the defined property.",
+      "keyIdea": "An implication has a direction; an equivalence is two implications.",
+      "examples": [
+        { "title": "A false converse", "body": "If an integer is divisible by 4, then it is even. The converse is false because 2 is even but not divisible by 4." }
+      ],
+      "exercise": {
+        "prompt": "Write the converse of 'If an integer is a multiple of 6, then it is a multiple of 3,' and decide whether the converse is true.",
+        "hints": ["Swap the hypothesis and conclusion, then search for a counterexample."],
+        "solution": "The converse is 'If an integer is a multiple of 3, then it is a multiple of 6.' It is false; 3 is a counterexample."
+      },
+      "sourceRefs": [
+        { "sourceId": "levin-discrete", "note": "Implication, converse, and biconditional examples." },
+        { "sourceId": "hammack-proof", "note": "Logical form used by later proof methods." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 7,
+      "tags": ["implication", "converse", "equivalence", "iff"]
+    },
+    {
+      "id": "K13",
+      "slug": "quantifiers-and-domains",
+      "chapterId": "logic",
+      "section": "3.4",
+      "title": "Quantifiers always have domains",
+      "kind": "definition",
+      "purpose": "State whether a claim concerns every object or at least one object, and say where those objects come from.",
+      "prerequisiteIds": ["K04", "K10"],
+      "notationIds": ["forall", "exists", "exists-unique"],
+      "motivation": "The same words can be true over one domain and false over another. Hidden domains create hidden mistakes.",
+      "tutorial": "$\\forall x\\in X, P(x)$ says that $P(x)$ holds for every element of $X$. $\\exists x\\in X, P(x)$ says at least one witness in $X$ makes $P(x)$ true. Write $\\exists!x\\in X, P(x)$ only when exactly one element works.\n\nTo prove a universal statement, work with an arbitrary allowed $x$. To prove an existential statement, provide a specific witness and verify it. A uniqueness claim also requires showing that any two possible witnesses are equal. The order of multiple quantifiers matters: '$\\forall x\\,\\exists y$' may be true even when '$\\exists y\\,\\forall x$' is false.",
+      "keyIdea": "A quantifier binds a variable and its domain; changing either changes the statement.",
+      "examples": [
+        { "title": "Order matters", "body": "Over the integers, $\\forall x\\,\\exists y, y>x$ is true. But $\\exists y\\,\\forall x, y>x$ is false: no integer exceeds every integer." }
+      ],
+      "exercise": {
+        "prompt": "Over the real numbers, decide whether each statement is true: (a) $\\forall x, x^2\\ge0$; (b) $\\exists x, x^2=-1$.",
+        "hints": ["Use the stated real-number domain."],
+        "solution": "(a) true; every real square is nonnegative. (b) false; no real number has square $-1$."
+      },
+      "sourceRefs": [
+        { "sourceId": "sundstrom-reasoning", "note": "Universal and existential statements with domains." },
+        { "sourceId": "mit-mcs", "note": "Quantifier order and witness-based reasoning." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 7,
+      "tags": ["quantifiers", "universal", "existential", "domains"]
+    },
+    {
+      "id": "K14",
+      "slug": "negating-compound-statements",
+      "chapterId": "logic",
+      "section": "3.5",
+      "title": "Negating compound statements",
+      "kind": "law",
+      "purpose": "Produce the exact opposite of a logical claim instead of a vaguely contrary sentence.",
+      "prerequisiteIds": ["K11", "K12", "K13"],
+      "notationIds": ["logical-not", "iff", "forall", "exists"],
+      "motivation": "Contradiction, counterexamples, and error analysis all depend on negating a claim correctly.",
+      "tutorial": "De Morgan's laws exchange and/or under negation:\n\n$$\\neg(P\\land Q) \\Longleftrightarrow (\\neg P)\\lor(\\neg Q),$$\n$$\\neg(P\\lor Q) \\Longleftrightarrow (\\neg P)\\land(\\neg Q).$$\n\nQuantifiers also exchange: the negation of 'every $x$ works' is 'some $x$ fails,' and the negation of 'some $x$ works' is 'every $x$ fails.' Formally, $\\neg\\forall x\\,P(x)\\Longleftrightarrow\\exists x\\,\\neg P(x)$.",
+      "keyIdea": "Negation crosses one logical layer at a time, switching and/or and every/some.",
+      "examples": [
+        { "title": "Negate a universal", "body": "The negation of 'Every integer is even' is 'There exists an integer that is not even,' not 'Every integer is odd.'" }
+      ],
+      "exercise": {
+        "prompt": "Negate: 'For every real number $x$, $x>0$ or $x=0$.'",
+        "hints": ["Switch every to there exists, then negate the or."],
+        "solution": "There exists a real number $x$ such that $x\\le0$ and $x\\ne0$; equivalently, there exists a real number $x<0$."
+      },
+      "sourceRefs": [
+        { "sourceId": "sundstrom-reasoning", "note": "Negations of quantified and compound statements." },
+        { "sourceId": "mit-mcs", "note": "Logical equivalences and De Morgan's laws." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Derive the correct negation of a quantified compound claim and justify each logical switch.",
+      "readMinutes": 7,
+      "tags": ["negation", "De Morgan", "quantifiers", "logic"]
+    },
+    {
+      "id": "K15",
+      "slug": "direct-proof-and-witnesses",
+      "chapterId": "proof",
+      "section": "4.1",
+      "title": "Direct proof and explicit witnesses",
+      "kind": "method",
+      "purpose": "Turn a quantified claim into a short sequence of checkable obligations.",
+      "prerequisiteIds": ["K07", "K12", "K13"],
+      "notationIds": ["implication", "forall", "exists"],
+      "motivation": "A proof is not a report that examples worked. It must explain why the conclusion follows for an arbitrary allowed input, or exhibit and verify the object promised by an existence claim.",
+      "tutorial": "For a universal implication $\\forall x\\in X, P(x)\\Rightarrow Q(x)$, begin with an arbitrary $x\\in X$, assume $P(x)$, and use definitions or established laws until $Q(x)$ follows. The word **arbitrary** matters: the argument may not rely on a special feature of one convenient example.\n\nFor an existential claim $\\exists x\\in X, P(x)$, choose a specific witness $w\\in X$ and verify $P(w)$. The choice and the verification are separate proof steps.",
+      "keyIdea": "Universal proofs keep the input arbitrary; existential proofs name and check a witness.",
+      "examples": [
+        { "title": "Unpack a definition", "body": "Suppose an integer $n$ is a multiple of 6, so $n=6k$ for some integer $k$. Since $n=3(2k)$ and $2k$ is an integer, $n$ is a multiple of 3." },
+        { "title": "Give a witness", "body": "To prove that an integer with square 49 exists, choose $w:=7$. It is an integer and $w^2=49$." }
+      ],
+      "exercise": {
+        "prompt": "Prove: for every integer $n$, if $n$ is a multiple of 10, then $n$ is a multiple of 5.",
+        "hints": ["Write the hypothesis as $n=10k$ for an integer $k$.", "Rewrite 10 as $5\\cdot2$."],
+        "solution": "Let $n$ be an arbitrary integer and suppose $n=10k$ for some integer $k$. Then $n=5(2k)$. Because $2k$ is an integer, the definition of multiple shows that $n$ is a multiple of 5."
+      },
+      "sourceRefs": [
+        { "sourceId": "hammack-proof", "note": "Direct proof structure and witness-based existence proofs." },
+        { "sourceId": "sundstrom-reasoning", "note": "Proofs of universal implications from definitions." },
+        { "sourceId": "mit-mcs", "note": "Checkable proof steps and explicit witnesses." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Construct a direct proof from an arbitrary input or prove an existence claim by naming and verifying a witness.",
+      "readMinutes": 8,
+      "tags": ["proof", "direct proof", "witnesses", "quantifiers"]
+    },
+    {
+      "id": "K16",
+      "slug": "counterexamples-and-disproof",
+      "chapterId": "proof",
+      "section": "4.2",
+      "title": "Counterexamples and disproof",
+      "kind": "method",
+      "purpose": "Refute a universal claim with one relevant object while recognizing that examples alone do not establish universality.",
+      "prerequisiteIds": ["K14", "K15"],
+      "notationIds": ["logical-not", "forall", "exists"],
+      "motivation": "A single failure can settle a universal claim, but only when the example belongs to the stated domain and actually violates the stated conclusion.",
+      "tutorial": "The negation of $\\forall x\\in X, P(x)$ is $\\exists x\\in X, \\neg P(x)$. A **counterexample** is exactly such a witness: an allowed object $c$ for which the claimed property fails. A complete disproof therefore checks both $c\\in X$ and $\\neg P(c)$.\n\nTen successful tests do not prove a universal statement, because an untested input may still fail. One verified counterexample does disprove it.",
+      "keyIdea": "A counterexample is a witness to the precise negation of a universal statement.",
+      "examples": [
+        { "title": "Cross terms matter", "body": "The claim $(a+b)^2=a^2+b^2$ for all real $a,b$ fails at $a=b=1$: the left side is 4 and the right side is 2." }
+      ],
+      "exercise": {
+        "prompt": "Disprove: for every real number $x$, $(x-1)(x+1)=x^2+1$.",
+        "hints": ["Try $x=0$.", "Evaluate both sides separately."],
+        "solution": "Choose $x:=0$. It is real, and the left side is $(-1)(1)=-1$ while the right side is $0^2+1=1$. Since the values differ, the universal identity is false."
+      },
+      "sourceRefs": [
+        { "sourceId": "levin-discrete", "note": "Counterexamples as a response to universal claims." },
+        { "sourceId": "hammack-proof", "note": "Disproof by a checked counterexample." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Disprove a universal claim by giving an in-domain counterexample and verifying the exact failure.",
+      "readMinutes": 6,
+      "tags": ["proof", "counterexample", "disproof", "quantifiers"]
+    },
+    {
+      "id": "K17",
+      "slug": "proof-by-cases",
+      "chapterId": "proof",
+      "section": "4.3",
+      "title": "Proof by cases",
+      "kind": "method",
+      "purpose": "Split an argument into possibilities that together cover every allowed input.",
+      "prerequisiteIds": ["K09", "K11", "K12", "K15"],
+      "notationIds": ["logical-and", "logical-or", "implication"],
+      "motivation": "Some hypotheses naturally offer several routes. A case proof is sound only when no possible input falls between the routes.",
+      "tutorial": "To prove $Q$ from a disjunction $P_1\\lor P_2$, prove $Q$ assuming $P_1$, prove $Q$ assuming $P_2$, and state why the two cases exhaust the hypothesis. Cases may overlap; they must cover everything.\n\nA useful case split is chosen from the structure of the problem, not from a desire to list examples. For ordered real numbers, a hypothesis such as $x\\le-1$ or $x\\ge1$ already supplies two complete cases.",
+      "keyIdea": "Each case proves the same target, and the cases together leave no allowed input untreated.",
+      "examples": [
+        { "title": "Two sides of an interval", "body": "If $x\\le-1$, then both $x-1$ and $x+1$ are nonpositive, so their product is nonnegative. If $x\\ge1$, both are nonnegative. Hence $(x-1)(x+1)\\ge0$ whenever $x\\le-1$ or $x\\ge1$." }
+      ],
+      "exercise": {
+        "prompt": "Prove that $x^2\\ge1$ for every real $x$ satisfying $x\\le-1$ or $x\\ge1$.",
+        "hints": ["Handle the two alternatives separately.", "In either case, compare the absolute size of $x$ with 1 without introducing new notation."],
+        "solution": "Let $x$ satisfy the hypothesis. If $x\\ge1$, multiplying $x\\ge1$ by the nonnegative number $x$ gives $x^2\\ge x\\ge1$. If $x\\le-1$, then $-x\\ge1$; multiplying by the nonnegative number $-x$ gives $(-x)^2\\ge-x\\ge1$, and $(-x)^2=x^2$. The two stated cases exhaust the hypothesis."
+      },
+      "sourceRefs": [
+        { "sourceId": "sundstrom-reasoning", "note": "Case-based proof organization." },
+        { "sourceId": "mit-mcs", "note": "Exhaustive cases as a proof pattern." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Prove one conclusion in every case of an explicit exhaustive split.",
+      "readMinutes": 7,
+      "tags": ["proof", "cases", "disjunction", "exhaustion"]
+    },
+    {
+      "id": "K18",
+      "slug": "indirect-proof",
+      "chapterId": "proof",
+      "section": "4.4",
+      "title": "Indirect proof",
+      "kind": "method",
+      "purpose": "Use contraposition or contradiction when assuming failure exposes the useful structure.",
+      "prerequisiteIds": ["K12", "K14", "K15", "K17"],
+      "notationIds": ["logical-not", "implication"],
+      "motivation": "Some conclusions reveal little when approached directly. Their negations can force a concrete equation, missing witness, or impossible bound.",
+      "tutorial": "To prove $P\\Rightarrow Q$ by **contraposition**, prove the equivalent implication $\\neg Q\\Rightarrow\\neg P$. To prove a statement by **contradiction**, assume its negation and derive an impossibility: two incompatible claims, or a violation of a definition or established law.\n\nAn indirect proof must name the assumption being negated and identify the exact contradiction. The symbol $\\bot$ may mark that endpoint, but the prose must say what conflicts.",
+      "keyIdea": "Indirect proof assumes the target fails and follows that assumption to a checkable impossibility.",
+      "examples": [
+        { "title": "No greatest integer", "body": "Assume an integer $g$ is greatest. Then $g+1$ is also an integer and $g+1>g$, contradicting the defining claim that no integer is larger than $g$." }
+      ],
+      "exercise": {
+        "prompt": "Prove by contraposition: for every real $x$, if $x^2<4$, then $-2<x<2$.",
+        "hints": ["Negating $-2<x<2$ gives $x\\le-2$ or $x\\ge2$.", "Use cases to show either alternative implies $x^2\\ge4$."],
+        "solution": "We prove the contrapositive. Suppose $x\\le-2$ or $x\\ge2$. If $x\\ge2$, multiplying by the nonnegative $x$ gives $x^2\\ge2x\\ge4$. If $x\\le-2$, then $-x\\ge2$, so $x^2=(-x)^2\\ge2(-x)\\ge4$. Thus not $(-2<x<2)$ implies $x^2\\ge4$, proving the original implication by contraposition."
+      },
+      "sourceRefs": [
+        { "sourceId": "hammack-proof", "note": "Contrapositive and contradiction proof forms." },
+        { "sourceId": "sundstrom-reasoning", "note": "Logical justification for indirect arguments." },
+        { "sourceId": "mit-mcs", "note": "Contradiction with an explicitly identified impossible conclusion." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Prove a claim by stating its contrapositive or negation and deriving the required opposite conclusion or an explicit contradiction.",
+      "readMinutes": 8,
+      "tags": ["proof", "contrapositive", "contradiction", "negation"]
+    },
+    {
+      "id": "K19",
+      "slug": "mathematical-induction",
+      "chapterId": "proof",
+      "section": "4.5",
+      "title": "Mathematical induction",
+      "kind": "method",
+      "purpose": "Prove a claim for every natural number by establishing a starting point and a successor step.",
+      "prerequisiteIds": ["K05", "K06", "K12", "K13", "K15"],
+      "notationIds": ["natural-numbers", "implication", "forall"],
+      "motivation": "An infinite list of separate checks is impossible. Induction packages them into one initial verification and one reusable step.",
+      "tutorial": "Let $P(n)$ be a statement for $n\\in\\mathbb N$. An induction proof has two obligations. The **base case** proves $P(0)$. The **inductive step** fixes an arbitrary $n\\in\\mathbb N$, assumes $P(n)$ as the induction hypothesis, and proves $P(n+1)$.\n\nThe step is conditional: it does not assume the theorem for every number at once. It shows that whenever the claim has reached one natural number, it reaches the next. If a theorem starts at 1 or another index, state that base explicitly.",
+      "keyIdea": "Base case plus successor step covers the natural numbers from the stated starting index onward.",
+      "examples": [
+        { "title": "Track the hypothesis", "body": "For $P(n): 1+3+\\cdots+(2n-1)=n^2$ with $n\\ge1$, adding the next odd number $2n+1$ turns $n^2$ into $n^2+2n+1=(n+1)^2$." }
+      ],
+      "exercise": {
+        "prompt": "Use induction to prove $2^n\\ge n+1$ for every $n\\in\\mathbb N$.",
+        "hints": ["At $n=0$, compare 1 with 1.", "In the step, double the induction hypothesis and compare $2n+2$ with $n+2$."],
+        "solution": "Base: $2^0=1\\ge1$. Step: assume $2^n\\ge n+1$ for an arbitrary $n\\in\\mathbb N$. Then $2^{n+1}=2\\cdot2^n\\ge2(n+1)=2n+2\\ge n+2$, since $n\\ge0$. Thus $P(n+1)$ holds, so induction proves the claim for all natural numbers."
+      },
+      "sourceRefs": [
+        { "sourceId": "mit-mcs", "note": "Induction as a base case and successor implication." },
+        { "sourceId": "levin-discrete", "note": "Beginner-facing induction examples and exercises." },
+        { "sourceId": "hammack-proof", "note": "Proof-writing structure for induction." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Prove a natural-number claim by verifying the declared base case and an inductive step that explicitly uses the induction hypothesis.",
+      "readMinutes": 10,
+      "tags": ["proof", "induction", "natural numbers", "successor"]
+    },
+    {
+      "id": "K20",
+      "slug": "set-builder-notation",
+      "chapterId": "sets",
+      "section": "5.1",
+      "title": "Set-builder notation",
+      "kind": "language",
+      "purpose": "Define a set by a domain and one precise membership condition.",
+      "prerequisiteIds": ["K04", "K13"],
+      "notationIds": ["set-builder"],
+      "motivation": "Lists work for tiny finite sets. Most mathematical sets need a rule that states exactly which objects belong.",
+      "tutorial": "The expression $\\{x\\in X:P(x)\\}$ means the set of elements $x$ from the ambient domain $X$ for which $P(x)$ is true. The domain comes first; the membership test comes after the colon.\n\nNisabaDB uses a colon rather than a vertical bar. Both are common, but the vertical bar is already used for divisibility, conditional probability, and restrictions in later subjects.",
+      "keyIdea": "A set-builder expression is a filter: domain in, predicate applied, satisfying elements out.",
+      "examples": [
+        { "title": "Even natural numbers", "body": "$E:=\\{n\\in\\mathbb N: \\exists k\\in\\mathbb N, n=2k\\}$ defines the even natural numbers without an endless list." }
+      ],
+      "exercise": {
+        "prompt": "Write the set of negative real numbers in NisabaDB's set-builder notation.",
+        "hints": ["State the real-number domain before the colon."],
+        "solution": "$\\{x\\in\\mathbb R:x<0\\}$."
+      },
+      "sourceRefs": [
+        { "sourceId": "hammack-proof", "note": "Roster and set-builder forms." },
+        { "sourceId": "judson-algebra", "note": "Set-builder notation reused in algebraic structures." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 5,
+      "tags": ["sets", "set-builder", "predicates", "notation"]
+    },
+    {
+      "id": "K21",
+      "slug": "subsets-and-proper-subsets",
+      "chapterId": "sets",
+      "section": "5.2",
+      "title": "Subsets without ambiguity",
+      "kind": "definition",
+      "purpose": "Express containment with separate symbols for inclusive and strict containment.",
+      "prerequisiteIds": ["K04", "K12", "K13"],
+      "notationIds": ["membership", "subset", "forall", "implication"],
+      "motivation": "The symbol $\\subset$ means inclusive subset in some books and proper subset in others. A unified textbook cannot inherit both conventions.",
+      "tutorial": "$A\\subseteq B$ means every element of $A$ belongs to $B$:\n\n$$A\\subseteq B \\Longleftrightarrow \\forall x,\\,(x\\in A\\Rightarrow x\\in B).$$\n\nEquality is allowed. Write $A\\subsetneq B$ when $A\\subseteq B$ and $A\\ne B$. NisabaDB never uses bare $\\subset$ because its meaning is not stable across sources.",
+      "keyIdea": "$\\subseteq$ allows equality; $\\subsetneq$ requires a missing element.",
+      "examples": [
+        { "title": "Inclusive and proper", "body": "$\\{1,2\\}\\subseteq\\{1,2\\}$ is true. Also $\\{1\\}\\subsetneq\\{1,2\\}$ because 2 belongs only to the larger set." }
+      ],
+      "exercise": {
+        "prompt": "Let $A=\\{1,2\\}$ and $B=\\{1,2,3\\}$. Decide the truth of $A\\subseteq B$, $B\\subseteq A$, and $A\\subsetneq B$.",
+        "hints": ["Check each element and then check equality."],
+        "solution": "$A\\subseteq B$ and $A\\subsetneq B$ are true. $B\\subseteq A$ is false because $3\\in B$ but $3\\notin A$."
+      },
+      "sourceRefs": [
+        { "sourceId": "sundstrom-reasoning", "note": "Subset definitions and element proofs." },
+        { "sourceId": "levin-discrete", "note": "Source comparison for inclusive/proper notation." },
+        { "sourceId": "judson-algebra", "note": "Containment notation used by later algebra chapters." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 6,
+      "tags": ["sets", "subsets", "proper subsets", "notation"]
+    },
+    {
+      "id": "K22",
+      "slug": "set-operations",
+      "chapterId": "sets",
+      "section": "5.3",
+      "title": "Union, intersection, and difference",
+      "kind": "definition",
+      "purpose": "Build new sets with operations whose membership rules are just logical connectives.",
+      "prerequisiteIds": ["K04", "K11", "K20", "K21"],
+      "notationIds": ["membership", "logical-and", "logical-or", "set-operations"],
+      "motivation": "Set operations look like a new subject, but their definitions are the logic of membership. This is a major redundancy we can remove.",
+      "tutorial": "Let $A$ and $B$ be subsets of a declared universe $U$. Then:\n\n- $A\\cup B:=\\{x\\in U:x\\in A\\lor x\\in B\\}$;\n- $A\\cap B:=\\{x\\in U:x\\in A\\land x\\in B\\}$;\n- $A\\setminus B:=\\{x\\in U:x\\in A\\land x\\notin B\\}$.\n\nThe complement of $A$ is written $U\\setminus A$. Keeping $U$ visible prevents the same set from acquiring different complements when the surrounding discussion changes.",
+      "keyIdea": "Union is or, intersection is and, and difference is and-not applied to membership.",
+      "examples": [
+        { "title": "Compute three operations", "body": "If $A=\\{1,2\\}$ and $B=\\{2,3\\}$, then $A\\cup B=\\{1,2,3\\}$, $A\\cap B=\\{2\\}$, and $A\\setminus B=\\{1\\}$." }
+      ],
+      "exercise": {
+        "prompt": "Let $U=\\{1,2,3,4,5,6\\}$, $A=\\{2,4,6\\}$, and $B=\\{4,5,6\\}$. Compute $A\\cup B$, $A\\cap B$, $A\\setminus B$, and $U\\setminus A$.",
+        "hints": ["For union, keep elements occurring in at least one set.", "For difference, begin in the set named on the left."],
+        "solution": "$A\\cup B=\\{2,4,5,6\\}$, $A\\cap B=\\{4,6\\}$, $A\\setminus B=\\{2\\}$, and $U\\setminus A=\\{1,3,5\\}$."
+      },
+      "sourceRefs": [
+        { "sourceId": "mit-mcs", "note": "Set operations as logical membership conditions." },
+        { "sourceId": "hammack-proof", "note": "Element-based set identities." },
+        { "sourceId": "sundstrom-reasoning", "note": "Set algebra and proof structure." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 7,
+      "tags": ["sets", "union", "intersection", "difference", "logic"]
+    },
+    {
+      "id": "K23",
+      "slug": "power-sets",
+      "chapterId": "sets",
+      "section": "5.4",
+      "title": "Power sets",
+      "kind": "definition",
+      "purpose": "Collect all subsets of one set into a new set whose elements are themselves sets.",
+      "prerequisiteIds": ["K04", "K20", "K21"],
+      "notationIds": ["subset", "power-set"],
+      "motivation": "Mathematics often needs to choose or compare possible subcollections. A power set turns those choices into ordinary elements of one larger collection.",
+      "tutorial": "The **power set** of $A$ is\n\n$$\\mathcal{P}(A):=\\{S:S\\subseteq A\\},$$\n\nwhere the variable $S$ ranges over sets. Its elements are subsets, not the original elements of $A$. The empty set belongs to every power set because $\\varnothing\\subseteq A$, and $A$ itself belongs because $A\\subseteq A$. Do not confuse $a\\in A$ with $\\{a\\}\\in\\mathcal{P}(A)$: the first relates an object to $A$, while the second treats a singleton set as an element of the power set.",
+      "keyIdea": "Elements of $\\mathcal{P}(A)$ are sets selected from $A$.",
+      "examples": [
+        { "title": "A two-element base set", "body": "If $A=\\{a,b\\}$, then $\\mathcal{P}(A)=\\{\\varnothing,\\{a\\},\\{b\\},\\{a,b\\}\\}$." }
+      ],
+      "exercise": {
+        "prompt": "List $\\mathcal{P}(\\{1,2,3\\})$ and explain why 1 is not one of its elements.",
+        "hints": ["Organize the subsets by size: zero, one, two, and three elements.", "A power-set element must itself be a set."],
+        "solution": "$\\mathcal{P}(\\{1,2,3\\})=\\{\\varnothing,\\{1\\},\\{2\\},\\{3\\},\\{1,2\\},\\{1,3\\},\\{2,3\\},\\{1,2,3\\}\\}$. The number 1 is not a set selected from $A$; the singleton $\\{1\\}$ is the corresponding power-set element."
+      },
+      "sourceRefs": [
+        { "sourceId": "hammack-proof", "note": "Power-set notation and finite examples." },
+        { "sourceId": "levin-discrete", "note": "Subsets treated as elements of a power set." },
+        { "sourceId": "judson-algebra", "note": "Power sets as ambient spaces for families of subsets." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 6,
+      "tags": ["sets", "power set", "subsets", "collections"]
+    },
+    {
+      "id": "K24",
+      "slug": "ordered-pairs-and-products",
+      "chapterId": "sets",
+      "section": "5.5",
+      "title": "Ordered pairs and Cartesian products",
+      "kind": "definition",
+      "purpose": "Represent two-coordinate data whose first and second positions have different roles.",
+      "prerequisiteIds": ["K04", "K20"],
+      "notationIds": ["set-builder", "cartesian-product"],
+      "motivation": "A set forgets order, but an input-output record, a grid location, or a directed edge must remember which entry comes first.",
+      "tutorial": "An **ordered pair** $(a,b)$ has a first coordinate $a$ and a second coordinate $b$. Two ordered pairs are equal exactly when corresponding coordinates agree: $(a,b)=(c,d)$ precisely when $a=c$ and $b=d$. Usually $(a,b)\\ne(b,a)$.\n\nThe Cartesian product is\n\n$$A\\times B:=\\{(a,b):a\\in A\\text{ and }b\\in B\\}.$$\n\nNisabaDB reserves $\\times$ for Cartesian products and uses $\\cdot$ when multiplication needs an explicit symbol.",
+      "keyIdea": "A Cartesian product lists every allowed first-coordinate and second-coordinate combination, with order preserved.",
+      "examples": [
+        { "title": "A small product", "body": "$\\{r,b\\}\\times\\{0,1\\}=\\{(r,0),(r,1),(b,0),(b,1)\\}$. Reversing the factors produces pairs with a number first and a letter second." }
+      ],
+      "exercise": {
+        "prompt": "Let $A=\\{1,2\\}$ and $B=\\{x,y,z\\}$. List $A\\times B$ and $B\\times A$.",
+        "hints": ["Hold one first coordinate fixed while cycling through the second set.", "The two products have the same size but usually different elements."],
+        "solution": "$A\\times B=\\{(1,x),(1,y),(1,z),(2,x),(2,y),(2,z)\\}$ and $B\\times A=\\{(x,1),(x,2),(y,1),(y,2),(z,1),(z,2)\\}$."
+      },
+      "sourceRefs": [
+        { "sourceId": "sundstrom-reasoning", "note": "Ordered-pair equality and Cartesian products." },
+        { "sourceId": "levin-discrete", "note": "Finite product examples leading to relations and functions." },
+        { "sourceId": "judson-algebra", "note": "Cartesian-product notation used by later algebraic structures." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 6,
+      "tags": ["sets", "ordered pairs", "Cartesian product", "coordinates"]
+    },
+    {
+      "id": "K25",
+      "slug": "set-identities-by-elements",
+      "chapterId": "sets",
+      "section": "5.6",
+      "title": "Set identities by following an element",
+      "kind": "theorem",
+      "purpose": "Prove two constructed sets equal by translating membership into logic and back again.",
+      "prerequisiteIds": ["K14", "K15", "K21", "K22"],
+      "notationIds": ["membership", "iff", "set-operations"],
+      "motivation": "A diagram can suggest a set identity, but extensionality and logic explain why it holds for every choice of sets.",
+      "tutorial": "Let $A$ and $B$ be subsets of a universe $U$. De Morgan's set identity is\n\n$$U\\setminus(A\\cup B)=(U\\setminus A)\\cap(U\\setminus B).$$\n\nTake an arbitrary $x\\in U$. Membership on the left means $x\\notin A\\cup B$, which means it is not true that $x\\in A$ or $x\\in B$. Logical De Morgan changes this to $x\\notin A$ and $x\\notin B$. That is exactly membership in the right side. Because the two membership conditions agree for every $x\\in U$, extensionality gives equality.",
+      "keyIdea": "For a set identity, reduce both sides to equivalent statements about one arbitrary element.",
+      "examples": [
+        { "title": "Element-chasing template", "body": "A clean proof has the form $x\\in L\\Longleftrightarrow$ a logical condition $\\Longleftrightarrow x\\in R$, followed by one sentence invoking extensionality." }
+      ],
+      "exercise": {
+        "prompt": "Prove $A\\setminus(B\\cup C)=(A\\setminus B)\\cap(A\\setminus C)$ for subsets $A,B,C$ of a universe $U$.",
+        "hints": ["Begin with an arbitrary $x\\in U$.", "Translate difference as 'in the first set and not in the second,' then apply logical De Morgan."],
+        "solution": "For arbitrary $x\\in U$, $x\\in A\\setminus(B\\cup C)$ iff $x\\in A$ and $x\\notin B\\cup C$. This holds iff $x\\in A$, $x\\notin B$, and $x\\notin C$, which is equivalent to $x\\in A\\setminus B$ and $x\\in A\\setminus C$. Thus $x\\in(A\\setminus B)\\cap(A\\setminus C)$. Extensionality proves the identity."
+      },
+      "sourceRefs": [
+        { "sourceId": "hammack-proof", "note": "Element-chasing proofs of set equality." },
+        { "sourceId": "sundstrom-reasoning", "note": "Set identities derived from logical equivalence." },
+        { "sourceId": "mit-mcs", "note": "De Morgan laws linking Boolean and set operations." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Prove a set identity by translating membership in each side into the same logical condition for an arbitrary element.",
+      "readMinutes": 8,
+      "tags": ["sets", "theorem", "extensionality", "De Morgan", "element chasing"]
+    },
+    {
+      "id": "K26",
+      "slug": "functions-domain-codomain-equality",
+      "chapterId": "functions",
+      "section": "6.1",
+      "title": "Functions, domains, and codomains",
+      "kind": "definition",
+      "purpose": "Treat a function as a typed assignment with exactly one output for every allowed input.",
+      "prerequisiteIds": ["K02", "K04", "K13", "K24"],
+      "notationIds": ["exists-unique", "function-map"],
+      "motivation": "A formula is not a complete function until its allowed inputs and promised output set are known. Those types decide whether the rule is total, whether it is onto, and whether two functions are equal.",
+      "tutorial": "A function declaration $f:A\\to B$ names the **domain** $A$ and **codomain** $B$. For every $x\\in A$, there must be exactly one value $f(x)\\in B$. The notation $x\\mapsto f(x)$ describes the assignment; it does not replace the typed declaration.\n\nIn this textbook, two functions are equal when they have the same domain, the same codomain, and the same value at every input. A rule that misses an allowed input or offers two outputs for one input is not a function with the claimed type.",
+      "keyIdea": "A function is a complete, single-valued assignment from a declared domain to a declared codomain.",
+      "examples": [
+        { "title": "A finite typed function", "body": "The declaration $f:\\{0,1,2\\}\\to\\mathbb Z$ with $f(x):=x^2-1$ gives the values $-1,0,3$. Each domain element receives one integer output." }
+      ],
+      "exercise": {
+        "prompt": "Does the rule 'send each real $x$ to a real $y$ satisfying $y^2=x$' define a function $\\mathbb R\\to\\mathbb R$? Explain both possible failures.",
+        "hints": ["Test a negative input.", "For a positive input, count the real square roots."],
+        "solution": "No. A negative real input has no real output satisfying the rule, so the assignment is not total. A positive input such as 4 has two possible outputs, 2 and $-2$, so the rule is also not single-valued."
+      },
+      "sourceRefs": [
+        { "sourceId": "sundstrom-reasoning", "note": "Functions with explicit domains, codomains, and output uniqueness." },
+        { "sourceId": "levin-discrete", "note": "Function rules and finite input-output examples." },
+        { "sourceId": "judson-algebra", "note": "Typed functions and equality conventions used in later algebra." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 7,
+      "tags": ["functions", "domain", "codomain", "equality"]
+    },
+    {
+      "id": "K27",
+      "slug": "images-and-preimages",
+      "chapterId": "functions",
+      "section": "6.2",
+      "title": "Images and preimages",
+      "kind": "definition",
+      "purpose": "Move whole sets forward or backward through a function without pretending that the function is invertible.",
+      "prerequisiteIds": ["K20", "K21", "K26"],
+      "notationIds": ["set-builder", "subset", "function-map", "image-preimage"],
+      "motivation": "Many questions concern all outputs from a region or all inputs reaching a target region. These operations are defined for every function, including functions that merge inputs or miss outputs.",
+      "tutorial": "Let $f:A\\to B$, $S\\subseteq A$, and $T\\subseteq B$. The **image** of $S$ is\n\n$$f[S]:=\\{y\\in B:\\exists x\\in S, y=f(x)\\}.$$\n\nThe **preimage** of $T$ is\n\n$$f^{-1}[T]:=\\{x\\in A:f(x)\\in T\\}.$$\n\nBrackets signal that the input is a set. The preimage notation does not assert that an inverse function exists; it simply filters the domain by where $f$ lands.",
+      "keyIdea": "Images collect reached outputs; preimages collect inputs that reach a chosen target set.",
+      "examples": [
+        { "title": "A many-to-one function", "body": "For $f:\\mathbb R\\to\\mathbb R$, $f(x)=x^2$, we have $f[\\{-2,1\\}]=\\{1,4\\}$ and $f^{-1}[\\{1,4\\}]=\\{-2,-1,1,2\\}$. The preimage is meaningful even though $f$ is not one-to-one." }
+      ],
+      "exercise": {
+        "prompt": "For $f:\\mathbb Z\\to\\mathbb Z$ defined by $f(n)=2n$, compute $f[\\{-1,0,2\\}]$ and $f^{-1}[\\{0,4\\}]$.",
+        "hints": ["For the image, evaluate each listed input.", "For the preimage, solve $2n=0$ and $2n=4$ in the integer domain."],
+        "solution": "$f[\\{-1,0,2\\}]=\\{-2,0,4\\}$ and $f^{-1}[\\{0,4\\}]=\\{0,2\\}$."
+      },
+      "sourceRefs": [
+        { "sourceId": "sundstrom-reasoning", "note": "Images and inverse images of subsets." },
+        { "sourceId": "judson-algebra", "note": "Image and preimage notation needed by later algebraic arguments." },
+        { "sourceId": "hammack-proof", "note": "Element descriptions of function images and preimages." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 7,
+      "tags": ["functions", "image", "preimage", "sets"]
+    },
+    {
+      "id": "K28",
+      "slug": "composition-and-identity",
+      "chapterId": "functions",
+      "section": "6.3",
+      "title": "Composition and identity functions",
+      "kind": "definition",
+      "purpose": "Combine compatible functions in the correct order and recognize the function that changes nothing.",
+      "prerequisiteIds": ["K26"],
+      "notationIds": ["function-map", "composition"],
+      "motivation": "Long mathematical constructions are assembled from shorter maps. Their types determine which outputs may legally become the next inputs.",
+      "tutorial": "If $f:A\\to B$ and $g:B\\to C$, their composition is the function $g\\circ f:A\\to C$ defined by\n\n$$(g\\circ f)(x):=g(f(x)).$$\n\nRead $g\\circ f$ as '$g$ after $f$': the right-hand function acts first. The identity function on $A$ is $\\operatorname{id}_A:A\\to A$, defined by $\\operatorname{id}_A(x):=x$. It satisfies $f\\circ\\operatorname{id}_A=f$ and $\\operatorname{id}_B\\circ f=f$. Composition is associative because both parenthesizations send $x$ to the same final value.",
+      "keyIdea": "Composition follows the flow of types from right to left; identity leaves every input unchanged.",
+      "examples": [
+        { "title": "Order changes the rule", "body": "For $f(x)=x+1$ and $g(x)=x^2$, $(g\\circ f)(x)=(x+1)^2$, while $(f\\circ g)(x)=x^2+1$." }
+      ],
+      "exercise": {
+        "prompt": "Using $f(x)=x+1$ and $g(x)=x^2$ on the real numbers, compute $(g\\circ f)(3)$ and $(f\\circ g)(3)$, then verify one identity-function equation at 3.",
+        "hints": ["Apply the function nearest the input first.", "$\\operatorname{id}_{\\mathbb R}(3)=3$."],
+        "solution": "$(g\\circ f)(3)=g(4)=16$ and $(f\\circ g)(3)=f(9)=10$. Also $(f\\circ\\operatorname{id}_{\\mathbb R})(3)=f(3)=4$, which agrees with the identity law."
+      },
+      "sourceRefs": [
+        { "sourceId": "judson-algebra", "note": "Composition, identity maps, and type compatibility." },
+        { "sourceId": "sundstrom-reasoning", "note": "Function composition and identity functions." },
+        { "sourceId": "levin-discrete", "note": "Beginner examples emphasizing composition order." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 7,
+      "tags": ["functions", "composition", "identity", "types"]
+    },
+    {
+      "id": "K29",
+      "slug": "injective-surjective-bijective",
+      "chapterId": "functions",
+      "section": "6.4",
+      "title": "Injective, surjective, and bijective functions",
+      "kind": "definition",
+      "purpose": "Separate loss of input information from failure to reach the whole codomain.",
+      "prerequisiteIds": ["K12", "K13", "K26"],
+      "notationIds": ["implication", "forall", "exists", "function-map"],
+      "motivation": "Two functions with the same formula can have different structural properties when their domains or codomains change. The definitions must therefore mention the declared type.",
+      "tutorial": "A function $f:A\\to B$ is **injective** when equal outputs force equal inputs:\n\n$$\\forall x_1,x_2\\in A,\\quad f(x_1)=f(x_2)\\Rightarrow x_1=x_2.$$\n\nIt is **surjective** when every codomain element is reached:\n\n$$\\forall y\\in B,\\quad\\exists x\\in A,\\ f(x)=y.$$\n\nIt is **bijective** when both properties hold. To disprove injectivity, exhibit two distinct inputs with one output. To disprove surjectivity, exhibit a codomain value with no preimage.",
+      "keyIdea": "Injective means no collisions; surjective means no missed codomain values; bijective means both.",
+      "examples": [
+        { "title": "The codomain matters", "body": "$f:\\mathbb Z\\to\\mathbb Z$, $f(n)=2n$, is injective but not surjective because no integer maps to 1. The map $g:\\mathbb Z\\to\\mathbb Z$, $g(n)=n+1$, is bijective." }
+      ],
+      "exercise": {
+        "prompt": "Classify $q:\\mathbb R\\to\\mathbb R$, $q(x)=x^2$, as injective, surjective, both, or neither. Give explicit witnesses for each failure.",
+        "hints": ["Compare the inputs 1 and $-1$.", "Ask whether any real input can map to $-1$."],
+        "solution": "$q$ is neither. It is not injective because $q(1)=q(-1)=1$ while $1\\ne-1$. It is not surjective because the codomain value $-1$ is not the square of any real number."
+      },
+      "sourceRefs": [
+        { "sourceId": "sundstrom-reasoning", "note": "Quantified definitions of injections, surjections, and bijections." },
+        { "sourceId": "levin-discrete", "note": "Collision and coverage interpretations." },
+        { "sourceId": "judson-algebra", "note": "Bijections and domain-codomain sensitivity." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": false,
+      "readMinutes": 8,
+      "tags": ["functions", "injective", "surjective", "bijective"]
+    },
+    {
+      "id": "K30",
+      "slug": "inverse-functions-and-bijections",
+      "chapterId": "functions",
+      "section": "6.5",
+      "title": "A function is invertible exactly when it is bijective",
+      "kind": "theorem",
+      "purpose": "Characterize when a function can be undone in both directions and show that the undoing function is unique.",
+      "prerequisiteIds": ["K15", "K28", "K29"],
+      "notationIds": ["iff", "function-map", "composition", "inverse-function"],
+      "motivation": "The symbol $f^{-1}$ is often written too early. The bijection theorem states the exact condition that earns the right to use it for a function.",
+      "tutorial": "An inverse of $f:A\\to B$ is a function $h:B\\to A$ satisfying\n\n$$h\\circ f=\\operatorname{id}_A\\quad\\text{and}\\quad f\\circ h=\\operatorname{id}_B.$$\n\nIf such $h$ exists, equal outputs of $f$ can be sent through $h$ to recover equal inputs, so $f$ is injective. For every $y\\in B$, choosing $x:=h(y)$ gives $f(x)=y$, so $f$ is surjective. Conversely, if $f$ is bijective, each $y\\in B$ has exactly one input $x\\in A$ with $f(x)=y$; define $f^{-1}(y)$ to be that input. The two identity equations follow. Any two inverses must give that same unique input, so the inverse is unique.",
+      "keyIdea": "A two-sided inverse exists precisely when every codomain value comes from one and only one domain value.",
+      "examples": [
+        { "title": "Undo an affine function", "body": "For $f:\\mathbb R\\to\\mathbb R$, $f(x)=3x-2$, solving $y=3x-2$ for $x$ gives $f^{-1}(y)=(y+2)/3$. Substitution in both composition orders returns the input." }
+      ],
+      "exercise": {
+        "prompt": "Suppose $h,k:B\\to A$ are both inverses of $f:A\\to B$. Prove that $h=k$.",
+        "hints": ["Start with an arbitrary $y\\in B$.", "Use $f(k(y))=y$, then use $h(f(x))=x$."],
+        "solution": "Let $y\\in B$ be arbitrary. Because $k$ is an inverse, $f(k(y))=y$. Therefore $h(y)=h(f(k(y)))=k(y)$ because $h\\circ f=\\operatorname{id}_A$. Thus $h$ and $k$ agree at every $y\\in B$, and they have the same domain and codomain, so $h=k$."
+      },
+      "sourceRefs": [
+        { "sourceId": "judson-algebra", "note": "Bijections, inverse maps, and uniqueness of inverses." },
+        { "sourceId": "sundstrom-reasoning", "note": "Proof that invertibility and bijectivity are equivalent." },
+        { "sourceId": "mit-mcs", "note": "Function composition used to verify two-sided inverses." }
+      ],
+      "status": "initial-rewrite",
+      "trainable": true,
+      "proofGoal": "Prove that a function has a two-sided inverse if and only if it is bijective, including uniqueness of the inverse.",
+      "readMinutes": 10,
+      "tags": ["functions", "inverse", "bijection", "theorem", "uniqueness"]
+    }
+  ]
+}

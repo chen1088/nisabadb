@@ -3,9 +3,33 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it } from "vitest";
 import rawCorpus from "../data/corpus.json";
 import { validateCorpus, type Statement } from "../data/schema";
-import { ProofPanel } from "./GraphExplorer";
+import { GraphExplorer, ProofPanel } from "./GraphExplorer";
 
 afterEach(cleanup);
+
+describe("paper graph expansion", () => {
+  it("starts every dependency disclosure folded", () => {
+    const corpus = validateCorpus(rawCorpus);
+    const paper = corpus.papers.find((candidate) => candidate.status === "gold");
+    if (!paper) throw new Error("Gold-paper graph fixture is incomplete");
+    const statements = corpus.statements.filter((statement) => statement.paperId === paper.id);
+
+    render(
+      <MemoryRouter>
+        <GraphExplorer paper={paper} statements={statements} />
+      </MemoryRouter>,
+    );
+
+    const disclosures = screen.getAllByRole("button", { name: /prerequisites for/i });
+    expect(disclosures.length).toBeGreaterThan(0);
+    disclosures.forEach((disclosure) => {
+      expect(disclosure).toHaveAttribute("aria-expanded", "false");
+    });
+    expect(
+      screen.queryByRole("button", { name: /fold prerequisites for/i }),
+    ).not.toBeInTheDocument();
+  });
+});
 
 describe("conjecture proof panel", () => {
   it("labels source status without automatically certifying an open problem", () => {

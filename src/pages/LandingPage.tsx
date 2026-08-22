@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { corpus, getPaperStatements, verificationMeta } from "../components/content";
-import { materials } from "../data/materials";
+import { knowledgeNodes } from "../data/knowledge";
 
 export function LandingPage() {
   const featured = corpus.papers.find((paper) => paper.featured) ?? corpus.papers[0];
@@ -21,20 +21,20 @@ export function LandingPage() {
             <span>to research mathematics.</span>
           </h1>
           <p className="hero-lede">
-            NisabaDB is collecting research papers and beginner-to-advanced learning sources,
-            then exposing every dependency between where a person starts and what they want
-            to understand. The goal is the smallest honest route—not the usual stack of courses.
+            NisabaDB rewrites mathematics into one connected textbook, exposing every dependency
+            between a person’s first symbol and the theorem they want to understand. The goal is
+            the smallest honest route—not the usual stack of courses.
           </p>
           <div className="hero-actions">
-            <Link className="button-link primary-button" to="/materials">
-              Browse the first source map <span aria-hidden="true">→</span>
+            <Link className="button-link primary-button" to="/knowledge">
+              Start the living textbook <span aria-hidden="true">→</span>
             </Link>
             <Link className="button-link subtle-button" to="/papers">
               Explore {corpus.papers.length.toLocaleString()} papers
             </Link>
           </div>
         </div>
-        <div className="hero-graph" aria-label="A research goal connected to candidate learning sources">
+        <div className="hero-graph" aria-label="A research goal connected to prerequisite knowledge">
           <div className="hero-graph-caption">
             <span>One destination</span>
             <span>Every candidate bridge exposed</span>
@@ -145,8 +145,8 @@ export function LandingPage() {
           <span>paper records</span>
         </div>
         <div>
-          <strong>{materials.length}</strong>
-          <span>checked learning sources</span>
+          <strong>{knowledgeNodes.length}</strong>
+          <span>rewritten knowledge nodes</span>
         </div>
         <div>
           <strong>{corpus.citationEdges.length}</strong>

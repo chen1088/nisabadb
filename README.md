@@ -1,36 +1,41 @@
 # NisabaDB
 
-**Map papers and learning sources. Distill the shortest honest route into mathematics.**
+**Map papers. Rewrite their mathematical foundations into one living textbook.**
 
-NisabaDB is a paper corpus, proof-bearing paper graph, checked learning-source collection, and future mathematical knowledge graph for a person starting with no mathematics background. Its gold corpus currently contains *A Dimension-Free Dictatorship Tester on the Symmetric Group* and Braverman--Khot--Lifshitz--Minzer's *An Invariance Principle for the Multi-slice, with Applications*. The website presents reviewed paper-local mathematics as interactive dependency graphs and maps useful books, courses, notes, and software from elementary foundations toward those research goals. Canonical Knowledge is deliberately withheld until source ideas can be extracted, compared, rewritten, and compressed responsibly.
+NisabaDB is a paper corpus, a collection of proof-bearing paper graphs, and one canonical living mathematics textbook for a person starting with no mathematics background. Its gold corpus currently contains *A Dimension-Free Dictatorship Tester on the Symmetric Group* and Braverman--Khot--Lifshitz--Minzer's *An Invariance Principle for the Multi-slice, with Applications*. The website presents reviewed paper-local mathematics as interactive dependency graphs and rewrites the reusable knowledge behind those papers into a unified exposition with one notation policy. Source books, courses, notes, and software remain editorial evidence and lineage behind the textbook; they are not a public shelf or separate curricula.
+
+The Knowledge textbook is organized simultaneously as chapters for reading and as an acyclic prerequisite graph for reuse, search, and alternate routes. The planned paperback is a curated set of important excerpts from this canonical text, not a competing edition or a bundle of source materials.
 
 The intended canonical domain is `nisabadb.org`. Until that domain is configured, the project is deployable through GitHub Pages.
 
 ## What works
 
-- Navigation for Papers, Materials, Knowledge, Unsolved, and Learn
-- A checked Materials collection spanning arithmetic repair, proof, discrete mathematics, calculus, linear algebra, probability, algorithms, computational algebra, representation theory, Boolean analysis, and research bridges
-- Interactive candidate source DAGs for six learner destinations, with alternatives excluded unless selected and whole books never mislabeled as Knowledge nodes
+- Navigation for Knowledge, Papers, Unsolved, and Train
+- One living Knowledge textbook with chapter reading order, stable knowledge nodes, an acyclic prerequisite DAG, a canonical notation registry, and source lineage kept behind the exposition
 - A bounded, cycle-safe citation-ancestry DAG projection, processing backlog, and paginated paper catalog
-- One expandable dependency DAG per paper, containing every paper-facing result without topic sub-tabs
+- One expandable dependency DAG per paper, containing every paper-facing result without topic sub-tabs; theorem/result nodes start folded so a paper opens as a readable map rather than a wall of statements
 - Search, status filters, route-sensitive dependency highlighting, and stable deep links
 - Explicit original, minimized, and candidate-reinterpretation route roles with independent review state
 - Persistent statement/proof reader with source locations, Lean declarations, and axiom audit
 - Prover-neutral formal-artifact schema and reproducible submission lifecycle; Lean 4 is the first populated adapter
 - Topologically generated distilled-paper view with optional prerequisite expansion
-- Explicitly gated Knowledge and Learn surfaces, so source containers and paper-local claims are not mislabeled as a global curriculum
+- A Train surface defined around meaningful theorem-like nodes sampled from the paper DAGs and presented as re-proving exercises for a human or AI
 - An intentionally empty Unsolved surface until a conjecture passes a dated literature-status review
 - Thousands of provisional paper records discovered through a resumable recursive citation queue
 - Validated TypeScript content model and a persistent OpenAlex ingestion queue
 - Responsive, keyboard-accessible React interface with KaTeX rendering
 
-The corpus contains 2,143 paper records: 2 gold rewrites and 2,141 provisional papers, connected by 2,284 citation records. The two reviewed paper graphs contain 93 mathematical nodes. The separate Materials collection contains 25 official-source-checked records and six candidate goal routes. Human-readable compressed paper routes are complete for 36 of 61 theorem-like nodes. Every remaining item is labeled as a proof idea or a proof not yet distilled; source-omitted proofs and unresolved source inconsistencies are never promoted to complete routes. The canonical Knowledge layer currently contains zero nodes by design.
+The corpus contains 2,143 paper records: 2 gold rewrites and 2,141 provisional papers, connected by 2,284 citation records. The two reviewed paper graphs contain 93 mathematical nodes. The initial living Knowledge edition contains 30 independently written nodes across six chapters, with 21 canonical notation entries and six source-lineage records. Human-readable compressed paper routes are complete for 36 of 61 theorem-like nodes. Every remaining item is labeled as a proof idea or a proof not yet distilled; source-omitted proofs and unresolved source inconsistencies are never promoted to complete routes. The initial textbook nodes remain labeled as initial rewrites until mathematical and pedagogical review is complete.
 
-## Materials are evidence, not assignments
+## Knowledge is one living textbook
 
-`src/data/materials.json` is the first curated source layer. Its prerequisite edges mean “this source is a plausible preparation for that source,” not “read every page before continuing.” Each record keeps free access separate from permission to make derivatives, lists only the concepts worth considering for extraction, and states a compression question. The validated graph rejects missing relations, duplicates, self-links, and prerequisite cycles.
+`src/data/knowledge.json` is the canonical textbook source. Each knowledge node belongs to a chapter and section, declares its prerequisite nodes, uses entries from the shared notation registry, and carries source references for editorial traceability. The validated graph rejects missing relations, duplicate identifiers, self-dependencies, and prerequisite cycles. Reader-facing prose, examples, and exercises are NisabaDB rewrites rather than stitched excerpts from the source texts.
 
-The first hypotheses include a purpose-built proof/discrete-math common core, algebra organized around executable structures, competing routes to Young diagrams, and finite-first Boolean analysis. They remain hypotheses until administrators review the extracted concepts, independently written tutorials, mathematical equivalences, and actual prerequisite costs.
+The chapter order is a curated reading route through that DAG, not the definition of the mathematics itself. A concept can therefore support several later chapters without being duplicated, and alternate reading routes can be generated without changing its canonical statement. The notation registry records one preferred symbol and meaning together with source-specific aliases, allowing material from different traditions to be unified explicitly instead of silently mixing conventions.
+
+Per-node source lineage and internal editorial research still guide extraction, comparison, licensing review, and provenance. They do not appear as a public Materials architecture and are never assignments to read whole books. The published paperback will excerpt selected chapters and results from the same canonical text.
+
+Train is separate from textbook navigation. It samples meaningful theorem-like nodes from the paper DAGs and asks a human or AI to reconstruct a proof as an exercise; dependency context, hints, and the reviewed route can be disclosed progressively rather than shown up front.
 
 ## Run locally
 

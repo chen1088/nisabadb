@@ -4,12 +4,13 @@ Status date: 2026-08-22
 
 ## Product structure
 
-- The primary navigation is now Papers, Knowledge, Unsolved, and Learn; the brand remains the home link.
+- The primary navigation is now Papers, Materials, Knowledge, Unsolved, and Learn; the brand remains the home link.
 - Papers is the active first phase: 2,143 catalog records, a bounded rooted citation-ancestry projection, a processing backlog, and 50-record catalog pagination.
+- Materials is a separate source-evidence layer for a learner starting with no mathematics background. It contains 25 official-source-checked books, courses, notes, software labs, and an interactive tool, connected into six provisional goal routes.
 - Each gold paper renders one complete dependency graph. Legacy `view` query parameters remain harmless, but main-theorem and topic graph tabs are no longer user-visible.
 - Proof routes distinguish their dependency role (`original`, `minimized`, or `reinterpretation`) from their review state. The current 61 populated routes are reviewed original/source routes; no minimized or reinterpretation route is claimed yet.
-- Knowledge contains zero canonical nodes and is deliberately gated. The existing 93 reviewed statements belong to two separate paper-local proof DAGs; there are no cross-paper statement dependencies, so presenting them as a global Knowledge DAG would be premature.
-- Learn is also gated until canonical Knowledge and its reviewed prerequisite DAG exist. The two gold paper graphs remain directly readable.
+- Knowledge contains zero canonical nodes and is deliberately gated. The 25 material records are evidence containers, and the existing 93 reviewed statements belong to two separate paper-local proof DAGs; neither source collection is a global Knowledge DAG.
+- Learn is also gated until canonical Knowledge and its reviewed prerequisite DAG exist. The six candidate material routes and two gold paper graphs remain directly inspectable without being presented as finished curricula.
 - Unsolved is intentionally empty. The one source conjecture is a literature-review candidate, not a confirmed-current open problem.
 - Formal artifacts are now prover-neutral. The 191 current artifacts are Lean 4 declarations; the schema also validates reproducible submissions from other checkers, but automated submission and execution await the worker service.
 
@@ -80,6 +81,19 @@ The first bounded recursive run processed ten identified papers and expanded the
 
 These citation records are bibliographic evidence, not mathematical prerequisite edges. The raw directed network may contain cycles; the Papers interface exposes a bounded, cycle-safe ancestry projection for navigation without asserting that the full citation network is a DAG.
 
+## Materials source collection
+
+The first collection spans arithmetic diagnostics, algebra and functions, proof, calculus, discrete mathematics, linear algebra, probability, algorithms, complexity, computational group theory, representation theory, Young diagrams, Boolean-function analysis, property testing, and PCPs. The current candidate destinations are first proof, mathematical common core, computational algebra, Young diagrams, dictatorship testing, and multislice invariance.
+
+Each route is a DAG of source containers, not a list of books to read and not a graph of canonical concepts. Alternate sources and on-demand references stay outside the selected route unless explicitly chosen. The initial compression hypotheses are:
+
+1. selected algebra/functions, one proof bridge, and the MIT discrete-math core may replace repeated portions of several conventional introductory courses;
+2. algebra may admit a smaller common language organized around executable structures, structure-preserving maps, invariants, and decomposition;
+3. representation-first and tableaux-first routes to Young diagrams should be compared rather than accumulated;
+4. much finite Boolean analysis may avoid making a full measure-theory course a mandatory ancestor.
+
+Access and derivative rights are displayed as separate facts. OpenStax records also disclose its current permission requirement for generative-AI ingestion. Free-to-read, no-derivatives, mixed-license, and commercial sources are link-and-cite evidence only; NisabaDB must write independent tutorials and examples rather than reproduce their exposition.
+
 ## Remaining mathematical work
 
 1. Distill complete proofs of the two imported Section 2 inputs from their primary literature and expose any additional prerequisite nodes they need.
@@ -93,6 +107,7 @@ These citation records are bibliographic evidence, not mathematical prerequisite
 9. Continue the recursive citation queue, resolve the 36 identity-blocked records (starting with exact DOI/arXiv candidates), and promote provisional papers to gold only after source-level mathematical review.
 10. Add process-safe leases/locks, bounded provider pagination, rate budgets, retries, and recovery before distributing queue work across DigitalOcean nodes.
 11. Split the static client artifact or add a catalog service before scaling substantially beyond the current 2,143 records.
-12. Begin cross-paper Knowledge equivalence review only after broad paper processing exposes real repeated concepts; then construct and minimize the canonical Knowledge DAG.
+12. Extract concept-level candidates from both material sources and paper proof DAGs, then compare overlaps, alternative routes, and prerequisite costs.
+13. Begin canonical Knowledge review only after those cross-source equivalences and independently written beginner bridges have been mathematically and pedagogically audited.
 
 These are labeled gaps, not hidden completion claims.

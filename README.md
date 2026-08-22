@@ -1,14 +1,16 @@
 # NisabaDB
 
-**Build the paper graph first. Distill shared mathematical knowledge from evidence.**
+**Map papers and learning sources. Distill the shortest honest route into mathematics.**
 
-NisabaDB is a paper corpus, proof-bearing paper graph, and future mathematical knowledge graph. Its gold corpus currently contains *A Dimension-Free Dictatorship Tester on the Symmetric Group* and Braverman--Khot--Lifshitz--Minzer's *An Invariance Principle for the Multi-slice, with Applications*. The website presents reviewed paper-local mathematics as interactive dependency graphs, theorem pages, and linearized distilled papers. Canonical cross-paper Knowledge is deliberately withheld until the corpus is broad enough to justify simplification and compression.
+NisabaDB is a paper corpus, proof-bearing paper graph, checked learning-source collection, and future mathematical knowledge graph for a person starting with no mathematics background. Its gold corpus currently contains *A Dimension-Free Dictatorship Tester on the Symmetric Group* and Braverman--Khot--Lifshitz--Minzer's *An Invariance Principle for the Multi-slice, with Applications*. The website presents reviewed paper-local mathematics as interactive dependency graphs and maps useful books, courses, notes, and software from elementary foundations toward those research goals. Canonical Knowledge is deliberately withheld until source ideas can be extracted, compared, rewritten, and compressed responsibly.
 
 The intended canonical domain is `nisabadb.org`. Until that domain is configured, the project is deployable through GitHub Pages.
 
 ## What works
 
-- Paper-first navigation for Papers, Knowledge, Unsolved, and Learn
+- Navigation for Papers, Materials, Knowledge, Unsolved, and Learn
+- A checked Materials collection spanning arithmetic repair, proof, discrete mathematics, calculus, linear algebra, probability, algorithms, computational algebra, representation theory, Boolean analysis, and research bridges
+- Interactive candidate source DAGs for six learner destinations, with alternatives excluded unless selected and whole books never mislabeled as Knowledge nodes
 - A bounded, cycle-safe citation-ancestry DAG projection, processing backlog, and paginated paper catalog
 - One expandable dependency DAG per paper, containing every paper-facing result without topic sub-tabs
 - Search, status filters, route-sensitive dependency highlighting, and stable deep links
@@ -16,13 +18,19 @@ The intended canonical domain is `nisabadb.org`. Until that domain is configured
 - Persistent statement/proof reader with source locations, Lean declarations, and axiom audit
 - Prover-neutral formal-artifact schema and reproducible submission lifecycle; Lean 4 is the first populated adapter
 - Topologically generated distilled-paper view with optional prerequisite expansion
-- Explicitly gated Knowledge and Learn surfaces, so paper-local claims are not mislabeled as a global curriculum
+- Explicitly gated Knowledge and Learn surfaces, so source containers and paper-local claims are not mislabeled as a global curriculum
 - An intentionally empty Unsolved surface until a conjecture passes a dated literature-status review
 - Thousands of provisional paper records discovered through a resumable recursive citation queue
 - Validated TypeScript content model and a persistent OpenAlex ingestion queue
 - Responsive, keyboard-accessible React interface with KaTeX rendering
 
-The corpus contains 2,143 paper records: 2 gold rewrites and 2,141 provisional papers, connected by 2,284 citation records. The two reviewed paper graphs contain 93 mathematical nodes. Human-readable compressed routes are complete for 36 of 61 theorem-like nodes. Every remaining item is labeled as a proof idea or a proof not yet distilled; source-omitted proofs and unresolved source inconsistencies are never promoted to complete routes. The canonical Knowledge layer currently contains zero nodes by design.
+The corpus contains 2,143 paper records: 2 gold rewrites and 2,141 provisional papers, connected by 2,284 citation records. The two reviewed paper graphs contain 93 mathematical nodes. The separate Materials collection contains 25 official-source-checked records and six candidate goal routes. Human-readable compressed paper routes are complete for 36 of 61 theorem-like nodes. Every remaining item is labeled as a proof idea or a proof not yet distilled; source-omitted proofs and unresolved source inconsistencies are never promoted to complete routes. The canonical Knowledge layer currently contains zero nodes by design.
+
+## Materials are evidence, not assignments
+
+`src/data/materials.json` is the first curated source layer. Its prerequisite edges mean “this source is a plausible preparation for that source,” not “read every page before continuing.” Each record keeps free access separate from permission to make derivatives, lists only the concepts worth considering for extraction, and states a compression question. The validated graph rejects missing relations, duplicates, self-links, and prerequisite cycles.
+
+The first hypotheses include a purpose-built proof/discrete-math common core, algebra organized around executable structures, competing routes to Young diagrams, and finite-first Boolean analysis. They remain hypotheses until administrators review the extracted concepts, independently written tutorials, mathematical equivalences, and actual prerequisite costs.
 
 ## Run locally
 
@@ -96,6 +104,6 @@ The public site remains static. Authenticated contributions, automated prover ru
 
 ## Provenance and reuse
 
-NisabaDB stores metadata, exact source locations, source links, and newly written proof distillations. It does not republish the source manuscript or third-party full text. Every formal link is pinned to a commit, and verification labels distinguish kernel checking, axiom auditing, and still-pending human–formal alignment.
+NisabaDB stores metadata, exact source locations, source links, small original descriptions, and newly written proof distillations. It does not republish source manuscripts or third-party textbook text merely because they are free to read. Openly licensed sources are adapted only under their terms; cite-only and no-derivatives sources support independently written explanations. Every formal link is pinned to a commit, and verification labels distinguish kernel checking, axiom auditing, and still-pending human–formal alignment.
 
 See [STATUS.md](STATUS.md) for precise coverage and remaining gaps, and [ARCHITECTURE.md](ARCHITECTURE.md) for the data model and continuation path.

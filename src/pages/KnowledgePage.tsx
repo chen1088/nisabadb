@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { corpus } from "../components/content";
+import { materials } from "../data/materials";
 
 const goldPapers = corpus.papers.filter((paper) => paper.status === "gold").length;
 const provisionalPapers = corpus.papers.length - goldPapers;
@@ -8,12 +9,12 @@ export function KnowledgePage() {
   return (
     <div className="knowledge-page page-shell">
       <header className="page-hero compact-page-hero knowledge-hero knowledge-hero-gated">
-        <p className="eyebrow">Later phase · deliberately gated</p>
-        <h1>Knowledge comes after corpus coverage.</h1>
+        <p className="eyebrow">Canonical layer · deliberately gated</p>
+        <h1>Knowledge is what survives compression.</h1>
         <p>
-          Two processed papers cannot support a meaningful global knowledge graph. NisabaDB
-          must first collect thousands of papers and distill their internal proof DAGs; only
-          then can repeated ideas be merged, simplified, and compressed responsibly.
+          A textbook, chapter, or paper is not one piece of Knowledge. NisabaDB must extract
+          the small ideas they use, forge beginner-friendly bridges between them, and compare
+          alternate routes before claiming a minimum prerequisite graph.
         </p>
       </header>
 
@@ -23,6 +24,11 @@ export function KnowledgePage() {
             <span>Canonical knowledge nodes</span>
             <strong>0</strong>
             <small>No cross-paper merges claimed</small>
+          </div>
+          <div>
+            <span>Checked learning sources</span>
+            <strong>{materials.length}</strong>
+            <small>Evidence containers, not curriculum nodes</small>
           </div>
           <div>
             <span>Processed source papers</span>
@@ -38,15 +44,15 @@ export function KnowledgePage() {
 
         <div className="knowledge-gate-copy">
           <p className="eyebrow">Why the graph is withheld</p>
-          <h2 id="knowledge-gate-title">A small, disconnected sample produces fake simplicity.</h2>
+          <h2 id="knowledge-gate-title">A source map is not yet a learning path.</h2>
           <p>
-            Paper-level theorem nodes are not yet source-independent knowledge. A canonical
-            Knowledge node needs evidence that the same idea recurs across papers, a reviewed
-            equivalence boundary, and a dependency route that survives removal of paper-specific
-            notation and exposition.
+            The current Materials DAG shows where useful explanations may be found. The paper
+            DAGs show how two research results are proved. A canonical Knowledge node needs a
+            minimized description, a tutorial for someone arriving with exactly its listed
+            prerequisites, reviewed equivalence boundaries, and evidence that every edge is used.
           </p>
-          <Link className="button-link primary-action" to="/papers">
-            Build the paper corpus first <span aria-hidden="true">→</span>
+          <Link className="button-link primary-action" to="/materials">
+            Inspect the source collection <span aria-hidden="true">→</span>
           </Link>
         </div>
       </section>
@@ -60,29 +66,29 @@ export function KnowledgePage() {
           <li>
             <span>01</span>
             <div>
-              <h3>Collect the paper universe</h3>
-              <p>Expand the citation graph into a resumable backlog of thousands of source records.</p>
+              <h3>Collect the source universe</h3>
+              <p>Map research papers and basic-to-advanced learning materials with precise provenance and reuse boundaries.</p>
             </div>
           </li>
           <li>
             <span>02</span>
             <div>
-              <h3>Process paper proof DAGs</h3>
-              <p>Extract exact statements, dependencies, proof routes, and verification evidence paper by paper.</p>
+              <h3>Extract small ideas</h3>
+              <p>Break papers and books into definitions, algorithms, examples, exact claims, and the dependencies they actually use.</p>
             </div>
           </li>
           <li>
             <span>03</span>
             <div>
-              <h3>Detect genuine overlap</h3>
-              <p>Propose cross-paper equivalences and reinterpretations without silently merging nearby claims.</p>
+              <h3>Forge and compare bridges</h3>
+              <p>Write independent beginner tutorials, computational reinterpretations, and alternate routes; measure their prerequisite cost.</p>
             </div>
           </li>
           <li>
             <span>04</span>
             <div>
-              <h3>Review and compress</h3>
-              <p>Administrators approve canonical nodes, minimized descriptions, tutorials, and prerequisite routes.</p>
+              <h3>Verify and compress</h3>
+              <p>Administrators approve source-independent nodes only after mathematical, pedagogical, and formal evidence survives review.</p>
             </div>
           </li>
         </ol>

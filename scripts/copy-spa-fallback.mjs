@@ -13,7 +13,7 @@ for (const statement of corpus.statements) {
   );
 }
 
-const routes = new Set(["knowledge", "papers", "unsolved", "learn"]);
+const routes = new Set(["materials", "knowledge", "papers", "unsolved", "learn"]);
 for (const paper of corpus.papers) {
   routes.add(`papers/${paper.id}`);
   if ((statementCountByPaper.get(paper.id) ?? 0) > 0) {

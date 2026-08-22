@@ -17,11 +17,11 @@ function renderAt(path: string) {
 describe("NisabaDB application", () => {
   it("presents the canonical branding and paper-first corpus phase", () => {
     renderAt("/");
-    expect(screen.getByRole("heading", { name: /distilled, verified/i })).toBeInTheDocument();
-    expect(screen.getByText("The distilled, verified graph of mathematics.")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /from first steps/i })).toBeInTheDocument();
+    expect(screen.getByText("From first arithmetic to research proofs.")).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: /explore the paper corpus/i }),
-    ).toHaveAttribute("href", "/papers");
+      screen.getByRole("link", { name: /browse the first source map/i }),
+    ).toHaveAttribute("href", "/materials");
   });
 
   it("opens a deep-linked result with its exact statement and active route", () => {
@@ -44,14 +44,36 @@ describe("NisabaDB application", () => {
     const navigation = screen.getByRole("navigation", { name: /primary navigation/i });
     expect(within(navigation).getAllByRole("link").map((link) => link.textContent)).toEqual([
       "Papers",
+      "Materials",
       "Knowledge",
       "Unsolved",
       "Learn",
     ]);
-    expect(screen.getByRole("heading", { name: /knowledge comes after corpus coverage/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /knowledge is what survives compression/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/knowledge activation status/i)).toHaveTextContent(/canonical knowledge nodes\s*0/i);
     expect(screen.queryByLabelText(/layered prerequisite graph/i)).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /build the paper corpus first/i })).toHaveAttribute("href", "/papers");
+    expect(screen.getByRole("link", { name: /inspect the source collection/i })).toHaveAttribute("href", "/materials");
+  });
+
+  it("maps checked materials from a zero-background start without calling them Knowledge", () => {
+    renderAt("/materials");
+    expect(screen.getByRole("heading", { name: /start at zero/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/materials collection status/i)).toHaveTextContent(/canonical knowledge nodes\s*0/i);
+    expect(screen.getByLabelText(/candidate source route for/i)).toBeInTheDocument();
+    expect(screen.getByText(/not a demand to read/i)).toBeInTheDocument();
+
+    fireEvent.change(screen.getByRole("combobox", { name: /mathematics destination/i }), {
+      target: { value: "young-diagrams" },
+    });
+    const route = screen.getByLabelText(/candidate source route for.*young diagrams/i);
+    expect(within(route).getByText("The Symmetric Group")).toBeInTheDocument();
+    expect(within(route).queryByText("Young Tableaux")).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByRole("searchbox", { name: /search materials/i }), {
+      target: { value: "fractions" },
+    });
+    expect(screen.getByRole("heading", { name: "Prealgebra 2e" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "The Symmetric Group" })).not.toBeInTheDocument();
   });
 
   it("shows the paper citation DAG, processing backlog, and bounded catalog", () => {

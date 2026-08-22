@@ -39,11 +39,12 @@ export function SiteLayout() {
           <NisabaMark />
           <span>
             <strong>NisabaDB</strong>
-            <small>The distilled, verified graph of mathematics.</small>
+            <small>From first arithmetic to research proofs.</small>
           </span>
         </Link>
         <nav aria-label="Primary navigation">
           <NavLink to="/papers">Papers</NavLink>
+          <NavLink to="/materials">Materials</NavLink>
           <NavLink to="/knowledge">Knowledge</NavLink>
           <NavLink to="/unsolved">Unsolved</NavLink>
           <NavLink to="/learn">Learn</NavLink>
@@ -57,12 +58,12 @@ export function SiteLayout() {
           <NisabaMark />
           <span>
             <strong>NisabaDB</strong>
-            <small>Mathematical statements, proofs, and formal evidence in one graph.</small>
+            <small>A shorter, inspectable route into mathematics.</small>
           </span>
         </div>
         <p>
-          Source papers remain immutable. Distillations preserve attribution, provenance,
-          and honest verification boundaries.
+          Papers and learning materials remain attributed source evidence. Knowledge appears
+          only after overlap, dependencies, and independently written explanations are reviewed.
         </p>
       </footer>
     </div>

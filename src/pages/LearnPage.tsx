@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { corpus } from "../components/content";
+import { materials } from "../data/materials";
 
 const goldPapers = corpus.papers.filter((paper) => paper.status === "gold");
 
@@ -11,8 +12,8 @@ export function LearnPage() {
         <h1>Training follows compression.</h1>
         <p>
           NisabaDB will not estimate a shortest curriculum or claim mastery tests before a
-          reviewed Knowledge DAG exists. For now, learners can read individual gold paper
-          graphs without mistaking those routes for a global mathematical curriculum.
+          reviewed Knowledge DAG exists. For now, learners can compare candidate source routes
+          and read individual gold paper graphs without mistaking either for a finished curriculum.
         </p>
       </header>
 
@@ -20,17 +21,19 @@ export function LearnPage() {
         <div className="knowledge-gate-counts" aria-label="Learning activation status">
           <div><span>Active curricula</span><strong>0</strong><small>No global route claimed</small></div>
           <div><span>Canonical knowledge nodes</span><strong>0</strong><small>Compression has not started</small></div>
+          <div><span>Mapped learning sources</span><strong>{materials.length}</strong><small>Evidence, not assigned books</small></div>
           <div><span>Readable paper graphs</span><strong>{goldPapers.length}</strong><small>Paper-local study only</small></div>
         </div>
         <div className="knowledge-gate-copy">
           <p className="eyebrow">What is available now</p>
-          <h2 id="learn-gate-title">Study the evidence-bearing papers directly.</h2>
+          <h2 id="learn-gate-title">Inspect the sources and papers directly.</h2>
           <p>
-            These paper routes preserve the authors' result structure, proof dependencies,
-            and verification boundaries. They are useful reading paths, but they are not yet
-            minimized across the literature.
+            The Materials page shows provisional routes from elementary sources toward research.
+            Paper graphs preserve authors' result structure and proof dependencies. Both are
+            useful now, but neither has been minimized into learner-ready Knowledge.
           </p>
           <div className="learn-paper-links">
+            <Link to="/materials">Compare candidate beginner-to-research source routes →</Link>
             {goldPapers.map((paper) => (
               <Link key={paper.id} to={`/papers/${paper.id}`}>{paper.title} →</Link>
             ))}

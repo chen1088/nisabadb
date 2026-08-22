@@ -1,11 +1,12 @@
 # NisabaDB architecture
 
-## Paper corpus first, knowledge compression later
+## Source evidence first, knowledge compression later
 
-`src/data/corpus.json` is the build-time source for the paper catalog, citation explorer, reviewed paper graphs, canonical theorem pages, and distilled-paper view. Rendering code never owns mathematical proof text. `src/data/schema.ts` validates the corpus as the application loads and in tests.
+`src/data/corpus.json` is the build-time source for the paper catalog, citation explorer, reviewed paper graphs, canonical theorem pages, and distilled-paper view. `src/data/materials.json` is the separate checked collection of beginner-to-research books, courses, notes, software labs, and tools. Rendering code never owns mathematical proof text or third-party textbook prose. `src/data/schema.ts` and `src/data/material-schema.ts` validate the two source layers as the application loads and in tests.
 
 - **Papers** is the active first phase. It exposes the large provisional corpus, a bounded citation-ancestry projection, processing backlog, and one complete proof-dependency graph for each reviewed paper. Main results and sections are focus points inside that graph, not separate graph tabs.
-- **Knowledge** has zero canonical nodes until enough papers have been processed to expose genuine repeated concepts. A later source-independent `KnowledgeNode` layer will merge equivalent claims only after cross-paper review, then minimize descriptions, tutorials, and dependencies.
+- **Materials** maps useful sources from an arithmetic diagnostic through current research bridges. Its prerequisite relations are candidate source-preparation edges, not learner assignments or canonical mathematical dependencies. Whole books never become Knowledge nodes.
+- **Knowledge** has zero canonical nodes until enough paper and material content has been extracted to expose genuine repeated concepts. A later source-independent `KnowledgeNode` layer will merge equivalent claims only after cross-source review, then minimize descriptions, tutorials, and dependencies.
 - **Unsolved** remains empty until a precise problem passes an administratively reviewed, dated literature audit.
 - **Learn** is gated until a reviewed Knowledge DAG exists. Paper-specific graph reading remains available on each gold paper without pretending to be a globally minimized curriculum.
 
@@ -22,8 +23,15 @@ Paper
   ├─ ModificationRecord
   └─ ingestion queue state
 
+Material source
+  ├─ prerequisiteIds -> Material source
+  ├─ alternativeIds -> Material source
+  ├─ extractFocus
+  ├─ access and derivative-rights evidence
+  └─ provisional compression question
+
 Future KnowledgeNode
-  ├─ evidenceRefs -> Statement across reviewed papers
+  ├─ evidenceRefs -> Statements and extracted material locations
   ├─ prerequisiteRefs -> KnowledgeNode
   ├─ minimized description and tutorial
   └─ review and verification evidence
@@ -51,6 +59,8 @@ The Zod schema and cross-record checks reject:
 - mismatched source-statement repair records or missing modification history;
 - impossible citation coverage, recursive-closure, or completed-queue claims;
 - `fully-certified` statement or route claims without reviewed alignment and a clean, input-free formal audit.
+
+The material schema separately rejects duplicate source or goal IDs, missing prerequisite or alternate sources, self-links, repeated relations, prerequisite cycles, and compression hypotheses with missing evidence. Alternative-route cycles are allowed because they express comparison, not precedence. Access availability and derivative rights are separate displayed facts: a free PDF is not assumed to permit adaptation or AI ingestion.
 
 The main dependency order is computed from the selected route at runtime. The distilled paper is therefore a topological reading of the same records—not a second manuscript.
 
@@ -114,7 +124,8 @@ The current application is static-first by design and eagerly loads the committe
 
 - `/` — project landing page and featured-paper entry
 - `/papers` — paper-corpus command view, rooted citation projection, backlog, and paginated catalog
-- `/knowledge` — gated future cross-paper compression layer; currently zero canonical nodes
+- `/materials` — checked learning-source collection and interactive candidate source DAGs
+- `/knowledge` — gated future cross-source compression layer; currently zero canonical nodes
 - `/papers/:paperId` — metadata, graph, proofs, citations, and formal coverage
 - `/papers/:paperId/distilled` — generated linear reading
 - `/theorems/:statementId` — canonical deep-linked statement

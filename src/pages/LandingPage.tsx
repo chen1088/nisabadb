@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { corpus, getPaperStatements, verificationMeta } from "../components/content";
+import { materials } from "../data/materials";
 
 export function LandingPage() {
   const featured = corpus.papers.find((paper) => paper.featured) ?? corpus.papers[0];
@@ -14,50 +15,48 @@ export function LandingPage() {
     <div className="landing-page">
       <section className="landing-hero">
         <div className="hero-copy">
-          <p className="eyebrow">Current phase · map the source literature</p>
+          <p className="eyebrow">For a learner starting with no mathematics background</p>
           <h1>
-            The distilled, verified
-            <span>graph of mathematics.</span>
+            From first steps
+            <span>to research mathematics.</span>
           </h1>
           <p className="hero-lede">
-            NisabaDB is first building a large, provenance-preserving paper graph. Each
-            processed paper becomes its own proof DAG; shared Knowledge will be simplified
-            only after the corpus is broad enough to reveal genuine overlap.
+            NisabaDB is collecting research papers and beginner-to-advanced learning sources,
+            then exposing every dependency between where a person starts and what they want
+            to understand. The goal is the smallest honest route—not the usual stack of courses.
           </p>
           <div className="hero-actions">
-            <Link className="button-link primary-button" to="/papers">
-              Explore the paper corpus <span aria-hidden="true">→</span>
+            <Link className="button-link primary-button" to="/materials">
+              Browse the first source map <span aria-hidden="true">→</span>
             </Link>
-            {featured ? (
-              <Link className="button-link subtle-button" to={`/papers/${featured.id}`}>
-                Open the first gold paper
-              </Link>
-            ) : null}
+            <Link className="button-link subtle-button" to="/papers">
+              Explore {corpus.papers.length.toLocaleString()} papers
+            </Link>
           </div>
         </div>
-        <div className="hero-graph" aria-label="A theorem connected to its proof prerequisites">
+        <div className="hero-graph" aria-label="A research goal connected to candidate learning sources">
           <div className="hero-graph-caption">
-            <span>One statement</span>
-            <span>Every dependency exposed</span>
+            <span>One destination</span>
+            <span>Every candidate bridge exposed</span>
           </div>
           <div className="mini-node mini-node-hero">
-            <small>Main theorem</small>
-            <strong>Dimension-free testing</strong>
-            <span>complete compressed route</span>
+            <small>Research destination</small>
+            <strong>Understand dictatorship testing</strong>
+            <span>current route · not yet claimed minimal</span>
           </div>
           <div className="mini-branch" aria-hidden="true" />
           <div className="mini-node-grid">
             <div className="mini-node">
-              <small>Definition 2.1</small>
-              <strong>Finite-seed tester</strong>
+              <small>Shared foundation</small>
+              <strong>Proof + finite probability</strong>
             </div>
             <div className="mini-node">
-              <small>Lemma 4.7</small>
-              <strong>Independent repetition</strong>
+              <small>Computational bridge</small>
+              <strong>Groups + Young diagrams</strong>
             </div>
           </div>
           <p className="hero-graph-note">
-            Exact statements · alternate routes · prover artifacts · source provenance
+            Start-level diagnostics · alternate routes · source rights · paper provenance
           </p>
         </div>
       </section>
@@ -65,37 +64,37 @@ export function LandingPage() {
       <section className="principles-section" aria-labelledby="principles-title">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">The graph is the rewritten paper</p>
-            <h2 id="principles-title">Read the logic, not just the conclusion</h2>
+            <p className="eyebrow">The learner DAG is not the textbook shelf</p>
+            <h2 id="principles-title">Begin with the person. End at the theorem.</h2>
           </div>
           <p>
-            Every displayed prerequisite must be used. Every nontrivial imported fact must
-            be visible. Missing work is marked, never papered over.
+            We use books and papers as evidence, extract only what a goal needs, and compare
+            competing routes before declaring any piece of mathematics essential.
           </p>
         </div>
         <div className="principle-grid">
           <article>
             <span className="principle-number">01</span>
-            <h3>Distilled proofs</h3>
+            <h3>Start where the learner is</h3>
             <p>
-              Human-readable routes preserve hypotheses, constants, restrictions, and edge
-              cases while removing incidental exposition.
+              Diagnose missing arithmetic or algebra one idea at a time. Known material is
+              skipped; a beginner is never told to “go learn the prerequisites” alone.
             </p>
           </article>
           <article>
             <span className="principle-number">02</span>
-            <h3>Explicit dependencies</h3>
+            <h3>Make abstractions executable</h3>
             <p>
-              Follow a proof backward through definitions, imported results, and alternate
-              routes without leaving the mathematical context.
+              Concrete examples and software experiments can carry a shared core from linear
+              algebra into groups, representations, probability, and algorithms.
             </p>
           </article>
           <article>
             <span className="principle-number">03</span>
-            <h3>Granular verification</h3>
+            <h3>Compare before compressing</h3>
             <p>
-              Kernel checking, axiom audits, and human–formal alignment remain separate,
-              inspectable claims.
+              Original, minimized, and reinterpreted routes remain visible. Compression is a
+              reviewed mathematical claim, not a promise made by the interface.
             </p>
           </article>
         </div>
@@ -146,8 +145,8 @@ export function LandingPage() {
           <span>paper records</span>
         </div>
         <div>
-          <strong>{corpus.statements.length}</strong>
-          <span>mathematical statements</span>
+          <strong>{materials.length}</strong>
+          <span>checked learning sources</span>
         </div>
         <div>
           <strong>{corpus.citationEdges.length}</strong>

@@ -1,0 +1,663 @@
+{
+  "schemaVersion": "1.0.0",
+  "verifiedAt": "2026-08-22",
+  "principle": "Books and courses are evidence containers, not knowledge nodes. NisabaDB will extract only the ideas a goal actually needs, compare alternate routes, and publish a compressed route only after review.",
+  "materials": [
+    {
+      "id": "openstax-prealgebra-2e",
+      "title": "Prealgebra 2e",
+      "authors": ["Lynn Marecek", "MaryAnne Anthony-Smith", "Andrea Honeycutt Mathis"],
+      "kind": "textbook",
+      "level": "starting-from-zero",
+      "role": "diagnostic",
+      "edition": "2nd edition",
+      "year": 2020,
+      "officialUrl": "https://openstax.org/details/books/prealgebra-2e",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "limited-open",
+        "note": "Free web and PDF access; CC BY-NC-SA 4.0. OpenStax separately restricts ingestion into generative-AI offerings, so NisabaDB records metadata and links unless permission is obtained."
+      },
+      "domains": ["arithmetic", "elementary-algebra", "geometry"],
+      "prerequisiteIds": [],
+      "alternativeIds": [],
+      "plainLanguageRole": "A repair kit for fractions, signed numbers, equations, units, and basic geometry. A learner tests out of anything already known.",
+      "extractFocus": ["number sense", "fractions and ratios", "signed arithmetic", "one-variable equations", "measurement"],
+      "compressionNote": "Use as a diagnostic bank, never as a cover-to-cover requirement.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "openstax-algebra-trigonometry-2e",
+      "title": "Algebra and Trigonometry 2e",
+      "authors": ["Jay Abramson"],
+      "kind": "textbook",
+      "level": "foundation",
+      "role": "core",
+      "edition": "2nd edition",
+      "year": 2021,
+      "officialUrl": "https://openstax.org/books/algebra-and-trigonometry-2e/pages/preface",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "limited-open",
+        "note": "Free web and PDF access; CC BY-NC-SA 4.0. Full-text AI processing requires separate attention to OpenStax's current terms."
+      },
+      "domains": ["algebra-and-functions", "trigonometry", "counting"],
+      "prerequisiteIds": ["openstax-prealgebra-2e"],
+      "alternativeIds": ["active-prelude-calculus"],
+      "plainLanguageRole": "A broad source bank for equations, functions, graphs, logarithms, systems, sequences, counting, and trigonometry.",
+      "extractFocus": ["equations", "functions and graphs", "exponents and logarithms", "systems", "counting"],
+      "compressionNote": "Select only the sections required by a later goal; compare them with the shorter Active Prelude route.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "active-prelude-calculus",
+      "title": "Active Prelude to Calculus",
+      "authors": ["Matthew Boelkins"],
+      "kind": "textbook",
+      "level": "foundation",
+      "role": "alternate",
+      "edition": "2019 edition, continuously updated web build",
+      "year": 2019,
+      "officialUrl": "https://activecalculus.org/apc/",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "open",
+        "note": "Free HTML, PDF, and source under CC BY-SA 4.0."
+      },
+      "domains": ["algebra-and-functions", "trigonometry", "calculus-preparation"],
+      "prerequisiteIds": ["openstax-prealgebra-2e"],
+      "alternativeIds": ["openstax-algebra-trigonometry-2e"],
+      "plainLanguageRole": "A shorter route through the algebra, functions, and trigonometry that calculus actually uses.",
+      "extractFocus": ["function language", "families of functions", "rates of change", "trigonometric models"],
+      "compressionNote": "This is an early test of whether one purpose-built route can replace much of separate algebra and trigonometry courses.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "sundstrom-writing-proof",
+      "title": "Mathematical Reasoning: Writing and Proof",
+      "authors": ["Ted Sundstrom"],
+      "kind": "textbook",
+      "level": "foundation",
+      "role": "core",
+      "edition": "Version 3",
+      "year": 2020,
+      "officialUrl": "https://scholarworks.gvsu.edu/books/24/",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "limited-open",
+        "note": "Free PDF under CC BY-NC-SA 3.0."
+      },
+      "domains": ["proof", "logic", "sets-and-functions", "number-theory"],
+      "prerequisiteIds": ["openstax-algebra-trigonometry-2e"],
+      "alternativeIds": [],
+      "plainLanguageRole": "Teaches how to read, construct, and clearly write a proof instead of assuming that skill appears automatically.",
+      "extractFocus": ["logic", "direct and indirect proof", "induction", "sets and functions", "equivalence relations"],
+      "compressionNote": "Proof language is a shared foundation; teach it once and reuse it across every branch.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "active-calculus-single-variable",
+      "title": "Active Calculus — Single Variable",
+      "authors": ["Matthew Boelkins"],
+      "kind": "textbook",
+      "level": "foundation",
+      "role": "core",
+      "edition": "2nd edition",
+      "year": 2025,
+      "officialUrl": "https://activecalculus.org/acs2e/",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "open",
+        "note": "Free HTML, PDF, and source under CC BY-SA 4.0."
+      },
+      "domains": ["calculus", "mathematical-modeling"],
+      "prerequisiteIds": ["active-prelude-calculus"],
+      "alternativeIds": [],
+      "plainLanguageRole": "An activity-led source for limits, derivatives, integrals, and the few continuous ideas later mathematics genuinely needs.",
+      "extractFocus": ["limits", "derivatives", "integrals", "series", "modeling"],
+      "compressionNote": "Make only goal-required calculus nodes mandatory; finite mathematics should not inherit calculus by habit.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "mit-mathematics-computer-science",
+      "title": "Mathematics for Computer Science",
+      "authors": ["Eric Lehman", "F. Thomson Leighton", "Albert R. Meyer"],
+      "kind": "textbook",
+      "level": "foundation",
+      "role": "core",
+      "edition": "2018 revision, Spring 2024 OCW reading",
+      "year": 2018,
+      "officialUrl": "https://ocw.mit.edu/courses/6-1200j-mathematics-for-computer-science-spring-2024/pages/readings/",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "open",
+        "note": "Free through MIT OpenCourseWare; the linked textbook revision is CC BY-SA 3.0."
+      },
+      "domains": ["proof", "discrete-mathematics", "combinatorics", "probability", "graphs"],
+      "prerequisiteIds": ["sundstrom-writing-proof", "active-prelude-calculus"],
+      "alternativeIds": [],
+      "plainLanguageRole": "The first common core joining proof, counting, graphs, recurrences, asymptotics, and finite probability.",
+      "extractFocus": ["induction", "graphs", "relations", "recurrences", "counting", "discrete probability"],
+      "compressionNote": "Treat it as an integration source, not a 900-page assignment; avoid reteaching its proof and probability core elsewhere.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "hefferon-linear-algebra",
+      "title": "Linear Algebra",
+      "authors": ["Jim Hefferon"],
+      "kind": "textbook",
+      "level": "intermediate",
+      "role": "core",
+      "edition": "4th edition",
+      "year": 2021,
+      "officialUrl": "https://hefferon.net/linearalgebra/",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "open",
+        "note": "Free PDF, source, solutions, videos, and Sage lab under GFDL or CC BY-SA 3.0 US."
+      },
+      "domains": ["linear-algebra", "computational-algebra"],
+      "prerequisiteIds": ["sundstrom-writing-proof", "active-calculus-single-variable"],
+      "alternativeIds": [],
+      "plainLanguageRole": "Starts with solving systems by computation, then turns those procedures into vector spaces and linear maps.",
+      "extractFocus": ["Gaussian elimination", "vector spaces", "linear maps", "bases", "eigenvalues", "Sage experiments"],
+      "compressionNote": "Teach computation before abstraction, then reuse the same matrix language in probability, algorithms, and representation theory.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "mit-introduction-probability",
+      "title": "Introduction to Probability",
+      "authors": ["John Tsitsiklis", "Patrick Jaillet"],
+      "kind": "course",
+      "level": "intermediate",
+      "role": "core",
+      "edition": "MIT RES.6-012, Spring 2018",
+      "year": 2018,
+      "officialUrl": "https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "mixed",
+        "note": "Free MIT OpenCourseWare videos and notes; license and exceptions must be checked item by item."
+      },
+      "domains": ["probability", "statistics"],
+      "prerequisiteIds": ["mit-mathematics-computer-science", "active-calculus-single-variable"],
+      "alternativeIds": [],
+      "plainLanguageRole": "Builds probability from experiments and uncertainty through conditioning, expectation, concentration, and limit behavior.",
+      "extractFocus": ["conditioning", "independence", "expectation", "variance", "inequalities", "limit theorems"],
+      "compressionNote": "Begin with finite probability; delay density and integration machinery until a goal needs continuous distributions.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "erickson-algorithms",
+      "title": "Algorithms",
+      "authors": ["Jeff Erickson"],
+      "kind": "textbook",
+      "level": "intermediate",
+      "role": "bridge",
+      "edition": "1st edition",
+      "year": 2019,
+      "officialUrl": "https://jeffe.cs.illinois.edu/teaching/algorithms/",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "open",
+        "note": "Free PDF under CC BY 4.0."
+      },
+      "domains": ["algorithms", "graphs", "optimization"],
+      "prerequisiteIds": ["mit-mathematics-computer-science"],
+      "alternativeIds": [],
+      "plainLanguageRole": "Turns proofs, recurrences, graphs, and combinatorics into procedures a computer can execute.",
+      "extractFocus": ["recursion", "dynamic programming", "graph algorithms", "greedy methods", "reductions"],
+      "compressionNote": "Reuse the discrete-math core and add only the computational design patterns.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "barak-introduction-tcs",
+      "title": "Introduction to Theoretical Computer Science",
+      "authors": ["Boaz Barak"],
+      "kind": "textbook",
+      "level": "intermediate",
+      "role": "core",
+      "edition": "Work in progress, December 2023 build",
+      "year": 2023,
+      "officialUrl": "https://introtcs.org/public/index.html",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "no-derivatives",
+        "note": "Free to read under CC BY-NC-ND 4.0; NisabaDB must link and write independent explanations."
+      },
+      "domains": ["computation", "complexity", "algorithms", "randomness"],
+      "prerequisiteIds": ["mit-mathematics-computer-science", "erickson-algorithms"],
+      "alternativeIds": [],
+      "plainLanguageRole": "Introduces what computers can do efficiently, how reductions transfer difficulty, and why randomness can help.",
+      "extractFocus": ["models of computation", "efficient computation", "reductions", "NP", "randomized computation"],
+      "compressionNote": "Carry the beginner complexity route here; consult advanced complexity references only for missing precision.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "carter-visual-group-theory",
+      "title": "Visual Group Theory",
+      "authors": ["Nathan Carter"],
+      "kind": "textbook",
+      "level": "foundation",
+      "role": "bridge",
+      "edition": "MAA Classroom Resource Materials 32",
+      "year": 2009,
+      "officialUrl": "https://bookstore.ams.org/clrm-32/",
+      "access": {
+        "availability": "paid-or-library",
+        "derivativeRights": "cite-only",
+        "note": "Publisher-controlled book; use as a cited evidence source, not as reusable text."
+      },
+      "domains": ["abstract-algebra", "symmetry", "group-theory"],
+      "prerequisiteIds": ["openstax-algebra-trigonometry-2e"],
+      "alternativeIds": [],
+      "plainLanguageRole": "Begins group theory with visible symmetries, multiplication tables, and diagrams rather than a wall of definitions.",
+      "extractFocus": ["permutations", "Cayley diagrams", "subgroups", "cosets", "homomorphisms", "quotients"],
+      "compressionNote": "Use concrete transformations as the on-ramp to executable algebra.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "group-explorer",
+      "title": "Group Explorer",
+      "authors": ["Nathan Carter", "Ray Ellis"],
+      "kind": "interactive-tool",
+      "level": "foundation",
+      "role": "lab",
+      "edition": "Version 3.6.1",
+      "year": 2019,
+      "officialUrl": "https://nathancarter.github.io/group-explorer/index.html",
+      "licenseUrl": "https://github.com/nathancarter/group-explorer",
+      "access": {
+        "availability": "free-software",
+        "derivativeRights": "open",
+        "note": "Free web application; source is LGPL v3.0."
+      },
+      "domains": ["computational-algebra", "group-theory", "visualization"],
+      "prerequisiteIds": ["carter-visual-group-theory"],
+      "alternativeIds": [],
+      "plainLanguageRole": "Lets a learner click, draw, and test small groups before manipulating the definitions symbolically.",
+      "extractFocus": ["multiplication tables", "Cayley diagrams", "subgroup lattices", "morphisms"],
+      "compressionNote": "Every early abstract group concept should receive a small manipulable witness.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "judson-abstract-algebra",
+      "title": "Abstract Algebra: Theory and Applications",
+      "authors": ["Thomas W. Judson"],
+      "kind": "textbook",
+      "level": "intermediate",
+      "role": "core",
+      "edition": "Annual edition 2025",
+      "year": 2025,
+      "officialUrl": "https://judsonbooks.org/abstract-algebra-theory-and-applications/",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "open",
+        "note": "Free HTML, PDF, and source under GNU Free Documentation License 1.2 or later."
+      },
+      "domains": ["abstract-algebra", "computational-algebra", "group-theory", "ring-theory"],
+      "prerequisiteIds": ["sundstrom-writing-proof", "carter-visual-group-theory"],
+      "alternativeIds": [],
+      "plainLanguageRole": "The main algebra source: groups, actions, rings, fields, and applications paired with executable Sage work.",
+      "extractFocus": ["groups and actions", "homomorphisms", "rings and fields", "permutations", "Sage exercises"],
+      "compressionNote": "Do not inherit its chapter order; express structures through operations, programs, invariants, and decompositions.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "sagemath-prep-tutorials",
+      "title": "SageMath PREP Tutorials",
+      "authors": ["SageMath community", "MAA PREP workshop contributors"],
+      "kind": "software-lab",
+      "level": "foundation",
+      "role": "lab",
+      "edition": "Current SageMath documentation",
+      "year": 2026,
+      "officialUrl": "https://doc.sagemath.org/html/en/prep/index.html",
+      "access": {
+        "availability": "free-software",
+        "derivativeRights": "open",
+        "note": "Free documentation under CC BY-SA 3.0; SageMath software is GPL."
+      },
+      "domains": ["computational-algebra", "linear-algebra", "programming"],
+      "prerequisiteIds": ["openstax-algebra-trigonometry-2e"],
+      "alternativeIds": [],
+      "plainLanguageRole": "A low-programming notebook layer for trying algebra and linear algebra immediately.",
+      "extractFocus": ["notebook basics", "functions", "linear algebra quickstart", "abstract algebra quickstart"],
+      "compressionNote": "Pair computation with each conceptual node instead of postponing it to a separate software course.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "gap-tutorial",
+      "title": "GAP — A Tutorial",
+      "authors": ["The GAP Group"],
+      "kind": "software-lab",
+      "level": "intermediate",
+      "role": "lab",
+      "edition": "Release 4.16.0",
+      "year": 2026,
+      "officialUrl": "https://docs.gap-system.org/doc/tut/chap0_mj.html",
+      "access": {
+        "availability": "free-software",
+        "derivativeRights": "open",
+        "note": "Free documentation and GPL v2-or-later core software."
+      },
+      "domains": ["computational-algebra", "group-theory", "representation-theory"],
+      "prerequisiteIds": ["judson-abstract-algebra", "sagemath-prep-tutorials"],
+      "alternativeIds": [],
+      "plainLanguageRole": "Turns generators, permutations, subgroups, maps, character tables, and representations into executable objects.",
+      "extractFocus": ["permutation groups", "subgroups", "homomorphisms", "character tables", "representations"],
+      "compressionNote": "Use GAP to expose what an abstract definition lets us compute, while still explaining the mathematics behind the command.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "hulpke-computational-group-theory",
+      "title": "Notes on Computational Group Theory",
+      "authors": ["Alexander Hulpke"],
+      "kind": "lecture-notes",
+      "level": "advanced",
+      "role": "bridge",
+      "edition": "Spring 2024 notes",
+      "year": 2024,
+      "officialUrl": "https://www.math.colostate.edu/~hulpke/lectures/m676cgt/hulpkenotes.pdf",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "cite-only",
+        "note": "Free official PDF with educational-use permission; no standard open adaptation license is stated."
+      },
+      "domains": ["computational-algebra", "algorithms", "group-theory"],
+      "prerequisiteIds": ["gap-tutorial"],
+      "alternativeIds": [],
+      "plainLanguageRole": "Explains the algorithms hidden under group-computation commands: orbits, stabilizers, rewriting, and recognition.",
+      "extractFocus": ["orbits and stabilizers", "Schreier vectors", "stabilizer chains", "Schreier–Sims", "rewriting"],
+      "compressionNote": "This is evidence for rebuilding group theory around algorithms, not a novice reading assignment.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "etingof-representation-theory",
+      "title": "Introduction to Representation Theory",
+      "authors": ["Pavel Etingof", "Oleg Golberg", "Sebastian Hensel", "Tiankai Liu", "Alex Schwendner", "Dmitry Vaintrob", "Elena Yudovina"],
+      "kind": "course",
+      "level": "advanced",
+      "role": "core",
+      "edition": "MIT 18.712, Fall 2010",
+      "year": 2010,
+      "officialUrl": "https://ocw.mit.edu/courses/18-712-introduction-to-representation-theory-fall-2010/pages/lecture-notes/",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "limited-open",
+        "note": "Free MIT OpenCourseWare notes under the license stated by OCW; the related AMS book has separate posting restrictions."
+      },
+      "domains": ["representation-theory", "linear-algebra", "group-theory"],
+      "prerequisiteIds": ["hefferon-linear-algebra", "judson-abstract-algebra"],
+      "alternativeIds": [],
+      "plainLanguageRole": "Explains a representation as a group action by matrices, then develops decomposition, characters, and the symmetric group.",
+      "extractFocus": ["group algebras", "irreducibility", "characters", "Maschke's theorem", "symmetric-group representations", "Schur–Weyl duality"],
+      "compressionNote": "Select the finite-group route; quivers, Lie theory, and homological algebra are not default prerequisites.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "sagan-symmetric-group",
+      "title": "The Symmetric Group",
+      "authors": ["Bruce E. Sagan"],
+      "kind": "textbook",
+      "level": "advanced",
+      "role": "core",
+      "edition": "2nd edition, Graduate Texts in Mathematics 203",
+      "year": 2001,
+      "officialUrl": "https://link.springer.com/book/10.1007/978-1-4757-6804-6",
+      "access": {
+        "availability": "paid-or-library",
+        "derivativeRights": "cite-only",
+        "note": "Commercial or library access; no open adaptation license."
+      },
+      "domains": ["representation-theory", "combinatorics", "symmetric-group", "young-diagrams"],
+      "prerequisiteIds": ["etingof-representation-theory"],
+      "alternativeIds": ["fulton-young-tableaux"],
+      "plainLanguageRole": "The compact target source joining representations of the symmetric group, tableaux algorithms, and symmetric functions.",
+      "extractFocus": ["partitions", "Young diagrams", "tableaux", "Specht modules", "branching", "symmetric functions"],
+      "compressionNote": "This is one strong current route to the dictatorship paper, not a claim of optimality.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "sage-symmetric-group-representations",
+      "title": "SageMath: Representations of the Symmetric Group",
+      "authors": ["SageMath community"],
+      "kind": "software-lab",
+      "level": "advanced",
+      "role": "lab",
+      "edition": "SageMath 10.8 documentation",
+      "year": 2026,
+      "officialUrl": "https://doc.sagemath.org/html/en/reference/combinat/sage/combinat/symmetric_group_representations.html",
+      "access": {
+        "availability": "free-software",
+        "derivativeRights": "open",
+        "note": "Documentation under CC BY-SA 3.0; SageMath software is GPL."
+      },
+      "domains": ["computational-algebra", "representation-theory", "young-diagrams"],
+      "prerequisiteIds": ["sagan-symmetric-group", "sagemath-prep-tutorials"],
+      "alternativeIds": [],
+      "plainLanguageRole": "Computes tableaux, Young symmetrizers, hook lengths, and small representation matrices so the abstract theory has visible examples.",
+      "extractFocus": ["Specht representations", "seminormal form", "tableaux", "Young symmetrizers", "hook lengths"],
+      "compressionNote": "Require executable low-rank witnesses for every representation-theory abstraction where practical.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "fulton-young-tableaux",
+      "title": "Young Tableaux",
+      "authors": ["William Fulton"],
+      "kind": "textbook",
+      "level": "advanced",
+      "role": "alternate",
+      "edition": "London Mathematical Society Student Texts 35",
+      "year": 1996,
+      "officialUrl": "https://www.cambridge.org/core/books/young-tableaux/A7570B10D82AE7233E25E5D6F70A07B6",
+      "access": {
+        "availability": "paid-or-library",
+        "derivativeRights": "cite-only",
+        "note": "Commercial or library access; no open adaptation license."
+      },
+      "domains": ["young-diagrams", "combinatorics", "representation-theory", "geometry"],
+      "prerequisiteIds": ["hefferon-linear-algebra", "judson-abstract-algebra"],
+      "alternativeIds": ["sagan-symmetric-group"],
+      "plainLanguageRole": "An alternate route beginning more directly from tableaux and combinatorics before connecting to representations and geometry.",
+      "extractFocus": ["tableaux algorithms", "symmetric functions", "symmetric-group representations", "Grassmannians"],
+      "compressionNote": "Compare its self-contained combinatorial path against the Sagan–Etingof route instead of silently adding both.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "odonnell-boolean-functions",
+      "title": "Analysis of Boolean Functions",
+      "authors": ["Ryan O'Donnell"],
+      "kind": "textbook",
+      "level": "advanced",
+      "role": "core",
+      "edition": "Corrected May 2021 edition",
+      "year": 2021,
+      "officialUrl": "https://www.cs.cmu.edu/~odonnell/papers/Analysis-of-Boolean-Functions-by-Ryan-ODonnell.pdf",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "cite-only",
+        "note": "Author-hosted PDF is free for noncommercial personal use; other rights are retained."
+      },
+      "domains": ["boolean-analysis", "probability", "fourier-analysis", "complexity"],
+      "prerequisiteIds": ["hefferon-linear-algebra", "mit-introduction-probability", "mit-mathematics-computer-science"],
+      "alternativeIds": [],
+      "plainLanguageRole": "The central technical source for Fourier expansion, influence, noise, hypercontractivity, Gaussian comparison, and testing.",
+      "extractFocus": ["Fourier expansion", "influence", "noise", "hypercontractivity", "invariance", "testing"],
+      "compressionNote": "Import only the chapters used by a target theorem; keep general-domain and Gaussian machinery on demand.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "goldreich-property-testing",
+      "title": "Introduction to Property Testing",
+      "authors": ["Oded Goldreich"],
+      "kind": "textbook",
+      "level": "advanced",
+      "role": "core",
+      "edition": "Cambridge University Press edition",
+      "year": 2017,
+      "officialUrl": "https://www.wisdom.weizmann.ac.il/~oded/pt-intro.html",
+      "access": {
+        "availability": "paid-or-library",
+        "derivativeRights": "cite-only",
+        "note": "Published edition is commercial; author drafts are free to read but copyright is retained and reposting is restricted."
+      },
+      "domains": ["property-testing", "algorithms", "complexity", "probability"],
+      "prerequisiteIds": ["barak-introduction-tcs", "mit-introduction-probability"],
+      "alternativeIds": [],
+      "plainLanguageRole": "Introduces algorithms that inspect only a tiny part of an object, including dictatorship and junta testing.",
+      "extractFocus": ["testing model", "distance and promises", "randomized testers", "dictatorship testing", "junta testing"],
+      "compressionNote": "Share probability and algorithm nodes with the common core; add Fourier analysis only when a tester uses it.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "filmus-boolean-function-analysis",
+      "title": "Boolean Function Analysis",
+      "authors": ["Yuval Filmus"],
+      "kind": "lecture-notes",
+      "level": "research-bridge",
+      "role": "bridge",
+      "edition": "June 2, 2022 lecture notes",
+      "year": 2022,
+      "officialUrl": "https://yuvalfilmus.cs.technion.ac.il/Courses/BooleanFunctionAnalysis/2021/LectureNotes.pdf",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "cite-only",
+        "note": "Free official notes; the author's site states all rights reserved."
+      },
+      "domains": ["boolean-analysis", "slice", "invariance", "probability"],
+      "prerequisiteIds": ["odonnell-boolean-functions"],
+      "alternativeIds": [],
+      "plainLanguageRole": "A short bridge from Boolean-cube analysis to invariance and analysis on a fixed-size slice.",
+      "extractFocus": ["invariance principle", "Fourier analysis on the slice", "harmonic multilinear polynomials"],
+      "compressionNote": "Use chiefly its slice and invariance sections instead of duplicating O'Donnell's Boolean-cube core.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "minzer-pcp-course",
+      "title": "Probabilistically Checkable Proofs",
+      "authors": ["Dor Minzer"],
+      "kind": "course",
+      "level": "research-bridge",
+      "role": "reference",
+      "edition": "MIT 18.408, Fall 2022",
+      "year": 2022,
+      "officialUrl": "https://ocw.mit.edu/courses/18-408-topics-in-theoretical-computer-science-probabilistically-checkable-proofs-fall-2022/pages/lecture-notes/",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "mixed",
+        "note": "Free MIT OpenCourseWare notes; the license and any marked exceptions must be checked item by item."
+      },
+      "domains": ["complexity", "pcp", "hardness", "boolean-analysis"],
+      "prerequisiteIds": ["barak-introduction-tcs", "odonnell-boolean-functions"],
+      "alternativeIds": [],
+      "plainLanguageRole": "A direct advanced route through PCP composition, long codes, dictatorship tests, Unique Games, and hardness.",
+      "extractFocus": ["PCP composition", "long code", "dictatorship tests", "Unique Games", "hardness"],
+      "compressionNote": "Keep this outside the common core; activate only for the hardness application branch.",
+      "verifiedAt": "2026-08-22"
+    },
+    {
+      "id": "axler-measure-real-analysis",
+      "title": "Measure, Integration & Real Analysis",
+      "authors": ["Sheldon Axler"],
+      "kind": "textbook",
+      "level": "advanced",
+      "role": "reference",
+      "edition": "Graduate Texts in Mathematics 282",
+      "year": 2020,
+      "officialUrl": "https://measure.axler.net/",
+      "access": {
+        "availability": "free",
+        "derivativeRights": "limited-open",
+        "note": "Open-access book under CC BY-NC 4.0."
+      },
+      "domains": ["real-analysis", "measure-theory", "functional-analysis", "probability"],
+      "prerequisiteIds": ["active-calculus-single-variable", "hefferon-linear-algebra", "sundstrom-writing-proof"],
+      "alternativeIds": [],
+      "plainLanguageRole": "A repair source when a proof truly needs measure, integration, Hilbert spaces, or rigorous continuous probability.",
+      "extractFocus": ["measure", "integration", "Lp spaces", "Hilbert spaces", "probability measures", "Fourier analysis"],
+      "compressionNote": "Reference on demand: it must not block finite Boolean-function analysis merely because conventional courses put analysis first.",
+      "verifiedAt": "2026-08-22"
+    }
+  ],
+  "goals": [
+    {
+      "id": "first-proof",
+      "title": "Write and understand a first proof",
+      "description": "Start at the learner's actual arithmetic level, then acquire only the algebra and proof language needed to make a rigorous argument.",
+      "targetMaterialIds": ["sundstrom-writing-proof"]
+    },
+    {
+      "id": "mathematical-common-core",
+      "title": "Build the first mathematical common core",
+      "description": "Join proof, discrete mathematics, linear algebra, probability, and algorithms without repeating their shared foundations.",
+      "targetMaterialIds": ["hefferon-linear-algebra", "mit-introduction-probability", "erickson-algorithms"]
+    },
+    {
+      "id": "computational-algebra",
+      "title": "Reach computational algebra",
+      "description": "Learn algebra through visible transformations and executable structures, then uncover the algorithms behind the software.",
+      "targetMaterialIds": ["hulpke-computational-group-theory"]
+    },
+    {
+      "id": "young-diagrams",
+      "title": "Reach Young diagrams and symmetric-group representations",
+      "description": "Move from matrices and group actions to partitions, tableaux, representations, and executable low-rank examples.",
+      "targetMaterialIds": ["sage-symmetric-group-representations"],
+      "destination": {
+        "label": "Continue into the dictatorship-testing paper",
+        "path": "/papers/dimension-free-dictatorship-tester"
+      }
+    },
+    {
+      "id": "dictatorship-testing",
+      "title": "Prepare for dictatorship testing",
+      "description": "Combine the current Young-diagram route with finite probability, Boolean analysis, property testing, and complexity. This is a candidate route, not the claimed minimum.",
+      "targetMaterialIds": ["sage-symmetric-group-representations", "goldreich-property-testing", "odonnell-boolean-functions"],
+      "destination": {
+        "label": "Open the dictatorship-testing paper",
+        "path": "/papers/dimension-free-dictatorship-tester"
+      }
+    },
+    {
+      "id": "multislice-invariance",
+      "title": "Prepare for multislice invariance and hardness",
+      "description": "Add slice analysis and the optional PCP branch to the Boolean-analysis and symmetric-group foundations used by the current research paper.",
+      "targetMaterialIds": ["filmus-boolean-function-analysis", "minzer-pcp-course", "sage-symmetric-group-representations"],
+      "destination": {
+        "label": "Open the multislice-invariance paper",
+        "path": "/papers/braverman-khot-lifshitz-minzer-2025-invariance-principle-multislice"
+      }
+    }
+  ],
+  "compressionCandidates": [
+    {
+      "id": "purpose-built-common-core",
+      "title": "One purpose-built common core",
+      "hypothesis": "Selected algebra and function nodes, one explicit proof bridge, and Mathematics for Computer Science may replace large repeated portions of traditional algebra, trigonometry, proof, discrete-math, and introductory-probability sequences.",
+      "evidenceMaterialIds": ["active-prelude-calculus", "sundstrom-writing-proof", "mit-mathematics-computer-science"],
+      "status": "hypothesis"
+    },
+    {
+      "id": "executable-algebra",
+      "title": "Abstract algebra as executable structure",
+      "hypothesis": "The reusable pattern structure → structure-preserving programs → invariants → decomposition can unify early group, linear, module, and representation theory while computation supplies concrete witnesses.",
+      "evidenceMaterialIds": ["group-explorer", "judson-abstract-algebra", "gap-tutorial", "hefferon-linear-algebra"],
+      "status": "hypothesis"
+    },
+    {
+      "id": "young-route-comparison",
+      "title": "Compare the Young-diagram routes",
+      "hypothesis": "A representation-first route through Etingof and Sagan and a tableaux-first route through Fulton may have different prerequisite costs; both should be measured before either is declared minimal.",
+      "evidenceMaterialIds": ["etingof-representation-theory", "sagan-symmetric-group", "fulton-young-tableaux", "sage-symmetric-group-representations"],
+      "status": "hypothesis"
+    },
+    {
+      "id": "finite-first-analysis",
+      "title": "Keep finite analysis finite",
+      "hypothesis": "Discrete probability and linear algebra may support much of Boolean-function analysis without making a full measure-theory course a mandatory ancestor; continuous analysis can be loaded only where a proof uses it.",
+      "evidenceMaterialIds": ["mit-mathematics-computer-science", "mit-introduction-probability", "odonnell-boolean-functions", "axler-measure-real-analysis"],
+      "status": "hypothesis"
+    }
+  ]
+}

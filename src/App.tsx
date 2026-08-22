@@ -4,6 +4,7 @@ import { DistilledPaperPage } from "./pages/DistilledPaperPage";
 import { LandingPage } from "./pages/LandingPage";
 import { LearnPage } from "./pages/LearnPage";
 import { KnowledgePage } from "./pages/KnowledgePage";
+import { MaterialsPage } from "./pages/MaterialsPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { PaperPage } from "./pages/PaperPage";
 import { PapersPage } from "./pages/PapersPage";
@@ -15,6 +16,7 @@ export default function App() {
     <Routes>
       <Route element={<SiteLayout />}>
         <Route index element={<LandingPage />} />
+        <Route path="materials" element={<MaterialsPage />} />
         <Route path="knowledge" element={<KnowledgePage />} />
         <Route path="papers" element={<PapersPage />} />
         <Route path="papers/:paperId" element={<PaperPage />} />

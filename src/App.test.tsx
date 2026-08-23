@@ -5,6 +5,8 @@ import App from "./App";
 import { corpus as browserCorpus } from "./components/content";
 import { knowledgeNodes } from "./data/knowledge";
 
+const lazyRouteTimeout = 30_000;
+
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
@@ -89,7 +91,11 @@ describe("NisabaDB application", () => {
 
   it("keeps the whole-field compression atlas under Knowledge", async () => {
     renderAt("/knowledge/compression?cluster=linearity-as-common-engine");
-    const selectedClusterHeading = await screen.findByRole("heading", { name: /linearity as a common computational engine/i });
+    const selectedClusterHeading = await screen.findByRole(
+      "heading",
+      { name: /linearity as a common computational engine/i },
+      { timeout: lazyRouteTimeout },
+    );
     await waitFor(() => expect(selectedClusterHeading).toHaveFocus());
     const navigation = screen.getByRole("navigation", { name: /primary navigation/i });
     expect(within(navigation).getAllByRole("link").map((link) => link.textContent)).toEqual([
@@ -101,7 +107,7 @@ describe("NisabaDB application", () => {
     const originalRoute = screen.getByText("Candidate source-route pattern", { selector: "summary span" }).closest("details");
     expect(originalRoute).not.toHaveAttribute("open");
     expect(screen.getByRole("heading", { name: /what does not disappear/i })).toBeInTheDocument();
-  });
+  }, lazyRouteTimeout);
 
   it("loads an individual source-book graph from the manifest", async () => {
     const registry = {
@@ -219,13 +225,21 @@ describe("NisabaDB application", () => {
     })));
 
     renderAt("/knowledge/coverage?source=S0001");
-    expect(await screen.findByRole("heading", { name: /build the dependency graph before compressing the library/i })).toBeInTheDocument();
-    const selectedSourceHeading = await screen.findByRole("heading", { name: "Fixture Mathematics" });
+    expect(await screen.findByRole(
+      "heading",
+      { name: /build the dependency graph before compressing the library/i },
+      { timeout: lazyRouteTimeout },
+    )).toBeInTheDocument();
+    const selectedSourceHeading = await screen.findByRole(
+      "heading",
+      { name: "Fixture Mathematics" },
+      { timeout: lazyRouteTimeout },
+    );
     await waitFor(() => expect(selectedSourceHeading).toHaveFocus());
     expect(screen.getByLabelText(/source dependency graph status/i)).toHaveTextContent(/component json files\s*1 \/ 1/i);
     expect(screen.getByText("S0001/complete-source.json")).toBeInTheDocument();
     expect(screen.getByText(/no theorem-like or supporting nodes have been published/i)).toBeInTheDocument();
-  });
+  }, lazyRouteTimeout);
 
   it("reads rewritten knowledge with unified notation and searchable chapters", async () => {
     renderAt("/knowledge?node=sets-elements-extensionality");

@@ -50,6 +50,8 @@ The old `data/knowledge/coverage-ledger.json` and its source-to-Knowledge dispos
 
 `S0060/complete-source.json` is the first populated pilot. It pins Oscar Levin's official PreTeXt source for *Discrete Mathematics: An Open Introduction, 4th Edition* and currently contains captured inventories for 109 active source files, 38 explicitly tagged theorem-like nodes, 74 definition/notation nodes, and three candidate edges where a theorem proof explicitly cross-references another inventoried result. The pilot remains unreviewed and incomplete: 35 theorem-like nodes have no route, implicit prerequisites and exercise-embedded results are still pending, and the file discloses a conflict between the active edition's license statement and the repository-level license.
 
+`S0002/complete-source.json` is the next book checkpoint, built from Michelle Manes's pinned 2018-05-25 Pressbooks WXR export of *Mathematics for Elementary Teachers*. The file inventories all 79 active front-matter, part, and chapter units and records a reproducible narrow baseline of 7 explicit theorem-like candidates and 111 support candidates, including 75 key-takeaway worked examples. It deliberately contains no inferred dependency edges or proof routes: all seven results remain unrouted, and implicit prose results, exercise-embedded claims, ordinary Think/Pair/Share boxes, and image-dependent mathematics still require semantic review. The WXR's unversioned `cc-by-sa` value is preserved without guessing a license version. Extraction remains `extracting`, the graph remains `building`, and nothing in this checkpoint is independently reviewed.
+
 The PreTeXt importer defaults to a dry run. It requires a clean checkout at the exact requested commit, derives repository provenance from its GitHub origin, traverses only active comment-stripped includes, validates the candidate against the book schema, and writes only the requested component. A write also refreshes the generated manifest atomically:
 
 ```sh
@@ -66,6 +68,19 @@ node scripts/import-pretext-book.mjs \
   --component-id complete-source \
   --commit 730e5e3b96094148818603041222df6f3d1d96ba \
   --entry-file source/dmoi.ptx \
+  --captured-at <ISO-8601-time> \
+  --write
+```
+
+The Pressbooks importer likewise defaults to a dry run. It binds the WXR title and author to the selected registry record, verifies a caller-supplied raw-file SHA-256 before constructing the graph, orders book units from Pressbooks parent/menu metadata, validates the candidate, and atomically updates only that book file and the manifest:
+
+```sh
+node scripts/import-pressbooks-book.mjs \
+  --source <pressbooks-export.xml> \
+  --source-url <official-wxr-download-url> \
+  --artifact-sha256 <64-hex-sha256> \
+  --record-id S0002 \
+  --component-id complete-source \
   --captured-at <ISO-8601-time> \
   --write
 ```

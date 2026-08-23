@@ -133,7 +133,7 @@ The per-book source-graph validator separately requires:
 
 The publication build recomputes the ordered source manifest, the 717-component book manifest, every edition unit manifest, every current Knowledge-node content fingerprint, and every administrative review's subject fingerprint. A stale source, graph, target, or approval therefore fails publication instead of inheriting an old reviewed state.
 
-The current 688-row / 717-component registry is intentionally incomplete. S0060 contains the first pinned candidate extraction; the other 716 component files are placeholders. Creating a placeholder establishes ownership and queue identity only, while a candidate extraction still cannot claim theorem coverage until its inventory and dependency decisions receive independent review.
+The current 688-row / 717-component registry is intentionally incomplete. S0060 and S0002 contain the first two pinned candidate extractions; the other 715 component files are placeholders. S0060 exercises the PreTeXt source boundary, while S0002 exercises a byte-pinned Pressbooks WXR boundary whose missing media keeps extraction explicitly in progress. Creating a placeholder establishes ownership and queue identity only, while a candidate extraction still cannot claim theorem coverage until its inventory and dependency decisions receive independent review.
 
 Required node fields also keep motivation, tutorial prose, a key idea, at least one worked example, a progressively disclosed exercise, source lineage, rewrite status, read time, and tags in the canonical data rather than the React components. Knowledge-node exercises are part of the textbook; the `/train` pool is independently derived from paper results.
 

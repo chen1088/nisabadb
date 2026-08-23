@@ -169,16 +169,16 @@ describe("one Phase-I dependency graph file per source component", () => {
     expect(validated.manifest.entries).toHaveLength(717);
     expect(validated.filesByPath).toHaveLength(717);
     expect(validated.manifest.summary).toEqual({
-      exactEditionResolvedCount: 1,
-      awaitingEditionCount: 716,
+      exactEditionResolvedCount: 2,
+      awaitingEditionCount: 715,
       reviewedExtractionCount: 0,
       reviewedCompleteGraphCount: 0,
-      sourceUnitCount: 109,
-      inventoriedSourceUnitCount: 109,
+      sourceUnitCount: 188,
+      inventoriedSourceUnitCount: 188,
       reviewedSourceUnitCount: 0,
-      theoremNodeCount: 38,
-      unroutedTheoremCount: 35,
-      supportNodeCount: 74,
+      theoremNodeCount: 45,
+      unroutedTheoremCount: 42,
+      supportNodeCount: 185,
       dependencyCount: 3,
       reviewedDependencyCount: 0,
       unresolvedReferenceCount: 0,
@@ -189,7 +189,14 @@ describe("one Phase-I dependency graph file per source component", () => {
     expect(pilot?.exactEdition).not.toBeNull();
     expect(pilot?.extractionState.status).toBe("extracted");
     expect(pilot?.graphState.status).toBe("extracted");
-    expect([...validated.filesByPath.entries()].filter(([path]) => path !== "S0060/complete-source.json").every(([, file]) => (
+    const secondBook = validated.filesByPath.get("S0002/complete-source.json");
+    expect(secondBook?.exactEdition?.sourceFormat).toBe("pressbooks-wxr");
+    expect(secondBook?.sourceUnits).toHaveLength(79);
+    expect(secondBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like")).toHaveLength(7);
+    expect(secondBook?.extractionState.status).toBe("extracting");
+    expect(secondBook?.graphState.status).toBe("building");
+    const populatedPaths = new Set(["S0060/complete-source.json", "S0002/complete-source.json"]);
+    expect([...validated.filesByPath.entries()].filter(([path]) => !populatedPaths.has(path)).every(([, file]) => (
       file.exactEdition === null
       && file.extractionState.status === "awaiting-edition"
       && file.graphState.status === "not-started"

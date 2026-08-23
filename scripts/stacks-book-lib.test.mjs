@@ -321,4 +321,316 @@ describe("strict Stacks formal graph extraction", () => {
     expect(result.graph.proofRoutes.find((route) => route.theoremNodeId === "tag-0013")
       ?.evidence.locator).not.toContain("Detached prose");
   });
+
+  it("promotes only exact-label audited remark claims and resolves the audited Tor alias", () => {
+    const claimTags = [
+      "08J5,derived-remark-truncation-distinguished-triangle",
+      "0AAA,derived-lemma-derived-canonical-delta-functor",
+      "0AAB,derived-remark-ordinary",
+      "00M5,algebra-lemma-characterize-flat",
+      "00M6,algebra-remark-Tor-ring-mod-ideal",
+      "0AAC,algebra-theorem-uses-tor-formula",
+    ].join("\n");
+    const claimUnits = [
+      {
+        stem: "derived",
+        path: "derived.tex",
+        title: "Derived Categories",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-derived-canonical-delta-functor}
+Short exact sequences canonically give distinguished triangles.
+\end{lemma}
+
+\begin{remark}
+\label{remark-truncation-distinguished-triangle}
+We claim there is a canonical distinguished triangle. Namely, apply
+Lemma \ref{lemma-derived-canonical-delta-functor}.
+\end{remark}
+
+\begin{remark}
+\label{remark-ordinary}
+This ordinary remark is not a theorem node.
+\end{remark}
+`,
+      },
+      {
+        stem: "algebra",
+        path: "algebra.tex",
+        title: "Algebra",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-characterize-flat}
+Flatness is characterized by injectivity after tensoring ideals.
+\end{lemma}
+
+\begin{remark}
+\label{remark-Tor-ring-mod-ideal}
+The proof of Lemma \ref{lemma-characterize-flat} gives the Tor formula.
+\end{remark}
+
+\begin{theorem}
+\label{theorem-uses-tor-formula}
+The formula has an application.
+\end{theorem}
+\begin{proof}
+Use Remark \ref{remark-Tor-ring-mod-ideal}.
+\end{proof}
+`,
+      },
+    ];
+
+    const result = extractStacksGraphFromUnits(claimUnits, claimTags, { capturedAt });
+
+    expect(result.stats).toMatchObject({
+      theoremCount: 4,
+      curatedClaimCount: 1,
+      excludedEnvironmentCounts: { remark: 2, remarks: 0 },
+    });
+    expect(result.graph.nodes.find(({ id }) => id === "tag-08j5")).toMatchObject({
+      nodeClass: "theorem-like",
+      kind: "claim",
+      sourceXmlId: "derived-remark-truncation-distinguished-triangle",
+    });
+    expect(result.graph.nodes.some(({ sourceXmlId }) => (
+      sourceXmlId === "derived-remark-ordinary"
+      || sourceXmlId === "algebra-remark-Tor-ring-mod-ideal"
+    ))).toBe(false);
+    expect(result.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-08j5",
+      prerequisite: { type: "node", id: "tag-0aaa" },
+    }));
+    expect(result.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-0aac",
+      prerequisite: { type: "node", id: "tag-00m5" },
+    }));
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-08j5")
+      ?.dependencyIds).toEqual(["dep-tag-08j5-to-tag-0aaa"]);
+    expect(result.graph.references.some(({ ref }) => (
+      ref === "algebra-remark-Tor-ring-mod-ideal"
+    ))).toBe(false);
+  });
+
+  it("resolves owner-specific named-result prose to an internal formal node", () => {
+    const result = extractStacksGraphFromUnits([{
+      stem: "algebra",
+      path: "algebra.tex",
+      title: "Algebra",
+      content: String.raw`
+\begin{lemma}
+\label{lemma-snake}
+The snake lemma.
+\end{lemma}
+\begin{proof}
+This is direct.
+\end{proof}
+
+\begin{lemma}
+\label{lemma-flat-tor-zero}
+The desired Tor group vanishes.
+\end{lemma}
+\begin{proof}
+The result follows from the snake lemma applied to the diagram.
+\end{proof}
+`,
+    }], [
+      "07JW,algebra-lemma-snake",
+      "00HL,algebra-lemma-flat-tor-zero",
+    ].join("\n"), { capturedAt });
+
+    expect(result.stats).toMatchObject({
+      namedResultDependencyCount: 1,
+      deicticDependencyCount: 0,
+    });
+    expect(result.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-00hl",
+      prerequisite: { type: "node", id: "tag-07jw" },
+    }));
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-00hl")
+      ?.dependencyIds).toEqual(["dep-tag-00hl-to-tag-07jw"]);
+  });
+
+  it("represents audited Zorn invocations as one shared typed external theorem", () => {
+    const conventionLines = Array.from({ length: 30 }, (_, index) => (
+      index === 27 ? "We use Zermelo-Fraenkel set theory with the axiom of choice." : ""
+    ));
+    const result = extractStacksGraphFromUnits([
+      {
+        stem: "conventions",
+        path: "conventions.tex",
+        title: "Conventions",
+        content: conventionLines.join("\n"),
+      },
+      {
+        stem: "fields",
+        path: "fields.tex",
+        title: "Fields",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-transcendence-degree}
+A transcendence basis exists.
+\end{lemma}
+\begin{proof}
+By Zorn's lemma, the partially ordered collection has a maximal element.
+\end{proof}
+`,
+      },
+    ], "030F,fields-lemma-transcendence-degree", { capturedAt });
+
+    expect(result.graph.externalInputs).toEqual([
+      expect.objectContaining({
+        id: "external-zorns-lemma",
+        kind: "external-theorem",
+        label: "Zorn's lemma",
+      }),
+    ]);
+    expect(result.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-030f",
+      prerequisite: { type: "external-input", id: "external-zorns-lemma" },
+      role: "logical",
+    }));
+  });
+
+  it("uses only the audited targets in an exact deictic proof's discussion window", () => {
+    const result = extractStacksGraphFromUnits([{
+      stem: "examples",
+      path: "examples.tex",
+      title: "Examples",
+      content: String.raw`
+\begin{lemma}
+\label{lemma-countable-coherent}
+The constructed ring is coherent.
+\end{lemma}
+\begin{proof}
+This is direct.
+\end{proof}
+
+The construction uses Lemma \ref{lemma-countable-coherent}.
+
+\begin{lemma}
+\label{lemma-completion-polynomial-ring-not-flat}
+The completion map is not flat.
+\end{lemma}
+\begin{proof}
+See above.
+\end{proof}
+`,
+    }], [
+      "0ALB,examples-lemma-countable-coherent",
+      "0ALC,examples-lemma-completion-polynomial-ring-not-flat",
+    ].join("\n"), { capturedAt });
+
+    expect(result.stats.deicticDependencyCount).toBe(1);
+    expect(result.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-0alc",
+      prerequisite: { type: "node", id: "tag-0alb" },
+    }));
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0alc")
+      ?.evidence.locator).toContain("L9-L18");
+  });
+
+  it("decomposes the mixed Tag 03II recall bundle by audited occurrence", () => {
+    const decentLines = Array(310).fill("");
+    decentLines[269] = String.raw`\begin{remark}`;
+    decentLines[270] = String.raw`\label{remark-recall}`;
+    decentLines[271] = "A mixed bundle of recalled facts.";
+    decentLines[272] = String.raw`\end{remark}`;
+    decentLines[289] = String.raw`\begin{lemma}`;
+    decentLines[290] = String.raw`\label{lemma-U-finite-above-x}`;
+    decentLines[291] = "The fibres are finite.";
+    decentLines[292] = String.raw`\end{lemma}`;
+    decentLines[294] = String.raw`\begin{proof}`;
+    decentLines[298] = String.raw`Since the map is etale it is open (see Remark \ref{remark-recall}).`;
+    decentLines[303] = "The other map is etale, hence locally quasi-finite";
+    decentLines[304] = "as recalled above.";
+    decentLines[305] = String.raw`\end{proof}`;
+    const result = extractStacksGraphFromUnits([
+      {
+        stem: "morphisms",
+        path: "morphisms.tex",
+        title: "Morphisms",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-etale-open}
+Etale morphisms are open.
+\end{lemma}
+\begin{lemma}
+\label{lemma-flat-unramified-etale}
+Flat unramified morphisms are etale.
+\end{lemma}
+\begin{lemma}
+\label{lemma-unramified-quasi-finite}
+Unramified morphisms are locally quasi-finite.
+\end{lemma}
+`,
+      },
+      {
+        stem: "decent-spaces",
+        path: "decent-spaces.tex",
+        title: "Decent Spaces",
+        content: decentLines.join("\n"),
+      },
+    ], [
+      "03WT,morphisms-lemma-etale-open",
+      "02GV,morphisms-lemma-flat-unramified-etale",
+      "02V5,morphisms-lemma-unramified-quasi-finite",
+      "03II,decent-spaces-remark-recall",
+      "03JS,decent-spaces-lemma-U-finite-above-x",
+    ].join("\n"), { capturedAt });
+
+    expect(result.stats).toMatchObject({
+      bundledRemarkDependencyCount: 3,
+      curatedResolvedBundledProofXrefCount: 1,
+    });
+    expect(result.graph.directDependencies
+      .filter(({ dependentNodeId }) => dependentNodeId === "tag-03js")
+      .map(({ prerequisite }) => prerequisite.id)
+      .sort()).toEqual(["tag-02gv", "tag-02v5", "tag-03wt"]);
+    expect(result.graph.references.some(({ ref }) => (
+      ref === "decent-spaces-remark-recall"
+    ))).toBe(false);
+    expect(result.graph.nodes.some(({ sourceXmlId }) => (
+      sourceXmlId === "decent-spaces-remark-recall"
+    ))).toBe(false);
+  });
+
+  it("suppresses a source-audited notation-only xref to a promoted claim", () => {
+    const result = extractStacksGraphFromUnits([
+      {
+        stem: "spaces-perfect",
+        path: "spaces-perfect.tex",
+        title: "Perfect Complexes on Spaces",
+        content: String.raw`
+\begin{remark}
+\label{remark-match-total-direct-images}
+We claim the pullback and pushforward diagrams commute, by the construction.
+\end{remark}
+`,
+      },
+      {
+        stem: "spaces-more-morphisms",
+        path: "spaces-more-morphisms.tex",
+        title: "More Morphisms of Spaces",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-affine-locally-rel-perfect}
+The object is relatively perfect.
+\end{lemma}
+\begin{proof}
+Use notation as in Remark
+\ref{spaces-perfect-remark-match-total-direct-images}.
+\end{proof}
+`,
+      },
+    ], [
+      "08GH,spaces-perfect-remark-match-total-direct-images",
+      "0DKQ,spaces-more-morphisms-lemma-affine-locally-rel-perfect",
+    ].join("\n"), { capturedAt });
+
+    expect(result.stats.suppressedProofXrefDependencyCount).toBe(1);
+    expect(result.graph.directDependencies.some((dependency) => (
+      dependency.dependentNodeId === "tag-0dkq"
+      && dependency.prerequisite.id === "tag-08gh"
+    ))).toBe(false);
+  });
 });

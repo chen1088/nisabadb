@@ -27,7 +27,7 @@ function usage() {
     "",
     "--captured-at is required with --write. Without --write, it defaults to the current time.",
     "The importer includes formal definitions, situations, lemmas, propositions, and theorems.",
-    "It deliberately excludes examples, exercises, and remarks.",
+    "It deliberately excludes examples, exercises, and all remarks except an exact-label allowlist of source-audited theorem-level claims.",
   ].join("\n");
 }
 
@@ -155,6 +155,9 @@ function report({ recordId, componentId, commit, capturedAt, sourceRepository, w
     `Definition/situation nodes: ${stats.supportCount}`,
     `Formal node kinds: ${JSON.stringify(stats.kindCounts)}`,
     `Candidate proof-reference edges: ${stats.directDependencyCount}`,
+    `  Explicit proof-xref edges: ${stats.explicitProofXrefDependencyCount}`,
+    `  Source-audited prose-use edges: ${stats.semanticDependencyCount} (${stats.namedResultDependencyCount} named-result / ${stats.deicticDependencyCount} deictic / ${stats.bundledRemarkDependencyCount} bundled-remark)`,
+    `Typed external inputs: ${stats.externalInputCount}`,
     `Candidate proof routes: ${stats.proofRouteCount}`,
     `Source-reference records: ${stats.referenceCount}`,
     `Unresolved source-reference records: ${stats.unresolvedReferenceCount}`,

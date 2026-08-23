@@ -8,12 +8,13 @@ The model is the reviewed *Dimension-Free Dictatorship Tester* graph, not a chap
 - Formal infrastructure: definition, notation, axiom, assumption, and construction when it establishes the language or objects used by proofs.
 - Imported results and external facts only when a source proof actually relies on them; they must be represented explicitly rather than hidden in prose.
 - A result embedded in an exercise or example only after review determines that it is genuinely a formal claim needed by another proof. It is then classified as a claim/result, never as an example node.
+- A result stated and derived inside a remark only after an exact-label source audit establishes that it is theorem-level. It is classified as a claim, never as a remark node; this exception cannot be generalized to the surrounding environment class.
 
 ## Material outside the graph
 
 - Worked examples and nonexamples.
 - Routine exercises, calculations, algorithms, key-takeaway boxes, and pedagogical activities.
-- Remarks, motivation, tutorial prose, chapter order, and thematic similarity.
+- Ordinary remarks, motivation, tutorial prose, chapter order, and thematic similarity.
 - Section headings and ordinary hyperlinks.
 
 These may remain source evidence, but their mere presence never increases theorem/support counts and never creates a dependency edge.
@@ -23,7 +24,7 @@ These may remain source evidence, but their mere presence never increases theore
 - A direct edge means that a source proof uses the prerequisite result, definition, assumption, construction, or external input.
 - Repetition, proximity, terminology, chapter order, and statement-level cross-references do not manufacture proof edges.
 - Repeated citations of the same prerequisite in one proof merge into one direct edge while retaining source locators in the edge evidence.
-- A theorem with no resolved explicit dependency remains pending. It is not declared a root until independent review confirms a root attestation.
+- A theorem with no resolved explicit or source-audited dependency remains pending. It is not declared a root until independent review confirms a root attestation.
 - A proof citation to excluded material or the bibliography remains an unresolved review item until its mathematical role is reviewed. A source-audited nested or expository label may resolve to an existing formal owner, but examples and remarks are never bulk-imported as theorem nodes.
 
 ## Completion

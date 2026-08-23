@@ -12,6 +12,17 @@ const GRAPH_ENVIRONMENTS = new Map([
 
 const EXCLUDED_ENVIRONMENTS = ["example", "exercise", "remark", "remarks"];
 
+// A remark is not a theorem merely because later proofs cite it. These three
+// pinned-source remarks are exceptional: each states an explicit mathematical
+// claim and gives its derivation inline. They were individually reviewed before
+// promotion. Keep this allowlist label-exact and do not generalize it by wording,
+// proximity, or citation frequency.
+const CURATED_CLAIMS = new Map([
+  ["derived-remark-truncation-distinguished-triangle", "Canonical distinguished triangles of truncations"],
+  ["sites-cohomology-remark-before-Leray", "Derived global sections after derived pushforward"],
+  ["spaces-perfect-remark-match-total-direct-images", "Compatibility of derived pullback and pushforward for representable algebraic spaces"],
+]);
+
 const STRUCTURAL_BOUNDARY_PATTERN = /^\s*\\(?:chapter|section|subsection|subsubsection)\b/u;
 
 // These permanent labels occur in exposition outside a strict formal environment.
@@ -44,6 +55,141 @@ const CURATED_FORMAL_REFERENCE_ALIASES = new Map([
   ["curves-equation-degree-c1", "chow-lemma-degree-vector-bundle"],
   ["derived-equation-everywhere", "derived-proposition-derived-functor"],
   ["divisors-equation-koszul", "modules-definition-koszul-complex"],
+  ["algebra-remark-Tor-ring-mod-ideal", "algebra-lemma-characterize-flat"],
+]);
+
+// Named results invoked in prose rather than through \ref. Every entry is tied
+// to one permanent owner tag and an exact expected phrase count in that owner's
+// proof. This is an audited whitelist, not a global name recognizer.
+const CURATED_NAMED_PROOF_DEPENDENCIES = [
+  { ownerTag: "00HL", targetTag: "07JW", phrasePattern: "snake lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "00LU", targetTag: "07JW", phrasePattern: "snake lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "00MZ", targetTag: "07JW", phrasePattern: "snake lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0CE7", targetTag: "07JW", phrasePattern: "snake lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "02TQ", targetTag: "07JW", phrasePattern: "snake lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "04D2", targetTag: "001P", phrasePattern: "Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "00WY", targetTag: "001P", phrasePattern: "Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "00XM", targetTag: "001P", phrasePattern: "Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "06D3", targetTag: "004B", phrasePattern: "\\$2\\$-Yoneda lemma", expectedOccurrenceCount: 3 },
+  { ownerTag: "030F", externalInputId: "external-zorns-lemma", phrasePattern: "Zorn's lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "00E0", externalInputId: "external-zorns-lemma", phrasePattern: "Zorn's lemma", expectedOccurrenceCount: 2 },
+  { ownerTag: "07P2", externalInputId: "external-zorns-lemma", phrasePattern: "Zorn's lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "01D7", externalInputId: "external-zorns-lemma", phrasePattern: "Zorn's lemma", expectedOccurrenceCount: 1 },
+];
+
+// Exact owner/prerequisite tag pairs recovered from proofs whose entire body is
+// a deictic delegation to the immediately preceding discussion. Every pair was
+// manually checked; the wider discussion windows also contained rejected
+// comparisons and forward references, so they must never be promoted wholesale.
+const CURATED_DEICTIC_PROOF_DEPENDENCIES = new Map([
+  ["02Y5", ["02XN", "004B", "0040"]],
+  ["039G", ["00UW", "02FM"]],
+  ["05JE", ["05GG", "031A"]],
+  ["05JG", ["05JE", "0315", "031A"]],
+  ["0ALC", ["0ALB"]],
+  ["0ALG", ["0AIF", "0430", "06WK", "09B8"]],
+  ["0GHI", ["05GH", "00OK", "00MA"]],
+  ["086I", ["01KO", "01L0"]],
+  ["087I", ["02WW"]],
+  ["05WJ", ["00NW", "05WI", "00NX"]],
+  ["05WL", ["05WK"]],
+  ["05G2", ["00R2"]],
+  ["05LC", ["05KK", "04PS"]],
+  ["09AP", ["096N", "096T", "00U7", "00U8"]],
+  ["0274", ["01PM"]],
+  ["06UK", ["02Z3"]],
+  ["04AH", ["0CQJ", "03YK", "01T8"]],
+  ["07Z1", ["04UK", "07XL"]],
+  ["078F", ["023Q", "072B"]],
+  ["05LE", ["021A", "03HV", "04EX", "04DZ"]],
+  ["05LH", ["021A", "04EX", "04DZ", "049J"]],
+  ["07BG", ["00X1", "04D3"]],
+  ["0GE9", ["00X1", "04D3"]],
+  ["07DD", ["06WK"]],
+  ["0D5E", ["0C66"]],
+  ["09R5", ["09JR", "05QW", "09QH", "0132"]],
+  ["0CXX", ["0AFB", "0AF9", "0AFA"]],
+  ["0ATF", ["0571"]],
+  ["0EU9", ["00HY", "01J8", "0ETH"]],
+  ["09I5", ["09DT"]],
+  ["01DK", ["0139", "0161"]],
+  ["0C7M", ["0C7E", "0C6Z", "0C5X"]],
+  ["0C7R", ["0C7M", "0C5X"]],
+  ["0C7V", ["0C7R"]],
+  ["0C80", ["0C7R"]],
+  ["0C82", ["0C7R", "0C7V"]],
+  ["0C86", ["0C7R", "0C80"]],
+  ["0C87", ["0C80", "0C7V"]],
+  ["0C89", ["0C82"]],
+  ["0C8D", ["0C87", "0C89", "0C82"]],
+  ["0C8F", ["0C87"]],
+  ["0C8H", ["0C87", "0C8D"]],
+  ["0C8I", ["0C87"]],
+  ["0C8J", ["0C87", "0C8D"]],
+  ["0C8L", ["0C8J", "0C8I"]],
+  ["0C8P", ["0C8I"]],
+  ["04RU", ["04QH", "04RR", "04PE", "04PH"]],
+  ["09VM", ["008J", "008L"]],
+  ["09WF", ["09WC", "09WD", "09WE"]],
+]);
+
+// Three slightly longer deictic proofs were audited separately. Unlike the
+// exact one-line cases, their source route begins at the earliest listed formal
+// prerequisite and includes the intervening discussion.
+const CURATED_ESSENTIAL_DEICTIC_PROOF_DEPENDENCIES = [
+  {
+    ownerTag: "0272",
+    targetTags: ["00IT"],
+    proofPattern: "^See discussion above and \\(insert future reference on normalization here\\)\\.$",
+    routeDebtNote: "The source proof also contains an explicit future-reference placeholder for normalization; that prerequisite remains unresolved review debt.",
+  },
+  {
+    ownerTag: "069G",
+    targetTags: ["069E", "069F"],
+    proofPattern: "^This is the defining property of a local complete intersection morphism\\. See discussion above\\.$",
+  },
+  {
+    ownerTag: "01JS",
+    targetTags: ["01JQ", "01JR"],
+    proofPattern: "^See discussion above the lemma\\.$",
+  },
+];
+
+// The excluded Tag 03II remark is a bundle of several recalled facts. These
+// occurrence-level resolutions select only the formal fact actually used at
+// each source location. Two nearby untagged prose uses are included explicitly.
+const CURATED_BUNDLED_REMARK_DEPENDENCIES = [
+  { ownerTag: "03JS", sourceLineRanges: [[299, 299]], targetTags: ["03WT"], resolvesTag: "03II", expectedPattern: "Remark \\\\ref\\{remark-recall\\}" },
+  { ownerTag: "03JS", sourceLineRanges: [[304, 305]], targetTags: ["02GV", "02V5"], expectedPattern: "locally quasi-finite" },
+  { ownerTag: "03JT", sourceLineRanges: [[655, 655]], targetTags: ["03WT"], resolvesTag: "03II", expectedPattern: "Remark \\\\ref\\{remark-recall\\}" },
+  { ownerTag: "03JT", sourceLineRanges: [[661, 662]], targetTags: ["02GV", "02V5"], expectedPattern: "locally quasi-finite" },
+  { ownerTag: "03JU", sourceLineRanges: [[374, 374], [411, 411]], targetTags: ["02GL"], resolvesTag: "03II", expectedPattern: "Remark \\\\ref\\{remark-recall\\}" },
+  { ownerTag: "03JV", sourceLineRanges: [[573, 573], [601, 601]], targetTags: ["02GL"], resolvesTag: "03II", expectedPattern: "Remark \\\\ref\\{remark-recall\\}" },
+  { ownerTag: "03IM", sourceLineRanges: [[1283, 1284]], targetTags: ["02GS", "03HV"], resolvesTag: "03II", expectedPattern: "generalizations lift" },
+  { ownerTag: "03IM", sourceLineRanges: [[1297, 1298]], targetTags: ["02GV", "02V5", "01TH"], resolvesTag: "03II", expectedPattern: "no specializations" },
+  { ownerTag: "03K2", sourceLineRanges: [[1365, 1368]], targetTags: ["02GS", "03HV"], resolvesTag: "03II", expectedPattern: "generalizations lift" },
+  { ownerTag: "0BBN", sourceLineRanges: [[1599, 1601]], targetTags: ["02GL"], resolvesTag: "03II", expectedPattern: "disjoint union" },
+  { ownerTag: "06QW", sourceLineRanges: [[2889, 2891]], targetTags: ["02GL"], resolvesTag: "03II", expectedPattern: "disjoint union" },
+  { ownerTag: "06QX", sourceLineRanges: [[2936, 2938]], targetTags: ["02GL"], resolvesTag: "03II", expectedPattern: "disjoint union" },
+  { ownerTag: "06QZ", sourceLineRanges: [[3020, 3027]], targetTags: ["02GL"], resolvesTag: "03II", expectedPattern: "disjoint union" },
+  { ownerTag: "06R1", sourceLineRanges: [[3127, 3129]], targetTags: ["02GL"], resolvesTag: "03II", expectedPattern: "regular" },
+  { ownerTag: "0BB6", sourceLineRanges: [[3285, 3289]], targetTags: ["02GL"], resolvesTag: "03II", expectedPattern: "finite disjoint unions" },
+  { ownerTag: "0AHB", sourceLineRanges: [[3433, 3436]], targetTags: ["02GL"], resolvesTag: "03II", expectedPattern: "finite disjoint union" },
+  { ownerTag: "088J", sourceLineRanges: [[3523, 3527]], targetTags: ["02GL"], resolvesTag: "03II", expectedPattern: "disjoint union" },
+  { ownerTag: "0BA5", sourceLineRanges: [[5318, 5320]], targetTags: ["02GL"], resolvesTag: "03II", expectedPattern: "finite disjoint union" },
+  { ownerTag: "0EDM", sourceLineRanges: [[7308, 7313]], targetTags: ["02GL"], resolvesTag: "03II", expectedPattern: "finitely many points" },
+];
+
+// This proof cites the promoted compatibility claim only to import notation.
+// It is deliberately resolved without a logical dependency edge.
+const CURATED_NONDEPENDENCY_PROOF_XREFS = new Set([
+  "0DKQ|08GH",
+]);
+
+const DEICTIC_PROOF_BODIES = new Set([
+  "See above.",
+  "See discussion above.",
+  "See the discussion above.",
 ]);
 
 function canonicalJson(value) {
@@ -251,6 +397,59 @@ function proofRouteGroups(proofs) {
     : [{ proofs, ordinal: 1 }];
 }
 
+function normalizedProofBody(rawProof) {
+  return normalizeWhitespace(rawProof
+    .replace(/^\s*\\begin\{proof\}(?:\[[^\]]*\])?/u, "")
+    .replace(/\\end\{proof\}\s*$/u, ""));
+}
+
+function proofPhraseOccurrences(owner, patternSource) {
+  const lines = owner.unit.content.split(/\r?\n/u);
+  const occurrences = [];
+  const proofStartLines = new Set();
+  for (const proof of owner.proofs ?? []) {
+    for (let lineNumber = proof.startLine; lineNumber <= proof.endLine; lineNumber += 1) {
+      const line = stripLatexComment(lines[lineNumber - 1] ?? "");
+      for (const match of line.matchAll(new RegExp(patternSource, "giu"))) {
+        occurrences.push({
+          lineNumber,
+          context: lineContext(lines, lineNumber),
+          matchedText: match[0],
+        });
+        proofStartLines.add(proof.startLine);
+      }
+    }
+  }
+  return { occurrences, proofStartLines: [...proofStartLines] };
+}
+
+function occurrenceLocator(unitPath, occurrence) {
+  return occurrence.endLine && occurrence.endLine !== occurrence.lineNumber
+    ? `${unitPath}:L${occurrence.lineNumber}-L${occurrence.endLine}`
+    : `${unitPath}:L${occurrence.lineNumber}`;
+}
+
+function precedingDiscussionRegion(owner) {
+  const lines = owner.unit.content.split(/\r?\n/u);
+  const previousProofEnd = environmentRanges(lines, "proof")
+    .filter(({ endLine }) => endLine < owner.startLine)
+    .at(-1)?.endLine ?? 0;
+  let previousBoundaryLine = 0;
+  for (let lineNumber = 1; lineNumber < owner.startLine; lineNumber += 1) {
+    if (STRUCTURAL_BOUNDARY_PATTERN.test(stripLatexComment(lines[lineNumber - 1] ?? ""))) {
+      previousBoundaryLine = lineNumber;
+    }
+  }
+  const startLine = Math.max(previousProofEnd, previousBoundaryLine) + 1;
+  const endLine = owner.startLine - 1;
+  return {
+    startLine,
+    endLine,
+    rawText: lines.slice(startLine - 1, endLine).join("\n"),
+    references: endLine >= startLine ? referencesInLines(lines, startLine, endLine) : [],
+  };
+}
+
 function environmentRanges(lines, environment) {
   const beginPattern = new RegExp(`^\\s*\\\\begin\\{${environment}\\}(?:\\[[^\\]]*\\])?\\s*$`, "u");
   const endPattern = new RegExp(`^\\s*\\\\end\\{${environment}\\}\\s*$`, "u");
@@ -319,7 +518,7 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
           locator,
           artifactSha256: sha256(rawEnvironment),
           capturedAt,
-          note: "Formal Stacks environment captured from the pinned LaTeX source; examples, exercises, and remarks are outside the graph policy.",
+          note: "Formal Stacks environment captured from the pinned LaTeX source; examples, exercises, and uncurated remarks are outside the graph policy.",
         }),
       };
       metadata.push({
@@ -333,6 +532,64 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
           .filter((label) => label !== localLabel)
           .map((label) => `${unit.stem}-${label}`),
         statementReferences: referencesInLines(lines, range.startLine, range.endLine),
+      });
+    }
+  }
+
+  for (const environment of ["remark", "remarks"]) {
+    for (const range of environmentRanges(lines, environment)) {
+      const rawEnvironment = lines.slice(range.startLine - 1, range.endLine).join("\n");
+      const localLabel = findBalancedCommandArgument(rawEnvironment, "label");
+      if (!localLabel) continue;
+      const fullLabel = `${unit.stem}-${localLabel}`;
+      const curatedTitle = CURATED_CLAIMS.get(fullLabel);
+      if (!curatedTitle) continue;
+      const tag = tags.fullLabelToTag.get(fullLabel);
+      if (!tag) throw new Error(`${unit.path}:${range.startLine} has no stable tag for ${fullLabel}`);
+      const nodeId = tagNodeId(tag);
+      const normalizedStatement = normalizeWhitespace(rawEnvironment
+        .replace(new RegExp(`^\\s*\\\\begin\\{${environment}\\}(?:\\[[^\\]]*\\])?`, "u"), "")
+        .replace(new RegExp(`\\\\end\\{${environment}\\}\\s*$`, "u"), ""));
+      const locator = `${unit.path}:L${range.startLine}-L${range.endLine}`;
+      const label = sourceLabel("claim", tag);
+      const artifactSha256 = sha256(rawEnvironment);
+      const inlineProof = {
+        ...range,
+        title: "Inline derivation in source remark",
+        rawProof: rawEnvironment,
+        references: referencesInLines(lines, range.startLine, range.endLine),
+        citations: citationsInLines(lines, range.startLine, range.endLine),
+      };
+      metadata.push({
+        node: {
+          id: nodeId,
+          nodeClass: "theorem-like",
+          kind: "claim",
+          sourceLabel: label,
+          title: curatedTitle,
+          sourceXmlId: fullLabel,
+          sourceLocator: locator,
+          normalizedStatement: normalizedStatement || label,
+          sourceTextSha256: artifactSha256,
+          evidence: capturedEvidence({
+            sourceUnitId: unitId(unit.stem),
+            locator,
+            artifactSha256,
+            capturedAt,
+            note: "Source-audited Stacks remark promoted by exact permanent label because it states a theorem-level claim and supplies an inline derivation; this does not promote remarks generally.",
+          }),
+        },
+        unit,
+        environment,
+        startLine: range.startLine,
+        endLine: range.endLine,
+        rawEnvironment,
+        aliasFullLabels: labelArguments(rawEnvironment)
+          .filter((labelArgument) => labelArgument !== localLabel)
+          .map((labelArgument) => `${unit.stem}-${labelArgument}`),
+        statementReferences: [],
+        proofs: [inlineProof],
+        curatedClaim: true,
       });
     }
   }
@@ -519,12 +776,294 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
     }
     nodeByFullLabel.set(aliasFullLabel, targetNode);
   }
-  const usedIds = new Set([...sourceUnits.map(({ id }) => id), ...nodes.map(({ id }) => id)]);
+
+  const metadataByFullLabel = new Map(metadata.map((item) => [item.node.sourceXmlId, item]));
+  const metadataByNodeId = new Map(metadata.map((item) => [item.node.id, item]));
+  const unitOrderByStem = new Map(units.map((unit, index) => [unit.stem, index]));
+  const metadataForTag = (tag, role) => {
+    const fullLabel = tags.tagToFullLabel.get(tag);
+    if (!fullLabel) return null;
+    const item = metadataByFullLabel.get(fullLabel);
+    if (!item) throw new Error(`Curated ${role} tag ${tag} (${fullLabel}) has no formal graph node`);
+    return item;
+  };
+  const targetForTag = (tag, role) => {
+    const item = metadataForTag(tag, role);
+    if (!item) throw new Error(`Curated ${role} target tag ${tag} is absent from the pinned tag manifest`);
+    return item;
+  };
+  const assertTargetPrecedesOwner = (target, owner, role) => {
+    const targetUnitOrder = unitOrderByStem.get(target.unit.stem);
+    const ownerUnitOrder = unitOrderByStem.get(owner.unit.stem);
+    const precedes = targetUnitOrder < ownerUnitOrder
+      || (targetUnitOrder === ownerUnitOrder && target.startLine < owner.startLine);
+    if (!precedes) {
+      throw new Error(`Curated ${role} target ${target.node.id} does not precede owner ${owner.node.id}`);
+    }
+  };
+
+  const semanticGroupsByOwner = new Map();
+  const addSemanticGroup = (group) => {
+    const targetId = group.targetNode?.id ?? group.externalInput?.id;
+    if (!targetId) throw new Error(`Curated semantic dependency for ${group.owner.node.id} has no target`);
+    const ownerGroups = semanticGroupsByOwner.get(group.owner.node.id) ?? new Map();
+    const existing = ownerGroups.get(targetId);
+    if (existing) {
+      existing.occurrences.push(...group.occurrences);
+      existing.proofStartLines = [...new Set([
+        ...existing.proofStartLines,
+        ...group.proofStartLines,
+      ])];
+      existing.routeEvidenceRegions.push(...group.routeEvidenceRegions);
+      existing.routeDebtNotes.push(...group.routeDebtNotes);
+    } else {
+      ownerGroups.set(targetId, {
+        ...group,
+        routeEvidenceRegions: [...group.routeEvidenceRegions],
+        routeDebtNotes: [...group.routeDebtNotes],
+      });
+    }
+    semanticGroupsByOwner.set(group.owner.node.id, ownerGroups);
+  };
+
+  const activeNamedAudits = CURATED_NAMED_PROOF_DEPENDENCIES
+    .map((config) => ({ config, owner: metadataForTag(config.ownerTag, "named-result owner") }))
+    .filter(({ owner }) => owner);
+  const externalInputs = [];
+  if (activeNamedAudits.some(({ config }) => config.externalInputId === "external-zorns-lemma")) {
+    const conventions = units.find(({ stem }) => stem === "conventions");
+    if (!conventions) throw new Error("Zorn's lemma audit requires the pinned conventions source unit");
+    const conventionLines = conventions.content.split(/\r?\n/u);
+    const rawConvention = conventionLines.slice(23, 30).join("\n");
+    if (!/Zermelo-Fraenkel set theory with the axiom of choice/iu.test(rawConvention)) {
+      throw new Error("The pinned ZFC-with-choice convention moved or changed");
+    }
+    externalInputs.push({
+      id: "external-zorns-lemma",
+      kind: "external-theorem",
+      label: "Zorn's lemma",
+      normalizedStatement: "Every nonempty partially ordered set in which every chain has an upper bound contains a maximal element.",
+      sourceTextSha256: null,
+      sourceCitation: "Invoked by name under the Stacks Project's declared ZFC convention; conventions.tex:L24-L30.",
+      evidence: capturedEvidence({
+        sourceUnitId: unitId("conventions"),
+        locator: "conventions.tex:L24-L30",
+        artifactSha256: sha256(rawConvention),
+        capturedAt,
+        note: "The pinned source declares Zermelo-Fraenkel set theory with choice; four source-audited formal proofs invoke Zorn's lemma by name.",
+      }),
+    });
+  }
+  const externalInputById = new Map(externalInputs.map((input) => [input.id, input]));
+
+  for (const { config, owner } of activeNamedAudits) {
+    const { occurrences, proofStartLines } = proofPhraseOccurrences(owner, config.phrasePattern);
+    if (occurrences.length !== config.expectedOccurrenceCount) {
+      throw new Error(`Curated named-result audit for ${config.ownerTag} expected ${config.expectedOccurrenceCount} occurrence(s), found ${occurrences.length}`);
+    }
+    const target = config.targetTag
+      ? targetForTag(config.targetTag, "named-result")
+      : null;
+    if (target) assertTargetPrecedesOwner(target, owner, "named-result");
+    const externalInput = config.externalInputId
+      ? externalInputById.get(config.externalInputId)
+      : null;
+    if (config.externalInputId && !externalInput) {
+      throw new Error(`Curated named-result external input ${config.externalInputId} is missing`);
+    }
+    const targetLabel = target?.node.sourceLabel ?? externalInput.label;
+    addSemanticGroup({
+      owner,
+      basis: "audited-named-result",
+      targetNode: target?.node ?? null,
+      externalInput,
+      occurrences,
+      proofStartLines,
+      routeEvidenceRegions: [],
+      routeDebtNotes: [],
+      rationale: `The pinned Stacks proof invokes ${targetLabel} by its standard name.`,
+      evidenceNote: `${occurrences.length} owner-specific, source-audited named-result invocation(s) merged into one dependency.`,
+    });
+  }
+
+  for (const [ownerTag, targetTags] of CURATED_DEICTIC_PROOF_DEPENDENCIES) {
+    const owner = metadataForTag(ownerTag, "deictic-proof owner");
+    if (!owner) continue;
+    const deicticProofs = (owner.proofs ?? []).filter((proof) => (
+      DEICTIC_PROOF_BODIES.has(normalizedProofBody(proof.rawProof))
+    ));
+    if (deicticProofs.length !== 1) {
+      throw new Error(`Curated deictic proof ${ownerTag} no longer has exactly one audited proof body`);
+    }
+    const proof = deicticProofs[0];
+    const discussion = precedingDiscussionRegion(owner);
+    const ownerLines = owner.unit.content.split(/\r?\n/u);
+    const routeRegion = {
+      startLine: discussion.startLine,
+      endLine: proof.endLine,
+      rawText: ownerLines.slice(discussion.startLine - 1, proof.endLine).join("\n"),
+    };
+    for (const targetTag of targetTags) {
+      const target = targetForTag(targetTag, "deictic-proof");
+      assertTargetPrecedesOwner(target, owner, "deictic-proof");
+      const targetFullLabel = tags.tagToFullLabel.get(targetTag);
+      const occurrences = discussion.references.filter(({ ref }) => (
+        resolveFullLabel(ref, owner.unit.stem, tags.fullLabelToTag) === targetFullLabel
+      ));
+      if (occurrences.length === 0) {
+        throw new Error(`Curated deictic pair ${ownerTag}->${targetTag} is absent from the preceding discussion window`);
+      }
+      addSemanticGroup({
+        owner,
+        basis: "audited-deictic-proof",
+        targetNode: target.node,
+        externalInput: null,
+        occurrences,
+        proofStartLines: [proof.startLine],
+        routeEvidenceRegions: [routeRegion],
+        routeDebtNotes: [],
+        rationale: `The pinned Stacks proof delegates to the preceding discussion, which explicitly cites ${target.node.sourceLabel}.`,
+        evidenceNote: `${occurrences.length} explicit discussion reference occurrence(s) selected by an owner-specific audit of the deictic proof.`,
+      });
+    }
+  }
+
+  for (const config of CURATED_ESSENTIAL_DEICTIC_PROOF_DEPENDENCIES) {
+    const owner = metadataForTag(config.ownerTag, "essential-deictic owner");
+    if (!owner) continue;
+    const matchingProofs = (owner.proofs ?? []).filter((proof) => (
+      new RegExp(config.proofPattern, "u").test(normalizedProofBody(proof.rawProof))
+    ));
+    if (matchingProofs.length !== 1) {
+      throw new Error(`Curated essential-deictic proof ${config.ownerTag} no longer matches its audited body`);
+    }
+    const proof = matchingProofs[0];
+    const discussion = precedingDiscussionRegion(owner);
+    const targets = config.targetTags.map((targetTag) => ({
+      targetTag,
+      target: targetForTag(targetTag, "essential-deictic"),
+    }));
+    for (const { target } of targets) assertTargetPrecedesOwner(target, owner, "essential-deictic");
+    const sameUnitTargetStarts = targets
+      .map(({ target }) => target)
+      .filter(({ unit }) => unit.stem === owner.unit.stem)
+      .map(({ startLine }) => startLine);
+    const routeStartLine = Math.min(discussion.startLine, ...sameUnitTargetStarts);
+    const ownerLines = owner.unit.content.split(/\r?\n/u);
+    const routeRegion = {
+      startLine: routeStartLine,
+      endLine: proof.endLine,
+      rawText: ownerLines.slice(routeStartLine - 1, proof.endLine).join("\n"),
+    };
+    for (const { targetTag, target } of targets) {
+      const targetFullLabel = tags.tagToFullLabel.get(targetTag);
+      const explicitOccurrences = discussion.references.filter(({ ref }) => (
+        resolveFullLabel(ref, owner.unit.stem, tags.fullLabelToTag) === targetFullLabel
+      ));
+      const occurrences = explicitOccurrences.length > 0
+        ? explicitOccurrences
+        : [{
+          lineNumber: target.startLine,
+          endLine: target.endLine,
+          context: `Audited preceding formal result ${target.node.sourceLabel}.`,
+        }];
+      addSemanticGroup({
+        owner,
+        basis: "audited-essential-deictic-proof",
+        targetNode: target.node,
+        externalInput: null,
+        occurrences,
+        proofStartLines: [proof.startLine],
+        routeEvidenceRegions: [routeRegion],
+        routeDebtNotes: config.routeDebtNote ? [config.routeDebtNote] : [],
+        rationale: `An owner-specific audit of the short deictic Stacks proof and its preceding construction identifies ${target.node.sourceLabel} as a direct prerequisite.`,
+        evidenceNote: "Owner-specific source audit of a short deictic proof; no proximity-wide inference rule was applied.",
+      });
+    }
+  }
+
+  const curatedResolvedProofGroupKeys = new Set();
+  const resolvedRangesByGroupKey = new Map();
+  for (const config of CURATED_BUNDLED_REMARK_DEPENDENCIES) {
+    const owner = metadataForTag(config.ownerTag, "bundled-remark owner");
+    if (!owner) continue;
+    const ownerLines = owner.unit.content.split(/\r?\n/u);
+    const sourceRegions = config.sourceLineRanges.map(([startLine, endLine]) => ({
+      startLine,
+      endLine,
+      rawText: ownerLines.slice(startLine - 1, endLine).join("\n"),
+    }));
+    if (sourceRegions.some((region) => !(owner.proofs ?? []).some((proof) => (
+      proof.startLine <= region.startLine && proof.endLine >= region.endLine
+    )))) {
+      throw new Error(`Curated bundled-remark evidence for ${config.ownerTag} moved outside its proof`);
+    }
+    const rawEvidence = sourceRegions.map(({ rawText }) => rawText).join("\n");
+    if (!new RegExp(config.expectedPattern, "iu").test(rawEvidence)) {
+      throw new Error(`Curated bundled-remark evidence for ${config.ownerTag} no longer matches its audited text`);
+    }
+    const occurrences = sourceRegions.map(({ startLine, endLine, rawText }) => ({
+      lineNumber: startLine,
+      endLine,
+      context: normalizeWhitespace(rawText).slice(0, 240),
+    }));
+    const proofStartLines = [...new Set(sourceRegions.map((region) => (
+      (owner.proofs ?? []).find((proof) => (
+        proof.startLine <= region.startLine && proof.endLine >= region.endLine
+      ))?.startLine
+    )).filter(Boolean))];
+    for (const targetTag of config.targetTags) {
+      const target = targetForTag(targetTag, "bundled-remark");
+      assertTargetPrecedesOwner(target, owner, "bundled-remark");
+      addSemanticGroup({
+        owner,
+        basis: "audited-bundled-remark",
+        targetNode: target.node,
+        externalInput: null,
+        occurrences,
+        proofStartLines,
+        routeEvidenceRegions: [],
+        routeDebtNotes: [],
+        rationale: `An occurrence-level source audit resolves the cited recall bundle to ${target.node.sourceLabel} for this proof use.`,
+        evidenceNote: "Occurrence-keyed audit of one fact from the excluded Tag 03II recall bundle; the remark itself was not promoted or globally aliased.",
+      });
+    }
+    if (config.resolvesTag) {
+      const resolvedFullLabel = tags.tagToFullLabel.get(config.resolvesTag);
+      if (!resolvedFullLabel) throw new Error(`Bundled-remark tag ${config.resolvesTag} is absent`);
+      const groupKey = `${owner.node.id}|${resolvedFullLabel}`;
+      const ranges = resolvedRangesByGroupKey.get(groupKey) ?? [];
+      ranges.push(...config.sourceLineRanges);
+      resolvedRangesByGroupKey.set(groupKey, ranges);
+      curatedResolvedProofGroupKeys.add(groupKey);
+    }
+  }
+  for (const groupKey of curatedResolvedProofGroupKeys) {
+    const [ownerNodeId, fullLabel] = groupKey.split("|");
+    const owner = metadataByNodeId.get(ownerNodeId);
+    const coveredRanges = resolvedRangesByGroupKey.get(groupKey) ?? [];
+    const uncovered = (owner.proofs ?? [])
+      .flatMap(({ references }) => references)
+      .filter(({ ref }) => resolveFullLabel(ref, owner.unit.stem, tags.fullLabelToTag) === fullLabel)
+      .filter(({ lineNumber }) => !coveredRanges.some(([startLine, endLine]) => (
+        startLine <= lineNumber && endLine >= lineNumber
+      )));
+    if (uncovered.length > 0) {
+      throw new Error(`Curated bundled-remark audit for ${ownerNodeId} left ${uncovered.length} occurrence(s) uncovered`);
+    }
+  }
+
+  const usedIds = new Set([
+    ...sourceUnits.map(({ id }) => id),
+    ...nodes.map(({ id }) => id),
+    ...externalInputs.map(({ id }) => id),
+  ]);
 
   const directDependencies = [];
   const dependencyIdByPair = new Map();
   const proofGroupsByOwner = new Map();
   const citationGroupsByOwner = new Map();
+  let suppressedProofXrefDependencyCount = 0;
   for (const owner of metadata.filter(({ node }) => node.nodeClass === "theorem-like")) {
     const proofs = owner.proofs ?? [];
     const proofReferences = proofs.flatMap(({ references }) => references);
@@ -542,6 +1081,12 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
     }));
     for (const group of groups) {
       if (!group.targetNode || group.targetNode.id === owner.node.id) continue;
+      const ownerTag = tags.fullLabelToTag.get(owner.node.sourceXmlId);
+      const targetTag = tags.fullLabelToTag.get(group.targetNode.sourceXmlId);
+      if (CURATED_NONDEPENDENCY_PROOF_XREFS.has(`${ownerTag}|${targetTag}`)) {
+        suppressedProofXrefDependencyCount += 1;
+        continue;
+      }
       const pair = `${owner.node.id}|${group.targetNode.id}`;
       if (dependencyIdByPair.has(pair)) continue;
       const id = `dep-${owner.node.id}-to-${group.targetNode.id}`;
@@ -567,6 +1112,43 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
       });
     }
   }
+  const explicitProofXrefDependencyCount = directDependencies.length;
+  let namedResultDependencyCount = 0;
+  let deicticDependencyCount = 0;
+  let bundledRemarkDependencyCount = 0;
+  for (const ownerGroups of semanticGroupsByOwner.values()) {
+    for (const group of ownerGroups.values()) {
+      const targetId = group.targetNode?.id ?? group.externalInput.id;
+      const pair = `${group.owner.node.id}|${targetId}`;
+      if (dependencyIdByPair.has(pair)) continue;
+      const id = `dep-${group.owner.node.id}-to-${targetId}`;
+      if (usedIds.has(id)) throw new Error(`Duplicate dependency ID: ${id}`);
+      usedIds.add(id);
+      dependencyIdByPair.set(pair, id);
+      const locator = group.occurrences
+        .map((item) => occurrenceLocator(group.owner.unit.path, item))
+        .join("; ");
+      directDependencies.push({
+        id,
+        dependentNodeId: group.owner.node.id,
+        prerequisite: group.targetNode
+          ? { type: "node", id: group.targetNode.id }
+          : { type: "external-input", id: group.externalInput.id },
+        role: group.targetNode ? dependencyRole(group.targetNode) : "logical",
+        rationale: group.rationale,
+        evidence: capturedEvidence({
+          sourceUnitId: unitId(group.owner.unit.stem),
+          locator,
+          artifactSha256: sha256(canonicalJson(group.occurrences)),
+          capturedAt,
+          note: group.evidenceNote,
+        }),
+      });
+      if (group.basis === "audited-named-result") namedResultDependencyCount += 1;
+      else if (group.basis.includes("deictic")) deicticDependencyCount += 1;
+      else if (group.basis === "audited-bundled-remark") bundledRemarkDependencyCount += 1;
+    }
+  }
 
   const proofRoutes = [];
   for (const owner of metadata.filter(({ node }) => node.nodeClass === "theorem-like")) {
@@ -580,10 +1162,20 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
         nodeByFullLabel,
         tags,
       });
-      const dependencyIds = [...new Set(routeReferenceGroups
+      const explicitDependencyIds = routeReferenceGroups
         .filter(({ targetNode }) => targetNode && targetNode.id !== owner.node.id)
         .map(({ targetNode }) => dependencyIdByPair.get(`${owner.node.id}|${targetNode.id}`))
-        .filter(Boolean))];
+        .filter(Boolean);
+      const routeProofStartLines = new Set(routeGroup.proofs.map(({ startLine }) => startLine));
+      const routeSemanticGroups = [...(semanticGroupsByOwner.get(owner.node.id)?.values() ?? [])]
+        .filter(({ proofStartLines }) => proofStartLines.some((line) => routeProofStartLines.has(line)));
+      const semanticDependencyIds = routeSemanticGroups
+        .map((group) => {
+          const targetId = group.targetNode?.id ?? group.externalInput.id;
+          return dependencyIdByPair.get(`${owner.node.id}|${targetId}`);
+        })
+        .filter(Boolean);
+      const dependencyIds = [...new Set([...explicitDependencyIds, ...semanticDependencyIds])];
       if (dependencyIds.length === 0) continue;
       const isAlternativeSet = routeGroups.length >= 2;
       const routeKind = isAlternativeSet && groupIndex > 0 ? "alternate-proof" : "source-proof";
@@ -591,25 +1183,41 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
       const id = `route-${owner.node.id}-${routeKind}${ordinalSuffix}`;
       if (usedIds.has(id)) throw new Error(`Duplicate proof-route ID: ${id}`);
       usedIds.add(id);
-      const locator = routeGroup.proofs.map((proof) => (
-        `${owner.unit.path}:L${proof.startLine}-L${proof.endLine}`
-      )).join("; ");
+      const routeEvidenceRegions = [...new Map(routeSemanticGroups
+        .flatMap(({ routeEvidenceRegions }) => routeEvidenceRegions)
+        .map((region) => [`${region.startLine}-${region.endLine}`, region])).values()];
+      const locatorParts = [
+        ...routeGroup.proofs.map((proof) => (
+          `${owner.unit.path}:L${proof.startLine}-L${proof.endLine}`
+        )),
+        ...routeEvidenceRegions.map((region) => (
+          `${owner.unit.path}:L${region.startLine}-L${region.endLine}`
+        )),
+      ];
+      const locator = [...new Set(locatorParts)].join("; ");
+      const routeEvidenceText = [
+        ...routeGroup.proofs.map(({ rawProof }) => rawProof),
+        ...routeEvidenceRegions.map(({ rawText }) => rawText),
+      ].join("\n");
+      const routeDebtNotes = [...new Set(routeSemanticGroups
+        .flatMap(({ routeDebtNotes }) => routeDebtNotes))];
+      const hasSemanticDependencies = routeSemanticGroups.length > 0;
       proofRoutes.push({
         id,
         theoremNodeId: owner.node.id,
         routeKind,
         dependencyIds,
         summary: routeKind === "alternate-proof"
-          ? "Source-faithful alternate route containing only the direct formal results and definitions explicitly cited in this separately titled Stacks proof."
-          : "Source-faithful candidate route containing the direct formal results and definitions explicitly cited in the pinned Stacks proof.",
+          ? "Source-faithful alternate route containing only direct prerequisites explicitly cited or selected by an owner-specific source audit of this separately titled Stacks proof."
+          : "Source-faithful candidate route containing direct prerequisites explicitly cited or selected by owner-specific audits of named and deictic proof language in the pinned Stacks source.",
         evidence: capturedEvidence({
           sourceUnitId: unitId(owner.unit.stem),
           locator: locator || owner.node.sourceLocator,
-          artifactSha256: sha256(routeGroup.proofs.map(({ rawProof }) => rawProof).join("\n")),
+          artifactSha256: sha256(routeEvidenceText),
           capturedAt,
           note: routeKind === "alternate-proof"
-            ? "Candidate alternative route from a separately titled source proof; implicit prerequisites remain pending and no review is claimed."
-            : "Candidate route from explicit proof references only; implicit prerequisites remain pending and no review is claimed.",
+            ? `Candidate alternative route from a separately titled source proof${hasSemanticDependencies ? " with owner-specific audited prose dependencies" : ""}; implicit prerequisites remain pending and no independent review is claimed.${routeDebtNotes.length ? ` ${routeDebtNotes.join(" ")}` : ""}`
+            : `Candidate route from ${hasSemanticDependencies ? "explicit proof references plus owner-specific audited named, deictic, or bundled-remark dependencies" : "explicit proof references only"}; implicit prerequisites remain pending and no independent review is claimed.${routeDebtNotes.length ? ` ${routeDebtNotes.join(" ")}` : ""}`,
         }),
       });
     }
@@ -620,6 +1228,7 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
     if (owner.node.nodeClass === "theorem-like") {
       for (const group of proofGroupsByOwner.get(owner.node.id) ?? []) {
         if (group.targetNode) continue;
+        if (curatedResolvedProofGroupKeys.has(`${owner.node.id}|${group.fullLabel}`)) continue;
         references.push(referenceEntity({ group, dependencyId: null, capturedAt, usedIds }));
       }
       for (const group of citationGroupsByOwner.get(owner.node.id) ?? []) {
@@ -631,12 +1240,14 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
   const inventoryByUnitId = new Map(sourceUnits.map(({ id }) => [id, {
     theoremNodeIds: [],
     supportNodeIds: [],
+    curatedClaimCount: 0,
   }]));
-  for (const { node, unit } of metadata) {
+  for (const { node, unit, curatedClaim = false } of metadata) {
     const inventory = inventoryByUnitId.get(unitId(unit.stem));
     if (!inventory) throw new Error(`Missing source-unit inventory for ${unit.path}`);
     if (node.nodeClass === "theorem-like") inventory.theoremNodeIds.push(node.id);
     else inventory.supportNodeIds.push(node.id);
+    if (curatedClaim) inventory.curatedClaimCount += 1;
   }
   const unitInventories = sourceUnits.map((unit) => {
     const inventory = inventoryByUnitId.get(unit.id);
@@ -652,18 +1263,19 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
         artifactSha256: unit.contentSha256,
         capturedAt,
         note: inventory.theoremNodeIds.length === 0
-          ? "Strict formal-environment scan found no theorem, lemma, or proposition in this complete pinned chapter; examples and exercises do not count as theorem nodes."
-          : `Strict formal-environment scan assigned ${inventory.theoremNodeIds.length} theorem-like and ${inventory.supportNodeIds.length} definition/situation node(s); examples, exercises, and remarks were excluded.`,
+          ? "Formal-environment plus curated-claim scan found no theorem-like result in this complete pinned chapter; examples and exercises do not count as theorem nodes."
+          : `Formal-environment plus curated-claim scan assigned ${inventory.theoremNodeIds.length} theorem-like and ${inventory.supportNodeIds.length} definition/situation node(s), including ${inventory.curatedClaimCount} exact-label source-audited remark claim(s); examples, exercises, and all other remarks were excluded.`,
       }),
     };
   });
 
+  const curatedClaimCount = metadata.filter(({ curatedClaim }) => curatedClaim).length;
   const excludedEnvironmentCounts = Object.fromEntries(EXCLUDED_ENVIRONMENTS.map((environment) => [
     environment,
     units.reduce((total, unit) => total + environmentRanges(
       unit.content.split(/\r?\n/u),
       environment,
-    ).length, 0),
+    ).length, 0) - metadata.filter((item) => item.curatedClaim && item.environment === environment).length,
   ]));
   const theoremCount = nodes.filter((node) => node.nodeClass === "theorem-like").length;
   const routedTheoremIds = new Set(proofRoutes.map(({ theoremNodeId }) => theoremNodeId));
@@ -689,7 +1301,7 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
     unitInventories,
     graph: {
       nodes,
-      externalInputs: [],
+      externalInputs,
       directDependencies,
       proofRoutes,
       references,
@@ -701,6 +1313,16 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
         .sort()
         .map((kind) => [kind, nodes.filter((node) => node.kind === kind).length])),
       directDependencyCount: directDependencies.length,
+      explicitProofXrefDependencyCount,
+      namedResultDependencyCount,
+      deicticDependencyCount,
+      bundledRemarkDependencyCount,
+      semanticDependencyCount: namedResultDependencyCount
+        + deicticDependencyCount
+        + bundledRemarkDependencyCount,
+      suppressedProofXrefDependencyCount,
+      curatedResolvedBundledProofXrefCount: curatedResolvedProofGroupKeys.size,
+      externalInputCount: externalInputs.length,
       proofRouteCount: proofRoutes.length,
       referenceCount: references.length,
       unresolvedReferenceCount,
@@ -719,6 +1341,7 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
       pendingTheoremCount: theoremCount - routedTheoremIds.size,
       unitInventoryCount: unitInventories.length,
       theoremFreeUnitCount: unitInventories.filter(({ theoremFreeAttestation }) => theoremFreeAttestation).length,
+      curatedClaimCount,
       excludedEnvironmentCounts,
       tagCount: tags.tagToFullLabel.size,
     },
@@ -840,7 +1463,7 @@ export function buildStacksBookFile({
           unitInventoryCount: extracted.unitInventories.length,
         },
         independentReview: null,
-        note: `Strict extraction from all ${extracted.sourceUnits.length} chapters in the pinned official source: ${kindSummary}. Deliberately excluded ${excludedSummary}; no worked example is a graph node.`,
+        note: `Formal-environment extraction plus ${extracted.stats.curatedClaimCount} exact-label, source-audited theorem-level remark claim(s) from all ${extracted.sourceUnits.length} chapters in the pinned official source: ${kindSummary}. Deliberately excluded ${excludedSummary}; no worked example is a graph node and no other remark was promoted.`,
       },
       graphState: {
         status: "extracted",
@@ -855,7 +1478,7 @@ export function buildStacksBookFile({
           referenceCount: extracted.graph.references.length,
         },
         independentReview: null,
-        note: `${extracted.stats.directDependencyCount} candidate edges come only from explicit formal references in source proofs; resolved occurrences are merged into edge evidence. ${extracted.stats.unresolvedTaggedProofReferenceCount} unresolved tagged proof-xref records (${extracted.stats.uniqueUnresolvedTaggedProofTargetCount} unique permanent labels) and ${extracted.stats.proofCitationReferenceCount} unresolved bibliographic proof-citation records (${extracted.stats.distinctProofCitationKeyCount} keys) remain review candidates; no citation was promoted to an external input. ${extracted.stats.pendingTheoremCount} theorem-like nodes have no route with a resolved explicit formal proof reference and remain pending, not roots. No mathematical review or graph-completeness claim is made.`,
+        note: `${extracted.stats.directDependencyCount} candidate edges comprise ${extracted.stats.explicitProofXrefDependencyCount} explicit proof-xref edges and ${extracted.stats.semanticDependencyCount} owner-specific source-audited prose-use edges (${extracted.stats.namedResultDependencyCount} named-result, ${extracted.stats.deicticDependencyCount} deictic-proof, ${extracted.stats.bundledRemarkDependencyCount} bundled-remark); resolved occurrences are merged into edge evidence, and ${extracted.stats.suppressedProofXrefDependencyCount} notation-only proof xref was explicitly suppressed. Zorn's lemma is represented once as a typed external theorem under the source's declared choice convention. ${extracted.stats.unresolvedTaggedProofReferenceCount} unresolved tagged proof-xref records (${extracted.stats.uniqueUnresolvedTaggedProofTargetCount} unique permanent labels) and ${extracted.stats.proofCitationReferenceCount} unresolved bibliographic proof-citation records (${extracted.stats.distinctProofCitationKeyCount} keys) remain review candidates; no bibliographic citation was promoted to an external input. ${extracted.stats.pendingTheoremCount} theorem-like nodes have no route with a resolved candidate prerequisite and remain pending, not roots. No independent mathematical review or graph-completeness claim is made.`,
       },
     },
     stats: {

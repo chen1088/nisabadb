@@ -176,12 +176,12 @@ describe("one Phase-I dependency graph file per source component", () => {
       sourceUnitCount: 225,
       inventoriedSourceUnitCount: 225,
       reviewedSourceUnitCount: 0,
-      theoremNodeCount: 13169,
-      unroutedTheoremCount: 2033,
+      theoremNodeCount: 13172,
+      unroutedTheoremCount: 1966,
       supportNodeCount: 1919,
-      dependencyCount: 35850,
+      dependencyCount: 36079,
       reviewedDependencyCount: 0,
-      unresolvedReferenceCount: 2837,
+      unresolvedReferenceCount: 2746,
     });
     expect(validated.filesByPath.get("S0001/level-1.json")?.identity.bookGraphId).toBe("S0001:level-1");
     expect(validated.filesByPath.get("S0074/volume-3.json")?.identity.componentLabel).toBe("Volume 3");
@@ -197,14 +197,19 @@ describe("one Phase-I dependency graph file per source component", () => {
     const densestBook = validated.filesByPath.get("S0262/complete-source.json");
     expect(densestBook?.exactEdition?.sourceFormat).toBe("latex");
     expect(densestBook?.sourceUnits).toHaveLength(116);
-    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like")).toHaveLength(13131);
+    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like")).toHaveLength(13134);
     expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "support")).toHaveLength(1845);
     expect(densestBook?.graph.nodes.every((node) => /^tag-[a-z0-9]{4}$/u.test(node.id))).toBe(true);
     expect(densestBook?.graph.nodes.some((node) => (
       node.kind === "example" || node.kind === "calculation" || node.kind === "algorithm"
     ))).toBe(false);
-    expect(densestBook?.graph.directDependencies).toHaveLength(35847);
-    expect(densestBook?.graph.proofRoutes).toHaveLength(11170);
+    expect(densestBook?.graph.externalInputs).toHaveLength(1);
+    expect(densestBook?.graph.externalInputs[0]).toMatchObject({
+      id: "external-zorns-lemma",
+      kind: "external-theorem",
+    });
+    expect(densestBook?.graph.directDependencies).toHaveLength(36076);
+    expect(densestBook?.graph.proofRoutes).toHaveLength(11240);
     expect(densestBook?.graph.proofRoutes.filter((route) => route.routeKind === "alternate-proof"))
       .toHaveLength(40);
     expect(densestBook?.graph.references.every((reference) => (
@@ -212,7 +217,7 @@ describe("one Phase-I dependency graph file per source component", () => {
       && reference.resolution.status === "unresolved"
     ))).toBe(true);
     expect(densestBook?.graph.references.filter((reference) => reference.basis === "proof-xref"))
-      .toHaveLength(2807);
+      .toHaveLength(2716);
     expect(densestBook?.graph.references.filter((reference) => reference.basis === "proof-citation"))
       .toHaveLength(30);
     expect(new Set(densestBook?.graph.references.filter((reference) => (

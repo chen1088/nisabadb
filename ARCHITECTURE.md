@@ -65,7 +65,7 @@ BookGraph
   │    ├─ prerequisite node or external input -> dependent node
   │    └─ role, rationale, evidence locator, capture audit, and review state
   ├─ ProofRoute ── theorem node + the dependency IDs used by that route
-  ├─ SourceReference ── proof/statement xref + resolved or unresolved target
+  ├─ SourceReference ── excluded or unresolved proof target retained for audit
   └─ ExternalInput ── imported theorem, axiom, definition, standard fact, or citation
 
 Phase-II mapping (frozen)
@@ -133,9 +133,9 @@ The per-book source-graph validator separately requires:
 
 The publication build recomputes the ordered source manifest, the 717-component book manifest, every edition unit manifest, every current Knowledge-node content fingerprint, and every administrative review's subject fingerprint. A stale source, graph, target, or approval therefore fails publication instead of inheriting an old reviewed state.
 
-The current 688-row / 717-component registry is intentionally incomplete. S0060 and S0002 contain the first two pinned candidate extractions; the other 715 component files are placeholders. S0060 exercises the PreTeXt source boundary, while S0002 exercises a byte-pinned Pressbooks WXR boundary whose missing media keeps extraction explicitly in progress. Creating a placeholder establishes ownership and queue identity only, while a candidate extraction still cannot claim theorem coverage until its inventory and dependency decisions receive independent review.
+The current 688-row / 717-component registry is intentionally incomplete. S0060 and S0262 contain the two pinned candidate extractions; the other 715 component files are placeholders. S0060 exercises the PreTeXt source boundary. S0262 exercises the large-scale LaTeX boundary against the permanent Stacks tag system: 116 source units, 14,976 strict formal nodes, and 35,754 explicit proof-use edges in one book JSON. Its importer excludes examples, exercises, and remarks, merges resolved proof citations into dependency evidence, and retains excluded tagged proof targets as unresolved references. The rejected example-heavy S0002 extraction has been restored to a placeholder. Creating a placeholder establishes ownership and queue identity only, while a candidate extraction still cannot claim theorem coverage until its inventory and dependency decisions receive independent review.
 
-Required node fields also keep motivation, tutorial prose, a key idea, at least one worked example, a progressively disclosed exercise, source lineage, rewrite status, read time, and tags in the canonical data rather than the React components. Knowledge-node exercises are part of the textbook; the `/train` pool is independently derived from paper results.
+Required **Knowledge-node** fields also keep motivation, tutorial prose, a key idea, at least one worked example, a progressively disclosed exercise, source lineage, rewrite status, read time, and tags in the canonical data rather than the React components. Those Phase-II teaching examples are distinct from Phase-I source-graph nodes: source worked examples and routine calculations are not theorem dependencies. Knowledge-node exercises are part of the future textbook; the `/train` pool is independently derived from paper results.
 
 Derived-behavior tests enforce that Train contains only theorem-like, non-imported results from gold papers with reviewed complete routes, and that a new random choice avoids the current result whenever the selected pool permits it. Paper-graph tests enforce an empty initial expansion set so every dependency disclosure is folded on first render.
 

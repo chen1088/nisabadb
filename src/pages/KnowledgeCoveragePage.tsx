@@ -16,6 +16,7 @@ type CoverageData = {
 type ManifestEntry = BookGraphManifest["entries"][number];
 
 const pageSize = 30;
+const graphDetailLimit = 200;
 
 function coverageDataUrl(filename: string) {
   const base = import.meta.env.BASE_URL.endsWith("/")
@@ -70,13 +71,18 @@ function aggregateStatus(entries: readonly ManifestEntry[]) {
     .join(" · ");
 }
 
-function targetLabel(file: BookGraphFile, type: "node" | "external-input", id: string) {
-  if (type === "node") {
-    const node = file.graph.nodes.find((candidate) => candidate.id === id);
-    return node ? `${node.title} (${id})` : id;
-  }
-  const input = file.graph.externalInputs.find((candidate) => candidate.id === id);
-  return input ? `${input.label} (${id})` : id;
+function visibleDetailItems<T extends { id: string }>(items: readonly T[], targetId: string) {
+  if (items.length <= graphDetailLimit) return items;
+  const visible = items.slice(0, graphDetailLimit);
+  const target = targetId ? items.find((item) => item.id === targetId) : undefined;
+  if (!target || visible.some((item) => item.id === target.id)) return visible;
+  return [...visible.slice(0, graphDetailLimit - 1), target];
+}
+
+function detailLimitNote(total: number) {
+  return total > graphDetailLimit
+    ? <p className="selected-source-empty">Showing {graphDetailLimit.toLocaleString()} items here for browser performance; the individual book JSON contains all {total.toLocaleString()}.</p>
+    : null;
 }
 
 export function KnowledgeCoveragePage() {
@@ -156,6 +162,31 @@ export function KnowledgeCoveragePage() {
   const selectedEntry = selectedEntries.find((entry) => entry.componentId === requestedComponentId)
     ?? selectedEntries[0];
   const familyById = new Map(data?.registry.families.map((family) => [family.id, family]) ?? []);
+  const selectedDetailId = hash ? decodeURIComponent(hash.slice(1)) : "";
+  const visibleNodes = selectedGraph
+    ? visibleDetailItems(selectedGraph.graph.nodes, selectedDetailId)
+    : [];
+  const visibleExternalInputs = selectedGraph
+    ? visibleDetailItems(selectedGraph.graph.externalInputs, selectedDetailId)
+    : [];
+  const visibleDependencies = selectedGraph
+    ? visibleDetailItems(selectedGraph.graph.directDependencies, selectedDetailId)
+    : [];
+  const visibleProofRoutes = selectedGraph
+    ? visibleDetailItems(selectedGraph.graph.proofRoutes, selectedDetailId)
+    : [];
+  const visibleReferences = selectedGraph
+    ? visibleDetailItems(selectedGraph.graph.references, selectedDetailId)
+    : [];
+  const selectedNodeLabels = new Map(selectedGraph?.graph.nodes.map((node) => (
+    [node.id, `${node.title} (${node.id})`] as const
+  )) ?? []);
+  const selectedInputLabels = new Map(selectedGraph?.graph.externalInputs.map((input) => (
+    [input.id, `${input.label} (${input.id})`] as const
+  )) ?? []);
+  const selectedTargetLabel = (type: "node" | "external-input", id: string) => (
+    (type === "node" ? selectedNodeLabels : selectedInputLabels).get(id) ?? id
+  );
 
   useEffect(() => {
     if (!data || !selectedRecord || !selectedEntry) {
@@ -372,7 +403,7 @@ export function KnowledgeCoveragePage() {
                     <header><h4 id="selected-graph-nodes-title">Graph nodes</h4><span>{selectedGraph.graph.nodes.length.toLocaleString()}</span></header>
                     {selectedGraph.graph.nodes.length ? (
                       <div className="theorem-occurrence-list">
-                        {selectedGraph.graph.nodes.map((node) => (
+                        {visibleNodes.map((node) => (
                           <article id={node.id} key={node.id} tabIndex={-1}>
                             <header>
                               <span>{node.id} · {humanize(node.nodeClass)} · {humanize(node.kind)}</span>
@@ -391,13 +422,14 @@ export function KnowledgeCoveragePage() {
                         ))}
                       </div>
                     ) : <p className="selected-source-empty">No theorem-like or supporting nodes have been published for this component yet.</p>}
+                    {detailLimitNote(selectedGraph.graph.nodes.length)}
                   </section>
 
                   <section className="book-graph-section" aria-labelledby="selected-external-inputs-title">
                     <header><h4 id="selected-external-inputs-title">External inputs</h4><span>{selectedGraph.graph.externalInputs.length.toLocaleString()}</span></header>
                     {selectedGraph.graph.externalInputs.length ? (
                       <div className="theorem-occurrence-list">
-                        {selectedGraph.graph.externalInputs.map((input) => (
+                        {visibleExternalInputs.map((input) => (
                           <article id={input.id} key={input.id} tabIndex={-1}>
                             <header><span>{input.id} · {humanize(input.kind)}</span><small>{input.evidence.status}</small></header>
                             <h4>{input.label}</h4>
@@ -407,55 +439,58 @@ export function KnowledgeCoveragePage() {
                         ))}
                       </div>
                     ) : <p className="selected-source-empty">No external inputs are recorded.</p>}
+                    {detailLimitNote(selectedGraph.graph.externalInputs.length)}
                   </section>
 
                   <section className="book-graph-section" aria-labelledby="selected-dependencies-title">
                     <header><h4 id="selected-dependencies-title">Direct dependencies</h4><span>{selectedGraph.graph.directDependencies.length.toLocaleString()}</span></header>
                     {selectedGraph.graph.directDependencies.length ? (
                       <div className="theorem-occurrence-list">
-                        {selectedGraph.graph.directDependencies.map((dependency) => (
+                        {visibleDependencies.map((dependency) => (
                           <article id={dependency.id} key={dependency.id} tabIndex={-1}>
                             <header><span>{dependency.id} · {humanize(dependency.role)}</span><small>{dependency.evidence.status}</small></header>
-                            <h4>{targetLabel(selectedGraph, "node", dependency.dependentNodeId)}</h4>
-                            <p>Depends directly on <strong>{targetLabel(selectedGraph, dependency.prerequisite.type, dependency.prerequisite.id)}</strong>.</p>
+                            <h4>{selectedTargetLabel("node", dependency.dependentNodeId)}</h4>
+                            <p>Depends directly on <strong>{selectedTargetLabel(dependency.prerequisite.type, dependency.prerequisite.id)}</strong>.</p>
                             <p>{dependency.rationale}</p>
                           </article>
                         ))}
                       </div>
                     ) : <p className="selected-source-empty">No direct dependency edges are recorded yet.</p>}
+                    {detailLimitNote(selectedGraph.graph.directDependencies.length)}
                   </section>
 
                   <section className="book-graph-section" aria-labelledby="selected-proof-routes-title">
                     <header><h4 id="selected-proof-routes-title">Proof routes</h4><span>{selectedGraph.graph.proofRoutes.length.toLocaleString()}</span></header>
                     {selectedGraph.graph.proofRoutes.length ? (
                       <div className="theorem-occurrence-list">
-                        {selectedGraph.graph.proofRoutes.map((route) => (
+                        {visibleProofRoutes.map((route) => (
                           <article id={route.id} key={route.id} tabIndex={-1}>
                             <header><span>{route.id} · {humanize(route.routeKind)}</span><small>{route.evidence.status}</small></header>
-                            <h4>{targetLabel(selectedGraph, "node", route.theoremNodeId)}</h4>
+                            <h4>{selectedTargetLabel("node", route.theoremNodeId)}</h4>
                             <p>{route.summary}</p>
                             <p><strong>Dependency edges:</strong> {route.dependencyIds.length ? route.dependencyIds.join(" · ") : "None (root attestation)"}</p>
                           </article>
                         ))}
                       </div>
                     ) : <p className="selected-source-empty">No proof routes or root attestations are recorded yet.</p>}
+                    {detailLimitNote(selectedGraph.graph.proofRoutes.length)}
                   </section>
 
                   <section className="book-graph-section" aria-labelledby="selected-references-title">
                     <header><h4 id="selected-references-title">Source references</h4><span>{selectedGraph.graph.references.length.toLocaleString()}</span></header>
                     {selectedGraph.graph.references.length ? (
                       <div className="theorem-occurrence-list">
-                        {selectedGraph.graph.references.map((reference) => (
+                        {visibleReferences.map((reference) => (
                           <article id={reference.id} key={reference.id} tabIndex={-1}>
                             <header>
                               <span>{reference.id} · {humanize(reference.basis)} · {reference.ref}</span>
                               <small>{reference.resolution.status} · {reference.evidence.status}</small>
                             </header>
-                            <h4>{targetLabel(selectedGraph, "node", reference.ownerNodeId)}</h4>
+                            <h4>{selectedTargetLabel("node", reference.ownerNodeId)}</h4>
                             <p>{reference.context}</p>
                             <dl>
                               <div><dt>Source locator</dt><dd>{reference.locator}</dd></div>
-                              <div><dt>Resolution</dt><dd>{reference.resolution.status === "resolved" ? targetLabel(selectedGraph, reference.resolution.target.type, reference.resolution.target.id) : "Unresolved"}</dd></div>
+                              <div><dt>Resolution</dt><dd>{reference.resolution.status === "resolved" ? selectedTargetLabel(reference.resolution.target.type, reference.resolution.target.id) : "Unresolved"}</dd></div>
                               <div><dt>Dependency edge</dt><dd>{reference.resolution.status === "resolved" ? reference.resolution.directDependencyId ?? "Statement reference only" : "None"}</dd></div>
                               <div><dt>Resolution note</dt><dd>{reference.resolution.note}</dd></div>
                             </dl>
@@ -463,6 +498,7 @@ export function KnowledgeCoveragePage() {
                         ))}
                       </div>
                     ) : <p className="selected-source-empty">No proof or statement references are recorded yet.</p>}
+                    {detailLimitNote(selectedGraph.graph.references.length)}
                   </section>
                 </>
               ) : null}
@@ -527,10 +563,10 @@ export function KnowledgeCoveragePage() {
         </div>
         <ul>
           <li>The exact edition is identified, stably located, artifact-fingerprinted, and divided into an ordered source-unit manifest.</li>
-          <li>Every theorem-like result and required definition, axiom, notation, construction, example, or calculation is inventoried.</li>
+          <li>Every theorem-like result and proof-relevant definition, axiom, notation, or construction is inventoried; worked examples and routine calculations are not graph nodes.</li>
           <li>Every direct proof dependency points to a local node or an explicitly documented external input.</li>
           <li>Each theorem-like node has a reviewed proof route or a reviewed root attestation when it has no direct prerequisites.</li>
-          <li>Proof and statement references are preserved, resolved where possible, and never silently converted into edges.</li>
+          <li>Resolved proof citations are merged into evidenced edges; excluded or unresolved proof targets remain explicit references and are never silently converted into nodes.</li>
           <li>Extraction evidence and graph evidence receive independent review, with stale fingerprints rejected.</li>
           <li>Corpus Phase I completes only when all {componentCount.toLocaleString()} component files reach reviewed-complete graph status.</li>
         </ul>

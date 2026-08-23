@@ -1,6 +1,6 @@
 # NisabaDB milestone status
 
-Status date: 2026-08-22
+Status date: 2026-08-23
 
 ## Current phase: source-book theorem graphs
 
@@ -16,23 +16,26 @@ The exact workload currently represented by the approved intake is:
 | Candidate exact editions identified | 2 / 717 |
 | Components with complete theorem inventories | 0 / 717 |
 | Components with independently reviewed dependency graphs | 0 / 717 |
-| Candidate source units | 188 |
-| Captured / reviewed source-unit inventories | 188 / 0 |
-| Candidate theorem-like / support nodes | 45 / 185 |
-| Candidate / reviewed source dependency edges | 3 / 0 |
+| Candidate source units | 225 |
+| Captured / reviewed source-unit inventories | 225 / 0 |
+| Candidate theorem-like / support nodes | 13,169 / 1,919 |
+| Candidate / reviewed source dependency edges | 35,757 / 0 |
+| Unresolved tagged proof references | 3,239 |
 
 The provisional 126-chapter roadmap is not corpus coverage and is not a target to enlarge now. It is an early Phase-II hypothesis for a future compressed NisabaDB book. The 717 source components must first retain their own uncompressed theorem and support-node graphs in individual JSON files.
 
 The first pipeline pilot is `S0060`, Oscar Levin's *Discrete Mathematics: An Open Introduction*. Its official PreTeXt source is pinned to commit `730e5e3b96094148818603041222df6f3d1d96ba`. A deterministic, comment-aware pass found 109 active source files, captured an inventory for all 109 (including 93 candidate theorem-free attestations), found 38 explicitly tagged theorem-like nodes and 74 definition/notation support nodes, and retained three explicit proof-xref dependency candidates. This is an unreviewed candidate extraction, not a complete graph: 35 theorem-like nodes still have no route, exercise-embedded results still need semantic inventory, and no unit, edge, or extraction has independent review. The edition-level source says CC-BY-NC-SA-4.0 while the repository-level `LICENSE` says CC-BY-SA-4.0; the individual book JSON preserves that conflict for review.
 
-The next sequential checkpoint is `S0002`, Michelle Manes's *Mathematics for Elementary Teachers*. Its raw 2018-05-25 Pressbooks WXR export is pinned by SHA-256 `b2606dae34637f804e306b2ebee86979f1042f06e2d4d8e12dbae972e6125a04`. The importer inventories all 79 active book units and captures a deliberately narrow floor of 7 explicit theorem-like candidates and 111 support candidates. Seventy-three units have no theorem marker under that scan, which is not a semantic theorem-free claim. All seven results remain unrouted and no dependencies are inferred from order, proximity, terminology, or ordinary hyperlinks. Prose-only and exercise-embedded results and mathematics dependent on the WXR's omitted media bytes remain pending, so the workflow states stay `extracting` / `building` with no completeness audit or independent review.
+The dense-book checkpoint is `S0262`, *The Stacks Project*. The official LaTeX source is pinned at tag-synchronized commit `ed88ff783bcb4dd9a28518a33b028841094009cf`, because the later upstream head contains six new lemmas not yet assigned permanent Stacks tags. The importer inventories all 116 chapters and captures 13,131 theorem-like nodes, 1,721 definitions, 124 formal situations/assumptions, 35,754 explicit proof-use edges, and 11,123 candidate source-proof routes. The graph has zero example nodes: 449 example environments, 386 exercises, and 1,048 remark environments are explicitly excluded. The 3,239 distinct tagged proof targets outside the strict node policy remain unresolved references, and 2,008 theorem-like nodes remain unrouted. This is a reproducible extracted graph, not an independently reviewed or complete one.
+
+The prior `S0002` Pressbooks checkpoint was rejected because its heuristic support inventory was dominated by worked examples in an elementary-teacher methods text. Its individual JSON file has been restored to the neutral placeholder state, so none of those examples or candidate counts remain in Phase-I progress.
 
 Phase I proceeds in this order:
 
 1. Give every required source component its own stable JSON graph file and index it from a small manifest.
 2. Resolve the component to an exact edition or an independently reviewed duplicate, recording access, license, stable locator, and artifact fingerprint.
 3. Build an immutable chapter/section/page/source-file or web-node manifest.
-4. Inventory every theorem, lemma, proposition, corollary, claim, named result, and result embedded in an exercise, together with every definition, construction, assumption, or external input needed by those results.
+4. Inventory every formal theorem, lemma, proposition, corollary, claim, and named result together with every definition, construction, assumption, or external input needed by those proofs. Worked examples and routine exercises are excluded; a genuinely proof-used formal claim inside one must be lifted and reviewed as a claim, not imported as an example node.
 5. Extract every direct source proof dependency with its route, locator, evidence, extractor identity, and review state. Candidate edges remain visibly distinct from reviewed edges.
 6. Mark a component graph complete only after every source unit and every theorem-like node has an independently reviewed dependency decision or explicit root/external-input attestation.
 7. Begin cross-source equivalence matching, compression, simplification, and canonical textbook design only after the Phase-I gate passes.
@@ -45,13 +48,13 @@ This file is the handoff for continuing NisabaDB from another machine or a cloud
 - Canonical branch: `main`; continue from `origin/main`, not from an old local checkout or an unmerged branch.
 - Live site: `https://chen1088.github.io/nisabadb/`
 - Live Knowledge book: `https://chen1088.github.io/nisabadb/knowledge`
-- Per-book graph foundation baseline: `a866804689cf2c8ca92967413663b700788d4288` (`Build per-book theorem graph foundation`).
+- Dense-book checkpoint started from `779edbc2709163ecda0c95217df22b107a3d62d2` (`Build S0002 Pressbooks graph checkpoint`); that S0002 extraction is superseded and removed by this checkpoint.
 - Deployment: every push to `main` runs `.github/workflows/deploy-pages.yml`, executes the full check, builds with `VITE_BASE_PATH=/nisabadb/`, and publishes GitHub Pages.
-- Verified milestone workflow: `https://github.com/chen1088/nisabadb/actions/runs/32584795993` completed successfully.
+- Last verified deployment before this checkpoint: `https://github.com/chen1088/nisabadb/actions/runs/32612561177` completed successfully.
 - Hosting boundary: the public site is a static browser application. It currently has no runtime backend, cloud secrets, DigitalOcean worker, or proof-submission service.
 - Required runtime: Node.js 24 and the committed npm lockfile.
-- Current pre-push verification: 16 test files and 135 tests pass; the GitHub Pages base-path build publishes all 717 lazy per-book graphs successfully.
-- The working branch began this checkpoint clean and synchronized with `origin/main` at `a866804`; publish completion still requires the new commit's Pages workflow and live-route verification.
+- Current pre-push verification: 17 test files and 138 tests pass; lint and the production build pass, and the build publishes all 717 lazy per-book graphs including the 67 MB S0262 JSON.
+- The working branch began this checkpoint clean and synchronized with `origin/main` at `779edbc`; publish completion still requires the new commit's Pages workflow and live-route verification.
 
 Resume with:
 
@@ -104,7 +107,7 @@ Default continuation order is the seven-step Phase-I sequence above. Do not writ
 - Proof routes distinguish their dependency role (`original`, `minimized`, or `reinterpretation`) from their review state. The current 61 populated routes are reviewed original/source routes; no minimized or reinterpretation route is claimed yet.
 - Knowledge is a frozen Phase-II prototype: 60 written nodes in 20 chapters, 33 notation entries, and 97 prerequisite edges. Its separate 126-chapter map contains 20 draft mappings and 106 planned entries; 126 is neither the number of source chapters nor a coverage target. All 60 nodes remain `initial-rewrite`; the reviewed count is 0.
 - The compression atlas is also a frozen Phase-II prototype: 18 candidate common-core clusters, 16 comparison lenses, and 35 residual decisions. No cluster or route is administrator-reviewed.
-- The exact approved registry contains 688 fingerprint-locked rows in 31 intake branches and 717 required components. Phase-I storage is one JSON graph per component plus a small aggregate manifest. S0060 and S0002 together contribute two pinned candidate editions, 188 source units, 45 theorem-like nodes, 185 support nodes, and three candidate edges; 715 components still await editions and all 717 graphs remain incomplete and unreviewed.
+- The exact approved registry contains 688 fingerprint-locked rows in 31 intake branches and 717 required components. Phase-I storage is one JSON graph per component plus a small aggregate manifest. S0060 and S0262 together contribute two pinned candidate editions, 225 source units, 13,169 theorem-like nodes, 1,919 support nodes, and 35,757 candidate edges; 715 components still await editions and all 717 graphs remain incomplete and unreviewed.
 - The 93 reviewed paper-local statements remain distinct from the canonical textbook nodes. Reusable content can be rewritten into Knowledge with explicit source lineage, notation normalization, and prerequisite review rather than copied or automatically promoted.
 - Train is the re-proving exercise surface. It randomly selects meaningful theorem-like nodes from the paper DAGs for a human or AI to prove, with dependency context and reviewed proof routes available for progressive disclosure.
 - A future published paperback is a curated excerpt of important parts of the same canonical Knowledge text, not a separate source collection.
@@ -180,7 +183,7 @@ These citation records are bibliographic evidence, not mathematical prerequisite
 
 ## Editorial source lineage and notation
 
-The current textbook records seven official registry-linked references spanning arithmetic, proof, discrete mathematics, sets, functions, abstract-algebra notation, and linear algebra. They are comparison evidence attached to rewritten nodes, not a public library, a list of assignments, or the architecture of Knowledge. The Phase-I source corpus now has 45 candidate theorem-like nodes across S0060 and S0002, but its complete and independently reviewed theorem-inventory count remains 0 of 717 components; the seven lesson references do not add to that count.
+The current textbook records seven official registry-linked references spanning arithmetic, proof, discrete mathematics, sets, functions, abstract-algebra notation, and linear algebra. They are comparison evidence attached to rewritten nodes, not a public library, a list of assignments, or the architecture of Knowledge. The Phase-I source corpus now has 13,169 candidate theorem-like nodes across S0060 and S0262, but its complete and independently reviewed theorem-inventory count remains 0 of 717 components; the seven lesson references do not add to that count.
 
 The initial compression hypotheses remain editorial questions:
 

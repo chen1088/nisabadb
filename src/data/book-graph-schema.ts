@@ -506,6 +506,7 @@ export function validateBookGraphFile(rawFile: unknown): BookGraphFile {
   );
   const externalInputIds = new Set(file.graph.externalInputs.map((input) => input.id));
   const dependencyIds = new Set(file.graph.directDependencies.map((dependency) => dependency.id));
+  const dependencyById = new Map(file.graph.directDependencies.map((dependency) => [dependency.id, dependency]));
 
   const inventorySourceUnitIds = unique(
     file.unitInventories.map((inventory) => inventory.sourceUnitId),
@@ -605,7 +606,7 @@ export function validateBookGraphFile(rawFile: unknown): BookGraphFile {
     }
     for (const dependencyId of route.dependencyIds) {
       if (!dependencyIds.has(dependencyId)) throw new Error(`${route.id} cites missing dependency ${dependencyId}`);
-      const dependency = file.graph.directDependencies.find((candidate) => candidate.id === dependencyId);
+      const dependency = dependencyById.get(dependencyId);
       if (dependency?.dependentNodeId !== route.theoremNodeId) {
         throw new Error(`${route.id} cites a dependency owned by another node`);
       }
@@ -637,7 +638,7 @@ export function validateBookGraphFile(rawFile: unknown): BookGraphFile {
       throw new Error(`${reference.id} resolved proof xref lacks a direct dependency`);
     }
     if (directDependencyId !== null) {
-      const dependency = file.graph.directDependencies.find((candidate) => candidate.id === directDependencyId);
+      const dependency = dependencyById.get(directDependencyId);
       if (!dependency) throw new Error(`${reference.id} cites missing dependency ${directDependencyId}`);
       if (dependency.dependentNodeId !== reference.ownerNodeId
         || dependency.prerequisite.type !== target.type

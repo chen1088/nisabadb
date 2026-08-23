@@ -173,15 +173,15 @@ describe("one Phase-I dependency graph file per source component", () => {
       awaitingEditionCount: 715,
       reviewedExtractionCount: 0,
       reviewedCompleteGraphCount: 0,
-      sourceUnitCount: 188,
-      inventoriedSourceUnitCount: 188,
+      sourceUnitCount: 225,
+      inventoriedSourceUnitCount: 225,
       reviewedSourceUnitCount: 0,
-      theoremNodeCount: 45,
-      unroutedTheoremCount: 42,
-      supportNodeCount: 185,
-      dependencyCount: 3,
+      theoremNodeCount: 13169,
+      unroutedTheoremCount: 2043,
+      supportNodeCount: 1919,
+      dependencyCount: 35757,
       reviewedDependencyCount: 0,
-      unresolvedReferenceCount: 0,
+      unresolvedReferenceCount: 3239,
     });
     expect(validated.filesByPath.get("S0001/level-1.json")?.identity.bookGraphId).toBe("S0001:level-1");
     expect(validated.filesByPath.get("S0074/volume-3.json")?.identity.componentLabel).toBe("Volume 3");
@@ -189,13 +189,28 @@ describe("one Phase-I dependency graph file per source component", () => {
     expect(pilot?.exactEdition).not.toBeNull();
     expect(pilot?.extractionState.status).toBe("extracted");
     expect(pilot?.graphState.status).toBe("extracted");
-    const secondBook = validated.filesByPath.get("S0002/complete-source.json");
-    expect(secondBook?.exactEdition?.sourceFormat).toBe("pressbooks-wxr");
-    expect(secondBook?.sourceUnits).toHaveLength(79);
-    expect(secondBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like")).toHaveLength(7);
-    expect(secondBook?.extractionState.status).toBe("extracting");
-    expect(secondBook?.graphState.status).toBe("building");
-    const populatedPaths = new Set(["S0060/complete-source.json", "S0002/complete-source.json"]);
+    const rejectedBook = validated.filesByPath.get("S0002/complete-source.json");
+    expect(rejectedBook?.exactEdition).toBeNull();
+    expect(rejectedBook?.graph.nodes).toHaveLength(0);
+    expect(rejectedBook?.extractionState.status).toBe("awaiting-edition");
+    expect(rejectedBook?.graphState.status).toBe("not-started");
+    const densestBook = validated.filesByPath.get("S0262/complete-source.json");
+    expect(densestBook?.exactEdition?.sourceFormat).toBe("latex");
+    expect(densestBook?.sourceUnits).toHaveLength(116);
+    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like")).toHaveLength(13131);
+    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "support")).toHaveLength(1845);
+    expect(densestBook?.graph.nodes.every((node) => /^tag-[a-z0-9]{4}$/u.test(node.id))).toBe(true);
+    expect(densestBook?.graph.nodes.some((node) => (
+      node.kind === "example" || node.kind === "calculation" || node.kind === "algorithm"
+    ))).toBe(false);
+    expect(densestBook?.graph.directDependencies).toHaveLength(35754);
+    expect(densestBook?.graph.proofRoutes.every((route) => route.routeKind === "source-proof")).toBe(true);
+    expect(densestBook?.graph.references.every((reference) => (
+      reference.basis === "proof-xref" && reference.resolution.status === "unresolved"
+    ))).toBe(true);
+    expect(densestBook?.extractionState.status).toBe("extracted");
+    expect(densestBook?.graphState.status).toBe("extracted");
+    const populatedPaths = new Set(["S0060/complete-source.json", "S0262/complete-source.json"]);
     expect([...validated.filesByPath.entries()].filter(([path]) => !populatedPaths.has(path)).every(([, file]) => (
       file.exactEdition === null
       && file.extractionState.status === "awaiting-edition"

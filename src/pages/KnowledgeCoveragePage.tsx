@@ -483,7 +483,7 @@ export function KnowledgeCoveragePage() {
                         {visibleReferences.map((reference) => (
                           <article id={reference.id} key={reference.id} tabIndex={-1}>
                             <header>
-                              <span>{reference.id} · {humanize(reference.basis)} · {reference.ref}</span>
+                              <span>{reference.id} · {humanize(reference.basis)} · {reference.ref}{reference.basis === "proof-citation" && reference.pinpoint ? ` · ${reference.pinpoint}` : ""}</span>
                               <small>{reference.resolution.status} · {reference.evidence.status}</small>
                             </header>
                             <h4>{selectedTargetLabel("node", reference.ownerNodeId)}</h4>
@@ -497,7 +497,7 @@ export function KnowledgeCoveragePage() {
                           </article>
                         ))}
                       </div>
-                    ) : <p className="selected-source-empty">No proof or statement references are recorded yet.</p>}
+                    ) : <p className="selected-source-empty">No proof, statement, or bibliographic references are recorded yet.</p>}
                     {detailLimitNote(selectedGraph.graph.references.length)}
                   </section>
                 </>

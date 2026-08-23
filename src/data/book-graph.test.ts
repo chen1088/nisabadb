@@ -177,11 +177,11 @@ describe("one Phase-I dependency graph file per source component", () => {
       inventoriedSourceUnitCount: 225,
       reviewedSourceUnitCount: 0,
       theoremNodeCount: 13169,
-      unroutedTheoremCount: 2043,
+      unroutedTheoremCount: 2033,
       supportNodeCount: 1919,
-      dependencyCount: 35757,
+      dependencyCount: 35850,
       reviewedDependencyCount: 0,
-      unresolvedReferenceCount: 3239,
+      unresolvedReferenceCount: 2837,
     });
     expect(validated.filesByPath.get("S0001/level-1.json")?.identity.bookGraphId).toBe("S0001:level-1");
     expect(validated.filesByPath.get("S0074/volume-3.json")?.identity.componentLabel).toBe("Volume 3");
@@ -203,11 +203,21 @@ describe("one Phase-I dependency graph file per source component", () => {
     expect(densestBook?.graph.nodes.some((node) => (
       node.kind === "example" || node.kind === "calculation" || node.kind === "algorithm"
     ))).toBe(false);
-    expect(densestBook?.graph.directDependencies).toHaveLength(35754);
-    expect(densestBook?.graph.proofRoutes.every((route) => route.routeKind === "source-proof")).toBe(true);
+    expect(densestBook?.graph.directDependencies).toHaveLength(35847);
+    expect(densestBook?.graph.proofRoutes).toHaveLength(11170);
+    expect(densestBook?.graph.proofRoutes.filter((route) => route.routeKind === "alternate-proof"))
+      .toHaveLength(40);
     expect(densestBook?.graph.references.every((reference) => (
-      reference.basis === "proof-xref" && reference.resolution.status === "unresolved"
+      ["proof-xref", "proof-citation"].includes(reference.basis)
+      && reference.resolution.status === "unresolved"
     ))).toBe(true);
+    expect(densestBook?.graph.references.filter((reference) => reference.basis === "proof-xref"))
+      .toHaveLength(2807);
+    expect(densestBook?.graph.references.filter((reference) => reference.basis === "proof-citation"))
+      .toHaveLength(30);
+    expect(new Set(densestBook?.graph.references.filter((reference) => (
+      reference.basis === "proof-citation"
+    )).map((reference) => reference.ref)).size).toBe(19);
     expect(densestBook?.extractionState.status).toBe("extracted");
     expect(densestBook?.graphState.status).toBe("extracted");
     const populatedPaths = new Set(["S0060/complete-source.json", "S0262/complete-source.json"]);
@@ -429,5 +439,55 @@ describe("book dependency graph integrity", () => {
     if (!resolved.graphState.graphAudit) throw new Error("missing graph audit fixture");
     resolved.graphState.graphAudit.referenceCount = 1;
     expect(validateBookGraphFile(resolved).graph.references[0]?.resolution.status).toBe("resolved");
+  });
+
+  it("keeps bibliographic proof citations structurally distinct from source xrefs", () => {
+    const citation = reviewedGraphFixture();
+    citation.graph.references.push({
+      id: "reference-citation",
+      ownerNodeId: "theorem-1",
+      basis: "proof-citation",
+      ref: "FixtureBibKey",
+      pinpoint: null,
+      context: "The source proof cites the fixture bibliography.",
+      locator: "page 1, proof of Theorem 1",
+      resolution: {
+        status: "unresolved",
+        note: "The exact imported mathematical result has not been reviewed.",
+      },
+      evidence: structuredClone(reviewedEvidence),
+    });
+    citation.graphState.status = "building";
+    citation.graphState.graphAudit = null;
+    citation.graphState.independentReview = null;
+    expect(validateBookGraphFile(citation).graph.references[0]).toMatchObject({
+      basis: "proof-citation",
+      pinpoint: null,
+    });
+
+    const missingPinpoint = structuredClone(citation);
+    delete (missingPinpoint.graph.references[0] as { pinpoint?: string | null }).pinpoint;
+    expect(() => validateBookGraphFile(missingPinpoint)).toThrow();
+
+    const nodeTarget = reviewedGraphFixture();
+    nodeTarget.graph.references.push({
+      id: "reference-citation",
+      ownerNodeId: "theorem-1",
+      basis: "proof-citation",
+      ref: "FixtureBibKey",
+      pinpoint: "Theorem 2",
+      context: "The source proof cites an exact external theorem.",
+      locator: "page 1, proof of Theorem 1",
+      resolution: {
+        status: "resolved",
+        target: { type: "node", id: "definition-1" },
+        directDependencyId: "dependency-1",
+        note: "Invalidly resolved to a local node.",
+      },
+      evidence: structuredClone(reviewedEvidence),
+    });
+    if (!nodeTarget.graphState.graphAudit) throw new Error("missing graph audit fixture");
+    nodeTarget.graphState.graphAudit.referenceCount = 1;
+    expect(() => validateBookGraphFile(nodeTarget)).toThrow(/typed external input/i);
   });
 });

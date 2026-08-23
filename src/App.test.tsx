@@ -408,5 +408,5 @@ describe("NisabaDB application", () => {
     unmount();
     renderAt("/papers/blais-2009-testing-juntas-nearly-optimally");
     expect(screen.queryByRole("link", { name: /read distilled paper/i })).not.toBeInTheDocument();
-  });
+  }, lazyRouteTimeout);
 });

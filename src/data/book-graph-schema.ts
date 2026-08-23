@@ -188,10 +188,9 @@ const resolvedReferenceResolutionSchema = z.object({
   note: z.string().min(1),
 }).strict();
 
-export const sourceReferenceSchema = z.object({
+const sourceReferenceFields = {
   id: stableIdSchema,
   ownerNodeId: stableIdSchema,
-  basis: z.enum(["proof-xref", "statement-xref"]),
   ref: z.string().min(1),
   context: z.string().min(1),
   locator: z.string().min(1),
@@ -200,7 +199,17 @@ export const sourceReferenceSchema = z.object({
     resolvedReferenceResolutionSchema,
   ]),
   evidence: graphEvidenceSchema,
-}).strict();
+};
+
+export const sourceReferenceSchema = z.discriminatedUnion("basis", [
+  z.object({ ...sourceReferenceFields, basis: z.literal("proof-xref") }).strict(),
+  z.object({ ...sourceReferenceFields, basis: z.literal("statement-xref") }).strict(),
+  z.object({
+    ...sourceReferenceFields,
+    basis: z.literal("proof-citation"),
+    pinpoint: z.string().min(1).nullable(),
+  }).strict(),
+]);
 
 const extractionAuditSchema = z.object({
   actorId: z.string().min(1),
@@ -622,7 +631,8 @@ export function validateBookGraphFile(rawFile: unknown): BookGraphFile {
     if (!nodeIds.has(reference.ownerNodeId)) {
       throw new Error(`${reference.id} has missing owner node ${reference.ownerNodeId}`);
     }
-    const signature = `${reference.ownerNodeId}|${reference.basis}|${reference.ref}|${reference.locator}`;
+    const pinpoint = reference.basis === "proof-citation" ? reference.pinpoint ?? "" : "";
+    const signature = `${reference.ownerNodeId}|${reference.basis}|${reference.ref}|${pinpoint}|${reference.locator}`;
     if (referenceSignatures.has(signature)) throw new Error(`${reference.id} duplicates a source reference`);
     referenceSignatures.add(signature);
     if (reference.resolution.status === "unresolved") continue;
@@ -634,8 +644,11 @@ export function validateBookGraphFile(rawFile: unknown): BookGraphFile {
     if (target.type === "external-input" && !externalInputIds.has(target.id)) {
       throw new Error(`${reference.id} resolves to missing external input ${target.id}`);
     }
-    if (reference.basis === "proof-xref" && directDependencyId === null) {
-      throw new Error(`${reference.id} resolved proof xref lacks a direct dependency`);
+    if (reference.basis === "proof-citation" && target.type !== "external-input") {
+      throw new Error(`${reference.id} bibliographic proof citation must resolve to a typed external input`);
+    }
+    if (["proof-xref", "proof-citation"].includes(reference.basis) && directDependencyId === null) {
+      throw new Error(`${reference.id} resolved proof reference lacks a direct dependency`);
     }
     if (directDependencyId !== null) {
       const dependency = dependencyById.get(directDependencyId);

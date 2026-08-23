@@ -12,6 +12,40 @@ const GRAPH_ENVIRONMENTS = new Map([
 
 const EXCLUDED_ENVIRONMENTS = ["example", "exercise", "remark", "remarks"];
 
+const STRUCTURAL_BOUNDARY_PATTERN = /^\s*\\(?:chapter|section|subsection|subsubsection)\b/u;
+
+// These permanent labels occur in exposition outside a strict formal environment.
+// In each case the pinned source explicitly identifies the labeled display with the
+// listed formal result. Keep this list narrow and source-audited; never infer an
+// owner merely from proximity.
+const CURATED_FORMAL_REFERENCE_ALIASES = new Map([
+  ["sites-equation-map-representable-into-presheaf", "categories-lemma-yoneda"],
+  ["derived-equation-long-exact-cohomology-sequence-D", "derived-lemma-cohomology-homological"],
+  ["derived-equation-decompose", "derived-lemma-filtered-injective"],
+  ["more-algebra-equation-first-ss-ext", "derived-lemma-two-ss-complex-functor"],
+  ["dga-equation-les", "homology-lemma-long-exact-sequence-cochain"],
+  ["coherent-equation-identify", "coherent-lemma-cohomology-projective-space-over-ring"],
+  ["cotangent-equation-triangle", "cotangent-proposition-triangle"],
+  ["spaces-more-morphisms-equation-equivalence-etale-spaces", "spaces-more-morphisms-theorem-topological-invariance"],
+  ["algebraic-equation-morphisms-spaces", "categories-lemma-2-category-fibred-setoids"],
+  ["spaces-cohomology-equation-representable-higher-direct-image", "spaces-properties-lemma-pushforward-etale-base-change-modules"],
+  ["sites-cohomology-equation-commutative-epsilon", "sites-lemma-localize-morphism"],
+  ["stacks-morphisms-equation-exact-sequence-isom", "stacks-morphisms-lemma-inertia"],
+  ["schemes-equation-canonical-morphism", "schemes-lemma-morphism-from-spec-local-ring"],
+  ["spaces-properties-equation-restrict", "spaces-properties-lemma-etale-morphism-topoi"],
+  ["spaces-properties-equation-restrict-modules", "spaces-properties-lemma-etale-exact-pullback"],
+  ["spaces-morphisms-equation-representable-pushforward", "spaces-properties-lemma-pushforward-etale-base-change-modules"],
+  ["more-morphisms-equation-D", "more-morphisms-lemma-difference-derivation"],
+  ["spaces-more-morphisms-equation-D", "spaces-more-morphisms-lemma-difference-derivation"],
+  ["stacks-sheaves-equation-compare-big-small", "stacks-sheaves-lemma-compare-morphism"],
+  ["proetale-equation-compare-big-small", "proetale-lemma-morphism-big-small"],
+  ["formal-defos-equation-sequence", "algebra-lemma-differential-seq"],
+  ["formal-defos-equation-sequence-extended", "algebra-lemma-exact-sequence-NL"],
+  ["curves-equation-degree-c1", "chow-lemma-degree-vector-bundle"],
+  ["derived-equation-everywhere", "derived-proposition-derived-functor"],
+  ["divisors-equation-koszul", "modules-definition-koszul-complex"],
+]);
+
 function canonicalJson(value) {
   return `${JSON.stringify(value, null, 2)}\n`;
 }
@@ -52,6 +86,7 @@ function cleanTitle(value) {
 function lineContext(lines, lineNumber) {
   const line = stripLatexComment(lines[lineNumber - 1] ?? "")
     .replace(/\\ref\{[^{}]+\}/gu, "[reference]")
+    .replace(/\\cite(?:\[[^\]]*\])?\{[^{}]+\}/gu, "[citation]")
     .replace(/\s+/gu, " ")
     .trim();
   return line.slice(0, 240) || `Explicit source reference on line ${lineNumber}.`;
@@ -104,6 +139,16 @@ function findBalancedCommandArgument(source, command) {
   return null;
 }
 
+function labelArguments(source) {
+  const labels = [];
+  const pattern = /\\label\{([^{}]+)\}/gu;
+  for (const rawLine of source.split(/\r?\n/u)) {
+    const line = stripLatexComment(rawLine);
+    for (const match of line.matchAll(pattern)) labels.push(match[1]);
+  }
+  return labels;
+}
+
 function parseTagRows(tagText) {
   const fullLabelToTag = new Map();
   const tagToFullLabel = new Map();
@@ -141,6 +186,69 @@ function referencesInLines(lines, startLine, endLine) {
     }
   }
   return references;
+}
+
+function citationsInLines(lines, startLine, endLine) {
+  const citations = [];
+  const pattern = /\\cite(?:\[([^\]]*)\])?\{([^{}]+)\}/gu;
+  for (let lineNumber = startLine; lineNumber <= endLine; lineNumber += 1) {
+    const line = stripLatexComment(lines[lineNumber - 1] ?? "");
+    const commandCount = [...line.matchAll(/\\cite\b/gu)].length;
+    let parsedCommandCount = 0;
+    for (const match of line.matchAll(pattern)) {
+      parsedCommandCount += 1;
+      const pinpoint = match[1]?.trim() || null;
+      for (const key of match[2].split(",").map((value) => value.trim()).filter(Boolean)) {
+        citations.push({ key, pinpoint, lineNumber, context: lineContext(lines, lineNumber) });
+      }
+    }
+    if (parsedCommandCount !== commandCount) {
+      throw new Error(`Unsupported or multiline \\cite syntax on line ${lineNumber}`);
+    }
+  }
+  return citations;
+}
+
+function bibliographyKeys(bibliographyText) {
+  const keys = new Set();
+  for (const match of bibliographyText.matchAll(/^\s*@[a-z]+\s*\{\s*([^,\s]+)\s*,/gimu)) {
+    keys.add(match[1]);
+  }
+  return keys;
+}
+
+function explicitProofOwner(proofTitle, metadata, stem, tags) {
+  if (!proofTitle) return null;
+  const referencedLabels = [...proofTitle.matchAll(/\\ref\{([^{}]+)\}/gu)]
+    .map((match) => resolveFullLabel(match[1], stem, tags.fullLabelToTag))
+    .filter(Boolean);
+  const candidates = metadata.filter((candidate) => (
+    candidate.node.nodeClass === "theorem-like"
+    && referencedLabels.includes(candidate.node.sourceXmlId)
+  ));
+  return candidates.length === 1 ? candidates[0] : null;
+}
+
+function isCompleteAlternativeProofTitle(title) {
+  if (!title || /proof of part\b/iu.test(title)) return false;
+  if (/^(?:First|Second|Third) proof\b/iu.test(title)) return true;
+  return [
+    /^Proof by naive method$/iu,
+    /^Less naive proof$/iu,
+    /^Proof (?:without )?using spectral sequences\.?$/iu,
+    /^Proof not using Artin approximation$/iu,
+    /^Proof using Gabriel-Rosenberg reconstruction$/iu,
+    /^Proof not relying on Gabriel-Rosenberg reconstruction$/iu,
+  ].some((pattern) => pattern.test(title));
+}
+
+function proofRouteGroups(proofs) {
+  const alternatives = proofs
+    .map((proof, index) => ({ proofs: [proof], ordinal: index + 1 }))
+    .filter(({ proofs: [proof] }) => isCompleteAlternativeProofTitle(proof.title));
+  return alternatives.length >= 2
+    ? alternatives
+    : [{ proofs, ordinal: 1 }];
 }
 
 function environmentRanges(lines, environment) {
@@ -221,6 +329,9 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
         startLine: range.startLine,
         endLine: range.endLine,
         rawEnvironment,
+        aliasFullLabels: labelArguments(rawEnvironment)
+          .filter((label) => label !== localLabel)
+          .map((label) => `${unit.stem}-${label}`),
         statementReferences: referencesInLines(lines, range.startLine, range.endLine),
       });
     }
@@ -229,27 +340,33 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
 
   const proofRanges = environmentRanges(lines, "proof");
   for (const proof of proofRanges) {
-    const owner = [...metadata]
+    const proofTitle = stripLatexComment(lines[proof.startLine - 1] ?? "")
+      .match(/^\s*\\begin\{proof\}(?:\[([^\]]*)\])?\s*$/u)?.[1]?.trim() || null;
+    const titledOwner = explicitProofOwner(proofTitle, metadata, unit.stem, tags);
+    const precedingOwner = [...metadata]
       .reverse()
       .find((candidate) => (
         candidate.node.nodeClass === "theorem-like"
         && candidate.endLine < proof.startLine
       ));
+    const owner = titledOwner ?? precedingOwner;
     if (!owner) continue;
-    const interveningTheorem = metadata.some((candidate) => (
-      candidate.node.nodeClass === "theorem-like"
-      && candidate.startLine > owner.startLine
-      && candidate.startLine < proof.startLine
-    ));
-    if (interveningTheorem) continue;
+    const crossesStructuralBoundary = lines
+      .slice(owner.endLine, proof.startLine - 1)
+      .some((line) => STRUCTURAL_BOUNDARY_PATTERN.test(stripLatexComment(line)));
+    if (!titledOwner && crossesStructuralBoundary) continue;
+    const existingProofs = owner.proofs ?? [];
+    if (existingProofs.length > 0 && !proofTitle) continue;
     const rawProof = lines.slice(proof.startLine - 1, proof.endLine).join("\n");
-    const proofs = owner.proofs ?? [];
-    proofs.push({
+    existingProofs.push({
       ...proof,
+      title: proofTitle,
       rawProof,
       references: referencesInLines(lines, proof.startLine, proof.endLine),
+      citations: citationsInLines(lines, proof.startLine, proof.endLine),
     });
-    owner.proofs = proofs;
+    owner.proofs = existingProofs;
+    owner.aliasFullLabels.push(...labelArguments(rawProof).map((label) => `${unit.stem}-${label}`));
   }
   return metadata;
 }
@@ -270,6 +387,23 @@ function uniqueReferenceGroups({ references, owner, basis, nodeByFullLabel, tags
       occurrences: [],
     };
     group.occurrences.push(reference);
+    groups.set(key, group);
+  }
+  return [...groups.values()];
+}
+
+function uniqueCitationGroups({ citations, owner }) {
+  const groups = new Map();
+  for (const citation of citations) {
+    const key = `${citation.key}\u0000${citation.pinpoint ?? ""}`;
+    const group = groups.get(key) ?? {
+      owner,
+      basis: "proof-citation",
+      citationKey: citation.key,
+      pinpoint: citation.pinpoint,
+      occurrences: [],
+    };
+    group.occurrences.push(citation);
     groups.set(key, group);
   }
   return [...groups.values()];
@@ -317,7 +451,41 @@ function referenceEntity({ group, dependencyId, capturedAt, usedIds }) {
   };
 }
 
-export function extractStacksGraphFromUnits(units, tagText, { capturedAt }) {
+function citationReferenceEntity({ group, capturedAt, usedIds }) {
+  const { owner, citationKey, pinpoint, occurrences } = group;
+  const citationIdentity = `${citationKey}\u0000${pinpoint ?? ""}`;
+  const targetSuffix = sha256(citationIdentity).slice(0, 12);
+  let id = `ref-${owner.node.id}-to-cite-${targetSuffix}-proof-citation`;
+  let counter = 2;
+  while (usedIds.has(id)) {
+    id = `ref-${owner.node.id}-to-cite-${targetSuffix}-proof-citation-${counter}`;
+    counter += 1;
+  }
+  usedIds.add(id);
+  const locator = occurrences.map((item) => `${owner.unit.path}:L${item.lineNumber}`).join("; ");
+  return {
+    id,
+    ownerNodeId: owner.node.id,
+    basis: "proof-citation",
+    ref: citationKey,
+    pinpoint,
+    context: occurrences[0]?.context ?? "Explicit bibliographic citation in a formal proof.",
+    locator,
+    resolution: {
+      status: "unresolved",
+      note: "This bibliographic proof citation requires source review before it can be promoted to a typed external mathematical input and dependency.",
+    },
+    evidence: capturedEvidence({
+      sourceUnitId: unitId(owner.unit.stem),
+      locator,
+      artifactSha256: sha256(canonicalJson(occurrences)),
+      capturedAt,
+      note: `${occurrences.length} explicit proof citation occurrence(s) merged by bibliography key and pinpoint; not independently reviewed.`,
+    }),
+  };
+}
+
+export function extractStacksGraphFromUnits(units, tagText, { capturedAt, bibliographyText = null }) {
   if (!Array.isArray(units) || units.length === 0) throw new Error("The Stacks source-unit list is empty");
   const tags = parseTagRows(tagText);
   const sourceUnits = units.map((unit, index) => ({
@@ -329,14 +497,37 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt }) {
   }));
   const metadata = units.flatMap((unit) => graphNodesFromUnit(unit, tags, capturedAt));
   const nodes = metadata.map(({ node }) => node);
-  const nodeByFullLabel = new Map(metadata.map(({ node }) => [node.sourceXmlId, node]));
+  const nodeByFullLabel = new Map();
+  for (const { node, aliasFullLabels } of metadata) {
+    for (const fullLabel of [node.sourceXmlId, ...new Set(aliasFullLabels)]) {
+      const existing = nodeByFullLabel.get(fullLabel);
+      if (existing && existing.id !== node.id) {
+        throw new Error(`Stacks label ${fullLabel} is owned by both ${existing.id} and ${node.id}`);
+      }
+      nodeByFullLabel.set(fullLabel, node);
+    }
+  }
+  for (const [aliasFullLabel, targetFullLabel] of CURATED_FORMAL_REFERENCE_ALIASES) {
+    if (!tags.fullLabelToTag.has(aliasFullLabel)) continue;
+    const targetNode = nodeByFullLabel.get(targetFullLabel);
+    if (!targetNode) {
+      throw new Error(`Curated Stacks alias ${aliasFullLabel} has missing formal target ${targetFullLabel}`);
+    }
+    const existing = nodeByFullLabel.get(aliasFullLabel);
+    if (existing && existing.id !== targetNode.id) {
+      throw new Error(`Curated Stacks alias ${aliasFullLabel} conflicts with formal owner ${existing.id}`);
+    }
+    nodeByFullLabel.set(aliasFullLabel, targetNode);
+  }
   const usedIds = new Set([...sourceUnits.map(({ id }) => id), ...nodes.map(({ id }) => id)]);
 
   const directDependencies = [];
   const dependencyIdByPair = new Map();
   const proofGroupsByOwner = new Map();
+  const citationGroupsByOwner = new Map();
   for (const owner of metadata.filter(({ node }) => node.nodeClass === "theorem-like")) {
-    const proofReferences = (owner.proofs ?? []).flatMap(({ references }) => references);
+    const proofs = owner.proofs ?? [];
+    const proofReferences = proofs.flatMap(({ references }) => references);
     const groups = uniqueReferenceGroups({
       references: proofReferences,
       owner,
@@ -345,6 +536,10 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt }) {
       tags,
     });
     proofGroupsByOwner.set(owner.node.id, groups);
+    citationGroupsByOwner.set(owner.node.id, uniqueCitationGroups({
+      citations: proofs.flatMap(({ citations }) => citations),
+      owner,
+    }));
     for (const group of groups) {
       if (!group.targetNode || group.targetNode.id === owner.node.id) continue;
       const pair = `${owner.node.id}|${group.targetNode.id}`;
@@ -374,36 +569,50 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt }) {
   }
 
   const proofRoutes = [];
-  const dependencyIdsByOwner = new Map();
-  for (const dependency of directDependencies) {
-    const ids = dependencyIdsByOwner.get(dependency.dependentNodeId) ?? [];
-    ids.push(dependency.id);
-    dependencyIdsByOwner.set(dependency.dependentNodeId, ids);
-  }
   for (const owner of metadata.filter(({ node }) => node.nodeClass === "theorem-like")) {
-    const dependencyIds = dependencyIdsByOwner.get(owner.node.id) ?? [];
-    if (dependencyIds.length === 0) continue;
     const proofs = owner.proofs ?? [];
-    const locator = proofs.map((proof) => (
-      `${owner.unit.path}:L${proof.startLine}-L${proof.endLine}`
-    )).join("; ");
-    const id = `route-${owner.node.id}-source-proof`;
-    if (usedIds.has(id)) throw new Error(`Duplicate proof-route ID: ${id}`);
-    usedIds.add(id);
-    proofRoutes.push({
-      id,
-      theoremNodeId: owner.node.id,
-      routeKind: "source-proof",
-      dependencyIds,
-      summary: "Source-faithful candidate route containing the direct formal results and definitions explicitly cited in the pinned Stacks proof.",
-      evidence: capturedEvidence({
-        sourceUnitId: unitId(owner.unit.stem),
-        locator: locator || owner.node.sourceLocator,
-        artifactSha256: sha256(proofs.map(({ rawProof }) => rawProof).join("\n")),
-        capturedAt,
-        note: "Candidate route from explicit proof references only; implicit prerequisites remain pending and no review is claimed.",
-      }),
-    });
+    const routeGroups = proofRouteGroups(proofs);
+    for (const [groupIndex, routeGroup] of routeGroups.entries()) {
+      const routeReferenceGroups = uniqueReferenceGroups({
+        references: routeGroup.proofs.flatMap(({ references }) => references),
+        owner,
+        basis: "proof-xref",
+        nodeByFullLabel,
+        tags,
+      });
+      const dependencyIds = [...new Set(routeReferenceGroups
+        .filter(({ targetNode }) => targetNode && targetNode.id !== owner.node.id)
+        .map(({ targetNode }) => dependencyIdByPair.get(`${owner.node.id}|${targetNode.id}`))
+        .filter(Boolean))];
+      if (dependencyIds.length === 0) continue;
+      const isAlternativeSet = routeGroups.length >= 2;
+      const routeKind = isAlternativeSet && groupIndex > 0 ? "alternate-proof" : "source-proof";
+      const ordinalSuffix = routeKind === "alternate-proof" ? `-${routeGroup.ordinal}` : "";
+      const id = `route-${owner.node.id}-${routeKind}${ordinalSuffix}`;
+      if (usedIds.has(id)) throw new Error(`Duplicate proof-route ID: ${id}`);
+      usedIds.add(id);
+      const locator = routeGroup.proofs.map((proof) => (
+        `${owner.unit.path}:L${proof.startLine}-L${proof.endLine}`
+      )).join("; ");
+      proofRoutes.push({
+        id,
+        theoremNodeId: owner.node.id,
+        routeKind,
+        dependencyIds,
+        summary: routeKind === "alternate-proof"
+          ? "Source-faithful alternate route containing only the direct formal results and definitions explicitly cited in this separately titled Stacks proof."
+          : "Source-faithful candidate route containing the direct formal results and definitions explicitly cited in the pinned Stacks proof.",
+        evidence: capturedEvidence({
+          sourceUnitId: unitId(owner.unit.stem),
+          locator: locator || owner.node.sourceLocator,
+          artifactSha256: sha256(routeGroup.proofs.map(({ rawProof }) => rawProof).join("\n")),
+          capturedAt,
+          note: routeKind === "alternate-proof"
+            ? "Candidate alternative route from a separately titled source proof; implicit prerequisites remain pending and no review is claimed."
+            : "Candidate route from explicit proof references only; implicit prerequisites remain pending and no review is claimed.",
+        }),
+      });
+    }
   }
 
   const references = [];
@@ -412,6 +621,9 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt }) {
       for (const group of proofGroupsByOwner.get(owner.node.id) ?? []) {
         if (group.targetNode) continue;
         references.push(referenceEntity({ group, dependencyId: null, capturedAt, usedIds }));
+      }
+      for (const group of citationGroupsByOwner.get(owner.node.id) ?? []) {
+        references.push(citationReferenceEntity({ group, capturedAt, usedIds }));
       }
     }
   }
@@ -455,8 +667,21 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt }) {
   ]));
   const theoremCount = nodes.filter((node) => node.nodeClass === "theorem-like").length;
   const routedTheoremIds = new Set(proofRoutes.map(({ theoremNodeId }) => theoremNodeId));
-  const unresolvedProofXrefCount = references.filter((reference) => (
+  const unresolvedTaggedProofReferences = references.filter((reference) => (
     reference.basis === "proof-xref" && reference.resolution.status === "unresolved"
+  ));
+  const proofCitationReferences = references.filter((reference) => (
+    reference.basis === "proof-citation"
+  ));
+  if (bibliographyText !== null) {
+    const knownBibliographyKeys = bibliographyKeys(bibliographyText);
+    const missingCitation = proofCitationReferences.find(({ ref }) => !knownBibliographyKeys.has(ref));
+    if (missingCitation) {
+      throw new Error(`Stacks proof citation key ${missingCitation.ref} is absent from my.bib`);
+    }
+  }
+  const unresolvedReferenceCount = references.filter((reference) => (
+    reference.resolution.status === "unresolved"
   )).length;
 
   return {
@@ -478,16 +703,24 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt }) {
       directDependencyCount: directDependencies.length,
       proofRouteCount: proofRoutes.length,
       referenceCount: references.length,
+      unresolvedReferenceCount,
       statementXrefCount: 0,
-      unresolvedProofXrefCount,
+      proofCitationReferenceCount: proofCitationReferences.length,
+      proofCitationOccurrenceCount: [...citationGroupsByOwner.values()]
+        .flatMap((groups) => groups)
+        .reduce((total, group) => total + group.occurrences.length, 0),
+      distinctProofCitationKeyCount: new Set(proofCitationReferences.map(({ ref }) => ref)).size,
+      proofCitationOwnerCount: new Set(proofCitationReferences.map(({ ownerNodeId }) => ownerNodeId)).size,
+      unresolvedProofXrefCount: unresolvedTaggedProofReferences.length,
+      unresolvedTaggedProofReferenceCount: unresolvedTaggedProofReferences.length,
+      uniqueUnresolvedTaggedProofTargetCount: new Set(
+        unresolvedTaggedProofReferences.map(({ ref }) => ref),
+      ).size,
       pendingTheoremCount: theoremCount - routedTheoremIds.size,
       unitInventoryCount: unitInventories.length,
       theoremFreeUnitCount: unitInventories.filter(({ theoremFreeAttestation }) => theoremFreeAttestation).length,
       excludedEnvironmentCounts,
       tagCount: tags.tagToFullLabel.size,
-      unresolvedTaggedProofTargetCount: references.filter((reference) => (
-        reference.basis === "proof-xref" && reference.resolution.status === "unresolved"
-      )).length,
     },
   };
 }
@@ -516,11 +749,13 @@ function makefileChapterStems(makefileText) {
 export function collectStacksSourceUnits(checkoutRoot) {
   const makefilePath = path.join(checkoutRoot, "Makefile");
   const tagsPath = path.join(checkoutRoot, "tags", "tags");
-  if (!fs.existsSync(makefilePath) || !fs.existsSync(tagsPath)) {
-    throw new Error("The checkout lacks the Stacks Makefile or tags/tags manifest");
+  const bibliographyPath = path.join(checkoutRoot, "my.bib");
+  if (!fs.existsSync(makefilePath) || !fs.existsSync(tagsPath) || !fs.existsSync(bibliographyPath)) {
+    throw new Error("The checkout lacks the Stacks Makefile, tags/tags manifest, or my.bib bibliography");
   }
   const makefileText = fs.readFileSync(makefilePath, "utf8");
   const tagText = fs.readFileSync(tagsPath, "utf8");
+  const bibliographyText = fs.readFileSync(bibliographyPath, "utf8");
   const units = makefileChapterStems(makefileText).map((stem) => {
     const relativePath = `${stem}.tex`;
     const filePath = path.join(checkoutRoot, relativePath);
@@ -533,7 +768,7 @@ export function collectStacksSourceUnits(checkoutRoot) {
       content,
     };
   });
-  return { units, tagText, makefileText };
+  return { units, tagText, makefileText, bibliographyText };
 }
 
 export function buildStacksBookFile({
@@ -545,10 +780,14 @@ export function buildStacksBookFile({
 }) {
   if (!/^[0-9a-f]{40}$/iu.test(commit)) throw new Error("--commit must be a full 40-character Git commit");
   const collected = collectStacksSourceUnits(checkoutRoot);
-  const extracted = extractStacksGraphFromUnits(collected.units, collected.tagText, { capturedAt });
+  const extracted = extractStacksGraphFromUnits(collected.units, collected.tagText, {
+    capturedAt,
+    bibliographyText: collected.bibliographyText,
+  });
   const artifactFiles = [
     { path: "Makefile", content: collected.makefileText },
     { path: "tags/tags", content: collected.tagText },
+    { path: "my.bib", content: collected.bibliographyText },
     ...collected.units.map((unit) => ({ path: unit.path, content: unit.content })),
   ];
   const artifactSha256 = sha256(canonicalJson(artifactFiles.map((file) => ({
@@ -616,7 +855,7 @@ export function buildStacksBookFile({
           referenceCount: extracted.graph.references.length,
         },
         independentReview: null,
-        note: `${extracted.stats.directDependencyCount} candidate edges come only from explicit formal references in source proofs; resolved occurrences are merged into edge evidence, while ${extracted.stats.unresolvedProofXrefCount} tagged proof targets outside the strict node policy remain explicit unresolved references. ${extracted.stats.pendingTheoremCount} theorem-like nodes have no resolved explicit formal proof citation and remain pending, not roots. No mathematical review or graph-completeness claim is made.`,
+        note: `${extracted.stats.directDependencyCount} candidate edges come only from explicit formal references in source proofs; resolved occurrences are merged into edge evidence. ${extracted.stats.unresolvedTaggedProofReferenceCount} unresolved tagged proof-xref records (${extracted.stats.uniqueUnresolvedTaggedProofTargetCount} unique permanent labels) and ${extracted.stats.proofCitationReferenceCount} unresolved bibliographic proof-citation records (${extracted.stats.distinctProofCitationKeyCount} keys) remain review candidates; no citation was promoted to an external input. ${extracted.stats.pendingTheoremCount} theorem-like nodes have no route with a resolved explicit formal proof reference and remain pending, not roots. No mathematical review or graph-completeness claim is made.`,
       },
     },
     stats: {

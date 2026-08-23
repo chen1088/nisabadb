@@ -12,11 +12,11 @@
     "inventoriedSourceUnitCount": 225,
     "reviewedSourceUnitCount": 0,
     "theoremNodeCount": 13169,
-    "unroutedTheoremCount": 2043,
+    "unroutedTheoremCount": 2033,
     "supportNodeCount": 1919,
-    "dependencyCount": 35757,
+    "dependencyCount": 35850,
     "reviewedDependencyCount": 0,
-    "unresolvedReferenceCount": 3239
+    "unresolvedReferenceCount": 2837
   },
   "entries": [
     {
@@ -5473,11 +5473,11 @@
       "inventoriedSourceUnitCount": 116,
       "reviewedSourceUnitCount": 0,
       "theoremNodeCount": 13131,
-      "unroutedTheoremCount": 2008,
+      "unroutedTheoremCount": 1998,
       "supportNodeCount": 1845,
-      "dependencyCount": 35754,
+      "dependencyCount": 35847,
       "reviewedDependencyCount": 0,
-      "unresolvedReferenceCount": 3239
+      "unresolvedReferenceCount": 2837
     },
     {
       "bookGraphId": "S0263:complete-source",

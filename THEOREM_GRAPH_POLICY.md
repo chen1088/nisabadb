@@ -24,7 +24,7 @@ These may remain source evidence, but their mere presence never increases theore
 - Repetition, proximity, terminology, chapter order, and statement-level cross-references do not manufacture proof edges.
 - Repeated citations of the same prerequisite in one proof merge into one direct edge while retaining source locators in the edge evidence.
 - A theorem with no resolved explicit dependency remains pending. It is not declared a root until independent review confirms a root attestation.
-- A proof citation to excluded material remains an unresolved review item. It is not resolved by bulk-importing examples or remarks.
+- A proof citation to excluded material or the bibliography remains an unresolved review item until its mathematical role is reviewed. A source-audited nested or expository label may resolve to an existing formal owner, but examples and remarks are never bulk-imported as theorem nodes.
 
 ## Completion
 

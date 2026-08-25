@@ -176,12 +176,12 @@ describe("one Phase-I dependency graph file per source component", () => {
       sourceUnitCount: 225,
       inventoriedSourceUnitCount: 225,
       reviewedSourceUnitCount: 0,
-      theoremNodeCount: 13172,
-      unroutedTheoremCount: 1966,
-      supportNodeCount: 1919,
-      dependencyCount: 36079,
+      theoremNodeCount: 13176,
+      unroutedTheoremCount: 1947,
+      supportNodeCount: 1929,
+      dependencyCount: 36237,
       reviewedDependencyCount: 0,
-      unresolvedReferenceCount: 2746,
+      unresolvedReferenceCount: 2638,
     });
     expect(validated.filesByPath.get("S0001/level-1.json")?.identity.bookGraphId).toBe("S0001:level-1");
     expect(validated.filesByPath.get("S0074/volume-3.json")?.identity.componentLabel).toBe("Volume 3");
@@ -197,32 +197,66 @@ describe("one Phase-I dependency graph file per source component", () => {
     const densestBook = validated.filesByPath.get("S0262/complete-source.json");
     expect(densestBook?.exactEdition?.sourceFormat).toBe("latex");
     expect(densestBook?.sourceUnits).toHaveLength(116);
-    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like")).toHaveLength(13134);
-    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "support")).toHaveLength(1845);
+    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like")).toHaveLength(13138);
+    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "support")).toHaveLength(1855);
     expect(densestBook?.graph.nodes.every((node) => /^tag-[a-z0-9]{4}$/u.test(node.id))).toBe(true);
     expect(densestBook?.graph.nodes.some((node) => (
       node.kind === "example" || node.kind === "calculation" || node.kind === "algorithm"
     ))).toBe(false);
-    expect(densestBook?.graph.externalInputs).toHaveLength(1);
-    expect(densestBook?.graph.externalInputs[0]).toMatchObject({
+    expect(densestBook?.graph.externalInputs).toHaveLength(11);
+    expect(densestBook?.graph.externalInputs).toContainEqual(expect.objectContaining({
       id: "external-zorns-lemma",
       kind: "external-theorem",
-    });
-    expect(densestBook?.graph.directDependencies).toHaveLength(36076);
-    expect(densestBook?.graph.proofRoutes).toHaveLength(11240);
+    }));
+    expect(densestBook?.graph.externalInputs).toContainEqual(expect.objectContaining({
+      id: "external-deligne-weight-bound",
+      kind: "external-theorem",
+    }));
+    expect(densestBook?.graph.directDependencies).toHaveLength(36234);
+    expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-0eq8",
+      prerequisite: { type: "node", id: "tag-0eq6" },
+    }));
+    expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-06ix",
+      prerequisite: { type: "node", id: "tag-06im" },
+      role: "definition",
+    }));
+    expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-06ix",
+      prerequisite: { type: "node", id: "tag-06t6" },
+      role: "definition",
+    }));
+    expect(densestBook?.graph.proofRoutes).toHaveLength(11263);
     expect(densestBook?.graph.proofRoutes.filter((route) => route.routeKind === "alternate-proof"))
       .toHaveLength(40);
     expect(densestBook?.graph.references.every((reference) => (
       ["proof-xref", "proof-citation"].includes(reference.basis)
-      && reference.resolution.status === "unresolved"
     ))).toBe(true);
     expect(densestBook?.graph.references.filter((reference) => reference.basis === "proof-xref"))
-      .toHaveLength(2716);
+      .toHaveLength(2632);
     expect(densestBook?.graph.references.filter((reference) => reference.basis === "proof-citation"))
-      .toHaveLength(30);
-    expect(new Set(densestBook?.graph.references.filter((reference) => (
-      reference.basis === "proof-citation"
-    )).map((reference) => reference.ref)).size).toBe(19);
+      .toHaveLength(19);
+    expect(densestBook?.graph.references.filter((reference) => (
+      reference.basis === "proof-citation" && reference.resolution.status === "resolved"
+    ))).toHaveLength(13);
+    expect(densestBook?.graph.references.filter((reference) => (
+      reference.basis === "proof-citation" && reference.resolution.status === "unresolved"
+    ))).toHaveLength(6);
+    expect(densestBook?.graph.references.filter((reference) => (
+      reference.basis === "proof-citation" && reference.ownerNodeId === "tag-000g"
+    )).map((reference) => reference.resolution)).toEqual([
+      expect.objectContaining({
+        status: "resolved",
+        target: { type: "external-input", id: "external-finite-formula-reflection" },
+        directDependencyId: "dep-tag-000g-to-external-finite-formula-reflection",
+      }),
+      expect.objectContaining({
+        status: "resolved",
+        target: { type: "external-input", id: "external-finite-formula-reflection" },
+        directDependencyId: "dep-tag-000g-to-external-finite-formula-reflection",
+      }),
+    ]);
     expect(densestBook?.extractionState.status).toBe("extracted");
     expect(densestBook?.graphState.status).toBe("extracted");
     const populatedPaths = new Set(["S0060/complete-source.json", "S0262/complete-source.json"]);

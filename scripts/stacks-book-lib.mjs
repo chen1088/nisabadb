@@ -21,7 +21,215 @@ const CURATED_CLAIMS = new Map([
   ["derived-remark-truncation-distinguished-triangle", "Canonical distinguished triangles of truncations"],
   ["sites-cohomology-remark-before-Leray", "Derived global sections after derived pushforward"],
   ["spaces-perfect-remark-match-total-direct-images", "Compatibility of derived pullback and pushforward for representable algebraic spaces"],
+  ["algebra-remark-fundamental-diagram", {
+    title: "Affine fibres and primes under a ring map",
+    startLine: 3421,
+    endLine: 3497,
+    sourceTextSha256: "40268cd94b6f364d69d1c8310d5b63d0f1dea0623dae588a2ac349f09045ab55",
+  }],
+  ["spaces-chow-remark-infinite-sums-rational-equivalences", {
+    title: "Locally supported sums of rational equivalences",
+    startLine: 1773,
+    endLine: 1800,
+    sourceTextSha256: "65c0b5dfc6e7ea9cbf8214d13d0c2e756f96d138696a94dd2fbfc4bd80108774",
+  }],
+  ["categories-remark-left-dual-adjoint", {
+    title: "Adjoint characterization and uniqueness of left duals",
+    startLine: 9385,
+    endLine: 9438,
+    sourceTextSha256: "befc4e009ad1ef5308039a0453426673be611cbaf2aa09918ad979058d06241b",
+  }],
 ]);
+
+// This exact labeled prose/display span states and derives a general result,
+// rather than merely defining notation for the displayed equation. The raw
+// span hash is pinned so that source drift fails extraction instead of silently
+// changing the promoted claim.
+const CURATED_PROSE_CLAIMS = new Map([
+  ["derived-equation-long-exact-cohomology-sequence", {
+    title: "Long exact sequence associated to a distinguished triangle",
+    startLine: 277,
+    endLine: 296,
+    sourceTextSha256: "7681c73366465bd0ef97fb5f144a2780d4b47dd88f49a42759bcdf08729072cc",
+  }],
+]);
+
+// Direct prerequisites of promoted claims whose derivations are stated in
+// prose rather than with explicit \ref commands. Each phrase count is checked
+// only inside the exact source span captured as that claim's inline proof.
+const CURATED_CLAIM_DEPENDENCIES = [
+  {
+    ownerTag: "0148",
+    targetTag: "0145",
+    phrasePattern: "Our discussion of TR2 above",
+    expectedOccurrenceCount: 1,
+  },
+  {
+    ownerTag: "0148",
+    targetTag: "0147",
+    phrasePattern: "homological functor",
+    expectedOccurrenceCount: 2,
+  },
+  {
+    ownerTag: "0FFR",
+    targetTag: "0FFP",
+    phrasePattern: "property of being a left dual",
+    expectedOccurrenceCount: 1,
+  },
+  {
+    ownerTag: "0EQ8",
+    targetTag: "0EQ6",
+    phrasePattern: "rational equivalences",
+    expectedOccurrenceCount: 1,
+  },
+];
+
+// Complete incoming proof-reference inventories for the newly promoted claims.
+// This prevents later source revisions from silently inheriting an audit that
+// was performed only for the owner occurrences listed here.
+const CURATED_CLAIM_INCOMING_REFERENCE_COUNTS = new Map([
+  ["0148", { "05SR": 1, "05R5": 2, "05RD": 1, "05RE": 1, "05RM": 1, "0CQQ": 1 }],
+  ["00E6", { "00E7": 1, "00GT": 1, "05DR": 1, "00HQ": 1, "0BRB": 2, "09EF": 1, "00QE": 1, "00SJ": 1, "0BK8": 1, "01K1": 1 }],
+  ["0EQ8", { "0EQB": 1, "0EQR": 1, "0ER5": 1, "0ER6": 1, "0ERC": 1, "0ERG": 1, "0ERU": 1, "0ERV": 1 }],
+  ["0FFR", { "0FFS": 1, "0FFT": 1, "0FFU": 1, "0FPA": 1, "0FPS": 1, "0FNW": 1, "0FNZ": 1 }],
+]);
+
+const CURATED_CITATION_SOURCE_REVISION = "ed88ff783bcb4dd9a28518a33b028841094009cf";
+
+// Exact bibliographic theorem invocations verified against primary sources.
+// Multiple citations or owners can attest one reusable external theorem input;
+// every local owner body and citation occurrence is hash-guarded.
+const CURATED_EXTERNAL_CITATION_INPUTS = [
+  {
+    id: "external-cumulative-hierarchy-exhaustion",
+    label: "Cumulative-hierarchy exhaustion",
+    normalizedStatement: "With V_0 empty, V_{alpha + 1} the power set of V_alpha, and V_lambda the union of earlier stages at a limit ordinal, every set belongs to V_alpha for some ordinal alpha.",
+    sourceCitation: "Thomas Jech, Set Theory, Lemma 6.3; https://doi.org/10.1007/3-540-44761-X",
+    uses: [
+      { ownerTag: "000C", citationKey: "Jech", pinpoint: "Lemma 6.3", ownerSourceTextSha256: "e894791e11547e7bb4c5e3da90a95a09b5016005f729a5dd0c29253fa5af120b", citationArtifactSha256: "1ea5576ac940d89782d8977ef742edfbbfb96a4f4f7749072914a2ec56aaff30" },
+    ],
+  },
+  {
+    id: "external-finite-formula-reflection",
+    label: "Finite-formula reflection theorem",
+    normalizedStatement: "For a finite list of formulas and an initial set M_0, some limit ordinal alpha contains M_0 in V_alpha and makes every listed formula absolute between V_alpha and the universe for parameters in V_alpha.",
+    sourceCitation: "Thomas Jech, Set Theory, Theorem 12.14, https://doi.org/10.1007/3-540-44761-X; Kenneth Kunen, Set Theory, Theorem 7.4, https://shop.elsevier.com/books/set-theory-an-introduction-to-independence-proofs/kunen/978-0-444-86839-8",
+    uses: [
+      { ownerTag: "000G", citationKey: "Jech", pinpoint: "Theorem 12.14", ownerSourceTextSha256: "9b9784072cf8e6219a41c5dcf13b590bd3ef16cc19ef3748324d38f1a162b73b", citationArtifactSha256: "74bad7b0e9a3af81cb2a5966cf67f3c26b65a05775b2dbb469af5fabd2830179" },
+      { ownerTag: "000G", citationKey: "Kunen", pinpoint: "Theorem 7.4", ownerSourceTextSha256: "9b9784072cf8e6219a41c5dcf13b590bd3ef16cc19ef3748324d38f1a162b73b", citationArtifactSha256: "9fe21c419216af5331433837b28285ab4198b16a9993d3461ae99cc3aa2f5b36" },
+    ],
+  },
+  {
+    id: "external-cardinality-finite-sequences",
+    label: "Cardinality of finite sequences",
+    normalizedStatement: "For every set A, the set of finite sequences in A has cardinality at most max(|A|, aleph_0); when A is infinite, it has cardinality |A|.",
+    sourceCitation: "Kenneth Kunen, Set Theory, Chapter I, Section 10.13; https://shop.elsevier.com/books/set-theory-an-introduction-to-independence-proofs/kunen/978-0-444-86839-8",
+    uses: [
+      { ownerTag: "000P", citationKey: "Kunen", pinpoint: "Ch. I, 10.13", ownerSourceTextSha256: "50a9099972b73e8814565b3008cff1130c4fcd279b79d4cd458dd23169b93e36", citationArtifactSha256: "6cf5f4dab419f14ee0872a787b6c4e091567fe027158e63b0b0fc4ad8a0def19" },
+      { ownerTag: "000Q", citationKey: "Kunen", pinpoint: "Ch. I, 10.13", ownerSourceTextSha256: "d2f697f6e9add7f2accb76265acaba50c3a99022332ab8fe84eadfde53559986", citationArtifactSha256: "5759fa32ae712c4ec5ce3314ac10d4f7341a16cb904209ecc2bddf3f0fe9faf2" },
+      { ownerTag: "04W0", citationKey: "Kunen", pinpoint: "Ch. I, 10.13", ownerSourceTextSha256: "f8e18dbfaba9c147e753be4f6fc4ba6929d3a0717e67b4056bee44d68d2836dd", citationArtifactSha256: "b1c01f171ac038f649ac18a21f1798a6ca7af25475b785fe41a0797fa1ae5c8a" },
+    ],
+  },
+  {
+    id: "external-indexed-disjoint-union-bound",
+    label: "Indexed disjoint-union cardinal bound",
+    normalizedStatement: "If each set X_j indexed by J has cardinality at most kappa, then the disjoint union of the X_j has cardinality at most |J| times kappa, and hence satisfies the corresponding infinite-cardinal maximum bound.",
+    sourceCitation: "Thomas Jech, Set Theory, Lemma 5.8; https://doi.org/10.1007/3-540-44761-X",
+    uses: [
+      { ownerTag: "000Q", citationKey: "Jech", pinpoint: "Lemma 5.8", ownerSourceTextSha256: "d2f697f6e9add7f2accb76265acaba50c3a99022332ab8fe84eadfde53559986", citationArtifactSha256: "183582ba81c636df869f310201168c51d13c0f9ff9a6be91707fc4b5a3a9c970" },
+    ],
+  },
+  {
+    id: "external-compact-support-coefficient-base-change",
+    label: "Compact-support coefficient base change",
+    normalizedStatement: "For a homomorphism of noetherian torsion coefficient rings Lambda to Lambda', a separated finite-type scheme Y over an algebraically closed field, and K in D_ctf(Y, Lambda), compactly supported cohomology commutes functorially with derived extension of coefficients to Lambda'.",
+    sourceCitation: "SGA 4 1/2, Rapport 4.12, pp. 54-55; https://library.slmath.org/nonmsri/sga/sga/ps/sga4.5.ps",
+    sourceSpanGuards: [
+      { sourceStem: "trace", startLine: 2323, endLine: 2352, sourceTextSha256: "4e6f5b339ba39b67b5b597af0926ae479f5d98e5dd825d75ac68f786b19c940f" },
+    ],
+    uses: [
+      { ownerTag: "03V2", citationKey: "SGA4.5", pinpoint: "Rapport 4.12", ownerSourceTextSha256: "d21773713b7f333cfe42d4cac24505f48a53a77488c1b027d452505051b1c8ff", citationArtifactSha256: "a880437ba118e37f20447f5fced00eb4bf2b88f22b1ff73ecc596e3ac50a335f" },
+    ],
+  },
+  {
+    id: "external-deligne-weight-bound",
+    label: "Deligne weight bound",
+    normalizedStatement: "For a finite-type scheme over a finite field, compactly supported cohomology raises an upper weight bound by the cohomological degree; for a smooth proper scheme and a lisse pure sheaf, ordinary cohomology is pure of the correspondingly shifted weight.",
+    sourceCitation: "Pierre Deligne, La conjecture de Weil II, Theorem 3.3.1 and Corollaries 3.3.4 and 3.3.6; https://www.numdam.org/item/PMIHES_1980__52__137_0.pdf",
+    sourceSpanGuards: [
+      { sourceStem: "trace", startLine: 3054, endLine: 3072, sourceTextSha256: "1d6b8928fe81f25b53b4bf3be0326582c32af61e50b5a6bae533ab3ce2a44b09" },
+    ],
+    uses: [
+      { ownerTag: "03VH", citationKey: "WeilII", pinpoint: null, ownerSourceTextSha256: "0fda6c51664b2557f3ef525dd7da63b7d21e41d5c05115d6c7e6249c8667ec6b", citationArtifactSha256: "48d56b83122e38b259fe3fd79b87a82c28b6ce7f8695f25d674efb27acae21e0" },
+    ],
+  },
+  {
+    id: "external-drinfeld-gl2-automorphic-galois",
+    label: "Drinfeld GL2 automorphic-to-Galois correspondence",
+    normalizedStatement: "In the stated global function-field setting, an unramified GL2 cuspidal Hecke eigenform with the prescribed l-adic data yields a continuous absolutely irreducible two-dimensional l-adic representation whose Frobenius traces and determinants match the Hecke eigenvalues with the stated normalization.",
+    sourceCitation: "Vladimir Drinfeld, Langlands' conjecture for GL(2) over functional fields, Theorems A and A', pp. 565-566; https://www.mathunion.org/fileadmin/ICM/Proceedings/ICM1978.2/ICM1978.2.ocr.pdf",
+    sourceSpanGuards: [
+      { sourceStem: "trace", startLine: 3448, endLine: 3553, sourceTextSha256: "e269235a0bbbd4801a65e02470027f4a0a7f73367ab54b138c72cb8c196b1dd5" },
+    ],
+    uses: [
+      { ownerTag: "03VT", citationKey: "D0", pinpoint: null, ownerSourceTextSha256: "e5b6350a46462e29b60b71e49a446cf7c4af681660d8bc5fa03a422a596b273d", citationArtifactSha256: "c5b9908244e27de36ea6dea383f37f513432ca43e7eb1a337f9c3f628cd1b049" },
+    ],
+  },
+  {
+    id: "external-dejong-cusp-forms-finite",
+    label: "Finite generation and base change for cusp forms",
+    normalizedStatement: "For noetherian Lambda, the cusp-form module C(Lambda) is finitely generated; over a field Lambda with prime field F, the natural base-change map C(F) tensor_F Lambda to C(Lambda) is a Hecke-compatible isomorphism.",
+    sourceCitation: "A. J. de Jong, A conjecture on arithmetic fundamental groups, Proposition 4.7; https://www.math.columbia.edu/~dejong/papers/ARITHFUN.dvi; https://doi.org/10.1007/BF02802496",
+    sourceSpanGuards: [
+      { sourceStem: "trace", startLine: 3619, endLine: 3624, sourceTextSha256: "3b91e4d6fdcb51226f52c9f13310dd1eefc2ba2e4f96ec7bad8e1168ef81b7fc" },
+    ],
+    uses: [
+      { ownerTag: "03VW", citationKey: "dJ-conjecture", pinpoint: "Proposition 4.7", ownerSourceTextSha256: "188e64c3622e14ab002ecb3cf44d3b6d88450a3a2e5ae530eef618cd4d378061", citationArtifactSha256: "ac22cc115659328eabc63dc413023eea172c229cd77fecff343c728d09f60714" },
+    ],
+  },
+  {
+    id: "external-dejong-rank2-conjecture",
+    label: "De Jong rank-two finite-monodromy theorem",
+    normalizedStatement: "For a normal scheme over a finite field in the stated Conjecture 2.3 setup, every continuous rank-two representation has finite geometric monodromy, equivalently in the associated rank-two lisse-sheaf formulation.",
+    sourceCitation: "A. J. de Jong, A conjecture on arithmetic fundamental groups, Corollary 4.10 with Conjecture 2.3; https://www.math.columbia.edu/~dejong/papers/ARITHFUN.dvi; https://doi.org/10.1007/BF02802496",
+    sourceSpanGuards: [
+      { sourceStem: "trace", startLine: 3712, endLine: 3718, sourceTextSha256: "07ec78cd09dfaccfa5d4b8b340b2d44eecfd11e201d675352df974cf3ce5b6d7" },
+    ],
+    uses: [
+      { ownerTag: "03VZ", citationKey: "dJ-conjecture", pinpoint: null, ownerSourceTextSha256: "b81656a237c14e4234a055e245a9ff918779f6c65326c43099497de93a7c1374", citationArtifactSha256: "1841aa01ee68c394d1e184eb1f482f09ccad4d852ac98c6c07fa96e5046a6ea4" },
+    ],
+  },
+  {
+    id: "external-kunz-f-finite-excellence",
+    label: "Kunz F-finite excellence criterion",
+    normalizedStatement: "For a noetherian local ring of characteristic p with finite residue-field imperfection degree, the ring is excellent if and only if Frobenius is finite; in particular, F-finiteness implies excellence.",
+    sourceCitation: "Ernst Kunz, On Noetherian rings of characteristic p, Corollary 2.6; https://doi.org/10.2307/2374038",
+    sourceSpanGuards: [
+      { sourceStem: "examples", startLine: 3299, endLine: 3332, sourceTextSha256: "6a4f6e251f7ce41452f52b3a6ea81b17b42e14dca83d0104957c1ccea89276da" },
+    ],
+    uses: [
+      { ownerTag: "0G66", citationKey: "Kun76", pinpoint: "Corollary 2.6", ownerSourceTextSha256: "5465130402e7d24fea7156af51026b46827ae770acb8c2893619a69fbc04114e", citationArtifactSha256: "a46860fa22e73b3fb5391134708bd0beec11c5b7ee437851ef961b089d7d32db" },
+    ],
+  },
+];
+
+// Exact proof citations audited as attribution, corroboration, background,
+// example/construction provenance, or otherwise nonlogical uses. These records
+// are omitted rather than left as theorem-dependency debt; genuinely
+// unresolved citation records not listed here remain visible for later review.
+const CURATED_NONDEPENDENCY_PROOF_CITATIONS = [
+  { ownerTag: "07E5", citationKey: "Faltings-einfacher", pinpoint: null, ownerSourceTextSha256: "f30f7040500fcfe8e7b04400566266cfe6b9a2f2f1af42d58c95c100fd84404a", citationArtifactSha256: "d8c1c8656c987b947e8ebae4ee0d7c945dda371cb06a3c8a4be6f18211ad92fe" },
+  { ownerTag: "08XE", citationKey: "EGA4", pinpoint: "Proposition~17.2.1", ownerSourceTextSha256: "79ab5d836b34b0a47d2534aee3d914cd9d2614ae2f5f4654735deeac0936b5dd", citationArtifactSha256: "341bddb0935f9bcb3dcf06c95684788d89bc54062ffbbbf1fb943b7d211fdd3c" },
+  { ownerTag: "08XE", citationKey: "EGA4", pinpoint: "Th\\'eor\\`eme~17.6.1", ownerSourceTextSha256: "79ab5d836b34b0a47d2534aee3d914cd9d2614ae2f5f4654735deeac0936b5dd", citationArtifactSha256: "93feac3fdaa6aeec8249e2889fd441fb0811c0652d2b0b6fcf0c17022a57f79c" },
+  { ownerTag: "0252", citationKey: "MatCA", pinpoint: "Section 20", ownerSourceTextSha256: "436950afa5c86eddd48d62000d854aa6c2ef068a0a50bb046ff937bb89971859", citationArtifactSha256: "182b573f016c16ce2aceea51922478427c0f2243130fd0b542ddb20276083a55" },
+  { ownerTag: "0CBY", citationKey: "ACG", pinpoint: "Proposition X.2.1", ownerSourceTextSha256: "d9087d3babab2097821d8de963288c24c617f0c3ecc4cf053558f6c3b1c5ec3b", citationArtifactSha256: "3c989e8e9b264cbcac12b85857358cbfb2905cef781a0e8c7d9906eea0156e64" },
+  { ownerTag: "03QE", citationKey: "EGA4", pinpoint: "Th\\'eor\\`eme 18.12.1", ownerSourceTextSha256: "800dd5038cd0a95cb39fedb5371b0bd8b3013234ae6c4b065e554b0ae0f10995", citationArtifactSha256: "0c44bff7e53b7062accb4cd32ba637ada9d0b2956476029013d00b3ba935a0c0" },
+  { ownerTag: "03R6", citationKey: "SilvermanEllipticCurves", pinpoint: null, ownerSourceTextSha256: "0421d45b8188e39d39cace3b51fdf50d60a897ae4fcfecc0d7c2c51e7306f9b3", citationArtifactSha256: "9690c9fbfd618e87e692f4245bbd943a65e9d2ddacf7b10bf616180dbd0c765c" },
+  { ownerTag: "03R7", citationKey: "SGA4.5", pinpoint: null, ownerSourceTextSha256: "7234252b03e93b66e61ef985620e2ee70351aa3427930d680a934c9eab303002", citationArtifactSha256: "b226e02d561cc139158e3cb9e1d6571e413583afd33ebb0dd4f2b387360d6f1e" },
+  { ownerTag: "0GI5", citationKey: "ArtinII", pinpoint: null, ownerSourceTextSha256: "0e8d6d0b0cfb3c66fa422cfb5c0a095d6d147f6f51eae591a556ec499d8f78a8", citationArtifactSha256: "ca9fe639e42cad9e0d0f1115f1b40a6c14a705812169d831f067d0d7bef299e6" },
+  { ownerTag: "08J1", citationKey: "H", pinpoint: "Example B.3.4.1", ownerSourceTextSha256: "7bf1108f5e43b63c9ff6a0bee90878ee7e3cca86a0ab02ae9fce30d36fd7feca", citationArtifactSha256: "bfe96b98b01c012d5421de95aada356d6c8e2a664f6931af45fddf754d3721bc" },
+  { ownerTag: "08KF", citationKey: "H", pinpoint: "Example B.3.4.2", ownerSourceTextSha256: "824f2813962a308412addd18cc46bd4bc6951b43ba2ab21ff53c002630e8f6c1", citationArtifactSha256: "1193576598fe143b6039b276b68a810ba40a565805ed4e22ba7854cc470c07d8" },
+];
 
 const STRUCTURAL_BOUNDARY_PATTERN = /^\s*\\(?:chapter|section|subsection|subsubsection)\b/u;
 
@@ -62,15 +270,82 @@ const CURATED_FORMAL_REFERENCE_ALIASES = new Map([
 // to one permanent owner tag and an exact expected phrase count in that owner's
 // proof. This is an audited whitelist, not a global name recognizer.
 const CURATED_NAMED_PROOF_DEPENDENCIES = [
+  // These owner proofs invoke the ordinary Nakayama lemma without an explicit
+  // \ref to Tag 00DV. The graded and localization variants are deliberately
+  // excluded, as are owners that already cite the formal lemma explicitly.
+  { ownerTag: "00SE", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "02K5", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "068Z", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "07CH", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "07CP", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "07CZ", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "07D1", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "07YL", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "09EJ", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0A7P", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0AWR", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0AXG", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0B99", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0BIA", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0DVZ", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0DZ1", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0E7G", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0G0Q", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0H76", targetTag: "00DV", phrasePattern: "Nakayama(?:'s)? lemma", expectedOccurrenceCount: 1 },
+
+  // Five-lemma invocations lacking an explicit reference to Tag 05QB.
+  { ownerTag: "06V6", targetTag: "05QB", phrasePattern: "five lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0127", targetTag: "05QB", phrasePattern: "five lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0BP2", targetTag: "05QB", phrasePattern: "five lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0F7B", targetTag: "05QB", phrasePattern: "five lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "09AK", targetTag: "05QB", phrasePattern: "five lemma", expectedOccurrenceCount: 1 },
+
   { ownerTag: "00HL", targetTag: "07JW", phrasePattern: "snake lemma", expectedOccurrenceCount: 1 },
   { ownerTag: "00LU", targetTag: "07JW", phrasePattern: "snake lemma", expectedOccurrenceCount: 1 },
   { ownerTag: "00MZ", targetTag: "07JW", phrasePattern: "snake lemma", expectedOccurrenceCount: 1 },
   { ownerTag: "0CE7", targetTag: "07JW", phrasePattern: "snake lemma", expectedOccurrenceCount: 1 },
   { ownerTag: "02TQ", targetTag: "07JW", phrasePattern: "snake lemma", expectedOccurrenceCount: 1 },
-  { ownerTag: "04D2", targetTag: "001P", phrasePattern: "Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
-  { ownerTag: "00WY", targetTag: "001P", phrasePattern: "Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
-  { ownerTag: "00XM", targetTag: "001P", phrasePattern: "Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  // Ordinary Yoneda invocations missing an explicit reference to Tag 001P.
+  // The negative lookbehind keeps the separate 2-Yoneda audit disjoint.
+  { ownerTag: "04D2", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "00WY", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "00XM", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0024", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "017V", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "03A2", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 2 },
+  { ownerTag: "05QT", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "05Y6", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "07HW", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "08PC", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "09CN", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0A04", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0A8D", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 2 },
+  { ownerTag: "0A9T", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0AU2", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0D79", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0D7D", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0D7X", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0E4L", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0E5Q", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0E5V", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0E8I", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0E9L", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0GF6", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0GLW", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "0H9L", targetTag: "001P", phrasePattern: "(?<!-)Yoneda(?:'s)? lemma", expectedOccurrenceCount: 1 },
+
+  // 2-Yoneda invocations missing an explicit reference to Tag 004B.
   { ownerTag: "06D3", targetTag: "004B", phrasePattern: "\\$2\\$-Yoneda lemma", expectedOccurrenceCount: 3 },
+  { ownerTag: "04XF", targetTag: "004B", phrasePattern: "\\$2\\$-Yoneda lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "04XS", targetTag: "004B", phrasePattern: "\\$2\\$-Yoneda lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "04ZZ", targetTag: "004B", phrasePattern: "\\$2\\$-Yoneda lemma", expectedOccurrenceCount: 2 },
+  { ownerTag: "05UK", targetTag: "004B", phrasePattern: "\\$2\\$-Yoneda lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "06CH", targetTag: "004B", phrasePattern: "\\$2\\$-Yoneda lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "06CX", targetTag: "004B", phrasePattern: "\\$2\\$-Yoneda lemma", expectedOccurrenceCount: 3 },
+  { ownerTag: "06D7", targetTag: "004B", phrasePattern: "\\$2\\$-Yoneda lemma", expectedOccurrenceCount: 2 },
+  { ownerTag: "06PJ", targetTag: "004B", phrasePattern: "\\$2\\$-Yoneda lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "07WN", targetTag: "004B", phrasePattern: "\\$2\\$-Yoneda lemma", expectedOccurrenceCount: 1 },
+
   { ownerTag: "030F", externalInputId: "external-zorns-lemma", phrasePattern: "Zorn's lemma", expectedOccurrenceCount: 1 },
   { ownerTag: "00E0", externalInputId: "external-zorns-lemma", phrasePattern: "Zorn's lemma", expectedOccurrenceCount: 2 },
   { ownerTag: "07P2", externalInputId: "external-zorns-lemma", phrasePattern: "Zorn's lemma", expectedOccurrenceCount: 1 },
@@ -184,7 +459,118 @@ const CURATED_BUNDLED_REMARK_DEPENDENCIES = [
 // It is deliberately resolved without a logical dependency edge.
 const CURATED_NONDEPENDENCY_PROOF_XREFS = new Set([
   "0DKQ|08GH",
+  // Optional "you can also deduce" notes after complete primary proofs.
+  "0FNW|0FFR",
+  "0FNZ|0FFR",
 ]);
+
+// These labeled prose/display spans are definitions, predicates, or
+// constructions used by theorem proofs. They are support nodes rather than
+// theorem-like claims. Every promotion is guarded by the exact defining span
+// and complete incoming owner/count inventory; equation labels are never
+// promoted as a class.
+const CURATED_PROSE_SUPPORT_NODES = [
+  {
+    targetTag: "0D50",
+    kind: "construction",
+    title: "Embedding of curves over proper spaces",
+    sourceStem: "quot",
+    startLine: 4560,
+    endLine: 4568,
+    sourceTextSha256: "3d08999cfd53fa5d2b9089c54365026f932526903521db68579a12547ccbdc1d",
+    ownerOccurrenceCounts: { "0D51": 1, "0D52": 1, "0D53": 1, "0D55": 1, "0D56": 1, "0D57": 1, "0D59": 1, "0D5B": 1 },
+  },
+  {
+    targetTag: "04EH",
+    kind: "definition",
+    title: "Stalk of a presheaf at p",
+    sourceStem: "sites",
+    startLine: 7861,
+    endLine: 7871,
+    sourceTextSha256: "8034590e879cdb544900e7794bbf2f093eff502a23ae65af9e4a30f661bd94ac",
+    ownerOccurrenceCounts: { "00Y7": 1, "00YA": 1, "0F4G": 1, "04ET": 2, "04FM": 1, "04K0": 1 },
+  },
+  {
+    targetTag: "0A9L",
+    kind: "construction",
+    title: "Open-restriction base-change transformation",
+    sourceStem: "duality",
+    startLine: 756,
+    endLine: 780,
+    sourceTextSha256: "2cd691ea47e9e1fb79187f22303060bff6bf65954a892ea14a31a8e068ec939d",
+    ownerOccurrenceCounts: { "0A9N": 1, "0B6Q": 1, "0AA0": 2, "0ATX": 3, "0ATY": 1, "0B6T": 1 },
+  },
+  {
+    targetTag: "0A9S",
+    kind: "construction",
+    title: "Pullback-right-adjoint comparison map",
+    sourceStem: "duality",
+    startLine: 1841,
+    endLine: 1865,
+    sourceTextSha256: "2ca8d006bf1659f33256fea6e44aa4dcfe13ff54f8daf070f6eb6f62c5318f92",
+    ownerOccurrenceCounts: { "0B6P": 1, "0B6Q": 2, "0E4K": 2, "0A9U": 2, "0B6T": 2, "0FYW": 1 },
+  },
+  {
+    targetTag: "0H58",
+    kind: "construction",
+    title: "Relative cycle-class homomorphism",
+    sourceStem: "relative-cycles",
+    startLine: 943,
+    endLine: 955,
+    sourceTextSha256: "6f2ee0659a8df5f7e5b2b0046608838b1338aa1bda71f87b2081aa4ce7021aff",
+    ownerOccurrenceCounts: { "0H59": 2, "0H5C": 1, "0H5D": 1, "0H6E": 1, "0H6R": 1 },
+  },
+  {
+    targetTag: "044P",
+    kind: "construction",
+    title: "Prequotient presheaf in groupoids",
+    sourceStem: "spaces-groupoids",
+    startLine: 2260,
+    endLine: 2282,
+    sourceTextSha256: "6f29cebb0c5880a0401f7ee91166f0b12c11224a163489cbdd3ea40c8b04ef97",
+    ownerOccurrenceCounts: { "044R": 1, "046Q": 1, "044V": 1, "044T": 1, "0CN4": 1 },
+  },
+  {
+    targetTag: "04PC",
+    kind: "definition",
+    title: "Finite-condition moduli pairs",
+    sourceStem: "spaces-more-groupoids",
+    startLine: 1297,
+    endLine: 1308,
+    sourceTextSha256: "505d4fff50a163c080a58a9777e4d8669f443eccfc73e01488de34a66d50eda7",
+    ownerOccurrenceCounts: { "04PE": 2, "04PK": 1, "04QG": 2, "04RI": 1, "04RR": 1 },
+  },
+  {
+    targetTag: "06IM",
+    kind: "definition",
+    title: "Bijective tangent-map condition",
+    sourceStem: "formal-defos",
+    startLine: 4399,
+    endLine: 4403,
+    sourceTextSha256: "c2f6af7287476b7c813986f6161cb416cae3124e4b0d9663eca094268d6eec44",
+    ownerOccurrenceCounts: { "06IV": 1, "06IX": 2 },
+  },
+  {
+    targetTag: "06T6",
+    kind: "definition",
+    title: "Bijective-on-derivation-orbits condition",
+    sourceStem: "formal-defos",
+    startLine: 4405,
+    endLine: 4409,
+    sourceTextSha256: "01f7ac665ce9ae222003b3c5adc47664718eb4b0bc84281f10c0cf6915f431a3",
+    ownerOccurrenceCounts: { "06IR": 1, "06T8": 2, "06IX": 1, "06JM": 1, "06KN": 1 },
+  },
+  {
+    targetTag: "08UF",
+    kind: "definition",
+    title: "Deformation problem for ringed topoi",
+    sourceStem: "defos",
+    startLine: 3869,
+    endLine: 3902,
+    sourceTextSha256: "5448054e48da2f7c8c7dd7f0f78b3020ed49f2cf081730bf4b97653299d54314",
+    ownerOccurrenceCounts: { "08UK": 1, "0GQ5": 1, "0GQ9": 1, "0D17": 1, "0D3Q": 1 },
+  },
+];
 
 const DEICTIC_PROOF_BODIES = new Set([
   "See above.",
@@ -542,8 +928,11 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
       const localLabel = findBalancedCommandArgument(rawEnvironment, "label");
       if (!localLabel) continue;
       const fullLabel = `${unit.stem}-${localLabel}`;
-      const curatedTitle = CURATED_CLAIMS.get(fullLabel);
-      if (!curatedTitle) continue;
+      const curatedConfig = CURATED_CLAIMS.get(fullLabel);
+      if (!curatedConfig) continue;
+      const curatedTitle = typeof curatedConfig === "string"
+        ? curatedConfig
+        : curatedConfig.title;
       const tag = tags.fullLabelToTag.get(fullLabel);
       if (!tag) throw new Error(`${unit.path}:${range.startLine} has no stable tag for ${fullLabel}`);
       const nodeId = tagNodeId(tag);
@@ -553,6 +942,14 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
       const locator = `${unit.path}:L${range.startLine}-L${range.endLine}`;
       const label = sourceLabel("claim", tag);
       const artifactSha256 = sha256(rawEnvironment);
+      if (typeof curatedConfig !== "string") {
+        if (range.startLine !== curatedConfig.startLine || range.endLine !== curatedConfig.endLine) {
+          throw new Error(`Curated claim ${fullLabel} moved from its audited source range`);
+        }
+        if (artifactSha256 !== curatedConfig.sourceTextSha256) {
+          throw new Error(`Curated claim ${fullLabel} changed from its audited source text`);
+        }
+      }
       const inlineProof = {
         ...range,
         title: "Inline derivation in source remark",
@@ -592,6 +989,121 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
         curatedClaim: true,
       });
     }
+  }
+
+  for (const [fullLabel, curatedConfig] of CURATED_PROSE_CLAIMS) {
+    if (!fullLabel.startsWith(`${unit.stem}-`)) continue;
+    if (!tags.fullLabelToTag.has(fullLabel)) continue;
+    const localLabel = fullLabel.slice(unit.stem.length + 1);
+    const range = {
+      startLine: curatedConfig.startLine,
+      endLine: curatedConfig.endLine,
+    };
+    const rawClaim = lines.slice(range.startLine - 1, range.endLine).join("\n");
+    if (sha256(rawClaim) !== curatedConfig.sourceTextSha256) {
+      throw new Error(`Curated prose claim ${fullLabel} changed from its audited source text`);
+    }
+    if (!labelArguments(rawClaim).includes(localLabel)) {
+      throw new Error(`Curated prose claim ${fullLabel} is absent from its audited source range`);
+    }
+    const tag = tags.fullLabelToTag.get(fullLabel);
+    const nodeId = tagNodeId(tag);
+    const locator = `${unit.path}:L${range.startLine}-L${range.endLine}`;
+    const label = sourceLabel("claim", tag);
+    const artifactSha256 = sha256(rawClaim);
+    const inlineProof = {
+      ...range,
+      title: "Inline derivation in source prose",
+      rawProof: rawClaim,
+      references: referencesInLines(lines, range.startLine, range.endLine),
+      citations: citationsInLines(lines, range.startLine, range.endLine),
+    };
+    metadata.push({
+      node: {
+        id: nodeId,
+        nodeClass: "theorem-like",
+        kind: "claim",
+        sourceLabel: label,
+        title: curatedConfig.title,
+        sourceXmlId: fullLabel,
+        sourceLocator: locator,
+        normalizedStatement: normalizeWhitespace(rawClaim) || label,
+        sourceTextSha256: artifactSha256,
+        evidence: capturedEvidence({
+          sourceUnitId: unitId(unit.stem),
+          locator,
+          artifactSha256,
+          capturedAt,
+          note: "Exact labeled Stacks prose/display span promoted after source audit because it states and derives a theorem-level claim; equation labels are not promoted generally.",
+        }),
+      },
+      unit,
+      environment: "prose-claim",
+      startLine: range.startLine,
+      endLine: range.endLine,
+      rawEnvironment: rawClaim,
+      aliasFullLabels: labelArguments(rawClaim)
+        .filter((labelArgument) => labelArgument !== localLabel)
+        .map((labelArgument) => `${unit.stem}-${labelArgument}`),
+      statementReferences: [],
+      proofs: [inlineProof],
+      curatedClaim: true,
+    });
+  }
+
+  for (const curatedConfig of CURATED_PROSE_SUPPORT_NODES) {
+    if (curatedConfig.sourceStem !== unit.stem) continue;
+    const fullLabel = tags.tagToFullLabel.get(curatedConfig.targetTag);
+    if (!fullLabel) continue;
+    if (!fullLabel.startsWith(`${unit.stem}-`)) {
+      throw new Error(`Curated prose support ${curatedConfig.targetTag} has unexpected source label ${fullLabel}`);
+    }
+    const localLabel = fullLabel.slice(unit.stem.length + 1);
+    const range = {
+      startLine: curatedConfig.startLine,
+      endLine: curatedConfig.endLine,
+    };
+    const rawSupport = lines.slice(range.startLine - 1, range.endLine).join("\n");
+    const artifactSha256 = sha256(rawSupport);
+    if (artifactSha256 !== curatedConfig.sourceTextSha256) {
+      throw new Error(`Curated prose support ${fullLabel} changed from its audited source text`);
+    }
+    if (!labelArguments(rawSupport).includes(localLabel)) {
+      throw new Error(`Curated prose support ${fullLabel} is absent from its audited source range`);
+    }
+    const nodeId = tagNodeId(curatedConfig.targetTag);
+    const locator = `${unit.path}:L${range.startLine}-L${range.endLine}`;
+    const label = sourceLabel(curatedConfig.kind, curatedConfig.targetTag);
+    metadata.push({
+      node: {
+        id: nodeId,
+        nodeClass: "support",
+        kind: curatedConfig.kind,
+        sourceLabel: label,
+        title: curatedConfig.title,
+        sourceXmlId: fullLabel,
+        sourceLocator: locator,
+        normalizedStatement: normalizeWhitespace(rawSupport) || label,
+        sourceTextSha256: artifactSha256,
+        evidence: capturedEvidence({
+          sourceUnitId: unitId(unit.stem),
+          locator,
+          artifactSha256,
+          capturedAt,
+          note: "Exact labeled Stacks prose/display span promoted as a source-audited definition or construction because formal proofs use it directly; no theorem-like claim is asserted.",
+        }),
+      },
+      unit,
+      environment: "prose-support",
+      startLine: range.startLine,
+      endLine: range.endLine,
+      rawEnvironment: rawSupport,
+      // Curated support spans represent exactly their own permanent label.
+      // Never alias a neighbouring equation or definition into this node.
+      aliasFullLabels: [],
+      statementReferences: referencesInLines(lines, range.startLine, range.endLine),
+      curatedSupport: true,
+    });
   }
   metadata.sort((left, right) => left.startLine - right.startLine);
 
@@ -708,7 +1220,7 @@ function referenceEntity({ group, dependencyId, capturedAt, usedIds }) {
   };
 }
 
-function citationReferenceEntity({ group, capturedAt, usedIds }) {
+function citationReferenceEntity({ group, externalInput = null, dependencyId = null, capturedAt, usedIds }) {
   const { owner, citationKey, pinpoint, occurrences } = group;
   const citationIdentity = `${citationKey}\u0000${pinpoint ?? ""}`;
   const targetSuffix = sha256(citationIdentity).slice(0, 12);
@@ -728,21 +1240,34 @@ function citationReferenceEntity({ group, capturedAt, usedIds }) {
     pinpoint,
     context: occurrences[0]?.context ?? "Explicit bibliographic citation in a formal proof.",
     locator,
-    resolution: {
-      status: "unresolved",
-      note: "This bibliographic proof citation requires source review before it can be promoted to a typed external mathematical input and dependency.",
-    },
+    resolution: externalInput
+      ? {
+        status: "resolved",
+        target: { type: "external-input", id: externalInput.id },
+        directDependencyId: dependencyId,
+        note: "A primary-source audit resolved this exact bibliographic theorem invocation to the linked typed external mathematical input and dependency.",
+      }
+      : {
+        status: "unresolved",
+        note: "This bibliographic proof citation requires source review before it can be promoted to a typed external mathematical input and dependency.",
+      },
     evidence: capturedEvidence({
       sourceUnitId: unitId(owner.unit.stem),
       locator,
       artifactSha256: sha256(canonicalJson(occurrences)),
       capturedAt,
-      note: `${occurrences.length} explicit proof citation occurrence(s) merged by bibliography key and pinpoint; not independently reviewed.`,
+      note: externalInput
+        ? `${occurrences.length} exact bibliographic theorem invocation(s) resolved by a source-audited allowlist against a primary source; no independent mathematical review is claimed.`
+        : `${occurrences.length} explicit proof citation occurrence(s) merged by bibliography key and pinpoint; not independently reviewed.`,
     }),
   };
 }
 
-export function extractStacksGraphFromUnits(units, tagText, { capturedAt, bibliographyText = null }) {
+export function extractStacksGraphFromUnits(
+  units,
+  tagText,
+  { capturedAt, bibliographyText = null, sourceRevision = null },
+) {
   if (!Array.isArray(units) || units.length === 0) throw new Error("The Stacks source-unit list is empty");
   const tags = parseTagRows(tagText);
   const sourceUnits = units.map((unit, index) => ({
@@ -830,6 +1355,11 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
     .map((config) => ({ config, owner: metadataForTag(config.ownerTag, "named-result owner") }))
     .filter(({ owner }) => owner);
   const externalInputs = [];
+  const auditedCitationResolutionByGroupKey = new Map();
+  const auditedNondependencyCitationGroupKeys = new Set();
+  const citationAuditKey = (ownerNodeId, citationKey, pinpoint) => (
+    `${ownerNodeId}|${citationKey}\u0000${pinpoint ?? ""}`
+  );
   if (activeNamedAudits.some(({ config }) => config.externalInputId === "external-zorns-lemma")) {
     const conventions = units.find(({ stem }) => stem === "conventions");
     if (!conventions) throw new Error("Zorn's lemma audit requires the pinned conventions source unit");
@@ -853,6 +1383,149 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
         note: "The pinned source declares Zermelo-Fraenkel set theory with choice; four source-audited formal proofs invoke Zorn's lemma by name.",
       }),
     });
+  }
+
+  const activeExternalCitationInputs = CURATED_EXTERNAL_CITATION_INPUTS
+    .map((config) => ({
+      config,
+      uses: config.uses
+        .map((use) => ({
+          use,
+          owner: metadataForTag(use.ownerTag, "external-citation owner"),
+        }))
+        .filter(({ owner }) => owner),
+    }))
+    .filter(({ uses }) => uses.length > 0);
+  if (activeExternalCitationInputs.length > 0
+    && sourceRevision !== CURATED_CITATION_SOURCE_REVISION) {
+    throw new Error(`Curated external-citation audit requires source revision ${CURATED_CITATION_SOURCE_REVISION}`);
+  }
+  for (const { config, uses: activeUses } of activeExternalCitationInputs) {
+    if (activeUses.length !== config.uses.length) {
+      throw new Error(`Curated external input ${config.id} is missing an audited owner`);
+    }
+    for (const guard of config.sourceSpanGuards ?? []) {
+      const sourceUnit = units.find(({ stem }) => stem === guard.sourceStem);
+      if (!sourceUnit) throw new Error(`Curated external input ${config.id} is missing ${guard.sourceStem}`);
+      const sourceLines = sourceUnit.content.split(/\r?\n/u);
+      const rawSource = sourceLines.slice(guard.startLine - 1, guard.endLine).join("\n");
+      if (sha256(rawSource) !== guard.sourceTextSha256) {
+        throw new Error(`Curated external input ${config.id} inherited source setup changed`);
+      }
+    }
+
+    const auditedUses = activeUses.map(({ use, owner }) => {
+      if (owner.node.sourceTextSha256 !== use.ownerSourceTextSha256) {
+        throw new Error(`Curated external-citation owner ${use.ownerTag} statement changed`);
+      }
+      const matches = uniqueCitationGroups({
+        citations: (owner.proofs ?? []).flatMap(({ citations }) => citations),
+        owner,
+      }).filter((group) => (
+        group.citationKey === use.citationKey
+        && group.pinpoint === use.pinpoint
+      ));
+      if (matches.length !== 1) {
+        throw new Error(`Curated citation ${use.ownerTag}/${use.citationKey}/${use.pinpoint ?? "no pinpoint"} no longer has one exact proof group`);
+      }
+      const group = matches[0];
+      if (sha256(canonicalJson(group.occurrences)) !== use.citationArtifactSha256) {
+        throw new Error(`Curated citation ${use.ownerTag}/${use.citationKey}/${use.pinpoint ?? "no pinpoint"} changed from its audited occurrence`);
+      }
+      const proofStartLines = [...new Set(group.occurrences.map(({ lineNumber }) => (
+        (owner.proofs ?? []).find((proof) => (
+          proof.startLine <= lineNumber && proof.endLine >= lineNumber
+        ))?.startLine
+      )))];
+      if (proofStartLines.includes(undefined)) {
+        throw new Error(`Curated citation ${use.ownerTag}/${use.citationKey} moved outside its proof`);
+      }
+      return { use, owner, group, proofStartLines };
+    });
+
+    const input = {
+      id: config.id,
+      kind: "external-theorem",
+      label: config.label,
+      normalizedStatement: config.normalizedStatement,
+      sourceTextSha256: null,
+      sourceCitation: config.sourceCitation,
+      evidence: {
+        status: "captured",
+        sourceUnitIds: [...new Set(auditedUses.map(({ owner }) => unitId(owner.unit.stem)))],
+        locator: auditedUses
+          .flatMap(({ owner, group }) => group.occurrences.map(({ lineNumber }) => (
+            `${owner.unit.path}:L${lineNumber}`
+          )))
+          .join("; "),
+        captureAudit: {
+          actorId: "stacks-latex-importer",
+          capturedAt,
+          artifactSha256: sha256(canonicalJson(auditedUses.map(({ use, group }) => ({
+            ownerTag: use.ownerTag,
+            citationKey: use.citationKey,
+            pinpoint: use.pinpoint,
+            occurrences: group.occurrences,
+          })))),
+        },
+        independentReview: null,
+        note: "The exact local citation invocation was checked against the named primary-source theorem; the external source text itself is identified by the source citation and was not copied into this artifact.",
+      },
+    };
+    externalInputs.push(input);
+    for (const { use, owner, group, proofStartLines } of auditedUses) {
+      auditedCitationResolutionByGroupKey.set(
+        citationAuditKey(owner.node.id, use.citationKey, use.pinpoint),
+        input,
+      );
+      addSemanticGroup({
+        owner,
+        basis: "audited-external-citation",
+        targetNode: null,
+        externalInput: input,
+        occurrences: group.occurrences,
+        proofStartLines,
+        routeEvidenceRegions: [],
+        routeDebtNotes: [],
+        rationale: `A primary-source audit identifies the exact bibliographic invocation as the external theorem “${input.label}”.`,
+        evidenceNote: "Exact owner, formal statement hash, bibliography key, pinpoint, occurrence hash, pinned source revision, and primary theorem locator were audited.",
+      });
+    }
+  }
+
+  const activeNondependencyCitations = CURATED_NONDEPENDENCY_PROOF_CITATIONS
+    .map((config) => ({
+      config,
+      owner: metadataForTag(config.ownerTag, "nondependency-citation owner"),
+    }))
+    .filter(({ owner }) => owner);
+  if (activeNondependencyCitations.length > 0
+    && sourceRevision !== CURATED_CITATION_SOURCE_REVISION) {
+    throw new Error(`Curated nondependency-citation audit requires source revision ${CURATED_CITATION_SOURCE_REVISION}`);
+  }
+  for (const { config, owner } of activeNondependencyCitations) {
+    if (owner.node.sourceTextSha256 !== config.ownerSourceTextSha256) {
+      throw new Error(`Curated nondependency-citation owner ${config.ownerTag} statement changed`);
+    }
+    const matches = uniqueCitationGroups({
+      citations: (owner.proofs ?? []).flatMap(({ citations }) => citations),
+      owner,
+    }).filter((group) => (
+      group.citationKey === config.citationKey
+      && group.pinpoint === config.pinpoint
+    ));
+    if (matches.length !== 1) {
+      throw new Error(`Curated nondependency citation ${config.ownerTag}/${config.citationKey}/${config.pinpoint ?? "no pinpoint"} no longer has one exact proof group`);
+    }
+    const group = matches[0];
+    if (sha256(canonicalJson(group.occurrences)) !== config.citationArtifactSha256) {
+      throw new Error(`Curated nondependency citation ${config.ownerTag}/${config.citationKey}/${config.pinpoint ?? "no pinpoint"} changed from its audited occurrence`);
+    }
+    auditedNondependencyCitationGroupKeys.add(citationAuditKey(
+      owner.node.id,
+      config.citationKey,
+      config.pinpoint,
+    ));
   }
   const externalInputById = new Map(externalInputs.map((input) => [input.id, input]));
 
@@ -883,6 +1556,32 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
       routeDebtNotes: [],
       rationale: `The pinned Stacks proof invokes ${targetLabel} by its standard name.`,
       evidenceNote: `${occurrences.length} owner-specific, source-audited named-result invocation(s) merged into one dependency.`,
+    });
+  }
+
+  for (const config of CURATED_CLAIM_DEPENDENCIES) {
+    const owner = metadataForTag(config.ownerTag, "curated-claim owner");
+    if (!owner) continue;
+    if (!owner.curatedClaim) {
+      throw new Error(`Curated claim dependency owner ${config.ownerTag} is not a promoted claim`);
+    }
+    const { occurrences, proofStartLines } = proofPhraseOccurrences(owner, config.phrasePattern);
+    if (occurrences.length !== config.expectedOccurrenceCount) {
+      throw new Error(`Curated claim audit for ${config.ownerTag}->${config.targetTag} expected ${config.expectedOccurrenceCount} occurrence(s), found ${occurrences.length}`);
+    }
+    const target = targetForTag(config.targetTag, "curated-claim prerequisite");
+    assertTargetPrecedesOwner(target, owner, "curated-claim prerequisite");
+    addSemanticGroup({
+      owner,
+      basis: "audited-curated-claim",
+      targetNode: target.node,
+      externalInput: null,
+      occurrences,
+      proofStartLines,
+      routeEvidenceRegions: [],
+      routeDebtNotes: [],
+      rationale: `The exact source-audited derivation of ${owner.node.sourceLabel} directly uses ${target.node.sourceLabel}.`,
+      evidenceNote: `${occurrences.length} exact phrase occurrence(s) in the promoted claim's pinned inline derivation.`,
     });
   }
 
@@ -1053,6 +1752,57 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
     }
   }
 
+  const orderedCountEntries = (value) => Object.entries(value)
+    .sort(([left], [right]) => left.localeCompare(right));
+  for (const [targetTag, expectedOwnerOccurrenceCounts]
+    of CURATED_CLAIM_INCOMING_REFERENCE_COUNTS) {
+    const fullLabel = tags.tagToFullLabel.get(targetTag);
+    if (!fullLabel) continue;
+    const target = metadataForTag(targetTag, "incoming-reference claim");
+    if (!target.curatedClaim) {
+      throw new Error(`Incoming-reference audit target ${targetTag} is not a promoted claim`);
+    }
+    const actualOwnerOccurrenceCounts = {};
+    for (const owner of metadata.filter(({ node }) => node.nodeClass === "theorem-like")) {
+      const occurrenceCount = (owner.proofs ?? [])
+        .flatMap(({ references }) => references)
+        .filter(({ ref }) => (
+          resolveFullLabel(ref, owner.unit.stem, tags.fullLabelToTag) === fullLabel
+        )).length;
+      if (occurrenceCount === 0) continue;
+      const ownerTag = tags.fullLabelToTag.get(owner.node.sourceXmlId);
+      actualOwnerOccurrenceCounts[ownerTag] = occurrenceCount;
+    }
+    if (canonicalJson(orderedCountEntries(actualOwnerOccurrenceCounts))
+      !== canonicalJson(orderedCountEntries(expectedOwnerOccurrenceCounts))) {
+      throw new Error(`Curated claim ${targetTag} incoming owner/count inventory changed`);
+    }
+  }
+
+  for (const config of CURATED_PROSE_SUPPORT_NODES) {
+    const fullLabel = tags.tagToFullLabel.get(config.targetTag);
+    if (!fullLabel) continue;
+    const target = metadataForTag(config.targetTag, "prose-support target");
+    if (!target.curatedSupport || target.node.nodeClass !== "support") {
+      throw new Error(`Curated prose support ${config.targetTag} is not an audited support node`);
+    }
+    const actualOwnerOccurrenceCounts = {};
+    for (const owner of metadata.filter(({ node }) => node.nodeClass === "theorem-like")) {
+      const occurrences = (owner.proofs ?? [])
+        .flatMap(({ references }) => references)
+        .filter(({ ref }) => (
+          resolveFullLabel(ref, owner.unit.stem, tags.fullLabelToTag) === fullLabel
+        ));
+      if (occurrences.length === 0) continue;
+      const ownerTag = tags.fullLabelToTag.get(owner.node.sourceXmlId);
+      actualOwnerOccurrenceCounts[ownerTag] = occurrences.length;
+    }
+    if (canonicalJson(orderedCountEntries(actualOwnerOccurrenceCounts))
+      !== canonicalJson(orderedCountEntries(config.ownerOccurrenceCounts))) {
+      throw new Error(`Curated prose support ${config.targetTag} owner/count inventory changed`);
+    }
+  }
+
   const usedIds = new Set([
     ...sourceUnits.map(({ id }) => id),
     ...nodes.map(({ id }) => id),
@@ -1114,6 +1864,8 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
   }
   const explicitProofXrefDependencyCount = directDependencies.length;
   let namedResultDependencyCount = 0;
+  let curatedClaimDependencyCount = 0;
+  let externalCitationDependencyCount = 0;
   let deicticDependencyCount = 0;
   let bundledRemarkDependencyCount = 0;
   for (const ownerGroups of semanticGroupsByOwner.values()) {
@@ -1145,6 +1897,8 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
         }),
       });
       if (group.basis === "audited-named-result") namedResultDependencyCount += 1;
+      else if (group.basis === "audited-curated-claim") curatedClaimDependencyCount += 1;
+      else if (group.basis === "audited-external-citation") externalCitationDependencyCount += 1;
       else if (group.basis.includes("deictic")) deicticDependencyCount += 1;
       else if (group.basis === "audited-bundled-remark") bundledRemarkDependencyCount += 1;
     }
@@ -1209,7 +1963,7 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
         dependencyIds,
         summary: routeKind === "alternate-proof"
           ? "Source-faithful alternate route containing only direct prerequisites explicitly cited or selected by an owner-specific source audit of this separately titled Stacks proof."
-          : "Source-faithful candidate route containing direct prerequisites explicitly cited or selected by owner-specific audits of named and deictic proof language in the pinned Stacks source.",
+          : "Source-faithful candidate route containing direct prerequisites explicitly cited or selected by owner-specific audits of semantic proof language and bibliographic theorem invocations in the pinned Stacks source.",
         evidence: capturedEvidence({
           sourceUnitId: unitId(owner.unit.stem),
           locator: locator || owner.node.sourceLocator,
@@ -1217,7 +1971,7 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
           capturedAt,
           note: routeKind === "alternate-proof"
             ? `Candidate alternative route from a separately titled source proof${hasSemanticDependencies ? " with owner-specific audited prose dependencies" : ""}; implicit prerequisites remain pending and no independent review is claimed.${routeDebtNotes.length ? ` ${routeDebtNotes.join(" ")}` : ""}`
-            : `Candidate route from ${hasSemanticDependencies ? "explicit proof references plus owner-specific audited named, deictic, or bundled-remark dependencies" : "explicit proof references only"}; implicit prerequisites remain pending and no independent review is claimed.${routeDebtNotes.length ? ` ${routeDebtNotes.join(" ")}` : ""}`,
+            : `Candidate route from ${hasSemanticDependencies ? "explicit proof references plus owner-specific audited named-result, curated-claim, external-citation, deictic, or bundled-remark dependencies" : "explicit proof references only"}; implicit prerequisites remain pending and no independent review is claimed.${routeDebtNotes.length ? ` ${routeDebtNotes.join(" ")}` : ""}`,
         }),
       });
     }
@@ -1232,7 +1986,23 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
         references.push(referenceEntity({ group, dependencyId: null, capturedAt, usedIds }));
       }
       for (const group of citationGroupsByOwner.get(owner.node.id) ?? []) {
-        references.push(citationReferenceEntity({ group, capturedAt, usedIds }));
+        const groupKey = citationAuditKey(
+          owner.node.id,
+          group.citationKey,
+          group.pinpoint,
+        );
+        if (auditedNondependencyCitationGroupKeys.has(groupKey)) continue;
+        const externalInput = auditedCitationResolutionByGroupKey.get(groupKey) ?? null;
+        const dependencyId = externalInput
+          ? dependencyIdByPair.get(`${owner.node.id}|${externalInput.id}`) ?? null
+          : null;
+        references.push(citationReferenceEntity({
+          group,
+          externalInput,
+          dependencyId,
+          capturedAt,
+          usedIds,
+        }));
       }
     }
   }
@@ -1241,13 +2011,20 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
     theoremNodeIds: [],
     supportNodeIds: [],
     curatedClaimCount: 0,
+    curatedSupportCount: 0,
   }]));
-  for (const { node, unit, curatedClaim = false } of metadata) {
+  for (const {
+    node,
+    unit,
+    curatedClaim = false,
+    curatedSupport = false,
+  } of metadata) {
     const inventory = inventoryByUnitId.get(unitId(unit.stem));
     if (!inventory) throw new Error(`Missing source-unit inventory for ${unit.path}`);
     if (node.nodeClass === "theorem-like") inventory.theoremNodeIds.push(node.id);
     else inventory.supportNodeIds.push(node.id);
     if (curatedClaim) inventory.curatedClaimCount += 1;
+    if (curatedSupport) inventory.curatedSupportCount += 1;
   }
   const unitInventories = sourceUnits.map((unit) => {
     const inventory = inventoryByUnitId.get(unit.id);
@@ -1264,12 +2041,13 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
         capturedAt,
         note: inventory.theoremNodeIds.length === 0
           ? "Formal-environment plus curated-claim scan found no theorem-like result in this complete pinned chapter; examples and exercises do not count as theorem nodes."
-          : `Formal-environment plus curated-claim scan assigned ${inventory.theoremNodeIds.length} theorem-like and ${inventory.supportNodeIds.length} definition/situation node(s), including ${inventory.curatedClaimCount} exact-label source-audited remark claim(s); examples, exercises, and all other remarks were excluded.`,
+          : `Formal-environment plus curated-span scan assigned ${inventory.theoremNodeIds.length} theorem-like and ${inventory.supportNodeIds.length} support node(s), including ${inventory.curatedClaimCount} exact-label source-audited claim(s) and ${inventory.curatedSupportCount} source-audited prose/display support node(s); examples, exercises, and all other remarks were excluded.`,
       }),
     };
   });
 
   const curatedClaimCount = metadata.filter(({ curatedClaim }) => curatedClaim).length;
+  const curatedSupportCount = metadata.filter(({ curatedSupport }) => curatedSupport).length;
   const excludedEnvironmentCounts = Object.fromEntries(EXCLUDED_ENVIRONMENTS.map((environment) => [
     environment,
     units.reduce((total, unit) => total + environmentRanges(
@@ -1285,6 +2063,14 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
   const proofCitationReferences = references.filter((reference) => (
     reference.basis === "proof-citation"
   ));
+  const resolvedProofCitationReferences = proofCitationReferences.filter(({ resolution }) => (
+    resolution.status === "resolved"
+  ));
+  const unresolvedProofCitationReferences = proofCitationReferences.filter(({ resolution }) => (
+    resolution.status === "unresolved"
+  ));
+  const citationOccurrenceCount = (citationReferences) => citationReferences
+    .reduce((total, reference) => total + reference.locator.split("; ").length, 0);
   if (bibliographyText !== null) {
     const knownBibliographyKeys = bibliographyKeys(bibliographyText);
     const missingCitation = proofCitationReferences.find(({ ref }) => !knownBibliographyKeys.has(ref));
@@ -1315,24 +2101,32 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
       directDependencyCount: directDependencies.length,
       explicitProofXrefDependencyCount,
       namedResultDependencyCount,
+      curatedClaimDependencyCount,
+      externalCitationDependencyCount,
       deicticDependencyCount,
       bundledRemarkDependencyCount,
       semanticDependencyCount: namedResultDependencyCount
+        + curatedClaimDependencyCount
+        + externalCitationDependencyCount
         + deicticDependencyCount
         + bundledRemarkDependencyCount,
       suppressedProofXrefDependencyCount,
+      suppressedProofCitationReferenceCount: auditedNondependencyCitationGroupKeys.size,
       curatedResolvedBundledProofXrefCount: curatedResolvedProofGroupKeys.size,
       externalInputCount: externalInputs.length,
       proofRouteCount: proofRoutes.length,
       referenceCount: references.length,
       unresolvedReferenceCount,
       statementXrefCount: 0,
-      proofCitationReferenceCount: proofCitationReferences.length,
-      proofCitationOccurrenceCount: [...citationGroupsByOwner.values()]
-        .flatMap((groups) => groups)
-        .reduce((total, group) => total + group.occurrences.length, 0),
-      distinctProofCitationKeyCount: new Set(proofCitationReferences.map(({ ref }) => ref)).size,
-      proofCitationOwnerCount: new Set(proofCitationReferences.map(({ ownerNodeId }) => ownerNodeId)).size,
+      totalProofCitationReferenceCount: proofCitationReferences.length
+        + auditedNondependencyCitationGroupKeys.size,
+      retainedProofCitationReferenceCount: proofCitationReferences.length,
+      resolvedProofCitationReferenceCount: resolvedProofCitationReferences.length,
+      resolvedProofCitationOccurrenceCount: citationOccurrenceCount(resolvedProofCitationReferences),
+      proofCitationReferenceCount: unresolvedProofCitationReferences.length,
+      proofCitationOccurrenceCount: citationOccurrenceCount(unresolvedProofCitationReferences),
+      distinctProofCitationKeyCount: new Set(unresolvedProofCitationReferences.map(({ ref }) => ref)).size,
+      proofCitationOwnerCount: new Set(unresolvedProofCitationReferences.map(({ ownerNodeId }) => ownerNodeId)).size,
       unresolvedProofXrefCount: unresolvedTaggedProofReferences.length,
       unresolvedTaggedProofReferenceCount: unresolvedTaggedProofReferences.length,
       uniqueUnresolvedTaggedProofTargetCount: new Set(
@@ -1342,6 +2136,7 @@ export function extractStacksGraphFromUnits(units, tagText, { capturedAt, biblio
       unitInventoryCount: unitInventories.length,
       theoremFreeUnitCount: unitInventories.filter(({ theoremFreeAttestation }) => theoremFreeAttestation).length,
       curatedClaimCount,
+      curatedSupportCount,
       excludedEnvironmentCounts,
       tagCount: tags.tagToFullLabel.size,
     },
@@ -1406,6 +2201,7 @@ export function buildStacksBookFile({
   const extracted = extractStacksGraphFromUnits(collected.units, collected.tagText, {
     capturedAt,
     bibliographyText: collected.bibliographyText,
+    sourceRevision: commit,
   });
   const artifactFiles = [
     { path: "Makefile", content: collected.makefileText },
@@ -1463,7 +2259,7 @@ export function buildStacksBookFile({
           unitInventoryCount: extracted.unitInventories.length,
         },
         independentReview: null,
-        note: `Formal-environment extraction plus ${extracted.stats.curatedClaimCount} exact-label, source-audited theorem-level remark claim(s) from all ${extracted.sourceUnits.length} chapters in the pinned official source: ${kindSummary}. Deliberately excluded ${excludedSummary}; no worked example is a graph node and no other remark was promoted.`,
+        note: `Formal-environment extraction plus ${extracted.stats.curatedClaimCount} exact-label, source-audited theorem-level claim(s) and ${extracted.stats.curatedSupportCount} proof-used definition/construction span(s) outside formal environments from all ${extracted.sourceUnits.length} chapters in the pinned official source: ${kindSummary}. Deliberately excluded ${excludedSummary}; no worked example is a graph node and no unlisted remark or display was promoted.`,
       },
       graphState: {
         status: "extracted",
@@ -1478,7 +2274,7 @@ export function buildStacksBookFile({
           referenceCount: extracted.graph.references.length,
         },
         independentReview: null,
-        note: `${extracted.stats.directDependencyCount} candidate edges comprise ${extracted.stats.explicitProofXrefDependencyCount} explicit proof-xref edges and ${extracted.stats.semanticDependencyCount} owner-specific source-audited prose-use edges (${extracted.stats.namedResultDependencyCount} named-result, ${extracted.stats.deicticDependencyCount} deictic-proof, ${extracted.stats.bundledRemarkDependencyCount} bundled-remark); resolved occurrences are merged into edge evidence, and ${extracted.stats.suppressedProofXrefDependencyCount} notation-only proof xref was explicitly suppressed. Zorn's lemma is represented once as a typed external theorem under the source's declared choice convention. ${extracted.stats.unresolvedTaggedProofReferenceCount} unresolved tagged proof-xref records (${extracted.stats.uniqueUnresolvedTaggedProofTargetCount} unique permanent labels) and ${extracted.stats.proofCitationReferenceCount} unresolved bibliographic proof-citation records (${extracted.stats.distinctProofCitationKeyCount} keys) remain review candidates; no bibliographic citation was promoted to an external input. ${extracted.stats.pendingTheoremCount} theorem-like nodes have no route with a resolved candidate prerequisite and remain pending, not roots. No independent mathematical review or graph-completeness claim is made.`,
+        note: `${extracted.stats.directDependencyCount} candidate edges comprise ${extracted.stats.explicitProofXrefDependencyCount} explicit proof-xref edges and ${extracted.stats.semanticDependencyCount} owner-specific source-audited semantic edges (${extracted.stats.namedResultDependencyCount} named-result, ${extracted.stats.curatedClaimDependencyCount} curated-claim, ${extracted.stats.externalCitationDependencyCount} external-citation, ${extracted.stats.deicticDependencyCount} deictic-proof, ${extracted.stats.bundledRemarkDependencyCount} bundled-remark); resolved occurrences are merged into edge evidence, and ${extracted.stats.suppressedProofXrefDependencyCount} exact owner-target proof-xref record(s) were audited as notation-only or optional nonlogical uses and suppressed. The graph has ${extracted.stats.externalInputCount} typed external theorem input(s): Zorn's lemma under the declared choice convention plus primary-source-audited bibliographic results. Of ${extracted.stats.totalProofCitationReferenceCount} original bibliographic proof-citation records, ${extracted.stats.resolvedProofCitationReferenceCount} resolve to ${extracted.stats.externalCitationDependencyCount} owner-input edges, ${extracted.stats.suppressedProofCitationReferenceCount} are audited nondependencies, and ${extracted.stats.proofCitationReferenceCount} remain unresolved. ${extracted.stats.unresolvedTaggedProofReferenceCount} unresolved tagged proof-xref records (${extracted.stats.uniqueUnresolvedTaggedProofTargetCount} unique permanent labels) and ${extracted.stats.proofCitationReferenceCount} bibliographic records (${extracted.stats.distinctProofCitationKeyCount} keys) remain review candidates. ${extracted.stats.pendingTheoremCount} theorem-like nodes have no route with a resolved candidate prerequisite and remain pending, not roots. No independent mathematical review or graph-completeness claim is made.`,
       },
     },
     stats: {

@@ -450,6 +450,286 @@ The result follows from the snake lemma applied to the diagram.
       ?.dependencyIds).toEqual(["dep-tag-00hl-to-tag-07jw"]);
   });
 
+  it("recovers audited Nakayama, five-lemma, and 2-Yoneda invocations", () => {
+    const result = extractStacksGraphFromUnits([
+      {
+        stem: "categories",
+        path: "categories.tex",
+        title: "Categories",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-yoneda-2category}
+The 2-Yoneda lemma.
+\end{lemma}
+`,
+      },
+      {
+        stem: "algebra",
+        path: "algebra.tex",
+        title: "Algebra",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-NAK}
+The ordinary Nakayama lemma.
+\end{lemma}
+`,
+      },
+      {
+        stem: "homology",
+        path: "homology.tex",
+        title: "Homology",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-five-lemma}
+The five lemma.
+\end{lemma}
+`,
+      },
+      {
+        stem: "stacks-properties",
+        path: "stacks-properties.tex",
+        title: "Properties of Stacks",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-equivalence}
+The two objects are equivalent.
+\end{lemma}
+\begin{proof}
+They are equivalent by the $2$-Yoneda lemma.
+\end{proof}
+`,
+      },
+      {
+        stem: "adequate",
+        path: "adequate.tex",
+        title: "Adequate Modules",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-extension-adequate-key}
+The natural map is an isomorphism.
+\end{lemma}
+\begin{proof}
+This follows from the five lemma.
+\end{proof}
+`,
+      },
+      {
+        stem: "dualizing",
+        path: "dualizing.tex",
+        title: "Dualizing Complexes",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-equivalence-finite-length}
+The two modules have the same number of generators.
+\end{lemma}
+\begin{proof}
+The conclusion follows from Nakayama's lemma.
+\end{proof}
+`,
+      },
+    ], [
+      "004B,categories-lemma-yoneda-2category",
+      "00DV,algebra-lemma-NAK",
+      "05QB,homology-lemma-five-lemma",
+      "04XF,stacks-properties-lemma-equivalence",
+      "06V6,adequate-lemma-extension-adequate-key",
+      "0A7P,dualizing-lemma-equivalence-finite-length",
+    ].join("\n"), { capturedAt });
+
+    expect(result.stats.namedResultDependencyCount).toBe(3);
+    expect(result.graph.directDependencies).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        dependentNodeId: "tag-04xf",
+        prerequisite: { type: "node", id: "tag-004b" },
+      }),
+      expect.objectContaining({
+        dependentNodeId: "tag-06v6",
+        prerequisite: { type: "node", id: "tag-05qb" },
+      }),
+      expect.objectContaining({
+        dependentNodeId: "tag-0a7p",
+        prerequisite: { type: "node", id: "tag-00dv" },
+      }),
+    ]));
+    expect(result.graph.proofRoutes).toHaveLength(3);
+  });
+
+  it("promotes the audited long-exact-sequence prose claim with both direct prerequisites", () => {
+    const rawClaim = String.raw`If $H : \mathcal{D} \to \mathcal{A}$ is a homological functor
+we often write $H^n(X) = H(X[n])$ so that $H(X) = H^0(X)$.
+Our discussion of TR2 above implies that a distinguished triangle
+$(X, Y, Z, f, g, h)$ determines a long exact sequence
+\begin{equation}
+\label{equation-long-exact-cohomology-sequence}
+\xymatrix@C=3pc{
+H^{-1}(Z) \ar[r]^{H(h[-1])} &
+H^0(X) \ar[r]^{H(f)} &
+H^0(Y) \ar[r]^{H(g)} &
+H^0(Z) \ar[r]^{H(h)} &
+H^1(X)
+}
+\end{equation}
+This will be called the {\it long exact sequence} associated to the
+distinguished triangle and the homological functor. As indicated
+we will not use any signs for the morphisms in the long exact
+sequence. This has the side effect that maps in the long exact sequence
+associated to the rotation (TR2) of a distinguished triangle differ
+from the maps in the sequence above by some signs.`;
+    const preamble = String.raw`\begin{definition}
+\label{definition-triangulated-category}
+A pre-triangulated category satisfies TR2.
+\end{definition}
+
+\begin{definition}
+\label{definition-homological}
+A homological functor sends distinguished triangles to exact sequences.
+\end{definition}`;
+    const preambleLines = preamble.split("\n");
+    const ownerSource = [
+      ["lemma-compose-delta-functor-homological", 1],
+      ["lemma-homological-functor-localize", 2],
+      ["lemma-homological-functor-kernel", 1],
+      ["lemma-homological-functor-bounded", 1],
+      ["lemma-acyclic-general", 1],
+      ["lemma-pre-prepare-adjoint", 1],
+    ].map(([label, occurrenceCount]) => String.raw`
+\begin{lemma}
+\label{${label}}
+The desired assertion holds.
+\end{lemma}
+\begin{proof}
+${Array.from({ length: occurrenceCount }, () => (
+    String.raw`Use Equation \ref{equation-long-exact-cohomology-sequence}.`
+  )).join(" ")}
+\end{proof}`).join("\n");
+    const content = [
+      ...preambleLines,
+      ...Array.from({ length: 276 - preambleLines.length }, () => "% audited padding"),
+      ...rawClaim.split("\n"),
+      ownerSource,
+    ].join("\n");
+
+    const result = extractStacksGraphFromUnits([{
+      stem: "derived",
+      path: "derived.tex",
+      title: "Derived Categories",
+      content,
+    }], [
+      "0145,derived-definition-triangulated-category",
+      "0147,derived-definition-homological",
+      "0148,derived-equation-long-exact-cohomology-sequence",
+      "05SR,derived-lemma-compose-delta-functor-homological",
+      "05R5,derived-lemma-homological-functor-localize",
+      "05RD,derived-lemma-homological-functor-kernel",
+      "05RE,derived-lemma-homological-functor-bounded",
+      "05RM,derived-lemma-acyclic-general",
+      "0CQQ,derived-lemma-pre-prepare-adjoint",
+    ].join("\n"), { capturedAt });
+
+    expect(result.stats).toMatchObject({
+      theoremCount: 7,
+      supportCount: 2,
+      curatedClaimCount: 1,
+      curatedClaimDependencyCount: 2,
+      semanticDependencyCount: 2,
+    });
+    expect(result.graph.nodes.find(({ id }) => id === "tag-0148")).toMatchObject({
+      nodeClass: "theorem-like",
+      kind: "claim",
+      title: "Long exact sequence associated to a distinguished triangle",
+      sourceLocator: "derived.tex:L277-L296",
+    });
+    expect(result.graph.directDependencies
+      .filter(({ dependentNodeId }) => dependentNodeId === "tag-0148")
+      .map(({ prerequisite }) => prerequisite.id)
+      .sort()).toEqual(["tag-0145", "tag-0147"]);
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0148")
+      ?.dependencyIds.sort()).toEqual([
+        "dep-tag-0148-to-tag-0145",
+        "dep-tag-0148-to-tag-0147",
+      ]);
+  });
+
+  it("keeps adjacent audited support conditions as distinct definition nodes", () => {
+    const supportLines = [
+      String.raw`\begin{equation}`,
+      String.raw`\label{equation-bijective}`,
+      String.raw`d\underline{\xi} : \text{Der}_\Lambda(R, k) \to T\mathcal{F}` + " ",
+      String.raw`\text{ is bijective}`,
+      String.raw`\end{equation}`,
+      "and the condition",
+      String.raw`\begin{equation}`,
+      String.raw`\label{equation-bijective-orbits}`,
+      String.raw`d\underline{\xi} : \text{Der}_\Lambda(R, k) \to T\mathcal{F}` + " ",
+      String.raw`\text{ is bijective on }\text{Der}_\Lambda(k, k)\text{-orbits.}`,
+      String.raw`\end{equation}`,
+    ];
+    const owner = (label, references) => String.raw`
+\begin{lemma}
+\label{${label}}
+The audited condition is used.
+\end{lemma}
+\begin{proof}
+${references.map((reference) => String.raw`Use (\ref{${reference}}).`).join(" ")}
+\end{proof}`;
+    const content = [
+      ...Array.from({ length: 4398 }, () => "% audited padding"),
+      ...supportLines,
+      owner("lemma-owner-06iv", ["equation-bijective"]),
+      owner("lemma-owner-06ix", [
+        "equation-bijective",
+        "equation-bijective",
+        "equation-bijective-orbits",
+      ]),
+      owner("lemma-owner-06ir", ["equation-bijective-orbits"]),
+      owner("lemma-owner-06t8", [
+        "equation-bijective-orbits",
+        "equation-bijective-orbits",
+      ]),
+      owner("lemma-owner-06jm", ["equation-bijective-orbits"]),
+      owner("lemma-owner-06kn", ["equation-bijective-orbits"]),
+    ].join("\n");
+
+    const result = extractStacksGraphFromUnits([{
+      stem: "formal-defos",
+      path: "formal-defos.tex",
+      title: "Formal Deformation Theory",
+      content,
+    }], [
+      "06IM,formal-defos-equation-bijective",
+      "06T6,formal-defos-equation-bijective-orbits",
+      "06IV,formal-defos-lemma-owner-06iv",
+      "06IX,formal-defos-lemma-owner-06ix",
+      "06IR,formal-defos-lemma-owner-06ir",
+      "06T8,formal-defos-lemma-owner-06t8",
+      "06JM,formal-defos-lemma-owner-06jm",
+      "06KN,formal-defos-lemma-owner-06kn",
+    ].join("\n"), { capturedAt });
+
+    expect(result.stats).toMatchObject({
+      theoremCount: 6,
+      supportCount: 2,
+      curatedSupportCount: 2,
+    });
+    expect(result.graph.nodes.find(({ id }) => id === "tag-06im")).toMatchObject({
+      nodeClass: "support",
+      kind: "definition",
+      sourceXmlId: "formal-defos-equation-bijective",
+    });
+    expect(result.graph.nodes.find(({ id }) => id === "tag-06t6")).toMatchObject({
+      nodeClass: "support",
+      kind: "definition",
+      sourceXmlId: "formal-defos-equation-bijective-orbits",
+    });
+    expect(result.graph.directDependencies
+      .filter(({ dependentNodeId }) => dependentNodeId === "tag-06ix")
+      .map(({ prerequisite, role }) => [prerequisite.id, role])
+      .sort()).toEqual([
+        ["tag-06im", "definition"],
+        ["tag-06t6", "definition"],
+      ]);
+  });
+
   it("represents audited Zorn invocations as one shared typed external theorem", () => {
     const conventionLines = Array.from({ length: 30 }, (_, index) => (
       index === 27 ? "We use Zermelo-Fraenkel set theory with the axiom of choice." : ""

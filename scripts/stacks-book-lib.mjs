@@ -264,6 +264,20 @@ const CURATED_FORMAL_REFERENCE_ALIASES = new Map([
   ["derived-equation-everywhere", "derived-proposition-derived-functor"],
   ["divisors-equation-koszul", "modules-definition-koszul-complex"],
   ["algebra-remark-Tor-ring-mod-ideal", "algebra-lemma-characterize-flat"],
+  // These two expository chapters explicitly restate the listed groupoid
+  // lemmas for later reference, including the defining restriction diagrams.
+  ["more-groupoids-equation-diagram", "groupoids-lemma-diagram"],
+  ["more-groupoids-equation-pull", "groupoids-lemma-diagram-pull"],
+  ["more-groupoids-equation-restriction", "groupoids-lemma-restrict-groupoid"],
+  ["spaces-more-groupoids-equation-diagram", "spaces-groupoids-lemma-diagram"],
+  ["spaces-more-groupoids-equation-pull", "spaces-groupoids-lemma-diagram-pull"],
+  ["spaces-more-groupoids-equation-restriction", "spaces-groupoids-lemma-restrict-groupoid"],
+  // Each derived-limit display is stated to hold by the corresponding formal lemma.
+  ["cohomology-equation-ses-Rlim-over-U", "cohomology-lemma-RGamma-commutes-with-Rlim"],
+  ["sites-cohomology-equation-ses-Rlim-over-U", "sites-cohomology-lemma-RGamma-commutes-with-Rlim"],
+  // Each comparison display is obtained from part (3) of the listed topology lemma.
+  ["etale-cohomology-equation-compare-big-small", "topologies-lemma-morphism-big-small-etale"],
+  ["spaces-more-cohomology-equation-compare-big-small", "spaces-topologies-lemma-morphism-big-small-etale"],
 ]);
 
 // Named results invoked in prose rather than through \ref. Every entry is tied
@@ -350,6 +364,8 @@ const CURATED_NAMED_PROOF_DEPENDENCIES = [
   { ownerTag: "00E0", externalInputId: "external-zorns-lemma", phrasePattern: "Zorn's lemma", expectedOccurrenceCount: 2 },
   { ownerTag: "07P2", externalInputId: "external-zorns-lemma", phrasePattern: "Zorn's lemma", expectedOccurrenceCount: 1 },
   { ownerTag: "01D7", externalInputId: "external-zorns-lemma", phrasePattern: "Zorn's lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "08ZP", externalInputId: "external-zorns-lemma", phrasePattern: "Zorn's lemma", expectedOccurrenceCount: 1 },
+  { ownerTag: "08XS", externalInputId: "external-zorns-lemma", phrasePattern: "Zorn's lemma", expectedOccurrenceCount: 1 },
 ];
 
 // Exact owner/prerequisite tag pairs recovered from proofs whose entire body is
@@ -1380,7 +1396,7 @@ export function extractStacksGraphFromUnits(
         locator: "conventions.tex:L24-L30",
         artifactSha256: sha256(rawConvention),
         capturedAt,
-        note: "The pinned source declares Zermelo-Fraenkel set theory with choice; four source-audited formal proofs invoke Zorn's lemma by name.",
+        note: "The pinned source declares Zermelo-Fraenkel set theory with choice; six source-audited formal proofs invoke Zorn's lemma by name.",
       }),
     });
   }

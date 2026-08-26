@@ -177,11 +177,11 @@ describe("one Phase-I dependency graph file per source component", () => {
       inventoriedSourceUnitCount: 225,
       reviewedSourceUnitCount: 0,
       theoremNodeCount: 13176,
-      unroutedTheoremCount: 1947,
+      unroutedTheoremCount: 1940,
       supportNodeCount: 1929,
-      dependencyCount: 36237,
+      dependencyCount: 36260,
       reviewedDependencyCount: 0,
-      unresolvedReferenceCount: 2638,
+      unresolvedReferenceCount: 2617,
     });
     expect(validated.filesByPath.get("S0001/level-1.json")?.identity.bookGraphId).toBe("S0001:level-1");
     expect(validated.filesByPath.get("S0074/volume-3.json")?.identity.componentLabel).toBe("Volume 3");
@@ -212,7 +212,7 @@ describe("one Phase-I dependency graph file per source component", () => {
       id: "external-deligne-weight-bound",
       kind: "external-theorem",
     }));
-    expect(densestBook?.graph.directDependencies).toHaveLength(36234);
+    expect(densestBook?.graph.directDependencies).toHaveLength(36257);
     expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
       dependentNodeId: "tag-0eq8",
       prerequisite: { type: "node", id: "tag-0eq6" },
@@ -227,14 +227,36 @@ describe("one Phase-I dependency graph file per source component", () => {
       prerequisite: { type: "node", id: "tag-06t6" },
       role: "definition",
     }));
-    expect(densestBook?.graph.proofRoutes).toHaveLength(11263);
+    expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-04r9",
+      prerequisite: { type: "node", id: "tag-03c6" },
+    }));
+    expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-0bks",
+      prerequisite: { type: "node", id: "tag-0d60" },
+    }));
+    expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-075a",
+      prerequisite: { type: "node", id: "tag-021i" },
+    }));
+    expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-0dga",
+      prerequisite: { type: "node", id: "tag-0df6" },
+    }));
+    for (const ownerNodeId of ["tag-08zp", "tag-08xs"]) {
+      expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
+        dependentNodeId: ownerNodeId,
+        prerequisite: { type: "external-input", id: "external-zorns-lemma" },
+      }));
+    }
+    expect(densestBook?.graph.proofRoutes).toHaveLength(11270);
     expect(densestBook?.graph.proofRoutes.filter((route) => route.routeKind === "alternate-proof"))
       .toHaveLength(40);
     expect(densestBook?.graph.references.every((reference) => (
       ["proof-xref", "proof-citation"].includes(reference.basis)
     ))).toBe(true);
     expect(densestBook?.graph.references.filter((reference) => reference.basis === "proof-xref"))
-      .toHaveLength(2632);
+      .toHaveLength(2611);
     expect(densestBook?.graph.references.filter((reference) => reference.basis === "proof-citation"))
       .toHaveLength(19);
     expect(densestBook?.graph.references.filter((reference) => (

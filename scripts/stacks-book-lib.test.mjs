@@ -311,6 +311,322 @@ describe("strict Stacks formal graph extraction", () => {
     ))).toBe(false);
   });
 
+  it("resolves audited restatement displays to their source lemmas", () => {
+    const restatementTags = [
+      "02YE,groupoids-lemma-diagram",
+      "03C6,groupoids-lemma-diagram-pull",
+      "02VB,groupoids-lemma-restrict-groupoid",
+      "04LF,more-groupoids-equation-diagram",
+      "04LG,more-groupoids-equation-pull",
+      "04MN,more-groupoids-equation-restriction",
+      "0X01,more-groupoids-theorem-uses-restatements",
+      "0X02,more-groupoids-equation-unrelated",
+      "043Z,spaces-groupoids-lemma-diagram",
+      "0450,spaces-groupoids-lemma-diagram-pull",
+      "044B,spaces-groupoids-lemma-restrict-groupoid",
+      "04P9,spaces-more-groupoids-equation-diagram",
+      "0451,spaces-more-groupoids-equation-pull",
+      "04RN,spaces-more-groupoids-equation-restriction",
+      "0X03,spaces-more-groupoids-theorem-uses-restatements",
+      "0D60,cohomology-lemma-RGamma-commutes-with-Rlim",
+      "0BKR,cohomology-equation-ses-Rlim-over-U",
+      "0X04,cohomology-theorem-uses-derived-limit-sequence",
+      "0D6K,sites-cohomology-lemma-RGamma-commutes-with-Rlim",
+      "0BKX,sites-cohomology-equation-ses-Rlim-over-U",
+      "0X05,sites-cohomology-theorem-uses-derived-limit-sequence",
+      "021I,topologies-lemma-morphism-big-small-etale",
+      "0759,etale-cohomology-equation-compare-big-small",
+      "0X06,etale-cohomology-theorem-uses-comparison",
+      "0DF6,spaces-topologies-lemma-morphism-big-small-etale",
+      "0DG9,spaces-more-cohomology-equation-compare-big-small",
+      "0X07,spaces-more-cohomology-theorem-uses-comparison",
+    ].join("\n");
+    const restatementUnits = [
+      {
+        stem: "groupoids",
+        path: "groupoids.tex",
+        title: "Groupoids",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-diagram}
+The groupoid diagram is cartesian.
+\end{lemma}
+\begin{proof}
+Direct.
+\end{proof}
+\begin{lemma}
+\label{lemma-diagram-pull}
+The pull diagram is cartesian.
+\end{lemma}
+\begin{proof}
+Direct.
+\end{proof}
+\begin{lemma}
+\label{lemma-restrict-groupoid}
+Restriction gives a groupoid.
+\end{lemma}
+\begin{proof}
+Direct.
+\end{proof}
+`,
+      },
+      {
+        stem: "more-groupoids",
+        path: "more-groupoids.tex",
+        title: "More on Groupoids",
+        content: String.raw`
+We restate Groupoids, Lemmas \ref{groupoids-lemma-diagram} and
+\ref{groupoids-lemma-diagram-pull} for easy reference.
+\begin{equation}
+\label{equation-diagram}
+1 = 1
+\end{equation}
+\begin{equation}
+\label{equation-pull}
+2 = 2
+\end{equation}
+The restriction diagram comes from Groupoids, Lemma
+\ref{groupoids-lemma-restrict-groupoid}.
+\begin{equation}
+\label{equation-restriction}
+3 = 3
+\end{equation}
+\begin{equation}
+\label{equation-unrelated}
+4 = 4
+\end{equation}
+\begin{theorem}
+\label{theorem-uses-restatements}
+The displays apply.
+\end{theorem}
+\begin{proof}
+Use Equations \ref{equation-diagram}, \ref{equation-pull},
+\ref{equation-restriction}, and \ref{equation-unrelated}.
+\end{proof}
+`,
+      },
+      {
+        stem: "spaces-groupoids",
+        path: "spaces-groupoids.tex",
+        title: "Groupoids in Spaces",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-diagram}
+The spaces diagram is cartesian.
+\end{lemma}
+\begin{proof}
+Direct.
+\end{proof}
+\begin{lemma}
+\label{lemma-diagram-pull}
+The spaces pull diagram is cartesian.
+\end{lemma}
+\begin{proof}
+Direct.
+\end{proof}
+\begin{lemma}
+\label{lemma-restrict-groupoid}
+Restriction gives a spaces groupoid.
+\end{lemma}
+\begin{proof}
+Direct.
+\end{proof}
+`,
+      },
+      {
+        stem: "spaces-more-groupoids",
+        path: "spaces-more-groupoids.tex",
+        title: "More on Groupoids in Spaces",
+        content: String.raw`
+We restate Groupoids in Spaces, Lemmas \ref{spaces-groupoids-lemma-diagram} and
+\ref{spaces-groupoids-lemma-diagram-pull} for easy reference.
+\begin{equation}
+\label{equation-diagram}
+1 = 1
+\end{equation}
+\begin{equation}
+\label{equation-pull}
+2 = 2
+\end{equation}
+The restriction diagram comes from Groupoids in Spaces, Lemma
+\ref{spaces-groupoids-lemma-restrict-groupoid}.
+\begin{equation}
+\label{equation-restriction}
+3 = 3
+\end{equation}
+\begin{theorem}
+\label{theorem-uses-restatements}
+The displays apply.
+\end{theorem}
+\begin{proof}
+Use Equations \ref{equation-diagram}, \ref{equation-pull}, and
+\ref{equation-restriction}.
+\end{proof}
+`,
+      },
+      {
+        stem: "cohomology",
+        path: "cohomology.tex",
+        title: "Cohomology",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-RGamma-commutes-with-Rlim}
+Derived global sections commute with derived limits.
+\end{lemma}
+\begin{proof}
+Direct.
+\end{proof}
+\begin{remark}
+\begin{equation}
+\label{equation-ses-Rlim-over-U}
+0 \to 0
+\end{equation}
+by Lemma \ref{lemma-RGamma-commutes-with-Rlim}.
+\end{remark}
+\begin{theorem}
+\label{theorem-uses-derived-limit-sequence}
+The limit is exact.
+\end{theorem}
+\begin{proof}
+Use Equation \ref{equation-ses-Rlim-over-U}.
+\end{proof}
+`,
+      },
+      {
+        stem: "sites-cohomology",
+        path: "sites-cohomology.tex",
+        title: "Cohomology on Sites",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-RGamma-commutes-with-Rlim}
+Derived global sections on a site commute with derived limits.
+\end{lemma}
+\begin{proof}
+Direct.
+\end{proof}
+\begin{remark}
+\begin{equation}
+\label{equation-ses-Rlim-over-U}
+0 \to 0
+\end{equation}
+by Lemma \ref{lemma-RGamma-commutes-with-Rlim}.
+\end{remark}
+\begin{theorem}
+\label{theorem-uses-derived-limit-sequence}
+The site limit is exact.
+\end{theorem}
+\begin{proof}
+Use Equation \ref{equation-ses-Rlim-over-U}.
+\end{proof}
+`,
+      },
+      {
+        stem: "topologies",
+        path: "topologies.tex",
+        title: "Topologies",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-morphism-big-small-etale}
+The big and small etale morphisms form a commutative diagram.
+\end{lemma}
+\begin{proof}
+Direct.
+\end{proof}
+`,
+      },
+      {
+        stem: "etale-cohomology",
+        path: "etale-cohomology.tex",
+        title: "Etale Cohomology",
+        content: String.raw`
+The diagram of Topologies, Lemma
+\ref{topologies-lemma-morphism-big-small-etale} gives
+\begin{equation}
+\label{equation-compare-big-small}
+1 = 1
+\end{equation}
+\begin{theorem}
+\label{theorem-uses-comparison}
+The comparison holds.
+\end{theorem}
+\begin{proof}
+Use Equation \ref{equation-compare-big-small}.
+\end{proof}
+`,
+      },
+      {
+        stem: "spaces-topologies",
+        path: "spaces-topologies.tex",
+        title: "Topologies on Spaces",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-morphism-big-small-etale}
+The big and small spaces etale morphisms form a commutative diagram.
+\end{lemma}
+\begin{proof}
+Direct.
+\end{proof}
+`,
+      },
+      {
+        stem: "spaces-more-cohomology",
+        path: "spaces-more-cohomology.tex",
+        title: "More Cohomology on Spaces",
+        content: String.raw`
+The diagram of Topologies on Spaces, Lemma
+\ref{spaces-topologies-lemma-morphism-big-small-etale} gives
+\begin{equation}
+\label{equation-compare-big-small}
+1 = 1
+\end{equation}
+\begin{theorem}
+\label{theorem-uses-comparison}
+The comparison holds.
+\end{theorem}
+\begin{proof}
+Use Equation \ref{equation-compare-big-small}.
+\end{proof}
+`,
+      },
+    ];
+    const result = extractStacksGraphFromUnits(restatementUnits, restatementTags, { capturedAt });
+    const prerequisitesByOwner = new Map([
+      ["tag-0x01", ["tag-02vb", "tag-02ye", "tag-03c6"]],
+      ["tag-0x03", ["tag-043z", "tag-044b", "tag-0450"]],
+      ["tag-0x04", ["tag-0d60"]],
+      ["tag-0x05", ["tag-0d6k"]],
+      ["tag-0x06", ["tag-021i"]],
+      ["tag-0x07", ["tag-0df6"]],
+    ]);
+
+    for (const [ownerNodeId, expectedPrerequisites] of prerequisitesByOwner) {
+      const actualPrerequisites = result.graph.directDependencies
+        .filter((dependency) => dependency.dependentNodeId === ownerNodeId)
+        .map((dependency) => dependency.prerequisite.id)
+        .sort();
+      expect(actualPrerequisites).toEqual(expectedPrerequisites);
+    }
+
+    const auditedAliases = new Set([
+      "more-groupoids-equation-diagram",
+      "more-groupoids-equation-pull",
+      "more-groupoids-equation-restriction",
+      "spaces-more-groupoids-equation-diagram",
+      "spaces-more-groupoids-equation-pull",
+      "spaces-more-groupoids-equation-restriction",
+      "cohomology-equation-ses-Rlim-over-U",
+      "sites-cohomology-equation-ses-Rlim-over-U",
+      "etale-cohomology-equation-compare-big-small",
+      "spaces-more-cohomology-equation-compare-big-small",
+    ]);
+    expect(result.graph.references.some(({ ref }) => auditedAliases.has(ref))).toBe(false);
+    expect(result.graph.references).toContainEqual(expect.objectContaining({
+      ownerNodeId: "tag-0x01",
+      ref: "more-groupoids-equation-unrelated",
+      resolution: expect.objectContaining({ status: "unresolved" }),
+    }));
+  });
+
   it("does not attach an untargeted proof across a section boundary", () => {
     const result = extractStacksGraphFromUnits(units, tagText, { capturedAt });
     const boundaryEdges = result.graph.directDependencies.filter((dependency) => (

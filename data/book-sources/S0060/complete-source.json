@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0.0",
+  "sourceSetRevision": "approved-2026-08-22-r1",
+  "bookGraphId": "S0060:complete-source",
+  "leads": [],
+  "proposals": [
+    {
+      "kind": "exact-edition",
+      "id": "s0060-pretext-730e5e3b9609",
+      "edition": {
+        "editionId": "s0060-pretext-730e5e3b9609",
+        "label": "Discrete Mathematics: An Open Introduction, 4th Edition",
+        "publicationYear": 2024,
+        "publisher": null,
+        "stableLocator": "https://github.com/oscarlevin/discrete-book/tree/730e5e3b96094148818603041222df6f3d1d96ba",
+        "artifactSha256": "ede2a158d947032994ec9343c335919c3c0274d2e0d4c0feff7a014d0ac15cc7",
+        "unitManifestSha256": "66b757ead3c7f9a642c8a52330f92b89bfcf5c5648d2c2349cc90e2d2a06ad70",
+        "sourceUnitKind": "source-file",
+        "sourceFormat": "pretext-xml",
+        "accessKind": "open",
+        "licenseSpdx": "CC-BY-NC-SA-4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+        "licenseNote": "The active book source states CC-BY-NC-SA-4.0, while the repository-level license file states CC-BY-SA-4.0. This candidate edition metadata follows the active book source; the conflict remains pending review.",
+        "sourceRepository": "https://github.com/oscarlevin/discrete-book",
+        "sourceRevision": "730e5e3b96094148818603041222df6f3d1d96ba"
+      },
+      "licenseAssessment": {
+        "status": "candidate",
+        "distributionClass": "review-required",
+        "administrativeReview": null,
+        "note": "License and derived-data distribution remain candidates until independent administrative review."
+      },
+      "proposalAudit": {
+        "actorId": "pretext-book-importer",
+        "proposedAt": "2026-08-22T23:04:40.841Z",
+        "subjectSha256": "f5a1e5187af2b9908842671ead3c5b24f041346b96b824d4e8fe80a7659a3311",
+        "note": "Deterministic candidate inventory from the official PreTeXt source at 730e5e3b96094148818603041222df6f3d1d96ba; no independent review is claimed."
+      },
+      "administrativeReview": null
+    }
+  ],
+  "selectedProposalId": null,
+  "blockers": [
+    {
+      "id": "license-conflict",
+      "proposalId": "s0060-pretext-730e5e3b9609",
+      "domain": "license",
+      "code": "license-conflict",
+      "state": "open",
+      "opened": {
+        "actorId": "pretext-book-importer",
+        "recordedAt": "2026-08-22T23:04:40.841Z",
+        "evidenceLocator": "https://github.com/oscarlevin/discrete-book/tree/730e5e3b96094148818603041222df6f3d1d96ba",
+        "evidenceSha256": "ede2a158d947032994ec9343c335919c3c0274d2e0d4c0feff7a014d0ac15cc7",
+        "note": "The active book source states CC-BY-NC-SA-4.0, while the repository-level license file states CC-BY-SA-4.0. This candidate edition metadata follows the active book source; the conflict remains pending review."
+      },
+      "resolution": null
+    }
+  ],
+  "importerAssessments": [
+    {
+      "id": "assessment-s0060-pretext-730e5e3b9609-cbb631c7934a",
+      "proposalId": "s0060-pretext-730e5e3b9609",
+      "adapterId": "pretext-book-importer",
+      "outcome": "candidate-produced",
+      "sourcePinSha256": "9182ba54b65bf5ac90e312dae42ffb462ccb788c5ed1390a3660d9359d034673",
+      "extractionArtifactSha256": "5877de23d4ebc33a3c8b277eaa167d8f571005946c7621ffd4a3c1d1d2c807e2",
+      "graphArtifactSha256": "cbb631c7934a1bb62608dd7a25e57334b4d1b34c3a1af08cb4d640c70ba03116",
+      "assessedBy": "pretext-book-importer",
+      "assessedAt": "2026-08-22T23:04:40.841Z",
+      "note": "The recorded importer produced this stored candidate graph; no independent review or completeness is claimed."
+    }
+  ]
+}

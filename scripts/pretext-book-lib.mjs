@@ -293,7 +293,7 @@ function capturedEvidence({ sourceUnitId, locator, artifactSha256, capturedAt, n
 }
 
 function sourceUnitId(relativePath, usedIds) {
-  return uniqueStableId(`unit-${relativePath.replace(/\.ptx$/iu, "")}`, relativePath, usedIds);
+  return uniqueStableId(`unit-${relativePath.replace(/\.(?:ptx|xml)$/iu, "")}`, relativePath, usedIds);
 }
 
 function includesIn(source) {
@@ -303,7 +303,21 @@ function includesIn(source) {
     if (element.name !== "xi:include") return;
     const href = element.attributes.href;
     if (!href) return;
-    includes.push({ href, parse: element.attributes.parse ?? "xml", line: element.startLine });
+    let ancestor = element.parent;
+    let embeddedAsset = false;
+    while (ancestor && ancestor.name !== "#document") {
+      if (ancestor.name === "prefigure") {
+        embeddedAsset = true;
+        break;
+      }
+      ancestor = ancestor.parent;
+    }
+    includes.push({
+      href,
+      parse: element.attributes.parse ?? "xml",
+      line: element.startLine,
+      embeddedAsset,
+    });
   });
   return includes;
 }
@@ -322,6 +336,7 @@ export function collectPretextSourceUnits(checkoutRoot, entryFile = "source/dmoi
   const visited = new Set();
   const missingIncludes = [];
   const embeddedTextIncludes = [];
+  const excludedXmlIncludes = [];
 
   const visit = (relativePath) => {
     const normalized = path.posix.normalize(relativePath.replaceAll("\\", "/").replace(/^\.\//u, ""));
@@ -338,11 +353,15 @@ export function collectPretextSourceUnits(checkoutRoot, entryFile = "source/dmoi
     const realAbsolute = fs.realpathSync(absolute);
     assertContained(realRoot, realAbsolute);
     visited.add(normalized);
-    const content = fs.readFileSync(realAbsolute, "utf8");
+    const content = fs.readFileSync(realAbsolute, "utf8").replace(/\r\n?/gu, "\n");
     ordered.push({ path: normalized, content });
     for (const include of includesIn(content)) {
       const target = path.posix.normalize(path.posix.join(path.posix.dirname(normalized), include.href));
-      if (include.parse === "text" || !target.endsWith(".ptx")) {
+      if (include.embeddedAsset) {
+        excludedXmlIncludes.push({ ownerPath: normalized, target, line: include.line });
+        continue;
+      }
+      if (include.parse === "text" || !/\.(?:ptx|xml)$/iu.test(target)) {
         embeddedTextIncludes.push({ ownerPath: normalized, target, line: include.line });
         continue;
       }
@@ -361,6 +380,7 @@ export function collectPretextSourceUnits(checkoutRoot, entryFile = "source/dmoi
     units: ordered,
     missingIncludes: [...new Set(missingIncludes)].sort(),
     embeddedTextIncludes,
+    excludedXmlIncludes,
   };
 }
 
@@ -380,6 +400,31 @@ function buildSourceUnits(units) {
   };
 }
 
+const EXCLUDED_GRAPH_ANCESTOR_TAGS = new Set([
+  "activity",
+  "answer",
+  "aside",
+  "example",
+  "exercise",
+  "exploration",
+  "hint",
+  "investigation",
+  "prefigure",
+  "project",
+  "remark",
+  "solution",
+  "task",
+]);
+
+function hasExcludedGraphAncestor(element) {
+  let ancestor = element.parent;
+  while (ancestor && ancestor.name !== "#document") {
+    if (EXCLUDED_GRAPH_ANCESTOR_TAGS.has(ancestor.name)) return true;
+    ancestor = ancestor.parent;
+  }
+  return false;
+}
+
 function graphCandidates(units) {
   const candidates = [];
   const documents = [];
@@ -389,7 +434,7 @@ function graphCandidates(units) {
     const fileOrdinals = new Map();
     walkElements(document, (element) => {
       const mapping = GRAPH_NODE_TAGS.get(element.name);
-      if (!mapping) return;
+      if (!mapping || hasExcludedGraphAncestor(element)) return;
       const ordinal = (fileOrdinals.get(element.name) ?? 0) + 1;
       fileOrdinals.set(element.name, ordinal);
       candidates.push({ element, mapping, ordinal });
@@ -722,8 +767,9 @@ export function extractPretextGraphFromUnits(units, {
   };
 }
 
-function inferredEditionLabel(units) {
-  const rootUnit = units.find((unit) => unit.path.endsWith("source/dmoi.ptx")) ?? units[0];
+function inferredEditionLabel(units, entryFile) {
+  const normalizedEntryFile = path.posix.normalize(entryFile.replaceAll("\\", "/").replace(/^\.\//u, ""));
+  const rootUnit = units.find((unit) => unit.path === normalizedEntryFile) ?? units[0];
   if (!rootUnit) return "Pinned official PreTeXt edition";
   const document = parsePretextXml(rootUnit.content, rootUnit.path);
   let book;
@@ -733,12 +779,31 @@ function inferredEditionLabel(units) {
   if (!book) return "Pinned official PreTeXt edition";
   const title = normalizeText(textContent(firstDirectElement(book, "title") ?? { type: "text", value: "" }));
   const subtitle = normalizeText(textContent(firstDirectElement(book, "subtitle") ?? { type: "text", value: "" }));
-  return [title, subtitle].filter(Boolean).join(": ") || "Pinned official PreTeXt edition";
+  let edition = "";
+  for (const unit of units) {
+    const document = parsePretextXml(unit.content, unit.path);
+    walkElements(document, (element) => {
+      if (!edition && element.name === "edition") edition = normalizeText(textContent(element));
+    });
+    if (edition) break;
+  }
+  const titleLine = [title, subtitle].filter(Boolean).join(": ");
+  if (!titleLine) return edition || "Pinned official PreTeXt edition";
+  return edition && !titleLine.toLowerCase().includes(edition.toLowerCase())
+    ? `${titleLine}, ${edition}`
+    : titleLine;
 }
 
 function inferredPublicationYear(units) {
   for (const unit of units) {
     const document = parsePretextXml(unit.content, unit.path);
+    let editionYear = null;
+    walkElements(document, (element) => {
+      if (editionYear || element.name !== "edition") return;
+      const match = normalizeText(textContent(element)).match(/\b((?:19|20|21)\d{2})\b/u);
+      if (match) editionYear = Number.parseInt(match[1], 10);
+    });
+    if (editionYear) return editionYear;
     const text = normalizeText(textContent(document));
     const released = text.match(/\breleased\s+in\s+(?:[A-Za-z]+\s+)?((?:19|20|21)\d{2})\b/iu);
     if (released) return Number.parseInt(released[1], 10);
@@ -746,37 +811,80 @@ function inferredPublicationYear(units) {
   return null;
 }
 
-function licenseFromText(source) {
-  if (/creativecommons\.org\/licenses\/by-nc-sa\/4\.0\//iu.test(source)) {
-    return {
+const LICENSE_PATTERNS = [
+  {
+    pattern: /GNU Free Documentation License,?\s*Version 1\.2\s+or any later version/iu,
+    license: {
+      licenseSpdx: "GFDL-1.2-or-later",
+      licenseUrl: "https://www.gnu.org/licenses/old-licenses/fdl-1.2.html",
+    },
+  },
+  {
+    pattern: /GNU Free Documentation License,?\s*Version 1\.3\s+or any later version/iu,
+    license: {
+      licenseSpdx: "GFDL-1.3-or-later",
+      licenseUrl: "https://www.gnu.org/licenses/fdl-1.3.html",
+    },
+  },
+  {
+    pattern: /creativecommons\.org\/licenses\/by-nc-sa\/4\.0\//iu,
+    license: {
       licenseSpdx: "CC-BY-NC-SA-4.0",
       licenseUrl: "https://creativecommons.org/licenses/by-nc-sa/4.0/",
-    };
-  }
-  if (/creativecommons\.org\/licenses\/by-sa\/4\.0\//iu.test(source)) {
-    return {
+    },
+  },
+  {
+    pattern: /creativecommons\.org\/licenses\/by-sa\/4\.0\//iu,
+    license: {
       licenseSpdx: "CC-BY-SA-4.0",
       licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
-    };
-  }
-  return { licenseSpdx: null, licenseUrl: null };
+    },
+  },
+  {
+    pattern: /creativecommons\.org\/licenses\/by\/4\.0\//iu,
+    license: {
+      licenseSpdx: "CC-BY-4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+    },
+  },
+];
+
+function licensesFromText(source) {
+  return LICENSE_PATTERNS
+    .filter(({ pattern }) => pattern.test(source))
+    .map(({ license }) => license);
+}
+
+export function licenseFromText(source) {
+  const matches = licensesFromText(source);
+  return matches.length === 1 ? matches[0] : { licenseSpdx: null, licenseUrl: null };
 }
 
 function inferredLicense(units, checkoutRoot) {
-  const editionLicense = licenseFromText(units.map((unit) => unit.content).join("\n"));
-  const repositoryLicensePath = ["LICENSE", "LICENSE.md", "LICENSE.txt"]
+  const editionLicenses = licensesFromText(units.map((unit) => unit.content).join("\n"));
+  const editionLicense = editionLicenses.length === 1
+    ? editionLicenses[0]
+    : { licenseSpdx: null, licenseUrl: null };
+  const repositoryLicensePath = ["LICENSE", "LICENSE.md", "LICENSE.txt", "COPYING"]
     .map((name) => path.join(checkoutRoot, name))
     .find((candidate) => fs.existsSync(candidate));
-  const repositoryLicense = repositoryLicensePath
-    ? licenseFromText(fs.readFileSync(repositoryLicensePath, "utf8"))
+  const repositoryLicenses = repositoryLicensePath
+    ? licensesFromText(fs.readFileSync(repositoryLicensePath, "utf8"))
+    : [];
+  const repositoryLicense = repositoryLicenses.length === 1
+    ? repositoryLicenses[0]
     : { licenseSpdx: null, licenseUrl: null };
   const conflict = editionLicense.licenseSpdx
     && repositoryLicense.licenseSpdx
     && editionLicense.licenseSpdx !== repositoryLicense.licenseSpdx;
   return {
     ...editionLicense,
-    licenseNote: conflict
-      ? `The active book source states ${editionLicense.licenseSpdx}, while the repository-level LICENSE states ${repositoryLicense.licenseSpdx}. This candidate edition metadata follows the active book source; the conflict remains pending review.`
+    licenseNote: editionLicenses.length > 1
+      ? `The active book source contains multiple distinct license markers (${editionLicenses.map(({ licenseSpdx }) => licenseSpdx).join(", ")}); governing license identification remains pending review.`
+      : repositoryLicenses.length > 1
+        ? `The repository-level license file contains multiple distinct license markers (${repositoryLicenses.map(({ licenseSpdx }) => licenseSpdx).join(", ")}); governing license identification remains pending review.`
+        : conflict
+      ? `The active book source states ${editionLicense.licenseSpdx}, while the repository-level license file states ${repositoryLicense.licenseSpdx}. This candidate edition metadata follows the active book source; the conflict remains pending review.`
       : editionLicense.licenseSpdx
         ? `Candidate license metadata inferred from the active pinned book source (${editionLicense.licenseSpdx}); not independently reviewed.`
         : "No unambiguous edition-level license was detected in the active pinned book source; license identification remains pending review.",
@@ -801,6 +909,12 @@ export function buildPretextBookFile({
   }));
   const artifactSha256 = sha256(canonicalJson(artifactManifest));
   const unitManifestSha256 = sha256(canonicalJson(extracted.sourceUnits));
+  const sourceBoundaryManifest = {
+    missingIncludes: collected.missingIncludes,
+    embeddedTextIncludes: collected.embeddedTextIncludes,
+    excludedXmlIncludes: collected.excludedXmlIncludes,
+  };
+  const sourceBoundarySha256 = sha256(canonicalJson(sourceBoundaryManifest));
   const extractionArtifactSha256 = sha256(canonicalJson({
     sourceUnits: extracted.sourceUnits,
     unitInventories: extracted.unitInventories,
@@ -810,13 +924,16 @@ export function buildPretextBookFile({
   const missingIncludeNote = collected.missingIncludes.length
     ? ` ${collected.missingIncludes.length} active PTX include target(s) were absent in the pinned checkout: ${collected.missingIncludes.join(", ")}.`
     : "";
+  const excludedXmlIncludeNote = collected.excludedXmlIncludes.length
+    ? ` ${collected.excludedXmlIncludes.length} embedded XML asset include(s) beneath PreFigure were excluded.`
+    : "";
 
   return {
     file: {
       ...baseFile,
       exactEdition: {
         editionId: `${baseFile.identity.sourceRecordId.toLowerCase()}-pretext-${commit.slice(0, 12)}`,
-        label: inferredEditionLabel(collected.units),
+        label: inferredEditionLabel(collected.units, entryFile),
         publicationYear: inferredPublicationYear(collected.units),
         publisher: null,
         stableLocator: `${sourceRepository}/tree/${commit}`,
@@ -844,7 +961,7 @@ export function buildPretextBookFile({
           unitInventoryCount: extracted.unitInventories.length,
         },
         independentReview: null,
-        note: `Deterministic candidate inventory from the official PreTeXt source at ${commit}; no independent review is claimed.${missingIncludeNote}`,
+        note: `Deterministic candidate inventory from the official PreTeXt source at ${commit}; no independent review is claimed.${missingIncludeNote}${excludedXmlIncludeNote} Source-boundary manifest SHA-256: ${sourceBoundarySha256}.`,
       },
       graphState: {
         status: "extracted",
@@ -867,6 +984,8 @@ export function buildPretextBookFile({
       sourceUnitCount: extracted.sourceUnits.length,
       missingIncludeCount: collected.missingIncludes.length,
       embeddedTextIncludeCount: collected.embeddedTextIncludes.length,
+      excludedXmlIncludeCount: collected.excludedXmlIncludes.length,
+      sourceBoundarySha256,
       artifactSha256,
       unitManifestSha256,
       extractionArtifactSha256,

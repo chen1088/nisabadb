@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "sourceSetRevision": "approved-2026-08-22-r1",
+  "bookGraphId": "S0262:complete-source",
+  "leads": [],
+  "proposals": [
+    {
+      "kind": "exact-edition",
+      "id": "s0262-stacks-ed88ff783bcb",
+      "edition": {
+        "editionId": "s0262-stacks-ed88ff783bcb",
+        "label": "The Stacks Project, source revision ed88ff783bcb",
+        "publicationYear": 2026,
+        "publisher": null,
+        "stableLocator": "https://github.com/stacks/stacks-project/tree/ed88ff783bcb4dd9a28518a33b028841094009cf",
+        "artifactSha256": "5ec98f9041a0973016eb2e3a840b751fc126d104da7a9f8da7a937eca37b4471",
+        "unitManifestSha256": "3964741a53593a6e372d733ea63917f8d2e2e340482ba649be2a2af0136ecc6e",
+        "sourceUnitKind": "chapter",
+        "sourceFormat": "latex",
+        "accessKind": "open",
+        "licenseSpdx": "GFDL-1.2-or-later",
+        "licenseUrl": "https://www.gnu.org/licenses/old-licenses/fdl-1.2.html",
+        "licenseNote": "The pinned Introduction grants GNU Free Documentation License version 1.2 or any later version, with no invariant sections or cover texts.",
+        "sourceRepository": "https://github.com/stacks/stacks-project",
+        "sourceRevision": "ed88ff783bcb4dd9a28518a33b028841094009cf"
+      },
+      "licenseAssessment": {
+        "status": "candidate",
+        "distributionClass": "review-required",
+        "administrativeReview": null,
+        "note": "License and derived-data distribution remain candidates until independent administrative review."
+      },
+      "proposalAudit": {
+        "actorId": "stacks-latex-importer",
+        "proposedAt": "2026-08-23T18:00:00.000Z",
+        "subjectSha256": "f3a757e14997d73f28de0fc0e74a45b14e23b4110034d8c991e80235dc8d4b1f",
+        "note": "Formal-environment extraction plus 7 exact-label, source-audited theorem-level claim(s) and 10 proof-used definition/construction span(s) outside formal environments from all 116 chapters in the pinned official source: 124 assumption, 7 claim, 5 construction, 1726 definition, 12587 lemma, 330 proposition, 214 theorem. Deliberately excluded 449 example, 386 exercise, 1037 remark, 5 remarks; no worked example is a graph node and no unlisted remark or display was promoted."
+      },
+      "administrativeReview": null
+    }
+  ],
+  "selectedProposalId": null,
+  "blockers": [],
+  "importerAssessments": [
+    {
+      "id": "assessment-s0262-stacks-ed88ff783bcb-92ded5e1cac2",
+      "proposalId": "s0262-stacks-ed88ff783bcb",
+      "adapterId": "stacks-latex-importer",
+      "outcome": "candidate-produced",
+      "sourcePinSha256": "914a3713e8d385f1d6c8bf6950aad0ad2f468b8e3da91ec24ef89cbf0b576122",
+      "extractionArtifactSha256": "935172555ec792807b0a888bc39db85757cbccf5a76bdbd7f9f5bfc42fcb3b56",
+      "graphArtifactSha256": "92ded5e1cac2441958d39849a10cc2f0a765db343b1f9f63e9a44bfdb7711073",
+      "assessedBy": "stacks-latex-importer",
+      "assessedAt": "2026-08-23T18:00:00.000Z",
+      "note": "The recorded importer produced this stored candidate graph; no independent review or completeness is claimed."
+    }
+  ]
+}

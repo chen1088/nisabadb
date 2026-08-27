@@ -1,0 +1,102 @@
+{
+  "storageSchemaVersion": "1.1.0",
+  "logicalSchemaVersion": "1.0.0",
+  "logicalContentSha256": "55c094a30e68d85e99dc5cf7584d545cc31dcf831bd9983268af148d5f2569a9",
+  "componentSha256": "4ad727044258ce58d4735585b6b3f8ad794ac863d08de11991e07f11acf06160",
+  "distribution": {
+    "class": "review-required",
+    "note": "Distribution of this derived graph requires an explicit source-license review."
+  },
+  "metadata": {
+    "phase": "source-dependency-graph",
+    "identity": {
+      "bookGraphId": "S0091:complete-source",
+      "sourceSetRevision": "approved-2026-08-22-r1",
+      "sourceRecordId": "S0091",
+      "sourceOrdinal": 91,
+      "familyId": "F05",
+      "sourceTitle": "Understanding Linear Algebra",
+      "sourceAuthorLine": "David Austin",
+      "sourceRawCitation": "Understanding Linear Algebra — David Austin",
+      "componentId": "complete-source",
+      "componentLabel": "Complete source named by this row"
+    },
+    "exactEdition": {
+      "editionId": "s0091-pretext-a895a539d997",
+      "label": "Understanding Linear Algebra: PROTEUS Version, 2026 Update",
+      "publicationYear": 2026,
+      "publisher": null,
+      "stableLocator": "https://github.com/davidaustinm/ula/tree/a895a539d9972bde1cc85aea5e9516fc7b0f4b25",
+      "artifactSha256": "3db0108207a8b4a1749bdad5897e744f3e132288c6718b1f224c1a9f7f1b52ad",
+      "unitManifestSha256": "8c32594062e054667806402a15b364b4a724fc7f70ee9c44677585080b3601d7",
+      "sourceUnitKind": "source-file",
+      "sourceFormat": "pretext-xml",
+      "accessKind": "open",
+      "licenseSpdx": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "licenseNote": "Candidate license metadata inferred from the active pinned book source (CC-BY-4.0); not independently reviewed.",
+      "sourceRepository": "https://github.com/davidaustinm/ula",
+      "sourceRevision": "a895a539d9972bde1cc85aea5e9516fc7b0f4b25"
+    },
+    "extractionState": {
+      "status": "extracted",
+      "extractionAudit": {
+        "actorId": "pretext-book-importer",
+        "completedAt": "2026-08-27T22:00:00.000Z",
+        "artifactSha256": "a28de9f175797e09deb2db3b0bb953ccde019ab0dfd8638720b87a654755b394",
+        "sourceUnitCount": 78,
+        "unitInventoryCount": 78
+      },
+      "independentReview": null,
+      "note": "Deterministic candidate inventory from the official PreTeXt source at a895a539d9972bde1cc85aea5e9516fc7b0f4b25; no independent review is claimed. 382 embedded XML asset include(s) beneath PreFigure were excluded. Source-boundary manifest SHA-256: 44d498baef12f7d3898cee1984f524c1a70c0f4a39c18c73bc6bd23fc8664ec3."
+    },
+    "graphState": {
+      "status": "extracted",
+      "graphAudit": {
+        "actorId": "pretext-book-importer",
+        "completedAt": "2026-08-27T22:00:00.000Z",
+        "artifactSha256": "1b50ae32f92c465aafa054e21b3102898e984a8dbbca2863e251d0539b804c5a",
+        "nodeCount": 103,
+        "externalInputCount": 0,
+        "directDependencyCount": 0,
+        "proofRouteCount": 0,
+        "referenceCount": 0
+      },
+      "independentReview": null,
+      "note": "0 candidate edge(s) come only from explicit xrefs inside proofs. 65 theorem-like node(s) have no resolved explicit proof dependency and remain pending, not roots. 0 proof xref(s) remain unresolved. No graph review or completeness is claimed."
+    }
+  },
+  "collections": {
+    "sourceUnits": [
+      {
+        "schemaVersion": "1.1.0",
+        "path": "complete-source/source-units/000000-019bf84adf119e65ed30897144b05e44ca99aa53b16a3accf8001652848c7396.jsonl",
+        "recordCount": 78,
+        "byteLength": 15447,
+        "sha256": "019bf84adf119e65ed30897144b05e44ca99aa53b16a3accf8001652848c7396"
+      }
+    ],
+    "unitInventories": [
+      {
+        "schemaVersion": "1.1.0",
+        "path": "complete-source/unit-inventories/000000-2017454bb34242d52da164eb97150bc2392e0eb80db62937c130f3c4a919be96.jsonl",
+        "recordCount": 78,
+        "byteLength": 49825,
+        "sha256": "2017454bb34242d52da164eb97150bc2392e0eb80db62937c130f3c4a919be96"
+      }
+    ],
+    "nodes": [
+      {
+        "schemaVersion": "1.1.0",
+        "path": "complete-source/nodes/000000-205c90997f1ea0b373448aa149b943d15f5011cdfd5690dad804a5c76d371677.jsonl",
+        "recordCount": 103,
+        "byteLength": 103326,
+        "sha256": "205c90997f1ea0b373448aa149b943d15f5011cdfd5690dad804a5c76d371677"
+      }
+    ],
+    "externalInputs": [],
+    "directDependencies": [],
+    "proofRoutes": [],
+    "references": []
+  }
+}

@@ -1,8 +1,8 @@
 {
   "storageSchemaVersion": "1.1.0",
   "logicalSchemaVersion": "1.0.0",
-  "logicalContentSha256": "d383cdc3b25c6f9aa4bcfe07ed03cc41001d895638b48b84301c18e2393f8438",
-  "componentSha256": "3e869814938a99a8b7067280049b84b8c5b8fd8f190b20735cff8c029e27cc69",
+  "logicalContentSha256": "56ac282259e8823d9c5d2acb4f181db5538f4ddd1d5d1bd1bce87f8ea1bd9fc5",
+  "componentSha256": "82d01f411f9bb11eea69c2bceed85d86594b0e9187f554b4aeef8dd774178103",
   "distribution": {
     "class": "review-required",
     "note": "Conservative default pending administrative distribution review (open / CC-BY-NC-SA-4.0)."
@@ -34,7 +34,7 @@
       "accessKind": "open",
       "licenseSpdx": "CC-BY-NC-SA-4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
-      "licenseNote": "The active book source states CC-BY-NC-SA-4.0, while the repository-level LICENSE states CC-BY-SA-4.0. This candidate edition metadata follows the active book source; the conflict remains pending review.",
+      "licenseNote": "The active book source states CC-BY-NC-SA-4.0, while the repository-level license file states CC-BY-SA-4.0. This candidate edition metadata follows the active book source; the conflict remains pending review.",
       "sourceRepository": "https://github.com/oscarlevin/discrete-book",
       "sourceRevision": "730e5e3b96094148818603041222df6f3d1d96ba"
     },
@@ -43,20 +43,20 @@
       "extractionAudit": {
         "actorId": "pretext-book-importer",
         "completedAt": "2026-08-22T23:04:40.841Z",
-        "artifactSha256": "1a8b592b40b44f9ab732c17aff78258e152c1087f5d3477af2615dbc701ff256",
+        "artifactSha256": "5877de23d4ebc33a3c8b277eaa167d8f571005946c7621ffd4a3c1d1d2c807e2",
         "sourceUnitCount": 109,
         "unitInventoryCount": 109
       },
       "independentReview": null,
-      "note": "Deterministic candidate inventory from the official PreTeXt source at 730e5e3b96094148818603041222df6f3d1d96ba; no independent review is claimed."
+      "note": "Deterministic candidate inventory from the official PreTeXt source at 730e5e3b96094148818603041222df6f3d1d96ba; no independent review is claimed. Source-boundary manifest SHA-256: 6ef2506ffd4995ae696532ac0dccb549d467cfcf84283824840993c415ba49d4."
     },
     "graphState": {
       "status": "extracted",
       "graphAudit": {
         "actorId": "pretext-book-importer",
         "completedAt": "2026-08-22T23:04:40.841Z",
-        "artifactSha256": "d1eab6a0f90c7f7031bd6963d9eeb52eb346da0639296f735cca1ce5b623bb1f",
-        "nodeCount": 112,
+        "artifactSha256": "cbb631c7934a1bb62608dd7a25e57334b4d1b34c3a1af08cb4d640c70ba03116",
+        "nodeCount": 110,
         "externalInputCount": 0,
         "directDependencyCount": 3,
         "proofRouteCount": 3,
@@ -79,19 +79,19 @@
     "unitInventories": [
       {
         "schemaVersion": "1.1.0",
-        "path": "complete-source/unit-inventories/000000-f8d1eb4ec8b775ad225afb5c0efb2cbbbd2633d117bb4df1a81989ce7b638086.jsonl",
+        "path": "complete-source/unit-inventories/000000-7e769022ecaae368bc11cee2239a036363f1a7243a4db25a4e445af5349c43a4.jsonl",
         "recordCount": 109,
-        "byteLength": 72490,
-        "sha256": "f8d1eb4ec8b775ad225afb5c0efb2cbbbd2633d117bb4df1a81989ce7b638086"
+        "byteLength": 72403,
+        "sha256": "7e769022ecaae368bc11cee2239a036363f1a7243a4db25a4e445af5349c43a4"
       }
     ],
     "nodes": [
       {
         "schemaVersion": "1.1.0",
-        "path": "complete-source/nodes/000000-725641a33e824573fe5151c056c17cd68126a66ffea36b2fcddf6908b0f1f9b3.jsonl",
-        "recordCount": 112,
-        "byteLength": 104476,
-        "sha256": "725641a33e824573fe5151c056c17cd68126a66ffea36b2fcddf6908b0f1f9b3"
+        "path": "complete-source/nodes/000000-e57cdc5b831a9fca5a16a055079aac6efa5e45a6c66b74bce9fff9e7be32a02f.jsonl",
+        "recordCount": 110,
+        "byteLength": 102839,
+        "sha256": "e57cdc5b831a9fca5a16a055079aac6efa5e45a6c66b74bce9fff9e7be32a02f"
       }
     ],
     "externalInputs": [],

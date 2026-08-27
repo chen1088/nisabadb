@@ -194,23 +194,23 @@ describe("one Phase-I dependency graph identity per source component", () => {
     expect(validated.manifest.schemaVersion).toBe("1.1.0");
     expect(validated.manifest.sourceRecordCount).toBe(688);
     expect(validated.manifest.componentCount).toBe(717);
-    expect(validated.manifest.artifactCount).toBe(2);
+    expect(validated.manifest.artifactCount).toBe(4);
     expect(validated.manifest.entries).toHaveLength(717);
     expect(new Set(validated.manifest.entries.map(({ bookGraphId }) => bookGraphId)).size).toBe(717);
     expect(validated.manifest.summary).toEqual({
-      exactEditionResolvedCount: 2,
-      awaitingEditionCount: 715,
+      exactEditionResolvedCount: 4,
+      awaitingEditionCount: 713,
       reviewedExtractionCount: 0,
       reviewedCompleteGraphCount: 0,
-      sourceUnitCount: 225,
-      inventoriedSourceUnitCount: 225,
+      sourceUnitCount: 335,
+      inventoriedSourceUnitCount: 335,
       reviewedSourceUnitCount: 0,
-      theoremNodeCount: 13176,
-      unroutedTheoremCount: 1928,
-      supportNodeCount: 1929,
-      dependencyCount: 36292,
+      theoremNodeCount: 13518,
+      unroutedTheoremCount: 2212,
+      supportNodeCount: 2036,
+      dependencyCount: 36362,
       reviewedDependencyCount: 0,
-      unresolvedReferenceCount: 2602,
+      unresolvedReferenceCount: 2623,
     });
     expect(validated.manifest.entries.find(({ bookGraphId }) => bookGraphId === "S0001:level-1")?.artifactPath)
       .toBeNull();
@@ -220,6 +220,7 @@ describe("one Phase-I dependency graph identity per source component", () => {
     expect(pilot?.exactEdition).not.toBeNull();
     expect(pilot?.extractionState.status).toBe("extracted");
     expect(pilot?.graphState.status).toBe("extracted");
+    expect(pilot?.graph.nodes.filter((node) => node.nodeClass === "support")).toHaveLength(72);
     const rejectedBook = validated.manifest.entries.find(({ bookGraphId }) => bookGraphId === "S0002:complete-source");
     expect(rejectedBook?.artifactPath).toBeNull();
     expect(rejectedBook?.exactEditionResolved).toBe(false);
@@ -384,8 +385,50 @@ describe("one Phase-I dependency graph identity per source component", () => {
     ]);
     expect(densestBook?.extractionState.status).toBe("extracted");
     expect(densestBook?.graphState.status).toBe("extracted");
-    expect(populatedFiles).toHaveLength(2);
-    expect(awaitingComponentCount).toBe(715);
+    const linearAlgebraBook = populatedFiles.get("S0091/complete-source.json");
+    expect(linearAlgebraBook?.exactEdition).toMatchObject({
+      sourceRepository: "https://github.com/davidaustinm/ula",
+      sourceRevision: "a895a539d9972bde1cc85aea5e9516fc7b0f4b25",
+      sourceFormat: "pretext-xml",
+      licenseSpdx: "CC-BY-4.0",
+    });
+    expect(linearAlgebraBook?.sourceUnits).toHaveLength(78);
+    expect(linearAlgebraBook?.sourceUnits.some((unit) => unit.locator.includes("/prefigure/")))
+      .toBe(false);
+    expect(linearAlgebraBook?.extractionState.note).toContain(
+      "382 embedded XML asset include(s) beneath PreFigure were excluded",
+    );
+    expect(linearAlgebraBook?.extractionState.note).toContain(
+      "44d498baef12f7d3898cee1984f524c1a70c0f4a39c18c73bc6bd23fc8664ec3",
+    );
+    expect(linearAlgebraBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like"))
+      .toHaveLength(65);
+    expect(linearAlgebraBook?.graph.nodes.filter((node) => node.nodeClass === "support"))
+      .toHaveLength(38);
+    expect(linearAlgebraBook?.graph.nodes.some((node) => node.sourceLocator.includes("/prefigure/")))
+      .toBe(false);
+    expect(linearAlgebraBook?.graph.directDependencies).toHaveLength(0);
+    expect(linearAlgebraBook?.graph.proofRoutes).toHaveLength(0);
+    const algebraBook = populatedFiles.get("S0164/complete-source.json");
+    expect(algebraBook?.exactEdition).toMatchObject({
+      label: "Abstract Algebra: Theory and Applications, Annual Edition 2026",
+      publicationYear: 2026,
+      sourceRepository: "https://github.com/twjudson/aata",
+      sourceRevision: "043274d5dead03ff007a461ffe4c2b8477be1248",
+      licenseSpdx: null,
+      licenseUrl: null,
+      licenseNote: expect.stringMatching(/multiple distinct license markers.*GFDL-1\.2-or-later.*GFDL-1\.3-or-later/i),
+    });
+    expect(algebraBook?.sourceUnits).toHaveLength(32);
+    expect(algebraBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like"))
+      .toHaveLength(277);
+    expect(algebraBook?.graph.nodes.filter((node) => node.nodeClass === "support"))
+      .toHaveLength(71);
+    expect(algebraBook?.graph.directDependencies).toHaveLength(70);
+    expect(algebraBook?.graph.references.filter((reference) => reference.resolution.status === "unresolved"))
+      .toHaveLength(21);
+    expect(populatedFiles).toHaveLength(4);
+    expect(awaitingComponentCount).toBe(713);
   });
 
   it("rejects component and artifact count drift", () => {

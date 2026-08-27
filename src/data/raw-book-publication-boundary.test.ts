@@ -11,6 +11,11 @@ describe("raw book-graph publication boundary", () => {
     "/data/not-books/%2E%2E/books/S0060/complete-source.json",
     "/DATA/BOOKS/S0262/complete-source.json",
     "/data/BOOKS/S0262/complete-source.json",
+    "/data/book-sources/manifest.json",
+    "/nisabadb/data/book-sources/S0091/complete-source.json",
+    "/data%2Fbook-sources%2FS0164%2Fcomplete-source.json",
+    "/data%5Cbook-sources%5CS0060%5Ccomplete-source.json",
+    "/DATA/BOOK-SOURCES/S0262/complete-source.json",
   ])("refuses direct repository data at %s", (url) => {
     expect(classifyRawBookDataRequest(url)).toBe(404);
   });

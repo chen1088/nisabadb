@@ -312,6 +312,26 @@ describe("book-graph v1.1 sharded codec", () => {
     expect(readBookGraphFileSync(indexPath)).toEqual(fixture);
   });
 
+  it("preserves an existing v1.1 distribution decision unless the caller explicitly replaces it", () => {
+    const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "nisabadb-codec-distribution-"));
+    temporaryDirectories.push(temporaryRoot);
+    const indexPath = path.join(temporaryRoot, "S0001", "complete-source.json");
+    const distribution = {
+      class: "metadata-only",
+      note: "Retain this component-specific distribution decision.",
+    };
+    writeBookGraphFileAtomicSync(indexPath, smallFixture(), { maxShardBytes: 700, distribution });
+
+    writeBookGraphFileAndRefreshSync(
+      indexPath,
+      smallFixture("A changed theorem statement."),
+      () => {},
+      { maxShardBytes: 700 },
+    );
+
+    expect(JSON.parse(fs.readFileSync(indexPath, "utf8")).distribution).toEqual(distribution);
+  });
+
   it("restores first-time artifact absence when manifest refresh fails", () => {
     const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "nisabadb-codec-first-write-"));
     temporaryDirectories.push(temporaryRoot);

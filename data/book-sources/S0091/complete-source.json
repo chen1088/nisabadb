@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "sourceSetRevision": "approved-2026-08-22-r1",
+  "bookGraphId": "S0091:complete-source",
+  "leads": [],
+  "proposals": [
+    {
+      "kind": "exact-edition",
+      "id": "s0091-pretext-a895a539d997",
+      "edition": {
+        "editionId": "s0091-pretext-a895a539d997",
+        "label": "Understanding Linear Algebra: PROTEUS Version, 2026 Update",
+        "publicationYear": 2026,
+        "publisher": null,
+        "stableLocator": "https://github.com/davidaustinm/ula/tree/a895a539d9972bde1cc85aea5e9516fc7b0f4b25",
+        "artifactSha256": "3db0108207a8b4a1749bdad5897e744f3e132288c6718b1f224c1a9f7f1b52ad",
+        "unitManifestSha256": "8c32594062e054667806402a15b364b4a724fc7f70ee9c44677585080b3601d7",
+        "sourceUnitKind": "source-file",
+        "sourceFormat": "pretext-xml",
+        "accessKind": "open",
+        "licenseSpdx": "CC-BY-4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "licenseNote": "Candidate license metadata inferred from the active pinned book source (CC-BY-4.0); not independently reviewed.",
+        "sourceRepository": "https://github.com/davidaustinm/ula",
+        "sourceRevision": "a895a539d9972bde1cc85aea5e9516fc7b0f4b25"
+      },
+      "licenseAssessment": {
+        "status": "candidate",
+        "distributionClass": "review-required",
+        "administrativeReview": null,
+        "note": "License and derived-data distribution remain candidates until independent administrative review."
+      },
+      "proposalAudit": {
+        "actorId": "pretext-book-importer",
+        "proposedAt": "2026-08-27T22:00:00.000Z",
+        "subjectSha256": "e201d21cf3a202db66747f28d9b6c3e0de40fdae80d4e3996915f7e08c882f44",
+        "note": "Deterministic candidate inventory from the official PreTeXt source at a895a539d9972bde1cc85aea5e9516fc7b0f4b25; no independent review is claimed."
+      },
+      "administrativeReview": null
+    }
+  ],
+  "selectedProposalId": null,
+  "blockers": [],
+  "importerAssessments": [
+    {
+      "id": "assessment-s0091-pretext-a895a539d997-1b50ae32f92c",
+      "proposalId": "s0091-pretext-a895a539d997",
+      "adapterId": "pretext-book-importer",
+      "outcome": "candidate-produced",
+      "sourcePinSha256": "90204658385c78ea3720026c5d80e521ade151399ac8cdec4922e4f0a3195c40",
+      "extractionArtifactSha256": "a28de9f175797e09deb2db3b0bb953ccde019ab0dfd8638720b87a654755b394",
+      "graphArtifactSha256": "1b50ae32f92c465aafa054e21b3102898e984a8dbbca2863e251d0539b804c5a",
+      "assessedBy": "pretext-book-importer",
+      "assessedAt": "2026-08-27T22:00:00.000Z",
+      "note": "The recorded importer produced this stored candidate graph; no independent review or completeness is claimed."
+    }
+  ]
+}

@@ -16,5 +16,5 @@ export function classifyRawBookDataRequest(requestUrl: string): 400 | 404 | null
     }
   }
   const normalizedPathname = `/${segments.join("/")}`;
-  return /(?:^|\/)data\/books(?:\/|$)/iu.test(normalizedPathname) ? 404 : null;
+  return /(?:^|\/)data\/(?:books|book-sources)(?:\/|$)/iu.test(normalizedPathname) ? 404 : null;
 }

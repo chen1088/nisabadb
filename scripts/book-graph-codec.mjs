@@ -527,10 +527,15 @@ export function writeBookGraphFileAndRefreshSync(
       return [shardPath, fs.readFileSync(shardPath)];
     })
     : []);
+  const writeOptions = !Object.hasOwn(options, "distribution")
+    && originalIndex?.storageSchemaVersion === BOOK_GRAPH_STORAGE_VERSION
+    && originalIndex.distribution
+    ? { ...options, distribution: originalIndex.distribution }
+    : options;
   let result;
 
   try {
-    result = writeBookGraphFileAtomicSync(absoluteIndexPath, file, options);
+    result = writeBookGraphFileAtomicSync(absoluteIndexPath, file, writeOptions);
     const nextShardPaths = new Set(result.shardPaths.map((relativePath) => (
       resolveShardPath(absoluteIndexPath, relativePath)
     )));

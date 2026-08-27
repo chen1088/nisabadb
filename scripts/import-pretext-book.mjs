@@ -77,7 +77,9 @@ function assertSafeIdentity(recordId, componentId) {
 
 function assertSafeEntryFile(entryFile) {
   const normalized = path.posix.normalize(entryFile.replaceAll("\\", "/").replace(/^\.\//u, ""));
-  if (normalized.startsWith("../") || path.posix.isAbsolute(normalized) || !normalized.endsWith(".ptx")) {
+  if (normalized.startsWith("../")
+    || path.posix.isAbsolute(normalized)
+    || !/\.(?:ptx|xml)$/iu.test(normalized)) {
     throw new Error(`Unsafe PreTeXt entry file: ${entryFile}`);
   }
   return normalized;
@@ -133,7 +135,9 @@ function report({
     `Unresolved proof xrefs: ${stats.unresolvedProofXrefCount}`,
     `Theorem-like nodes still dependency-pending: ${stats.pendingTheoremCount}`,
     `Ambiguous inventoried xml:id values: ${stats.ambiguousGraphXmlIdCount}`,
-    `Missing active PTX includes: ${stats.missingIncludeCount}`,
+    `Missing active PreTeXt includes: ${stats.missingIncludeCount}`,
+    `Excluded embedded XML asset includes: ${stats.excludedXmlIncludeCount}`,
+    `Source-boundary manifest SHA-256: ${stats.sourceBoundarySha256}`,
     `Artifact SHA-256: ${stats.artifactSha256}`,
     `Unit manifest SHA-256: ${stats.unitManifestSha256}`,
     `${write ? "Updated" : "Would update only"}: ${path.relative(repositoryRoot, destination)}`,

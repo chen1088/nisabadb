@@ -6,12 +6,29 @@ import {
   readBookGraphFileSync,
   referencedBookGraphShardPaths,
 } from "./book-graph-codec.mjs";
+import {
+  bookGraphIdentityFor,
+  canonicalNeutralArtifactPathsSync,
+  initialBookGraphFor,
+} from "./book-graph-source-components.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const registryPath = path.join(repositoryRoot, "data/knowledge/source-records.json");
 const booksRoot = path.join(repositoryRoot, "data/books");
 const manifestPath = path.join(booksRoot, "manifest.json");
-const checkOnly = process.argv.includes("--check");
+const commandArguments = process.argv.slice(2);
+const allowedArguments = new Set(["--check", "--remove-neutral-placeholders"]);
+for (const argument of commandArguments) {
+  if (!allowedArguments.has(argument)) throw new Error(`Unknown option: ${argument}`);
+}
+if (new Set(commandArguments).size !== commandArguments.length) {
+  throw new Error("Duplicate book-graph corpus option");
+}
+const checkOnly = commandArguments.includes("--check");
+const removeNeutralPlaceholders = commandArguments.includes("--remove-neutral-placeholders");
+if (checkOnly && removeNeutralPlaceholders) {
+  throw new Error("--check and --remove-neutral-placeholders are mutually exclusive");
+}
 
 const sourceRecordIdPattern = /^S\d{4}$/;
 const componentIdPattern = /^[a-z0-9][a-z0-9-]*$/;
@@ -23,6 +40,19 @@ function readJson(filePath) {
 
 function canonicalJson(value) {
   return `${JSON.stringify(value, null, 2)}\n`;
+}
+
+function atomicWrite(filePath, bytes) {
+  const temporaryPath = path.join(
+    path.dirname(filePath),
+    `.${path.basename(filePath)}.tmp-${process.pid}-${Date.now()}`,
+  );
+  try {
+    fs.writeFileSync(temporaryPath, bytes);
+    fs.renameSync(temporaryPath, filePath);
+  } finally {
+    if (fs.existsSync(temporaryPath)) fs.unlinkSync(temporaryPath);
+  }
 }
 
 function digestJson(value) {
@@ -45,69 +75,6 @@ function relativeFileFor(recordId, componentId) {
   return relativeFile;
 }
 
-function identityFor(registry, record, component) {
-  return {
-    bookGraphId: `${record.id}:${component.id}`,
-    sourceSetRevision: registry.sourceSetRevision,
-    sourceRecordId: record.id,
-    sourceOrdinal: record.ordinal,
-    familyId: record.familyId,
-    sourceTitle: record.title,
-    sourceAuthorLine: record.authorLine,
-    sourceRawCitation: record.rawCitation,
-    componentId: component.id,
-    componentLabel: component.label,
-  };
-}
-
-function placeholderFor(registry, record, component) {
-  return {
-    schemaVersion: "1.0.0",
-    phase: "source-dependency-graph",
-    identity: identityFor(registry, record, component),
-    exactEdition: null,
-    sourceUnits: [],
-    unitInventories: [],
-    graph: {
-      nodes: [],
-      externalInputs: [],
-      directDependencies: [],
-      proofRoutes: [],
-      references: [],
-    },
-    extractionState: {
-      status: "awaiting-edition",
-      extractionAudit: null,
-      independentReview: null,
-      note: "Awaiting acquisition and identification of the exact edition before theorem extraction.",
-    },
-    graphState: {
-      status: "not-started",
-      graphAudit: null,
-      independentReview: null,
-      note: "Phase-I source dependency graph has not been extracted.",
-    },
-  };
-}
-
-function isSafePlaceholder(value) {
-  return value !== null
-    && typeof value === "object"
-    && value.exactEdition === null
-    && Array.isArray(value.sourceUnits)
-    && value.sourceUnits.length === 0
-    && (value.unitInventories === undefined
-      || (Array.isArray(value.unitInventories) && value.unitInventories.length === 0))
-    && value.graph !== null
-    && typeof value.graph === "object"
-    && ["nodes", "externalInputs", "directDependencies", "proofRoutes"]
-      .every((key) => Array.isArray(value.graph[key]) && value.graph[key].length === 0)
-    && (value.graph.references === undefined
-      || (Array.isArray(value.graph.references) && value.graph.references.length === 0))
-    && value.extractionState?.status === "awaiting-edition"
-    && value.graphState?.status === "not-started";
-}
-
 function desiredCorpus(registry) {
   if (!Array.isArray(registry.records)) throw new Error("Source registry has no records array");
   const baseEntries = [];
@@ -122,7 +89,7 @@ function desiredCorpus(registry) {
     }
     for (const component of record.requiredEditionComponents) {
       const relativeFile = relativeFileFor(record.id, component.id);
-      const identity = identityFor(registry, record, component);
+      const identity = bookGraphIdentityFor(registry, record, component);
       if (seenPaths.has(relativeFile)) throw new Error(`Duplicate book-graph path: ${relativeFile}`);
       if (seenGraphIds.has(identity.bookGraphId)) throw new Error(`Duplicate book graph ID: ${identity.bookGraphId}`);
       seenPaths.add(relativeFile);
@@ -133,9 +100,9 @@ function desiredCorpus(registry) {
         sourceOrdinal: record.ordinal,
         componentId: component.id,
         componentLabel: component.label,
-        path: relativeFile,
+        canonicalArtifactPath: relativeFile,
       });
-      placeholders.set(relativeFile, placeholderFor(registry, record, component));
+      placeholders.set(relativeFile, initialBookGraphFor(registry, record, component));
     }
   }
 
@@ -177,11 +144,22 @@ function metricsFor(file, relativeFile) {
   };
 }
 
-function manifestFor(registry, baseEntries) {
+function manifestFor(registry, baseEntries, neutralFiles) {
   const entries = baseEntries.map((baseEntry) => {
-    const filePath = path.join(booksRoot, ...baseEntry.path.split("/"));
-    if (!fs.existsSync(filePath)) throw new Error(`Missing book graph file: ${baseEntry.path}`);
-    return { ...baseEntry, ...metricsFor(readBookGraphFileSync(filePath), baseEntry.path) };
+    const { canonicalArtifactPath, ...identity } = baseEntry;
+    const filePath = path.join(booksRoot, ...canonicalArtifactPath.split("/"));
+    if (!fs.existsSync(filePath)) {
+      return {
+        ...identity,
+        artifactPath: null,
+        ...metricsFor(neutralFiles.get(canonicalArtifactPath), canonicalArtifactPath),
+      };
+    }
+    return {
+      ...identity,
+      artifactPath: canonicalArtifactPath,
+      ...metricsFor(readBookGraphFileSync(filePath), canonicalArtifactPath),
+    };
   });
   const summary = {
     exactEditionResolvedCount: entries.filter((entry) => entry.exactEditionResolved).length,
@@ -199,10 +177,11 @@ function manifestFor(registry, baseEntries) {
     unresolvedReferenceCount: entries.reduce((sum, entry) => sum + entry.unresolvedReferenceCount, 0),
   };
   return {
-    schemaVersion: "1.0.0",
+    schemaVersion: "1.1.0",
     sourceSetRevision: registry.sourceSetRevision,
     sourceRecordCount: registry.records.length,
-    componentFileCount: entries.length,
+    componentCount: entries.length,
+    artifactCount: entries.filter((entry) => entry.artifactPath !== null).length,
     summary,
     entries,
   };
@@ -236,10 +215,14 @@ function referencedShardFiles(baseEntries) {
   const shardFiles = [];
   const seen = new Set();
   for (const baseEntry of baseEntries) {
-    const filePath = path.join(booksRoot, ...baseEntry.path.split("/"));
+    const filePath = path.join(booksRoot, ...baseEntry.canonicalArtifactPath.split("/"));
+    if (!fs.existsSync(filePath)) continue;
     const storageIndex = readJson(filePath);
     for (const shardPath of referencedBookGraphShardPaths(storageIndex)) {
-      const relativeShardPath = path.posix.join(path.posix.dirname(baseEntry.path), shardPath);
+      const relativeShardPath = path.posix.join(
+        path.posix.dirname(baseEntry.canonicalArtifactPath),
+        shardPath,
+      );
       if (seen.has(relativeShardPath)) {
         throw new Error(`Duplicate referenced book-graph shard: ${relativeShardPath}`);
       }
@@ -250,18 +233,43 @@ function referencedShardFiles(baseEntries) {
   return shardFiles.sort();
 }
 
-function checkCorpus(registry, baseEntries, placeholders) {
-  if (!fs.existsSync(manifestPath)) throw new Error("Missing data/books/manifest.json; run npm run books:sync");
-  const manifest = manifestFor(registry, baseEntries);
-  const actualManifest = readJson(manifestPath);
-  if (canonicalJson(actualManifest) !== canonicalJson(manifest)) {
-    throw new Error("data/books/manifest.json is stale; run npm run books:sync");
+function priorArtifactPaths(manifest) {
+  if (!manifest || typeof manifest !== "object" || !Array.isArray(manifest.entries)) {
+    throw new Error("Existing data/books/manifest.json has no entries array");
   }
+  return manifest.entries.map((entry) => {
+    if (Object.hasOwn(entry, "artifactPath")) {
+      if (entry.artifactPath !== null && typeof entry.artifactPath !== "string") {
+        throw new Error("Existing book manifest has an invalid artifactPath");
+      }
+      return entry.artifactPath;
+    }
+    if (typeof entry.path === "string") return entry.path;
+    throw new Error("Existing book manifest entry has neither artifactPath nor legacy path");
+  }).filter((artifactPath) => artifactPath !== null);
+}
 
-  const expectedFiles = [...placeholders.keys()].sort();
+function assertNoSilentArtifactLoss(previousManifest) {
+  for (const relativeFile of priorArtifactPaths(previousManifest)) {
+    if (!relativeFilePattern.test(relativeFile) || path.posix.normalize(relativeFile) !== relativeFile) {
+      throw new Error(`Existing book manifest has an unsafe artifact path: ${relativeFile}`);
+    }
+    const filePath = path.join(booksRoot, ...relativeFile.split("/"));
+    if (!fs.existsSync(filePath)) {
+      throw new Error(
+        `Previously present book graph artifact disappeared: ${relativeFile}; `
+          + "restore it or use the explicit neutral-placeholder migration",
+      );
+    }
+  }
+}
+
+function validateArtifactFiles(baseEntries, neutralFiles) {
+  const allowedFiles = new Set(neutralFiles.keys());
   const actualFiles = listBookJsonFiles(booksRoot);
-  if (canonicalJson(actualFiles) !== canonicalJson(expectedFiles)) {
-    throw new Error(`Book graph file set differs from the registry (${actualFiles.length}/${expectedFiles.length})`);
+  const unexpectedFiles = actualFiles.filter((relativeFile) => !allowedFiles.has(relativeFile));
+  if (unexpectedFiles.length > 0) {
+    throw new Error(`Unexpected book graph artifacts: ${unexpectedFiles.join(", ")}`);
   }
 
   const expectedShardFiles = referencedShardFiles(baseEntries);
@@ -274,17 +282,16 @@ function checkCorpus(registry, baseEntries, placeholders) {
     throw new Error(`Book graph shard file set differs from component indexes (${missingCount} missing, ${orphanCount} orphan)`);
   }
 
-  for (const [relativeFile, placeholder] of placeholders) {
+  for (const relativeFile of actualFiles) {
     const filePath = path.join(booksRoot, ...relativeFile.split("/"));
     const actual = readBookGraphFileSync(filePath);
-    const expectedIdentity = placeholder.identity;
+    const expectedIdentity = neutralFiles.get(relativeFile).identity;
     if (canonicalJson(actual.identity) !== canonicalJson(expectedIdentity)) {
       throw new Error(`${relativeFile} identity does not match the source registry`);
     }
-    if (actual.exactEdition !== null) {
-      if (actual.exactEdition?.unitManifestSha256 !== digestJson(actual.sourceUnits)) {
-        throw new Error(`${relativeFile} unit-manifest fingerprint is stale`);
-      }
+    if (actual.exactEdition !== null
+      && actual.exactEdition?.unitManifestSha256 !== digestJson(actual.sourceUnits)) {
+      throw new Error(`${relativeFile} unit-manifest fingerprint is stale`);
     }
     if (actual.extractionState?.extractionAudit
       && actual.extractionState.extractionAudit.artifactSha256 !== digestJson({
@@ -300,48 +307,104 @@ function checkCorpus(registry, baseEntries, placeholders) {
   }
 }
 
-function syncCorpus(registry, baseEntries, placeholders) {
-  fs.mkdirSync(booksRoot, { recursive: true });
-  let created = 0;
-  let refreshed = 0;
-  let preserved = 0;
-
-  for (const [relativeFile, placeholder] of placeholders) {
-    const filePath = path.join(booksRoot, ...relativeFile.split("/"));
-    fs.mkdirSync(path.dirname(filePath), { recursive: true });
-    if (!fs.existsSync(filePath)) {
-      fs.writeFileSync(filePath, canonicalJson(placeholder));
-      created += 1;
-      continue;
-    }
-
-    const current = readBookGraphFileSync(filePath);
-    if (isSafePlaceholder(current)) {
-      const next = canonicalJson(placeholder);
-      if (fs.readFileSync(filePath, "utf8") !== next) {
-        fs.writeFileSync(filePath, next);
-        refreshed += 1;
-      }
-    } else {
-      preserved += 1;
-    }
+function checkCorpus(registry, baseEntries, neutralFiles) {
+  if (!fs.existsSync(manifestPath)) throw new Error("Missing data/books/manifest.json; run npm run books:sync");
+  const manifest = manifestFor(registry, baseEntries, neutralFiles);
+  const actualManifest = readJson(manifestPath);
+  if (canonicalJson(actualManifest) !== canonicalJson(manifest)) {
+    throw new Error("data/books/manifest.json is stale; run npm run books:sync");
   }
+  validateArtifactFiles(baseEntries, neutralFiles);
+}
 
-  const manifest = manifestFor(registry, baseEntries);
-  fs.writeFileSync(manifestPath, canonicalJson(manifest));
-  checkCorpus(registry, baseEntries, placeholders);
+function syncCorpus(registry, baseEntries, neutralFiles) {
+  fs.mkdirSync(booksRoot, { recursive: true });
+  const previousManifestBytes = fs.existsSync(manifestPath) ? fs.readFileSync(manifestPath) : null;
+  if (fs.existsSync(manifestPath)) {
+    assertNoSilentArtifactLoss(readJson(manifestPath));
+  }
+  validateArtifactFiles(baseEntries, neutralFiles);
+  const manifest = manifestFor(registry, baseEntries, neutralFiles);
+  try {
+    atomicWrite(manifestPath, canonicalJson(manifest));
+    checkCorpus(registry, baseEntries, neutralFiles);
+  } catch (error) {
+    if (previousManifestBytes) {
+      atomicWrite(manifestPath, previousManifestBytes);
+    } else if (fs.existsSync(manifestPath)) {
+      fs.unlinkSync(manifestPath);
+    }
+    throw error;
+  }
   process.stdout.write(
-    `Book graph components synchronized: ${placeholders.size} total, ${created} created, ${refreshed} placeholders refreshed, ${preserved} populated indexes preserved.\n`,
+    `Book graph manifest synchronized: ${manifest.componentCount} component identities, `
+      + `${manifest.artifactCount} stored artifacts, ${manifest.componentCount - manifest.artifactCount} absent.\n`,
   );
 }
 
+function restoreBackups(backups) {
+  for (const [filePath, bytes] of backups) {
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    fs.writeFileSync(filePath, bytes);
+  }
+}
+
+function removeCanonicalNeutralPlaceholders(registry, baseEntries, neutralFiles) {
+  if (!fs.existsSync(manifestPath)) {
+    throw new Error("Missing data/books/manifest.json; refusing placeholder migration without prior state");
+  }
+  const previousManifestBytes = fs.readFileSync(manifestPath);
+  const previousManifest = JSON.parse(previousManifestBytes.toString("utf8"));
+  assertNoSilentArtifactLoss(previousManifest);
+  validateArtifactFiles(baseEntries, neutralFiles);
+
+  const removableArtifacts = [];
+  for (const [relativeFile, neutralFile] of neutralFiles) {
+    const filePath = path.join(booksRoot, ...relativeFile.split("/"));
+    const artifactPaths = canonicalNeutralArtifactPathsSync(filePath, neutralFile);
+    if (artifactPaths) removableArtifacts.push({ relativeFile, artifactPaths });
+  }
+
+  const backups = new Map();
+  try {
+    for (const { artifactPaths } of removableArtifacts) {
+      for (const artifactPath of artifactPaths) {
+        if (!fs.existsSync(artifactPath)) {
+          throw new Error(`Neutral-placeholder artifact disappeared during migration: ${artifactPath}`);
+        }
+        backups.set(artifactPath, fs.readFileSync(artifactPath));
+      }
+    }
+    for (const { artifactPaths } of removableArtifacts) {
+      for (const artifactPath of artifactPaths) fs.unlinkSync(artifactPath);
+    }
+
+    const manifest = manifestFor(registry, baseEntries, neutralFiles);
+    atomicWrite(manifestPath, canonicalJson(manifest));
+    checkCorpus(registry, baseEntries, neutralFiles);
+    process.stdout.write(
+      `Removed ${removableArtifacts.length} exact canonical neutral placeholders; `
+        + `${manifest.artifactCount} stored artifacts remain for ${manifest.componentCount} components.\n`,
+    );
+  } catch (error) {
+    restoreBackups(backups);
+    atomicWrite(manifestPath, previousManifestBytes);
+    throw error;
+  }
+}
+
 const registry = readJson(registryPath);
-const { baseEntries, placeholders } = desiredCorpus(registry);
+const { baseEntries, placeholders: neutralFiles } = desiredCorpus(registry);
 
 if (checkOnly) {
-  checkCorpus(registry, baseEntries, placeholders);
-  const manifest = manifestFor(registry, baseEntries);
-  process.stdout.write(`Book graph data valid: ${manifest.sourceRecordCount} source rows, ${manifest.componentFileCount} component identities.\n`);
+  checkCorpus(registry, baseEntries, neutralFiles);
+  const manifest = manifestFor(registry, baseEntries, neutralFiles);
+  process.stdout.write(
+    `Book graph data valid: ${manifest.sourceRecordCount} source rows, `
+      + `${manifest.componentCount} component identities, ${manifest.artifactCount} stored artifacts.\n`,
+  );
+} else if (removeNeutralPlaceholders) {
+  removeCanonicalNeutralPlaceholders(registry, baseEntries, neutralFiles);
 } else {
-  syncCorpus(registry, baseEntries, placeholders);
+  syncCorpus(registry, baseEntries, neutralFiles);
 }

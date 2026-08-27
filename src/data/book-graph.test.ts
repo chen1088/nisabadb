@@ -7,6 +7,7 @@ import rawRegistry from "../../data/knowledge/source-records.json";
 // @ts-expect-error The Node-only storage codec is intentionally maintained as an ESM JavaScript module.
 import { readBookGraphFileSync } from "../../scripts/book-graph-codec.mjs";
 import {
+  validateBookGraphCorpus,
   validateBookGraphFile,
   validateBookGraphIndex,
   validateBookGraphManifestEntry,
@@ -39,148 +40,163 @@ const reviewedEvidence = {
 };
 
 function reviewedGraphFixture(): BookGraphFile {
-  const placeholder = structuredClone(readDiskBookGraph("S0001/level-1.json")) as BookGraphFile;
-  placeholder.exactEdition = {
-    editionId: "fixture-edition",
-    label: "Exact fixture edition",
-    publicationYear: 2024,
-    publisher: "Fixture Press",
-    stableLocator: "isbn:fixture",
-    sourceFormat: "pdf",
-    accessKind: "owned-copy",
-    licenseSpdx: null,
-    licenseUrl: null,
-    licenseNote: "License review is pending for this exact edition.",
-    sourceRepository: null,
-    sourceRevision: null,
-    artifactSha256: "a".repeat(64),
-    unitManifestSha256: "b".repeat(64),
-    sourceUnitKind: "page",
-  };
-  placeholder.sourceUnits = [{
-    id: "unit-1",
-    ordinal: 1,
-    label: "Page 1",
-    locator: "page 1",
-    contentSha256: "1".repeat(64),
-  }];
-  placeholder.unitInventories = [{
-    sourceUnitId: "unit-1",
-    theoremNodeIds: ["theorem-1"],
-    supportNodeIds: ["definition-1"],
-    theoremFreeAttestation: false,
-    evidence: structuredClone(reviewedEvidence),
-  }];
-  placeholder.graph.nodes = [
-    {
-      id: "definition-1",
-      nodeClass: "support",
-      kind: "definition",
-      sourceLabel: "Definition 1",
-      sourceXmlId: "definition-1",
-      sourceLocator: "page 1",
-      title: "Fixture definition",
-      normalizedStatement: "A fixture object is defined.",
-      sourceTextSha256: "2".repeat(64),
+  const record = rawRegistry.records[0];
+  const component = record?.requiredEditionComponents[0];
+  if (!record || !component) throw new Error("missing source-registry fixture identity");
+
+  return {
+    schemaVersion: "1.0.0",
+    phase: "source-dependency-graph",
+    identity: {
+      bookGraphId: `${record.id}:${component.id}`,
+      sourceSetRevision: rawRegistry.sourceSetRevision,
+      sourceRecordId: record.id,
+      sourceOrdinal: record.ordinal,
+      familyId: record.familyId,
+      sourceTitle: record.title,
+      sourceAuthorLine: record.authorLine,
+      sourceRawCitation: record.rawCitation,
+      componentId: component.id,
+      componentLabel: component.label,
+    },
+    exactEdition: {
+      editionId: "fixture-edition",
+      label: "Exact fixture edition",
+      publicationYear: 2024,
+      publisher: "Fixture Press",
+      stableLocator: "isbn:fixture",
+      sourceFormat: "pdf",
+      accessKind: "owned-copy",
+      licenseSpdx: null,
+      licenseUrl: null,
+      licenseNote: "License review is pending for this exact edition.",
+      sourceRepository: null,
+      sourceRevision: null,
+      artifactSha256: "a".repeat(64),
+      unitManifestSha256: "b".repeat(64),
+      sourceUnitKind: "page",
+    },
+    sourceUnits: [{
+      id: "unit-1",
+      ordinal: 1,
+      label: "Page 1",
+      locator: "page 1",
+      contentSha256: "1".repeat(64),
+    }],
+    unitInventories: [{
+      sourceUnitId: "unit-1",
+      theoremNodeIds: ["theorem-1"],
+      supportNodeIds: ["definition-1"],
+      theoremFreeAttestation: false,
       evidence: structuredClone(reviewedEvidence),
+    }],
+    graph: {
+      nodes: [
+        {
+          id: "definition-1",
+          nodeClass: "support",
+          kind: "definition",
+          sourceLabel: "Definition 1",
+          sourceXmlId: "definition-1",
+          sourceLocator: "page 1",
+          title: "Fixture definition",
+          normalizedStatement: "A fixture object is defined.",
+          sourceTextSha256: "2".repeat(64),
+          evidence: structuredClone(reviewedEvidence),
+        },
+        {
+          id: "theorem-1",
+          nodeClass: "theorem-like",
+          kind: "theorem",
+          sourceLabel: "Theorem 1",
+          sourceXmlId: "theorem-1",
+          sourceLocator: "page 1",
+          title: "Fixture theorem",
+          normalizedStatement: "Every fixture object has the fixture property.",
+          sourceTextSha256: "3".repeat(64),
+          evidence: structuredClone(reviewedEvidence),
+        },
+      ],
+      externalInputs: [],
+      directDependencies: [{
+        id: "dependency-1",
+        dependentNodeId: "theorem-1",
+        prerequisite: { type: "node", id: "definition-1" },
+        role: "definition",
+        rationale: "The theorem uses the fixture definition.",
+        evidence: structuredClone(reviewedEvidence),
+      }],
+      proofRoutes: [{
+        id: "route-1",
+        theoremNodeId: "theorem-1",
+        routeKind: "source-proof",
+        dependencyIds: ["dependency-1"],
+        summary: "Apply the fixture definition directly.",
+        evidence: structuredClone(reviewedEvidence),
+      }],
+      references: [],
     },
-    {
-      id: "theorem-1",
-      nodeClass: "theorem-like",
-      kind: "theorem",
-      sourceLabel: "Theorem 1",
-      sourceXmlId: "theorem-1",
-      sourceLocator: "page 1",
-      title: "Fixture theorem",
-      normalizedStatement: "Every fixture object has the fixture property.",
-      sourceTextSha256: "3".repeat(64),
-      evidence: structuredClone(reviewedEvidence),
+    extractionState: {
+      status: "reviewed",
+      extractionAudit: {
+        actorId: "worker:extractor",
+        completedAt: "2026-08-22T12:00:00Z",
+        artifactSha256: "d".repeat(64),
+        sourceUnitCount: 1,
+        unitInventoryCount: 1,
+      },
+      independentReview: {
+        actorId: "reviewer:extraction",
+        reviewedAt: "2026-08-22T13:00:00Z",
+        evidenceSha256: "d".repeat(64),
+        note: "Source-unit extraction independently reviewed.",
+      },
+      note: "Fixture extraction is complete.",
     },
-  ];
-  placeholder.graph.directDependencies = [{
-    id: "dependency-1",
-    dependentNodeId: "theorem-1",
-    prerequisite: { type: "node", id: "definition-1" },
-    role: "definition",
-    rationale: "The theorem uses the fixture definition.",
-    evidence: structuredClone(reviewedEvidence),
-  }];
-  placeholder.graph.proofRoutes = [{
-    id: "route-1",
-    theoremNodeId: "theorem-1",
-    routeKind: "source-proof",
-    dependencyIds: ["dependency-1"],
-    summary: "Apply the fixture definition directly.",
-    evidence: structuredClone(reviewedEvidence),
-  }];
-  placeholder.extractionState = {
-    status: "reviewed",
-    extractionAudit: {
-      actorId: "worker:extractor",
-      completedAt: "2026-08-22T12:00:00Z",
-      artifactSha256: "d".repeat(64),
-      sourceUnitCount: 1,
-      unitInventoryCount: 1,
+    graphState: {
+      status: "reviewed-complete",
+      graphAudit: {
+        actorId: "worker:graph",
+        completedAt: "2026-08-22T14:00:00Z",
+        artifactSha256: "e".repeat(64),
+        nodeCount: 2,
+        externalInputCount: 0,
+        directDependencyCount: 1,
+        proofRouteCount: 1,
+        referenceCount: 0,
+      },
+      independentReview: {
+        actorId: "reviewer:graph",
+        reviewedAt: "2026-08-22T15:00:00Z",
+        evidenceSha256: "e".repeat(64),
+        note: "The complete graph was independently reviewed.",
+      },
+      note: "Fixture graph is complete.",
     },
-    independentReview: {
-      actorId: "reviewer:extraction",
-      reviewedAt: "2026-08-22T13:00:00Z",
-      evidenceSha256: "d".repeat(64),
-      note: "Source-unit extraction independently reviewed.",
-    },
-    note: "Fixture extraction is complete.",
   };
-  placeholder.graphState = {
-    status: "reviewed-complete",
-    graphAudit: {
-      actorId: "worker:graph",
-      completedAt: "2026-08-22T14:00:00Z",
-      artifactSha256: "e".repeat(64),
-      nodeCount: 2,
-      externalInputCount: 0,
-      directDependencyCount: 1,
-      proofRouteCount: 1,
-      referenceCount: 0,
-    },
-    independentReview: {
-      actorId: "reviewer:graph",
-      reviewedAt: "2026-08-22T15:00:00Z",
-      evidenceSha256: "e".repeat(64),
-      note: "The complete graph was independently reviewed.",
-    },
-    note: "Fixture graph is complete.",
-  };
-  return placeholder;
 }
 
 describe("one Phase-I dependency graph identity per source component", () => {
   it("covers all 688 source rows and all 717 actual book or volume components exactly once", () => {
     const validated = validateBookGraphIndex(rawRegistry, rawManifest);
-    const populatedPaths = new Set(["S0060/complete-source.json", "S0262/complete-source.json"]);
-    const populatedFiles = new Map<string, BookGraphFile>();
-    let validatedComponentCount = 0;
-    let awaitingComponentCount = 0;
+    const rawArtifacts = new Map<string, unknown>();
     for (const entry of validated.manifest.entries) {
-      const file = validateBookGraphManifestEntry(
-        validated.registry,
-        entry,
-        readDiskBookGraph(entry.path),
-      );
-      validatedComponentCount += 1;
-      if (populatedPaths.has(entry.path)) {
-        populatedFiles.set(entry.path, file);
-      } else if (file.exactEdition === null
-        && file.extractionState.status === "awaiting-edition"
-        && file.graphState.status === "not-started") {
-        awaitingComponentCount += 1;
+      if (entry.artifactPath !== null) {
+        rawArtifacts.set(entry.artifactPath, readDiskBookGraph(entry.artifactPath));
       }
     }
+    const corpus = validateBookGraphCorpus(rawRegistry, rawManifest, rawArtifacts);
+    const populatedFiles = corpus.filesByPath;
+    const awaitingComponentCount = validated.manifest.entries
+      .filter(({ artifactPath }) => artifactPath === null).length;
 
     expect(validated.registry.records).toHaveLength(688);
+    expect(validated.manifest.schemaVersion).toBe("1.1.0");
     expect(validated.manifest.sourceRecordCount).toBe(688);
-    expect(validated.manifest.componentFileCount).toBe(717);
+    expect(validated.manifest.componentCount).toBe(717);
+    expect(validated.manifest.artifactCount).toBe(2);
     expect(validated.manifest.entries).toHaveLength(717);
-    expect(validatedComponentCount).toBe(717);
+    expect(new Set(validated.manifest.entries.map(({ bookGraphId }) => bookGraphId)).size).toBe(717);
     expect(validated.manifest.summary).toEqual({
       exactEditionResolvedCount: 2,
       awaitingEditionCount: 715,
@@ -196,15 +212,16 @@ describe("one Phase-I dependency graph identity per source component", () => {
       reviewedDependencyCount: 0,
       unresolvedReferenceCount: 2602,
     });
-    expect(validated.manifest.entries.find(({ path }) => path === "S0001/level-1.json")?.bookGraphId)
-      .toBe("S0001:level-1");
-    expect(validated.manifest.entries.find(({ path }) => path === "S0074/volume-3.json")?.componentLabel)
+    expect(validated.manifest.entries.find(({ bookGraphId }) => bookGraphId === "S0001:level-1")?.artifactPath)
+      .toBeNull();
+    expect(validated.manifest.entries.find(({ bookGraphId }) => bookGraphId === "S0074:volume-3")?.componentLabel)
       .toBe("Volume 3");
     const pilot = populatedFiles.get("S0060/complete-source.json");
     expect(pilot?.exactEdition).not.toBeNull();
     expect(pilot?.extractionState.status).toBe("extracted");
     expect(pilot?.graphState.status).toBe("extracted");
-    const rejectedBook = validated.manifest.entries.find(({ path }) => path === "S0002/complete-source.json");
+    const rejectedBook = validated.manifest.entries.find(({ bookGraphId }) => bookGraphId === "S0002:complete-source");
+    expect(rejectedBook?.artifactPath).toBeNull();
     expect(rejectedBook?.exactEditionResolved).toBe(false);
     expect(rejectedBook?.theoremNodeCount).toBe(0);
     expect(rejectedBook?.extractionStatus).toBe("awaiting-edition");
@@ -371,43 +388,111 @@ describe("one Phase-I dependency graph identity per source component", () => {
     expect(awaitingComponentCount).toBe(715);
   });
 
-  it("rejects missing, extra, unsafe, identity-mismatched, or stale manifest components", () => {
+  it("rejects component and artifact count drift", () => {
     const { registry, manifest } = validateBookGraphIndex(rawRegistry, rawManifest);
-    const placeholderEntry = manifest.entries.find(({ path }) => path === "S0001/level-1.json");
-    if (!placeholderEntry) throw new Error("missing placeholder manifest fixture");
-    const placeholder = readDiskBookGraph(placeholderEntry.path);
+    const absentEntry = manifest.entries.find(({ artifactPath }) => artifactPath === null);
+    if (!absentEntry) throw new Error("missing absent-artifact manifest fixture");
 
     const missing = structuredClone(manifest);
     missing.entries.pop();
     expect(() => validateBookGraphIndex(rawRegistry, missing)).toThrow(/cover every required component/i);
 
     const extra = structuredClone(manifest);
-    extra.componentFileCount += 1;
+    extra.componentCount += 1;
     extra.entries.push({
-      ...structuredClone(placeholderEntry),
+      ...structuredClone(absentEntry),
       bookGraphId: "S9999:extra",
       sourceRecordId: "S9999",
       sourceOrdinal: 9999,
       componentId: "extra",
       componentLabel: "Extra component",
-      path: "S9999/extra.json",
     });
     expect(() => validateBookGraphIndex(rawRegistry, extra)).toThrow(/cover every required component/i);
 
+    const artifactCountDrift = structuredClone(manifest);
+    artifactCountDrift.artifactCount += 1;
+    expect(() => validateBookGraphIndex(rawRegistry, artifactCountDrift)).toThrow(/artifact count is stale/i);
+
+    const componentCountDrift = structuredClone(manifest);
+    componentCountDrift.componentCount -= 1;
+    expect(() => validateBookGraphIndex(rawRegistry, componentCountDrift)).toThrow(/cover every required component/i);
+
+    void registry;
+  });
+
+  it("rejects unsafe, duplicate, or noncanonical artifact paths", () => {
+    const { manifest } = validateBookGraphIndex(rawRegistry, rawManifest);
+    const presentEntries = manifest.entries.filter((entry) => entry.artifactPath !== null);
+    const firstPresent = presentEntries[0];
+    const secondPresent = presentEntries[1];
+    if (!firstPresent || !secondPresent) throw new Error("missing present-artifact manifest fixtures");
+
     const unsafeManifest = structuredClone(manifest);
-    if (!unsafeManifest.entries[0]) throw new Error("missing manifest fixture");
-    unsafeManifest.entries[0].path = "../escape.json";
+    const unsafeEntry = unsafeManifest.entries.find(({ bookGraphId }) => bookGraphId === firstPresent.bookGraphId);
+    if (!unsafeEntry) throw new Error("missing unsafe-path fixture entry");
+    unsafeEntry.artifactPath = "../escape.json";
     expect(() => validateBookGraphIndex(rawRegistry, unsafeManifest)).toThrow();
 
-    const wrongIdentity = structuredClone(placeholder) as BookGraphFile;
+    const noncanonicalManifest = structuredClone(manifest);
+    const noncanonicalEntry = noncanonicalManifest.entries.find(({ bookGraphId }) => bookGraphId === firstPresent.bookGraphId);
+    if (!noncanonicalEntry) throw new Error("missing noncanonical-path fixture entry");
+    noncanonicalEntry.artifactPath = `${noncanonicalEntry.sourceRecordId}/wrong-component.json`;
+    expect(() => validateBookGraphIndex(rawRegistry, noncanonicalManifest)).toThrow(/canonical artifact path/i);
+
+    const duplicatePathManifest = structuredClone(manifest);
+    const duplicateEntry = duplicatePathManifest.entries.find(({ bookGraphId }) => bookGraphId === secondPresent.bookGraphId);
+    if (!duplicateEntry) throw new Error("missing duplicate-path fixture entry");
+    duplicateEntry.artifactPath = firstPresent.artifactPath;
+    expect(() => validateBookGraphIndex(rawRegistry, duplicatePathManifest)).toThrow(/artifact path/i);
+  });
+
+  it("rejects absent-artifact state or metric drift and refuses to validate a missing artifact", () => {
+    const { registry, manifest } = validateBookGraphIndex(rawRegistry, rawManifest);
+    const absentEntry = manifest.entries.find(({ artifactPath }) => artifactPath === null);
+    if (!absentEntry) throw new Error("missing absent-artifact manifest fixture");
+
+    const metricDrift = structuredClone(manifest);
+    const metricEntry = metricDrift.entries.find(({ bookGraphId }) => bookGraphId === absentEntry.bookGraphId);
+    if (!metricEntry) throw new Error("missing null-metric fixture entry");
+    metricEntry.theoremNodeCount = 1;
+    expect(() => validateBookGraphIndex(rawRegistry, metricDrift)).toThrow(/absent book graph artifact/i);
+
+    const stateDrift = structuredClone(manifest);
+    const stateEntry = stateDrift.entries.find(({ bookGraphId }) => bookGraphId === absentEntry.bookGraphId);
+    if (!stateEntry) throw new Error("missing null-state fixture entry");
+    stateEntry.extractionStatus = "queued";
+    expect(() => validateBookGraphIndex(rawRegistry, stateDrift)).toThrow(/absent book graph artifact/i);
+
+    expect(() => validateBookGraphManifestEntry(registry, absentEntry, reviewedGraphFixture()))
+      .toThrow(/no book graph artifact/i);
+  });
+
+  it("validates only present artifacts and rejects identity, metric, or file-set drift", () => {
+    const { registry, manifest } = validateBookGraphIndex(rawRegistry, rawManifest);
+    const presentEntry = manifest.entries.find(({ artifactPath }) => artifactPath !== null);
+    if (!presentEntry || presentEntry.artifactPath === null) throw new Error("missing present-artifact manifest fixture");
+    const presentFile = readDiskBookGraph(presentEntry.artifactPath);
+
+    const wrongIdentity = structuredClone(presentFile) as BookGraphFile;
     wrongIdentity.identity.componentLabel = "Wrong component";
-    expect(() => validateBookGraphManifestEntry(registry, placeholderEntry, wrongIdentity))
+    expect(() => validateBookGraphManifestEntry(registry, presentEntry, wrongIdentity))
       .toThrow(/immutable identity/i);
 
-    const staleMetrics = structuredClone(placeholderEntry);
-    staleMetrics.theoremNodeCount = 1;
-    expect(() => validateBookGraphManifestEntry(registry, staleMetrics, placeholder))
+    const staleMetrics = structuredClone(presentEntry);
+    staleMetrics.theoremNodeCount += 1;
+    expect(() => validateBookGraphManifestEntry(registry, staleMetrics, presentFile))
       .toThrow(/manifest metrics are stale/i);
+
+    const rawArtifacts = new Map<string, unknown>();
+    for (const entry of manifest.entries) {
+      if (entry.artifactPath !== null) rawArtifacts.set(entry.artifactPath, readDiskBookGraph(entry.artifactPath));
+    }
+    expect(validateBookGraphCorpus(rawRegistry, rawManifest, rawArtifacts).filesByPath.size)
+      .toBe(manifest.artifactCount);
+
+    rawArtifacts.delete(presentEntry.artifactPath);
+    expect(() => validateBookGraphCorpus(rawRegistry, rawManifest, rawArtifacts))
+      .toThrow(/present artifacts/i);
   });
 });
 

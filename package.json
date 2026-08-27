@@ -13,6 +13,7 @@
     "content:validate": "vitest run src/data/content.test.ts",
     "books:sync": "node scripts/book-graph-files.mjs",
     "books:check": "node scripts/book-graph-files.mjs --check && vitest run src/data/book-graph.test.ts",
+    "books:prune-placeholders": "node scripts/book-graph-files.mjs --remove-neutral-placeholders",
     "books:migrate-storage": "node scripts/migrate-book-graph-storage.mjs",
     "citations:snapshot": "node scripts/build-citation-snapshot.mjs",
     "citations:ingest": "node scripts/ingest-citations.mjs"

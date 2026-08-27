@@ -66,8 +66,9 @@ export function KnowledgeCoveragePage() {
         ), 0);
         if (manifest.sourceSetRevision !== registry.sourceSetRevision
           || manifest.sourceRecordCount !== registry.records.length
-          || manifest.componentFileCount !== requiredComponentCount
-          || manifest.entries.length !== requiredComponentCount) {
+          || manifest.componentCount !== requiredComponentCount
+          || manifest.entries.length !== requiredComponentCount
+          || manifest.artifactCount !== manifest.entries.filter((entry) => entry.artifactPath !== null).length) {
           throw new Error("The book-graph manifest does not match the approved source registry.");
         }
         setData({ registry, manifest });
@@ -124,7 +125,7 @@ export function KnowledgeCoveragePage() {
   }, [data, selectedEntry, selectedRecord]);
 
   const summary = data?.manifest.summary;
-  const componentCount = data?.manifest.componentFileCount ?? __SOURCE_COMPONENT_COUNT__;
+  const componentCount = data?.manifest.componentCount ?? __SOURCE_COMPONENT_COUNT__;
   const candidateDependencyCount = summary
     ? summary.dependencyCount - summary.reviewedDependencyCount
     : 0;
@@ -137,10 +138,11 @@ export function KnowledgeCoveragePage() {
           <p className="eyebrow">Phase I · data-first source graph status</p>
           <h1>Build the dependency graph before compressing the library.</h1>
           <p>
-            Each approved source is tracked in a durable raw graph. The first job is to identify the
-            exact edition, inventory every theorem-like and supporting node, and record its direct
-            proof dependencies. Raw graph artifacts stay in the data pipeline rather than becoming
-            browser payloads; compression and simplification remain a later phase.
+            Every required source component has a durable manifest identity, even before its raw
+            graph artifact is created. The first job is to identify the exact edition, inventory every
+            theorem-like and supporting node, and record its direct proof dependencies. Created raw
+            graph artifacts stay in the data pipeline rather than becoming browser payloads;
+            compression and simplification remain a later phase.
           </p>
           <div className="coverage-hero-actions">
             <a href="#source-registry">Inspect the source registry</a>
@@ -165,7 +167,7 @@ export function KnowledgeCoveragePage() {
           <>
             <dl aria-label="Source dependency graph status">
               <div><dt>Approved source records</dt><dd>{data.registry.records.length.toLocaleString()}</dd></div>
-              <div><dt>Indexed source components</dt><dd>{ratio(data.manifest.entries.length, componentCount)}</dd></div>
+              <div><dt>Created graph artifacts</dt><dd>{ratio(data.manifest.artifactCount, componentCount)}</dd></div>
               <div><dt>Exact editions identified</dt><dd>{ratio(summary.exactEditionResolvedCount, componentCount)}</dd></div>
               <div><dt>Reviewed-complete graphs</dt><dd>{ratio(summary.reviewedCompleteGraphCount, componentCount)}</dd></div>
               <div><dt>Theorem-like nodes</dt><dd>{summary.theoremNodeCount.toLocaleString()}</dd></div>
@@ -225,7 +227,7 @@ export function KnowledgeCoveragePage() {
               <div><dt>Extraction state</dt><dd>{humanize(selectedEntry.extractionStatus)}</dd></div>
               <div><dt>Graph state</dt><dd>{humanize(selectedEntry.graphStatus)}</dd></div>
               <div><dt>Exact edition</dt><dd>{selectedEntry.exactEditionResolved ? "identified" : "awaiting identification"}</dd></div>
-              <div><dt>Repository data path</dt><dd>{selectedEntry.path}</dd></div>
+              <div><dt>Repository data artifact</dt><dd>{selectedEntry.artifactPath ?? "Not created"}</dd></div>
             </dl>
 
             <nav className="book-component-choices" aria-label={`Components of ${selectedRecord.title}`}>

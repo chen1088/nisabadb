@@ -516,12 +516,17 @@ export function writeBookGraphFileAndRefreshSync(
     throw new Error("A manifest refresh callback is required for a book-graph update");
   }
   const absoluteIndexPath = path.resolve(indexPath);
-  const originalIndexBytes = fs.readFileSync(absoluteIndexPath);
-  const originalIndex = JSON.parse(originalIndexBytes.toString("utf8"));
-  const originalShardBytes = new Map(referencedBookGraphShardPaths(originalIndex).map((relativePath) => {
-    const shardPath = resolveShardPath(absoluteIndexPath, relativePath);
-    return [shardPath, fs.readFileSync(shardPath)];
-  }));
+  const indexExisted = fs.existsSync(absoluteIndexPath);
+  const originalIndexBytes = indexExisted ? fs.readFileSync(absoluteIndexPath) : null;
+  const originalIndex = originalIndexBytes
+    ? JSON.parse(originalIndexBytes.toString("utf8"))
+    : null;
+  const originalShardBytes = new Map(originalIndex
+    ? referencedBookGraphShardPaths(originalIndex).map((relativePath) => {
+      const shardPath = resolveShardPath(absoluteIndexPath, relativePath);
+      return [shardPath, fs.readFileSync(shardPath)];
+    })
+    : []);
   let result;
 
   try {
@@ -532,10 +537,14 @@ export function writeBookGraphFileAndRefreshSync(
     for (const shardPath of originalShardBytes.keys()) {
       if (!nextShardPaths.has(shardPath) && fs.existsSync(shardPath)) fs.unlinkSync(shardPath);
     }
-    refreshManifest();
+    refreshManifest({ phase: "write" });
     return result;
   } catch (error) {
-    atomicWrite(absoluteIndexPath, originalIndexBytes);
+    if (originalIndexBytes) {
+      atomicWrite(absoluteIndexPath, originalIndexBytes);
+    } else if (fs.existsSync(absoluteIndexPath)) {
+      fs.unlinkSync(absoluteIndexPath);
+    }
     for (const [shardPath, bytes] of originalShardBytes) {
       fs.mkdirSync(path.dirname(shardPath), { recursive: true });
       if (!fs.existsSync(shardPath) || !fs.readFileSync(shardPath).equals(bytes)) {
@@ -546,7 +555,7 @@ export function writeBookGraphFileAndRefreshSync(
       if (!originalShardBytes.has(createdPath) && fs.existsSync(createdPath)) fs.unlinkSync(createdPath);
     }
     try {
-      refreshManifest();
+      refreshManifest({ phase: "rollback", artifactPreviouslyExisted: indexExisted });
     } catch (rollbackError) {
       throw new AggregateError(
         [error, rollbackError],

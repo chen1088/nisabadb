@@ -7,12 +7,17 @@ import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
 import { buildStacksBookFile } from "./stacks-book-lib.mjs";
 import {
-  readBookGraphFileSync,
   writeBookGraphFileAndRefreshSync,
 } from "./book-graph-codec.mjs";
+import {
+  createRollbackSafeManifestRefreshSync,
+  readBookGraphBaseOrInitialSync,
+} from "./book-graph-source-components.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const bookGraphSyncScript = path.join(repositoryRoot, "scripts", "book-graph-files.mjs");
+const sourceRegistryPath = path.join(repositoryRoot, "data", "knowledge", "source-records.json");
+const bookGraphManifestPath = path.join(repositoryRoot, "data", "books", "manifest.json");
 const allowedOptions = new Set([
   "--source",
   "--record-id",
@@ -115,10 +120,14 @@ function runBookGraphFiles(...arguments_) {
 
 function writeCandidateAndRefreshManifest(destination, candidate) {
   runBookGraphFiles("--check");
-  writeBookGraphFileAndRefreshSync(destination, candidate, () => {
-    const syncOutput = runBookGraphFiles();
-    if (syncOutput) process.stdout.write(syncOutput);
+  const refreshManifest = createRollbackSafeManifestRefreshSync({
+    manifestPath: bookGraphManifestPath,
+    refresh: () => {
+      const syncOutput = runBookGraphFiles();
+      if (syncOutput) process.stdout.write(syncOutput);
+    },
   });
+  writeBookGraphFileAndRefreshSync(destination, candidate, refreshManifest);
 }
 
 function report({ recordId, componentId, commit, capturedAt, sourceRepository, write, destination, stats }) {
@@ -175,11 +184,12 @@ if (sourceRepository !== "https://github.com/stacks/stacks-project") {
   throw new Error(`Expected the official Stacks repository, got ${sourceRepository}`);
 }
 const destination = componentFilePath(recordId, componentId);
-if (!fs.existsSync(destination)) throw new Error(`Missing component file: ${destination}`);
-const baseFile = readBookGraphFileSync(destination);
-if (baseFile.identity?.sourceRecordId !== recordId || baseFile.identity?.componentId !== componentId) {
-  throw new Error("The destination component identity does not match the requested record/component");
-}
+const baseFile = readBookGraphBaseOrInitialSync({
+  indexPath: destination,
+  registryPath: sourceRegistryPath,
+  recordId,
+  componentId,
+});
 
 const built = buildStacksBookFile({
   baseFile,

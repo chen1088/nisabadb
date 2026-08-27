@@ -7,12 +7,17 @@ import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
 import { buildPressbooksBookFile } from "./pressbooks-book-lib.mjs";
 import {
-  readBookGraphFileSync,
   writeBookGraphFileAndRefreshSync,
 } from "./book-graph-codec.mjs";
+import {
+  createRollbackSafeManifestRefreshSync,
+  readBookGraphBaseOrInitialSync,
+} from "./book-graph-source-components.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const bookGraphSyncScript = path.join(repositoryRoot, "scripts", "book-graph-files.mjs");
+const sourceRegistryPath = path.join(repositoryRoot, "data", "knowledge", "source-records.json");
+const bookGraphManifestPath = path.join(repositoryRoot, "data", "books", "manifest.json");
 const allowedOptions = new Set([
   "--source",
   "--source-url",
@@ -120,10 +125,14 @@ function runBookGraphFiles(...arguments_) {
 
 function writeCandidateAndRefreshManifest(destination, candidate) {
   runBookGraphFiles("--check");
-  writeBookGraphFileAndRefreshSync(destination, candidate, () => {
-    const syncOutput = runBookGraphFiles();
-    if (syncOutput) process.stdout.write(syncOutput);
+  const refreshManifest = createRollbackSafeManifestRefreshSync({
+    manifestPath: bookGraphManifestPath,
+    refresh: () => {
+      const syncOutput = runBookGraphFiles();
+      if (syncOutput) process.stdout.write(syncOutput);
+    },
   });
+  writeBookGraphFileAndRefreshSync(destination, candidate, refreshManifest);
 }
 
 function report({ built, recordId, componentId, sourcePath, sourceUrl, capturedAt, write, destination }) {
@@ -180,13 +189,12 @@ if (!/<rss\b[\s\S]*xmlns:wp=/u.test(xmlSource) || !/<channel>/u.test(xmlSource))
 }
 
 const destination = componentFilePath(recordId, componentId);
-if (!fs.existsSync(destination)) {
-  throw new Error(`Missing component file ${path.relative(repositoryRoot, destination)}; synchronize the 717 book files first`);
-}
-const baseFile = readBookGraphFileSync(destination);
-if (baseFile.identity?.sourceRecordId !== recordId || baseFile.identity?.componentId !== componentId) {
-  throw new Error("The destination component identity does not match the requested source record and component");
-}
+const baseFile = readBookGraphBaseOrInitialSync({
+  indexPath: destination,
+  registryPath: sourceRegistryPath,
+  recordId,
+  componentId,
+});
 
 const built = buildPressbooksBookFile({
   baseFile,

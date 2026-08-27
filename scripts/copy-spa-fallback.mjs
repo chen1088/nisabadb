@@ -83,28 +83,54 @@ for (const filename of ["source-records.json", "verification-policy.json"]) {
 }
 
 const bookManifest = JSON.parse(await readFile(join("data", "books", "manifest.json"), "utf8"));
-if (bookManifest.sourceRecordCount !== sourceRegistry.records.length
-  || bookManifest.componentFileCount !== bookManifest.entries?.length) {
+if (bookManifest.schemaVersion !== "1.1.0"
+  || bookManifest.sourceRecordCount !== sourceRegistry.records.length
+  || bookManifest.componentCount !== bookManifest.entries?.length) {
   throw new Error("The per-book graph manifest does not match the approved source registry.");
 }
 const expectedComponentCount = sourceRegistry.records.reduce(
   (total, record) => total + record.requiredEditionComponents.length,
   0,
 );
-if (bookManifest.componentFileCount !== expectedComponentCount) {
+if (bookManifest.componentCount !== expectedComponentCount) {
   throw new Error("The per-book graph manifest loses required book or volume components.");
 }
 const publishedBookDirectory = join(knowledgeCoverageDirectory, "books");
 await rm(publishedBookDirectory, { recursive: true, force: true });
 await mkdir(publishedBookDirectory, { recursive: true });
-await copyFile(join("data", "books", "manifest.json"), join(publishedBookDirectory, "manifest.json"));
+const expectedBookIdentities = sourceRegistry.records.flatMap((record) => (
+  record.requiredEditionComponents.map((component) => ({
+    bookGraphId: `${record.id}:${component.id}`,
+    sourceRecordId: record.id,
+    sourceOrdinal: record.ordinal,
+    componentId: component.id,
+    componentLabel: component.label,
+  }))
+));
 const publishedBookPaths = new Set();
-for (const entry of bookManifest.entries) {
-  if (!/^S\d{4}\/[a-z0-9][a-z0-9-]*\.json$/.test(entry.path) || publishedBookPaths.has(entry.path)) {
-    throw new Error(`Unsafe or duplicate per-book graph path: ${entry.path}`);
+let artifactCount = 0;
+for (const [index, entry] of bookManifest.entries.entries()) {
+  const expectedIdentity = expectedBookIdentities[index];
+  if (!expectedIdentity || Object.entries(expectedIdentity).some(([key, value]) => entry[key] !== value)) {
+    throw new Error(`The per-book graph manifest loses component identity at position ${index + 1}.`);
   }
-  publishedBookPaths.add(entry.path);
+  if (entry.artifactPath === null) continue;
+  if (typeof entry.artifactPath !== "string"
+    || !/^S\d{4}\/[a-z0-9][a-z0-9-]*\.json$/.test(entry.artifactPath)
+    || publishedBookPaths.has(entry.artifactPath)) {
+    throw new Error(`Unsafe or duplicate per-book graph artifact path: ${entry.artifactPath}`);
+  }
+  const canonicalPath = `${entry.sourceRecordId}/${entry.componentId}.json`;
+  if (entry.artifactPath !== canonicalPath) {
+    throw new Error(`Noncanonical per-book graph artifact path: ${entry.artifactPath}`);
+  }
+  publishedBookPaths.add(entry.artifactPath);
+  artifactCount += 1;
 }
+if (bookManifest.artifactCount !== artifactCount) {
+  throw new Error("The per-book graph manifest artifact count is stale.");
+}
+await copyFile(join("data", "books", "manifest.json"), join(publishedBookDirectory, "manifest.json"));
 
 const corpus = JSON.parse(await readFile("src/data/corpus.json", "utf8"));
 const statementCountByPaper = new Map();
@@ -146,5 +172,5 @@ for (const route of routes) {
 
 console.log(`Created static entry shells for ${routes.size} canonical client routes.`);
 console.log(
-  `Published ${sourceRegistry.records.length} source records and the ${bookManifest.componentFileCount}-component status manifest; raw book graphs remain internal data.`,
+  `Published ${sourceRegistry.records.length} source records and the ${bookManifest.componentCount}-component status manifest (${bookManifest.artifactCount} graph artifacts created); raw book graphs remain internal data.`,
 );

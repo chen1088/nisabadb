@@ -137,10 +137,11 @@ describe("NisabaDB application", () => {
       }],
     };
     const manifest = {
-      schemaVersion: "1.0.0",
+      schemaVersion: "1.1.0",
       sourceSetRevision: "fixture-r1",
       sourceRecordCount: 1,
-      componentFileCount: 1,
+      componentCount: 1,
+      artifactCount: 0,
       summary: {
         exactEditionResolvedCount: 0,
         awaitingEditionCount: 1,
@@ -162,7 +163,7 @@ describe("NisabaDB application", () => {
         sourceOrdinal: 1,
         componentId: "complete-source",
         componentLabel: "Complete fixture source",
-        path: "S0001/complete-source.json",
+        artifactPath: null,
         extractionStatus: "awaiting-edition",
         graphStatus: "not-started",
         exactEditionResolved: false,
@@ -202,8 +203,8 @@ describe("NisabaDB application", () => {
     );
     await waitFor(() => expect(selectedSourceHeading).toHaveFocus());
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
-    expect(screen.getByLabelText(/source dependency graph status/i)).toHaveTextContent(/indexed source components\s*1 \/ 1/i);
-    expect(screen.getByText("S0001/complete-source.json")).toBeInTheDocument();
+    expect(screen.getByLabelText(/source dependency graph status/i)).toHaveTextContent(/created graph artifacts\s*0 \/ 1/i);
+    expect(screen.getByText("Not created")).toBeInTheDocument();
     expect(screen.getByLabelText(/selected component manifest counts/i)).toHaveTextContent(/theorem-like nodes\s*0/i);
     expect(screen.getByText(/raw node, edge, route, and reference artifacts are validated in the data pipeline/i)).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: /graph nodes/i })).not.toBeInTheDocument();

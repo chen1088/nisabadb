@@ -14,6 +14,12 @@ import {
   writeBookGraphFileAtomicSync,
   writeBookGraphFileAndRefreshSync,
 } from "./book-graph-codec.mjs";
+import {
+  canonicalNeutralArtifactPathsSync,
+  createRollbackSafeManifestRefreshSync,
+  initialBookGraphFor,
+  readBookGraphBaseOrInitialSync,
+} from "./book-graph-source-components.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const temporaryDirectories = [];
@@ -175,6 +181,24 @@ function smallFixture(statement = "Every finite example has a deterministic enco
   };
 }
 
+function fixtureRegistry() {
+  return {
+    sourceSetRevision: "fixture-revision",
+    records: [{
+      id: "S0001",
+      ordinal: 1,
+      familyId: "F01",
+      title: "Fixture Mathematics",
+      authorLine: "Ada Example",
+      rawCitation: "Ada Example, Fixture Mathematics.",
+      requiredEditionComponents: [{
+        id: "complete-source",
+        label: "Complete source",
+      }],
+    }],
+  };
+}
+
 function decodeEncoded(encoded, replacements = new Map()) {
   return decodeBookGraphFile(encoded.index, (relativePath) => (
     replacements.get(relativePath) ?? encoded.shards.get(relativePath)
@@ -286,6 +310,113 @@ describe("book-graph v1.1 sharded codec", () => {
     expect(refreshCount).toBe(2);
     expect(fs.readFileSync(indexPath).equals(originalIndexBytes)).toBe(true);
     expect(readBookGraphFileSync(indexPath)).toEqual(fixture);
+  });
+
+  it("restores first-time artifact absence when manifest refresh fails", () => {
+    const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "nisabadb-codec-first-write-"));
+    temporaryDirectories.push(temporaryRoot);
+    const indexPath = path.join(temporaryRoot, "S0001", "complete-source.json");
+    let refreshCount = 0;
+
+    expect(() => writeBookGraphFileAndRefreshSync(
+      indexPath,
+      smallFixture(),
+      () => {
+        refreshCount += 1;
+        if (refreshCount === 1) throw new Error("synthetic first-write manifest failure");
+      },
+      { maxShardBytes: 700 },
+    )).toThrow(/synthetic first-write manifest failure/i);
+
+    expect(refreshCount).toBe(2);
+    expect(fs.existsSync(indexPath)).toBe(false);
+    const remainingFiles = fs.existsSync(path.dirname(indexPath))
+      ? fs.readdirSync(path.dirname(indexPath), { recursive: true, withFileTypes: true })
+        .filter((entry) => entry.isFile())
+      : [];
+    expect(remainingFiles).toHaveLength(0);
+  });
+
+  it("restores the prior root manifest before a failed first-write rollback refresh", () => {
+    const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "nisabadb-manifest-rollback-"));
+    temporaryDirectories.push(temporaryRoot);
+    const indexPath = path.join(temporaryRoot, "S0001", "complete-source.json");
+    const manifestPath = path.join(temporaryRoot, "manifest.json");
+    const originalManifest = Buffer.from('{"artifactPath":null}\n', "utf8");
+    const changedManifest = Buffer.from('{"artifactPath":"S0001/complete-source.json"}\n', "utf8");
+    fs.writeFileSync(manifestPath, originalManifest);
+    const phases = [];
+    const refreshManifest = createRollbackSafeManifestRefreshSync({
+      manifestPath,
+      refresh: ({ phase }) => {
+        phases.push(phase);
+        if (phase === "write") {
+          fs.writeFileSync(manifestPath, changedManifest);
+          throw new Error("synthetic post-manifest failure");
+        }
+        expect(fs.readFileSync(manifestPath).equals(originalManifest)).toBe(true);
+      },
+    });
+
+    expect(() => writeBookGraphFileAndRefreshSync(
+      indexPath,
+      smallFixture(),
+      refreshManifest,
+      { maxShardBytes: 700 },
+    )).toThrow(/synthetic post-manifest failure/i);
+
+    expect(phases).toEqual(["write", "rollback"]);
+    expect(fs.existsSync(indexPath)).toBe(false);
+    expect(fs.readFileSync(manifestPath).equals(originalManifest)).toBe(true);
+  });
+
+  it("synthesizes absent component bases and recognizes only exact canonical neutral artifacts", () => {
+    const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "nisabadb-neutral-artifact-"));
+    temporaryDirectories.push(temporaryRoot);
+    const registryPath = path.join(temporaryRoot, "source-records.json");
+    const indexPath = path.join(temporaryRoot, "S0001", "complete-source.json");
+    const registry = fixtureRegistry();
+    const neutral = initialBookGraphFor(
+      registry,
+      registry.records[0],
+      registry.records[0].requiredEditionComponents[0],
+    );
+    fs.writeFileSync(registryPath, `${JSON.stringify(registry)}\n`, "utf8");
+
+    expect(readBookGraphBaseOrInitialSync({
+      indexPath,
+      registryPath,
+      recordId: "S0001",
+      componentId: "complete-source",
+    })).toEqual(neutral);
+
+    fs.mkdirSync(path.dirname(indexPath), { recursive: true });
+    fs.writeFileSync(indexPath, `${JSON.stringify(neutral, null, 2)}\n`, "utf8");
+    expect(canonicalNeutralArtifactPathsSync(indexPath, neutral)).toEqual([indexPath]);
+
+    const blocked = structuredClone(neutral);
+    blocked.extractionState.status = "blocked";
+    blocked.extractionState.note = "The source is unavailable under the current access policy.";
+    fs.writeFileSync(indexPath, `${JSON.stringify(blocked, null, 2)}\n`, "utf8");
+    expect(canonicalNeutralArtifactPathsSync(indexPath, neutral)).toBeNull();
+
+    const populated = structuredClone(neutral);
+    populated.graph.nodes.push(smallFixture().graph.nodes[0]);
+    populated.extractionState.status = "extracting";
+    populated.graphState.status = "building";
+    fs.writeFileSync(indexPath, `${JSON.stringify(populated, null, 2)}\n`, "utf8");
+    expect(canonicalNeutralArtifactPathsSync(indexPath, neutral)).toBeNull();
+
+    writeBookGraphFileAtomicSync(indexPath, neutral, {
+      distribution: {
+        class: "metadata-only",
+        note: "A custom distribution decision must be retained.",
+      },
+    });
+    expect(canonicalNeutralArtifactPathsSync(indexPath, neutral)).toBeNull();
+
+    writeBookGraphFileAtomicSync(indexPath, neutral);
+    expect(canonicalNeutralArtifactPathsSync(indexPath, neutral)).toEqual([indexPath]);
   });
 
   it("round-trips the two current populated components without writing", { timeout: 30_000 }, () => {

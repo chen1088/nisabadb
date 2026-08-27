@@ -284,7 +284,7 @@ const bookGraphManifestEntrySchema = z.object({
   sourceOrdinal: z.number().int().positive(),
   componentId: stableIdSchema,
   componentLabel: z.string().min(1),
-  path: relativeBookFileSchema,
+  artifactPath: relativeBookFileSchema.nullable(),
   extractionStatus: extractionStatusSchema,
   graphStatus: graphStatusSchema,
   exactEditionResolved: z.boolean(),
@@ -297,13 +297,35 @@ const bookGraphManifestEntrySchema = z.object({
   dependencyCount: z.number().int().nonnegative(),
   reviewedDependencyCount: z.number().int().nonnegative(),
   unresolvedReferenceCount: z.number().int().nonnegative(),
-}).strict();
+}).strict().superRefine((entry, context) => {
+  if (entry.artifactPath !== null) return;
+
+  const invalidAbsentState = entry.extractionStatus !== "awaiting-edition"
+    || entry.graphStatus !== "not-started"
+    || entry.exactEditionResolved
+    || entry.sourceUnitCount !== 0
+    || entry.inventoriedSourceUnitCount !== 0
+    || entry.reviewedSourceUnitCount !== 0
+    || entry.theoremNodeCount !== 0
+    || entry.unroutedTheoremCount !== 0
+    || entry.supportNodeCount !== 0
+    || entry.dependencyCount !== 0
+    || entry.reviewedDependencyCount !== 0
+    || entry.unresolvedReferenceCount !== 0;
+  if (invalidAbsentState) {
+    context.addIssue({
+      code: "custom",
+      message: "An absent book graph artifact must remain awaiting-edition/not-started with zero metrics",
+    });
+  }
+});
 
 export const bookGraphManifestSchema = z.object({
-  schemaVersion: z.literal("1.0.0"),
+  schemaVersion: z.literal("1.1.0"),
   sourceSetRevision: z.string().min(1),
   sourceRecordCount: z.number().int().positive(),
-  componentFileCount: z.number().int().positive(),
+  componentCount: z.number().int().positive(),
+  artifactCount: z.number().int().nonnegative(),
   summary: z.object({
     exactEditionResolvedCount: z.number().int().nonnegative(),
     awaitingEditionCount: z.number().int().nonnegative(),
@@ -719,9 +741,10 @@ function sameJson(left: unknown, right: unknown) {
 }
 
 type ManifestEntry = BookGraphManifest["entries"][number];
-type ManifestBaseEntry = Pick<ManifestEntry,
-  "bookGraphId" | "sourceRecordId" | "sourceOrdinal" | "componentId" | "componentLabel" | "path">;
-type ManifestMetrics = Omit<ManifestEntry, keyof ManifestBaseEntry>;
+type ManifestIdentity = Pick<ManifestEntry,
+  "bookGraphId" | "sourceRecordId" | "sourceOrdinal" | "componentId" | "componentLabel">;
+type ManifestMetrics = Omit<ManifestEntry, keyof ManifestIdentity | "artifactPath">;
+type ExpectedManifestComponent = ManifestIdentity & { canonicalArtifactPath: string };
 
 function manifestMetrics(file: BookGraphFile): ManifestMetrics {
   const routedTheoremIds = new Set(file.graph.proofRoutes.map((route) => route.theoremNodeId));
@@ -762,17 +785,17 @@ function manifestSummary(entries: readonly ManifestEntry[]): BookGraphManifest["
 }
 
 function expectedManifestComponents(registry: SourceRegistry) {
-  const expected = new Map<string, ManifestBaseEntry>();
+  const expected = new Map<string, ExpectedManifestComponent>();
   for (const record of registry.records) {
     for (const component of record.requiredEditionComponents) {
-      const relativePath = `${record.id}/${component.id}.json`;
-      expected.set(relativePath, {
-        bookGraphId: `${record.id}:${component.id}`,
+      const bookGraphId = `${record.id}:${component.id}`;
+      expected.set(bookGraphId, {
+        bookGraphId,
         sourceRecordId: record.id,
         sourceOrdinal: record.ordinal,
         componentId: component.id,
         componentLabel: component.label,
-        path: relativePath,
+        canonicalArtifactPath: `${record.id}/${component.id}.json`,
       });
     }
   }
@@ -790,27 +813,45 @@ export function validateBookGraphIndex(
   if (manifest.sourceRecordCount !== registry.records.length) throw new Error("Book manifest source-record count is stale");
 
   const expected = expectedManifestComponents(registry);
-  if (manifest.componentFileCount !== expected.size || manifest.entries.length !== expected.size) {
+  if (manifest.componentCount !== expected.size || manifest.entries.length !== expected.size) {
     throw new Error(`Book manifest does not cover every required component (${manifest.entries.length}/${expected.size})`);
   }
 
-  unique(manifest.entries.map((entry) => entry.path), "book manifest path");
   unique(manifest.entries.map((entry) => entry.bookGraphId), "book graph ID");
+  const artifactPaths = manifest.entries.flatMap((entry) => (
+    entry.artifactPath === null ? [] : [entry.artifactPath]
+  ));
+  unique(artifactPaths, "book manifest artifact path");
+  if (manifest.artifactCount !== artifactPaths.length) {
+    throw new Error(`Book manifest artifact count is stale (${manifest.artifactCount}/${artifactPaths.length})`);
+  }
+
   for (const entry of manifest.entries) {
-    if (entry.path.includes("..") || entry.path.startsWith("/") || entry.path.includes("\\")) {
-      throw new Error(`Unsafe book graph path: ${entry.path}`);
-    }
-    const expectedItem = expected.get(entry.path);
-    const baseEntry: ManifestBaseEntry = {
+    const expectedItem = expected.get(entry.bookGraphId);
+    const identity: ManifestIdentity = {
       bookGraphId: entry.bookGraphId,
       sourceRecordId: entry.sourceRecordId,
       sourceOrdinal: entry.sourceOrdinal,
       componentId: entry.componentId,
       componentLabel: entry.componentLabel,
-      path: entry.path,
     };
-    if (!expectedItem || !sameJson(baseEntry, expectedItem)) {
-      throw new Error(`${entry.path} is not the exact registry component indexed by the manifest`);
+    if (!expectedItem || !sameJson(identity, {
+      bookGraphId: expectedItem.bookGraphId,
+      sourceRecordId: expectedItem.sourceRecordId,
+      sourceOrdinal: expectedItem.sourceOrdinal,
+      componentId: expectedItem.componentId,
+      componentLabel: expectedItem.componentLabel,
+    })) {
+      throw new Error(`${entry.bookGraphId} is not the exact registry component indexed by the manifest`);
+    }
+
+    if (entry.artifactPath !== null) {
+      if (entry.artifactPath.includes("..") || entry.artifactPath.startsWith("/") || entry.artifactPath.includes("\\")) {
+        throw new Error(`Unsafe book graph path: ${entry.artifactPath}`);
+      }
+      if (entry.artifactPath !== expectedItem.canonicalArtifactPath) {
+        throw new Error(`${entry.artifactPath} is not the canonical artifact path for ${entry.bookGraphId}`);
+      }
     }
   }
   if (!sameJson(manifest.summary, manifestSummary(manifest.entries))) {
@@ -826,38 +867,40 @@ export function validateBookGraphManifestEntry(
   rawFile: unknown,
 ): BookGraphFile {
   const entry = bookGraphManifestEntrySchema.parse(rawEntry);
-  if (entry.path.includes("..") || entry.path.startsWith("/") || entry.path.includes("\\")) {
-    throw new Error(`Unsafe book graph path: ${entry.path}`);
+  if (entry.artifactPath === null) {
+    throw new Error(`${entry.bookGraphId} has no book graph artifact to validate`);
+  }
+  if (entry.artifactPath.includes("..") || entry.artifactPath.startsWith("/") || entry.artifactPath.includes("\\")) {
+    throw new Error(`Unsafe book graph path: ${entry.artifactPath}`);
   }
 
   const record = registry.records.find(({ id }) => id === entry.sourceRecordId);
   const component = record?.requiredEditionComponents.find(({ id }) => id === entry.componentId);
   if (!record || !component) {
-    throw new Error(`${entry.path} is not the exact registry component indexed by the manifest`);
+    throw new Error(`${entry.artifactPath} is not the exact registry component indexed by the manifest`);
   }
-  const expectedEntry: ManifestBaseEntry = {
+  const expectedEntry: ManifestIdentity = {
     bookGraphId: `${record.id}:${component.id}`,
     sourceRecordId: record.id,
     sourceOrdinal: record.ordinal,
     componentId: component.id,
     componentLabel: component.label,
-    path: `${record.id}/${component.id}.json`,
   };
-  const baseEntry: ManifestBaseEntry = {
+  const identity: ManifestIdentity = {
     bookGraphId: entry.bookGraphId,
     sourceRecordId: entry.sourceRecordId,
     sourceOrdinal: entry.sourceOrdinal,
     componentId: entry.componentId,
     componentLabel: entry.componentLabel,
-    path: entry.path,
   };
-  if (!sameJson(baseEntry, expectedEntry)) {
-    throw new Error(`${entry.path} is not the exact registry component indexed by the manifest`);
+  if (!sameJson(identity, expectedEntry)
+    || entry.artifactPath !== `${record.id}/${component.id}.json`) {
+    throw new Error(`${entry.artifactPath} is not the exact registry component indexed by the manifest`);
   }
 
   const file = validateBookGraphFile(rawFile);
   if (!sameJson(file.identity, expectedIdentity(registry, record, component))) {
-    throw new Error(`${entry.path} immutable identity does not match the source registry`);
+    throw new Error(`${entry.artifactPath} immutable identity does not match the source registry`);
   }
   if (!sameJson(manifestMetrics(file), {
     extractionStatus: entry.extractionStatus,
@@ -873,7 +916,7 @@ export function validateBookGraphManifestEntry(
     reviewedDependencyCount: entry.reviewedDependencyCount,
     unresolvedReferenceCount: entry.unresolvedReferenceCount,
   })) {
-    throw new Error(`${entry.path} manifest metrics are stale`);
+    throw new Error(`${entry.artifactPath} manifest metrics are stale`);
   }
   return file;
 }
@@ -888,10 +931,13 @@ export function validateBookGraphCorpus(
     ? new Map(rawFilesByPath)
     : new Map(Object.entries(rawFilesByPath));
 
-  if (rawFiles.size !== manifest.entries.length) {
-    throw new Error(`Book graph file set is not one-to-one with registry components (${rawFiles.size}/${manifest.entries.length})`);
+  if (rawFiles.size !== manifest.artifactCount) {
+    throw new Error(`Book graph file set is not one-to-one with present artifacts (${rawFiles.size}/${manifest.artifactCount})`);
   }
-  const manifestEntriesByPath = new Map(manifest.entries.map((entry) => [entry.path, entry]));
+  const manifestEntriesByPath = new Map<string, ManifestEntry>();
+  for (const entry of manifest.entries) {
+    if (entry.artifactPath !== null) manifestEntriesByPath.set(entry.artifactPath, entry);
+  }
   const parsedFiles = new Map<string, BookGraphFile>();
   for (const [relativePath, rawFile] of rawFiles) {
     if (!relativeBookFileSchema.safeParse(relativePath).success || relativePath.includes("..") || relativePath.includes("\\")) {

@@ -106,7 +106,7 @@ export function KnowledgeCompressionPage() {
           <h2 id="coverage-boundary-title">Blocked until Phase I is complete.</h2>
           <p>The atlas remains visible as an early hypothesis, but clusters, shortened routes, and the canonical chapter plan will not advance until every source component has its own reviewed theorem dependency graph. {compressionProgram.coverageNote}</p>
         </div>
-        <Link to="/knowledge/coverage">Open the source graph workspace →</Link>
+        <Link to="/knowledge/coverage">Open source graph status →</Link>
       </section>
 
       <section className="compression-method page-shell" aria-labelledby="compression-method-title">

@@ -1,25 +1,21 @@
+/// <reference types="node" />
+
 import { describe, expect, it } from "vitest";
+import path from "node:path";
 import rawManifest from "../../data/books/manifest.json";
 import rawRegistry from "../../data/knowledge/source-records.json";
+// @ts-expect-error The Node-only storage codec is intentionally maintained as an ESM JavaScript module.
+import { readBookGraphFileSync } from "../../scripts/book-graph-codec.mjs";
 import {
-  validateBookGraphCorpus,
   validateBookGraphFile,
+  validateBookGraphIndex,
+  validateBookGraphManifestEntry,
   type BookGraphFile,
-  type BookGraphManifest,
 } from "./book-graph-schema";
 
-const rawBookModules = import.meta.glob("../../data/books/S*/*.json", {
-  eager: true,
-  import: "default",
-}) as Record<string, unknown>;
-
-function diskCorpus() {
-  const manifest = rawManifest as BookGraphManifest;
-  const files = new Map<string, unknown>();
-  for (const [modulePath, rawFile] of Object.entries(rawBookModules)) {
-    files.set(modulePath.replace("../../data/books/", ""), rawFile);
-  }
-  return { manifest, files };
+function readDiskBookGraph(relativePath: string) {
+  const filePath = path.join(process.cwd(), "data", "books", ...relativePath.split("/"));
+  return readBookGraphFileSync(filePath);
 }
 
 const extractor = {
@@ -43,8 +39,7 @@ const reviewedEvidence = {
 };
 
 function reviewedGraphFixture(): BookGraphFile {
-  const { files } = diskCorpus();
-  const placeholder = structuredClone(files.get("S0001/level-1.json")) as BookGraphFile;
+  const placeholder = structuredClone(readDiskBookGraph("S0001/level-1.json")) as BookGraphFile;
   placeholder.exactEdition = {
     editionId: "fixture-edition",
     label: "Exact fixture edition",
@@ -158,16 +153,34 @@ function reviewedGraphFixture(): BookGraphFile {
   return placeholder;
 }
 
-describe("one Phase-I dependency graph file per source component", () => {
+describe("one Phase-I dependency graph identity per source component", () => {
   it("covers all 688 source rows and all 717 actual book or volume components exactly once", () => {
-    const { manifest, files } = diskCorpus();
-    const validated = validateBookGraphCorpus(rawRegistry, manifest, files);
+    const validated = validateBookGraphIndex(rawRegistry, rawManifest);
+    const populatedPaths = new Set(["S0060/complete-source.json", "S0262/complete-source.json"]);
+    const populatedFiles = new Map<string, BookGraphFile>();
+    let validatedComponentCount = 0;
+    let awaitingComponentCount = 0;
+    for (const entry of validated.manifest.entries) {
+      const file = validateBookGraphManifestEntry(
+        validated.registry,
+        entry,
+        readDiskBookGraph(entry.path),
+      );
+      validatedComponentCount += 1;
+      if (populatedPaths.has(entry.path)) {
+        populatedFiles.set(entry.path, file);
+      } else if (file.exactEdition === null
+        && file.extractionState.status === "awaiting-edition"
+        && file.graphState.status === "not-started") {
+        awaitingComponentCount += 1;
+      }
+    }
 
     expect(validated.registry.records).toHaveLength(688);
     expect(validated.manifest.sourceRecordCount).toBe(688);
     expect(validated.manifest.componentFileCount).toBe(717);
     expect(validated.manifest.entries).toHaveLength(717);
-    expect(validated.filesByPath).toHaveLength(717);
+    expect(validatedComponentCount).toBe(717);
     expect(validated.manifest.summary).toEqual({
       exactEditionResolvedCount: 2,
       awaitingEditionCount: 715,
@@ -183,18 +196,20 @@ describe("one Phase-I dependency graph file per source component", () => {
       reviewedDependencyCount: 0,
       unresolvedReferenceCount: 2602,
     });
-    expect(validated.filesByPath.get("S0001/level-1.json")?.identity.bookGraphId).toBe("S0001:level-1");
-    expect(validated.filesByPath.get("S0074/volume-3.json")?.identity.componentLabel).toBe("Volume 3");
-    const pilot = validated.filesByPath.get("S0060/complete-source.json");
+    expect(validated.manifest.entries.find(({ path }) => path === "S0001/level-1.json")?.bookGraphId)
+      .toBe("S0001:level-1");
+    expect(validated.manifest.entries.find(({ path }) => path === "S0074/volume-3.json")?.componentLabel)
+      .toBe("Volume 3");
+    const pilot = populatedFiles.get("S0060/complete-source.json");
     expect(pilot?.exactEdition).not.toBeNull();
     expect(pilot?.extractionState.status).toBe("extracted");
     expect(pilot?.graphState.status).toBe("extracted");
-    const rejectedBook = validated.filesByPath.get("S0002/complete-source.json");
-    expect(rejectedBook?.exactEdition).toBeNull();
-    expect(rejectedBook?.graph.nodes).toHaveLength(0);
-    expect(rejectedBook?.extractionState.status).toBe("awaiting-edition");
-    expect(rejectedBook?.graphState.status).toBe("not-started");
-    const densestBook = validated.filesByPath.get("S0262/complete-source.json");
+    const rejectedBook = validated.manifest.entries.find(({ path }) => path === "S0002/complete-source.json");
+    expect(rejectedBook?.exactEditionResolved).toBe(false);
+    expect(rejectedBook?.theoremNodeCount).toBe(0);
+    expect(rejectedBook?.extractionStatus).toBe("awaiting-edition");
+    expect(rejectedBook?.graphStatus).toBe("not-started");
+    const densestBook = populatedFiles.get("S0262/complete-source.json");
     expect(densestBook?.exactEdition?.sourceFormat).toBe("latex");
     expect(densestBook?.sourceUnits).toHaveLength(116);
     expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like")).toHaveLength(13138);
@@ -352,41 +367,47 @@ describe("one Phase-I dependency graph file per source component", () => {
     ]);
     expect(densestBook?.extractionState.status).toBe("extracted");
     expect(densestBook?.graphState.status).toBe("extracted");
-    const populatedPaths = new Set(["S0060/complete-source.json", "S0262/complete-source.json"]);
-    expect([...validated.filesByPath.entries()].filter(([path]) => !populatedPaths.has(path)).every(([, file]) => (
-      file.exactEdition === null
-      && file.extractionState.status === "awaiting-edition"
-      && file.graphState.status === "not-started"
-    ))).toBe(true);
+    expect(populatedFiles).toHaveLength(2);
+    expect(awaitingComponentCount).toBe(715);
   });
 
-  it("rejects missing, extra, unsafe, or identity-mismatched component files", () => {
-    const { manifest, files } = diskCorpus();
+  it("rejects missing, extra, unsafe, identity-mismatched, or stale manifest components", () => {
+    const { registry, manifest } = validateBookGraphIndex(rawRegistry, rawManifest);
+    const placeholderEntry = manifest.entries.find(({ path }) => path === "S0001/level-1.json");
+    if (!placeholderEntry) throw new Error("missing placeholder manifest fixture");
+    const placeholder = readDiskBookGraph(placeholderEntry.path);
 
-    const missing = new Map(files);
-    missing.delete("S0001/level-1.json");
-    expect(() => validateBookGraphCorpus(rawRegistry, manifest, missing)).toThrow(/one-to-one/i);
+    const missing = structuredClone(manifest);
+    missing.entries.pop();
+    expect(() => validateBookGraphIndex(rawRegistry, missing)).toThrow(/cover every required component/i);
 
-    const extra = new Map(files);
-    extra.set("S9999/extra.json", structuredClone(files.get("S0001/level-1.json")));
-    expect(() => validateBookGraphCorpus(rawRegistry, manifest, extra)).toThrow(/one-to-one/i);
+    const extra = structuredClone(manifest);
+    extra.componentFileCount += 1;
+    extra.entries.push({
+      ...structuredClone(placeholderEntry),
+      bookGraphId: "S9999:extra",
+      sourceRecordId: "S9999",
+      sourceOrdinal: 9999,
+      componentId: "extra",
+      componentLabel: "Extra component",
+      path: "S9999/extra.json",
+    });
+    expect(() => validateBookGraphIndex(rawRegistry, extra)).toThrow(/cover every required component/i);
 
     const unsafeManifest = structuredClone(manifest);
     if (!unsafeManifest.entries[0]) throw new Error("missing manifest fixture");
     unsafeManifest.entries[0].path = "../escape.json";
-    expect(() => validateBookGraphCorpus(rawRegistry, unsafeManifest, files)).toThrow();
+    expect(() => validateBookGraphIndex(rawRegistry, unsafeManifest)).toThrow();
 
-    const mismatched = new Map(files);
-    const wrongIdentity = structuredClone(files.get("S0001/level-1.json")) as BookGraphFile;
+    const wrongIdentity = structuredClone(placeholder) as BookGraphFile;
     wrongIdentity.identity.componentLabel = "Wrong component";
-    mismatched.set("S0001/level-1.json", wrongIdentity);
-    expect(() => validateBookGraphCorpus(rawRegistry, manifest, mismatched)).toThrow(/immutable identity/i);
+    expect(() => validateBookGraphManifestEntry(registry, placeholderEntry, wrongIdentity))
+      .toThrow(/immutable identity/i);
 
-    const staleMetrics = structuredClone(manifest);
-    if (!staleMetrics.entries[0]) throw new Error("missing manifest metric fixture");
-    staleMetrics.entries[0].theoremNodeCount = 1;
-    staleMetrics.summary.theoremNodeCount = 1;
-    expect(() => validateBookGraphCorpus(rawRegistry, staleMetrics, files)).toThrow(/manifest metrics are stale/i);
+    const staleMetrics = structuredClone(placeholderEntry);
+    staleMetrics.theoremNodeCount = 1;
+    expect(() => validateBookGraphManifestEntry(registry, staleMetrics, placeholder))
+      .toThrow(/manifest metrics are stale/i);
   });
 });
 

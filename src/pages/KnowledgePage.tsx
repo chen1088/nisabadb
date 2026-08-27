@@ -482,7 +482,7 @@ export function KnowledgePage() {
           </p>
         </div>
         <div className="compression-contract-flow" aria-label="Reference processing status">
-          <div><strong>{__SOURCE_COMPONENT_COUNT__}</strong><span>individual book graph files</span></div>
+          <div><strong>{__SOURCE_COMPONENT_COUNT__}</strong><span>tracked source components</span></div>
           <span aria-hidden="true">→</span>
           <div><strong>edition</strong><span>resolve and fingerprint</span></div>
           <span aria-hidden="true">→</span>

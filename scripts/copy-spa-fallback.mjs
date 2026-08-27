@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readFile, readdir } from "node:fs/promises";
+import { copyFile, mkdir, readFile, readdir, rm } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 
@@ -95,6 +95,7 @@ if (bookManifest.componentFileCount !== expectedComponentCount) {
   throw new Error("The per-book graph manifest loses required book or volume components.");
 }
 const publishedBookDirectory = join(knowledgeCoverageDirectory, "books");
+await rm(publishedBookDirectory, { recursive: true, force: true });
 await mkdir(publishedBookDirectory, { recursive: true });
 await copyFile(join("data", "books", "manifest.json"), join(publishedBookDirectory, "manifest.json"));
 const publishedBookPaths = new Set();
@@ -103,10 +104,6 @@ for (const entry of bookManifest.entries) {
     throw new Error(`Unsafe or duplicate per-book graph path: ${entry.path}`);
   }
   publishedBookPaths.add(entry.path);
-  const source = join("data", "books", ...entry.path.split("/"));
-  const destination = join(publishedBookDirectory, ...entry.path.split("/"));
-  await mkdir(dirname(destination), { recursive: true });
-  await copyFile(source, destination);
 }
 
 const corpus = JSON.parse(await readFile("src/data/corpus.json", "utf8"));
@@ -149,5 +146,5 @@ for (const route of routes) {
 
 console.log(`Created static entry shells for ${routes.size} canonical client routes.`);
 console.log(
-  `Published ${sourceRegistry.records.length} source records and ${bookManifest.componentFileCount} lazy per-book graphs.`,
+  `Published ${sourceRegistry.records.length} source records and the ${bookManifest.componentFileCount}-component status manifest; raw book graphs remain internal data.`,
 );

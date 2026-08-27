@@ -1,0 +1,116 @@
+{"id":"unit-introduction","ordinal":1,"label":"Introduction","locator":"introduction.tex","contentSha256":"b3804dba27d421090ac21a4672ca05fe05e886d72654bb21e7b718003a5584e7"}
+{"id":"unit-conventions","ordinal":2,"label":"Conventions","locator":"conventions.tex","contentSha256":"b37bdc9188b005994d334222886a9c3d878d270f8bb2f79368f8351d12b50880"}
+{"id":"unit-sets","ordinal":3,"label":"Set Theory","locator":"sets.tex","contentSha256":"0162ed4c8b4d6715413222eef1a676118bad4b5a920a564567194d234197787c"}
+{"id":"unit-categories","ordinal":4,"label":"Categories","locator":"categories.tex","contentSha256":"b61dbe24f4665edf40344c70e2db414a36f7997abce1fa38010a6faa88c999de"}
+{"id":"unit-topology","ordinal":5,"label":"Topology","locator":"topology.tex","contentSha256":"eae41da930055bb6036b5f43e442aa93a1b192153c236d01c73abb8a3734690b"}
+{"id":"unit-sheaves","ordinal":6,"label":"Sheaves on Spaces","locator":"sheaves.tex","contentSha256":"2813b2dd21137c1284be4445abd339d52fac5799b2c27b1fb0cd6fb22c86e747"}
+{"id":"unit-sites","ordinal":7,"label":"Sites and Sheaves","locator":"sites.tex","contentSha256":"a3dd734abe1c213da5f427399b78715a769c21fbb7775cb4ec223f015d3ac27f"}
+{"id":"unit-stacks","ordinal":8,"label":"Stacks","locator":"stacks.tex","contentSha256":"e3b7a14379f8498b74a5a25330752903c07e65f718cb0446eb7fa67fb79fcbde"}
+{"id":"unit-fields","ordinal":9,"label":"Fields","locator":"fields.tex","contentSha256":"d16c6945525497e24eca6714cc3bad6516d3efec18fb5deb03637a4ea2501ba2"}
+{"id":"unit-algebra","ordinal":10,"label":"Commutative Algebra","locator":"algebra.tex","contentSha256":"fdbe752528ebb5c0487904cc2655b99710d3dd18c21363ac1363953128123ed4"}
+{"id":"unit-brauer","ordinal":11,"label":"Brauer groups","locator":"brauer.tex","contentSha256":"0ea9b2dfefa7832bcc028e05a0a4cf84b50225b28d6e992ea35a94f4f5ad6c9d"}
+{"id":"unit-homology","ordinal":12,"label":"Homological Algebra","locator":"homology.tex","contentSha256":"c230150f2d30193a92879ac49b19ce04d32fe2ce19304b2c2b4a009b0d6037d8"}
+{"id":"unit-derived","ordinal":13,"label":"Derived Categories","locator":"derived.tex","contentSha256":"a9b8db97c916374012e2ee8dc0ad45d91ff66fd4623feed45058d56b2e913cf9"}
+{"id":"unit-simplicial","ordinal":14,"label":"Simplicial Methods","locator":"simplicial.tex","contentSha256":"62bfddf6957739afe668d3b81a82ab2e66193b6fdb0d348aa88060d3c8f2a4fa"}
+{"id":"unit-more-algebra","ordinal":15,"label":"More on Algebra","locator":"more-algebra.tex","contentSha256":"ebd7a98350960545d81d56202c18f91ba33dbc0a44c19d53510ead45677e471e"}
+{"id":"unit-smoothing","ordinal":16,"label":"Smoothing Ring Maps","locator":"smoothing.tex","contentSha256":"1d2482646a8a64d4bde256c7330b13ad1add6d14ef614c3de7784cf71fe54185"}
+{"id":"unit-modules","ordinal":17,"label":"Sheaves of Modules","locator":"modules.tex","contentSha256":"21904d1c30c4560bbe16c62f827f39917fd12a9d5eff84ced8ac765e59d1e8d3"}
+{"id":"unit-sites-modules","ordinal":18,"label":"Modules on Sites","locator":"sites-modules.tex","contentSha256":"0d27cd521ec4704308b0c360f5d152fa7ee070a8ffb929a040eaf203aeb0de89"}
+{"id":"unit-injectives","ordinal":19,"label":"Injectives","locator":"injectives.tex","contentSha256":"f5c7ce60fc3af6280d6c75c70b417d44928803312bae1cbc0cc1212924169f57"}
+{"id":"unit-cohomology","ordinal":20,"label":"Cohomology of Sheaves","locator":"cohomology.tex","contentSha256":"c7f3fc4d0f8b1ec61d85a2a61b6d5bf685e206e0c5afb40e3b04c4d2710b89d2"}
+{"id":"unit-sites-cohomology","ordinal":21,"label":"Cohomology on Sites","locator":"sites-cohomology.tex","contentSha256":"aacf806e8f5a576b0b157003b5ce804f643e57db0eff1e690c59aabfeb8487fa"}
+{"id":"unit-dga","ordinal":22,"label":"Differential Graded Algebra","locator":"dga.tex","contentSha256":"289a7512713eb2193aaac234d63e30a0437861f2c2be3216d186a5edadef0fb0"}
+{"id":"unit-dpa","ordinal":23,"label":"Divided Power Algebra","locator":"dpa.tex","contentSha256":"809a75ec011401b9d023665142342730ebe9088ba8dc60e9ebbc9d6f254d8c63"}
+{"id":"unit-sdga","ordinal":24,"label":"Differential Graded Sheaves","locator":"sdga.tex","contentSha256":"189e23bb6d61d7a123b34c8f1932663915ca79fe8a212fffb45d8f9ca0bb431d"}
+{"id":"unit-hypercovering","ordinal":25,"label":"Hypercoverings","locator":"hypercovering.tex","contentSha256":"413b33f16a256a771ab6b660e7acc818546a7d0a743bf4414cc0ec2aa5367f12"}
+{"id":"unit-schemes","ordinal":26,"label":"Schemes","locator":"schemes.tex","contentSha256":"1d65b442c050f96b04c6ab21fc52f2ca5af9fa9a2df4de5fcd7824f30eb40649"}
+{"id":"unit-constructions","ordinal":27,"label":"Constructions of Schemes","locator":"constructions.tex","contentSha256":"be66d4029f85ee1e03a66404988ae6baab72a13ec3a47712ecc49592f8c1a480"}
+{"id":"unit-properties","ordinal":28,"label":"Properties of Schemes","locator":"properties.tex","contentSha256":"77ea7c5ea825499dfdec8017dea065f42fcd2b336a9e21d2dd60e4581e9fda26"}
+{"id":"unit-morphisms","ordinal":29,"label":"Morphisms of Schemes","locator":"morphisms.tex","contentSha256":"2609ef10df87edc05541e672b57fbffe67367f413e3f776c4e7fba149f72ac68"}
+{"id":"unit-coherent","ordinal":30,"label":"Cohomology of Schemes","locator":"coherent.tex","contentSha256":"d18d3d9a08988d3094be0b36bf7e4db743f86f9b808d08cf500d0e74c13fb407"}
+{"id":"unit-divisors","ordinal":31,"label":"Divisors","locator":"divisors.tex","contentSha256":"36651a1d1c977b51afa4fc44e09711e97801372301a2a763090d1f5d17cb5f81"}
+{"id":"unit-limits","ordinal":32,"label":"Limits of Schemes","locator":"limits.tex","contentSha256":"1957de475b47e434589f24ba0182a0e46818549371e1e7a56330a771924c60ac"}
+{"id":"unit-varieties","ordinal":33,"label":"Varieties","locator":"varieties.tex","contentSha256":"6d7b8d7fd0122922f411297fca82e51f916a9725a2cf1c7f2eb672143a9a1823"}
+{"id":"unit-topologies","ordinal":34,"label":"Topologies on Schemes","locator":"topologies.tex","contentSha256":"7a4ba6f4bea12b060eec6a6f6613f729340a14f4c8a5b988c82d3663f2a29143"}
+{"id":"unit-descent","ordinal":35,"label":"Descent","locator":"descent.tex","contentSha256":"0450e50f96ece0b3acad28fb02ca1bf8a91d62eefd5f0652f4e1c04de6f33b54"}
+{"id":"unit-perfect","ordinal":36,"label":"Derived Categories of Schemes","locator":"perfect.tex","contentSha256":"b6b5089f57ecf1af44741e032210a2b9d04444cdb42aa9b3165731a53d5c0801"}
+{"id":"unit-more-morphisms","ordinal":37,"label":"More on Morphisms","locator":"more-morphisms.tex","contentSha256":"4fc1f79b0e5b724b30e7daa6b62b23cd91c427db2c83b9cb84ec1eed2933ce97"}
+{"id":"unit-flat","ordinal":38,"label":"More on Flatness","locator":"flat.tex","contentSha256":"cd5c4f47aae2e0c39d6d1f03ac26beb6e47ae61ed501ba9295c967a5d6951747"}
+{"id":"unit-groupoids","ordinal":39,"label":"Groupoid Schemes","locator":"groupoids.tex","contentSha256":"296814154b529894700567c426241a65b79e3bc4334a9bb55684fa50c8870fc4"}
+{"id":"unit-more-groupoids","ordinal":40,"label":"More on Groupoid Schemes","locator":"more-groupoids.tex","contentSha256":"63fdd1ab79b3b0b42cf0dd5a93a964689da1c4c7e4f0e5d46531c81b7c88ccee"}
+{"id":"unit-etale","ordinal":41,"label":"\\'Etale Morphisms of Schemes","locator":"etale.tex","contentSha256":"5cc253bd4c2fd76654aef9d89f1614502ae9aadf7e39dce869f15a012ce09f9d"}
+{"id":"unit-chow","ordinal":42,"label":"Chow Homology and Chern Classes","locator":"chow.tex","contentSha256":"b1ae20756bd73c565c62d67d9dc85afedbe1748e914e9f8120f3b10fb85cf258"}
+{"id":"unit-intersection","ordinal":43,"label":"Intersection Theory","locator":"intersection.tex","contentSha256":"cd9dd9a3f1351457b270a262f13614712e41b87585706fe4c38c3cb2a7f6cbda"}
+{"id":"unit-pic","ordinal":44,"label":"Picard Schemes of Curves","locator":"pic.tex","contentSha256":"41263217edf01eef488850d39b9fedc7e06ff62bdbc6ac39ce20b1ab45eeb72d"}
+{"id":"unit-weil","ordinal":45,"label":"Weil Cohomology Theories","locator":"weil.tex","contentSha256":"b17edc8093596796acba992b059bc5ffbe00994b88acb39388b479f3c7c042a2"}
+{"id":"unit-adequate","ordinal":46,"label":"Adequate Modules","locator":"adequate.tex","contentSha256":"ef902b74711fe3c1ee4d39bd4ade84c6324d19082982073ad9a819fff7bfb10a"}
+{"id":"unit-dualizing","ordinal":47,"label":"Dualizing Complexes","locator":"dualizing.tex","contentSha256":"3288b2b27e2eecb6cc5fa5c0eb073271ccf227fc62db8f89bc5b9013f2ee1884"}
+{"id":"unit-duality","ordinal":48,"label":"Duality for Schemes","locator":"duality.tex","contentSha256":"f53d8d1b05036bc88ff92446f3bed6a284ee810ad2c9cb18d7e91c6a33952c6f"}
+{"id":"unit-discriminant","ordinal":49,"label":"Discriminants and Differents","locator":"discriminant.tex","contentSha256":"e9e8fe39b5cb42657a6b851634d370a169c8409166d1ea64174983e8d8cd007d"}
+{"id":"unit-derham","ordinal":50,"label":"de Rham Cohomology","locator":"derham.tex","contentSha256":"324f0d4eccc882a66628c24a329bc3689bfadece749400b868ce4d752e692f00"}
+{"id":"unit-local-cohomology","ordinal":51,"label":"Local Cohomology","locator":"local-cohomology.tex","contentSha256":"ac9c55030686a6e562ffe2b489339d39df8dbd26e0c2680c43428ce9ad21211d"}
+{"id":"unit-algebraization","ordinal":52,"label":"Algebraic and Formal Geometry","locator":"algebraization.tex","contentSha256":"42f4f86784a0c37a49b83ebba209aeeeb4659cec4afba96ce029fe8aaf677ced"}
+{"id":"unit-curves","ordinal":53,"label":"Algebraic Curves","locator":"curves.tex","contentSha256":"de75b6d3761e8d25bfe82a16714aeebc65e4b378c01f9de787c142adee48189d"}
+{"id":"unit-resolve","ordinal":54,"label":"Resolution of Surfaces","locator":"resolve.tex","contentSha256":"c9223687dba5b04cc2c5e4e83e067233ae87f5a411c43ab966e19ef778e02cb7"}
+{"id":"unit-models","ordinal":55,"label":"Semistable Reduction","locator":"models.tex","contentSha256":"497ddacaa348b4905097d48c118253c54a17b20553b77b76e43b4780cd3d0b62"}
+{"id":"unit-functors","ordinal":56,"label":"Functors and Morphisms","locator":"functors.tex","contentSha256":"e759833d210368c48b930e4d073dc53aeeb66743d5b53a9fddb003313c52a8ee"}
+{"id":"unit-equiv","ordinal":57,"label":"Derived Categories of Varieties","locator":"equiv.tex","contentSha256":"3bac5347085cc7184c40d485383dc9f5962bf65edb57b09fa01dc05a2cb6b320"}
+{"id":"unit-pione","ordinal":58,"label":"Fundamental Groups of Schemes","locator":"pione.tex","contentSha256":"d1bdc88fb219ebba27dc28d7d4311468770ba3460107cee5aed403905a1714b8"}
+{"id":"unit-etale-cohomology","ordinal":59,"label":"\\'Etale Cohomology","locator":"etale-cohomology.tex","contentSha256":"015f27b1d332cc096b1f323daeeb855b299bb5a08f43c05131f196d4c183e7bf"}
+{"id":"unit-crystalline","ordinal":60,"label":"Crystalline Cohomology","locator":"crystalline.tex","contentSha256":"25c778aca7ac20e5393e22457ccc0febd529f7bbd9d897942b45ec15b681c84d"}
+{"id":"unit-proetale","ordinal":61,"label":"Pro-\\'etale Cohomology","locator":"proetale.tex","contentSha256":"4bff75b26c0b1d9aff074480dbe23dd6220f5bddff9f92ead369cd5b4f6d87a9"}
+{"id":"unit-relative-cycles","ordinal":62,"label":"Relative Cycles","locator":"relative-cycles.tex","contentSha256":"52e91ae7501a21f1a332b85d2fbe78134068f285bf09d97cedc686d83272a97b"}
+{"id":"unit-more-etale","ordinal":63,"label":"More \\'Etale Cohomology","locator":"more-etale.tex","contentSha256":"75f47019596f985b2559187020a3d275f51b7972864a284b0bf3aca45893e771"}
+{"id":"unit-trace","ordinal":64,"label":"The Trace Formula","locator":"trace.tex","contentSha256":"642cb0f2314fc73bef27542c79f55af87dcc0b0bf87d7cecf29b9b61860e4bfc"}
+{"id":"unit-spaces","ordinal":65,"label":"Algebraic Spaces","locator":"spaces.tex","contentSha256":"8fad75efd500ff6be1a13fbd90a4c1f003cc7c974805d977ded411911f966479"}
+{"id":"unit-spaces-properties","ordinal":66,"label":"Properties of Algebraic Spaces","locator":"spaces-properties.tex","contentSha256":"363df83ad8f7a8d66dbce842342770802744fbcfbd689c16d81c26c0644fc807"}
+{"id":"unit-spaces-morphisms","ordinal":67,"label":"Morphisms of Algebraic Spaces","locator":"spaces-morphisms.tex","contentSha256":"bcc5f6154061a473850149f357c29e11990136c00f2aa80b99defddcf16c16e6"}
+{"id":"unit-decent-spaces","ordinal":68,"label":"Decent Algebraic Spaces","locator":"decent-spaces.tex","contentSha256":"1507631d0cbceb98431f352f56ff29f47add70bc50ebdf15584539af93f18d32"}
+{"id":"unit-spaces-cohomology","ordinal":69,"label":"Cohomology of Algebraic Spaces","locator":"spaces-cohomology.tex","contentSha256":"7e2706c7b5ca1020e8830107227e8976a0303c58ca9df78decbc1ec9c9adfe6c"}
+{"id":"unit-spaces-limits","ordinal":70,"label":"Limits of Algebraic Spaces","locator":"spaces-limits.tex","contentSha256":"f085e8f1a8b35cf3205046700a5d335ffe11c8ccae5b7cee75e47bc7ff2f9f79"}
+{"id":"unit-spaces-divisors","ordinal":71,"label":"Divisors on Algebraic Spaces","locator":"spaces-divisors.tex","contentSha256":"abca725b44fb3e33351e1d5198fdee52e35f7e40efcf9fb89b1a8328f35720a1"}
+{"id":"unit-spaces-over-fields","ordinal":72,"label":"Algebraic Spaces over Fields","locator":"spaces-over-fields.tex","contentSha256":"0ce3101028303be493945fb21a4753cdc0a5f62ca23f97bec91601a6f7b56dd1"}
+{"id":"unit-spaces-topologies","ordinal":73,"label":"Topologies on Algebraic Spaces","locator":"spaces-topologies.tex","contentSha256":"4229ebbc66a5265d95b4a30fb553d92efb9521f6b0424f8413984be625bee75e"}
+{"id":"unit-spaces-descent","ordinal":74,"label":"Descent and Algebraic Spaces","locator":"spaces-descent.tex","contentSha256":"43788246b3d50e5f2e94ed000b8c590cddeef08f7a13318cf59f78becf602f02"}
+{"id":"unit-spaces-perfect","ordinal":75,"label":"Derived Categories of Spaces","locator":"spaces-perfect.tex","contentSha256":"bd1055e662da20cc5f4e45e7e87a8a83ccc0064626cdc52e0a8cf13a65b8d3d0"}
+{"id":"unit-spaces-more-morphisms","ordinal":76,"label":"More on Morphisms of Spaces","locator":"spaces-more-morphisms.tex","contentSha256":"8247406d3566a62cc877d83e73110e6428fcfde844d951990d758828ddb98e7d"}
+{"id":"unit-spaces-flat","ordinal":77,"label":"Flatness on Algebraic Spaces","locator":"spaces-flat.tex","contentSha256":"01463d68f7dd148400852c6e63965389e8034b8d1eb63a7da29b77818f15f549"}
+{"id":"unit-spaces-groupoids","ordinal":78,"label":"Groupoids in Algebraic Spaces","locator":"spaces-groupoids.tex","contentSha256":"b61ac90436e288e4940ea7e9323e7d9998d819b0b579efe6cb73af58c4faa9a0"}
+{"id":"unit-spaces-more-groupoids","ordinal":79,"label":"More on Groupoids in Spaces","locator":"spaces-more-groupoids.tex","contentSha256":"ce58da28092090761e7bfc0eab68b4762011fd170ad940551863a3a8f33bfa87"}
+{"id":"unit-bootstrap","ordinal":80,"label":"Bootstrap","locator":"bootstrap.tex","contentSha256":"60fad3487e66719495bde8b109570376e73a5e1629ce50af11b4b491e262d423"}
+{"id":"unit-spaces-pushouts","ordinal":81,"label":"Pushouts of Algebraic Spaces","locator":"spaces-pushouts.tex","contentSha256":"f7ae008fad3d2a602ccf72b0712aeaf3b6c0591779a88c936a2305e53d331f6a"}
+{"id":"unit-spaces-chow","ordinal":82,"label":"Chow Groups of Spaces","locator":"spaces-chow.tex","contentSha256":"dee18dd8cec6be2f33b18f972f64de71ebf5b9e6d09c496edc085136dc55520d"}
+{"id":"unit-groupoids-quotients","ordinal":83,"label":"Quotients of Groupoids","locator":"groupoids-quotients.tex","contentSha256":"987d4cffab31547ea08711a7918d3e5479658aeb5daa4ae1aa76e0ee5fa7d2ce"}
+{"id":"unit-spaces-more-cohomology","ordinal":84,"label":"More on Cohomology of Spaces","locator":"spaces-more-cohomology.tex","contentSha256":"8f9c67ff930dc38917c8b87123ff05ccef0a14e0c00bcdf2cd06db45be9006a5"}
+{"id":"unit-spaces-simplicial","ordinal":85,"label":"Simplicial Spaces","locator":"spaces-simplicial.tex","contentSha256":"85a26b9c747915ca957699aec766c455cc53173df74bf1d0425c4d1aa38ac755"}
+{"id":"unit-spaces-duality","ordinal":86,"label":"Duality for Spaces","locator":"spaces-duality.tex","contentSha256":"e1a5885e00ed059adabe08a48116f4ab61b481622a369a891b05fa49331bcd38"}
+{"id":"unit-formal-spaces","ordinal":87,"label":"Formal Algebraic Spaces","locator":"formal-spaces.tex","contentSha256":"c8850062770e01969c478bd585db881062789527625a2e814719974581b7ebc2"}
+{"id":"unit-restricted","ordinal":88,"label":"Algebraization of Formal Spaces","locator":"restricted.tex","contentSha256":"e3d6307beb3cdd8f00864181e8121e98e834e32acf228efa6e67a4c28d386607"}
+{"id":"unit-spaces-resolve","ordinal":89,"label":"Resolution of Surfaces Revisited","locator":"spaces-resolve.tex","contentSha256":"6bf2ed935c50120f264a6c5ee5b63b72e9f25bf924512f1a72f6faa226f2cc43"}
+{"id":"unit-formal-defos","ordinal":90,"label":"Formal Deformation Theory","locator":"formal-defos.tex","contentSha256":"a0c089adab8a1510d2adec604a3bd7fd30786825bb52691580f8345ba5fe7118"}
+{"id":"unit-defos","ordinal":91,"label":"Deformation Theory","locator":"defos.tex","contentSha256":"9bf42d85935480a96268ecea7ae80739fadf9fbb97a2c43bce519c075493f823"}
+{"id":"unit-cotangent","ordinal":92,"label":"The Cotangent Complex","locator":"cotangent.tex","contentSha256":"6f75d9ea4ddaf9b588a4d6679e89eda6a2a21ef776380afc3737b9762c105d52"}
+{"id":"unit-examples-defos","ordinal":93,"label":"Deformation Problems","locator":"examples-defos.tex","contentSha256":"c5f99605fca343cee31ceef431529fbd1f1e47a6dd4d6f6b84461a18aa8c0e58"}
+{"id":"unit-algebraic","ordinal":94,"label":"Algebraic Stacks","locator":"algebraic.tex","contentSha256":"b160c511370a3f0d3283367e131876fd92d01ca335abfe035be05a3c714f2dfc"}
+{"id":"unit-examples-stacks","ordinal":95,"label":"Examples of Stacks","locator":"examples-stacks.tex","contentSha256":"983b75d3080d51d24bce4033f4ad6b695766c113f83ab6b50ea092415503e931"}
+{"id":"unit-stacks-sheaves","ordinal":96,"label":"Sheaves on Algebraic Stacks","locator":"stacks-sheaves.tex","contentSha256":"8711279d9aa590a9687fe6bd95f448581cb52f6ea943c88aa0ccb46ed79fd8a1"}
+{"id":"unit-criteria","ordinal":97,"label":"Criteria for Representability","locator":"criteria.tex","contentSha256":"2c8413705fe7b1db22a0851c7d9fe37bdb28519c502f8a8379dc55c4a728da26"}
+{"id":"unit-artin","ordinal":98,"label":"Artin's Axioms","locator":"artin.tex","contentSha256":"922b9e6163b1ce982fdf5cea235f11bb774ad2c4b420fbdcec4896256a395ffd"}
+{"id":"unit-quot","ordinal":99,"label":"Quot and Hilbert Spaces","locator":"quot.tex","contentSha256":"947c854e5325ed873a2c36ce9a8955a25a9524b5f055c30c28dc85f2ba83aef5"}
+{"id":"unit-stacks-properties","ordinal":100,"label":"Properties of Algebraic Stacks","locator":"stacks-properties.tex","contentSha256":"9583ae04e2be80d5626336878077fda37ae7b25c5b9f5ff9539160ffe6508297"}
+{"id":"unit-stacks-morphisms","ordinal":101,"label":"Morphisms of Algebraic Stacks","locator":"stacks-morphisms.tex","contentSha256":"9a2ff5127b97b6de0e517471a0307f03c10d69aa5e32d305afa8676064e325a5"}
+{"id":"unit-stacks-limits","ordinal":102,"label":"Limits of Algebraic Stacks","locator":"stacks-limits.tex","contentSha256":"bb7c07f51f2b2e449148a49bdb17d68800b08c4ebfe854fb6a9740abf8a5083d"}
+{"id":"unit-stacks-cohomology","ordinal":103,"label":"Cohomology of Algebraic Stacks","locator":"stacks-cohomology.tex","contentSha256":"85c7bf824994f2b7022f7d28e3d0a574709290c603a914cc4fd0df115160f681"}
+{"id":"unit-stacks-perfect","ordinal":104,"label":"Derived Categories of Stacks","locator":"stacks-perfect.tex","contentSha256":"2245f5f780c09be91ed129809ca606353c70cc455d3f0100d578c09d23b35788"}
+{"id":"unit-stacks-introduction","ordinal":105,"label":"Introducing Algebraic Stacks","locator":"stacks-introduction.tex","contentSha256":"f415523a007f2add0cac67301fce2110a8c75d7c918cfbc738be7457e41d8e55"}
+{"id":"unit-stacks-more-morphisms","ordinal":106,"label":"More on Morphisms of Stacks","locator":"stacks-more-morphisms.tex","contentSha256":"29d430b417eaed201af895c66d54e63f5e634308d76e2d206c44b2e1195b9d11"}
+{"id":"unit-stacks-geometry","ordinal":107,"label":"The Geometry of Algebraic Stacks","locator":"stacks-geometry.tex","contentSha256":"df429a7a32e433e4c3de0101cd3cfb185c036e01a43c6ec7b07fef6f8c70dfc8"}
+{"id":"unit-moduli","ordinal":108,"label":"Moduli Stacks","locator":"moduli.tex","contentSha256":"30ca7afe2e493ab91c7c50b8ab015884b6b1b7469af6daae4cf3f1b2eaaffd9e"}
+{"id":"unit-moduli-curves","ordinal":109,"label":"Moduli of Curves","locator":"moduli-curves.tex","contentSha256":"75473f916de40288f1f8d715e7a0d81ebebaa9127d1ffefebdecc0cc01b4c42c"}
+{"id":"unit-examples","ordinal":110,"label":"Examples","locator":"examples.tex","contentSha256":"d45a2afd8836024cc4e0aff2b086c3805c50becef1e3c5b65a591a94fdb5fce8"}
+{"id":"unit-exercises","ordinal":111,"label":"Exercises","locator":"exercises.tex","contentSha256":"e16462e2177575c836e835c2fb3d5f9fdf0b06f61c17342b685f237cabc64879"}
+{"id":"unit-guide","ordinal":112,"label":"A Guide to the Literature","locator":"guide.tex","contentSha256":"0ba787f108dc4eace7bd3d7d755d3be652b8ccc425d31387df9931fb46315f06"}
+{"id":"unit-desirables","ordinal":113,"label":"Desirables","locator":"desirables.tex","contentSha256":"1d832f5fcfe9a19c744099a6a3ee3386fbe1d44bcbd4204384d9a776eee6e489"}
+{"id":"unit-coding","ordinal":114,"label":"Coding Style","locator":"coding.tex","contentSha256":"55eb96cbee2d244287d7a5b921fa301395793bf78fcdb43cf9d38602b0cc7568"}
+{"id":"unit-obsolete","ordinal":115,"label":"Obsolete","locator":"obsolete.tex","contentSha256":"796bfadfecf7cce2da41d2d9381e36dca7998d10d7d084ab51295eb57e82b9ed"}
+{"id":"unit-fdl","ordinal":116,"label":"GNU Free Documentation License","locator":"fdl.tex","contentSha256":"816df5205345b6c7c72d363f813358eb3ef39a30cea04dd05fe63b7f6b31db40"}

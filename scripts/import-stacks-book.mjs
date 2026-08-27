@@ -6,6 +6,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
 import { buildStacksBookFile } from "./stacks-book-lib.mjs";
+import {
+  readBookGraphFileSync,
+  writeBookGraphFileAndRefreshSync,
+} from "./book-graph-codec.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const bookGraphSyncScript = path.join(repositoryRoot, "scripts", "book-graph-files.mjs");
@@ -52,10 +56,6 @@ function parseArguments(argv) {
   return values;
 }
 
-function serializedBookJson(value) {
-  return `${JSON.stringify(value)}\n`;
-}
-
 function git(checkout, args) {
   return execFileSync("git", ["-C", checkout, ...args], {
     encoding: "utf8",
@@ -99,6 +99,7 @@ async function validateCandidate(candidate) {
   try {
     const schema = await server.ssrLoadModule("/src/data/book-graph-schema.ts");
     schema.validateBookGraphFile(candidate);
+    return candidate;
   } finally {
     await server.close();
   }
@@ -112,36 +113,12 @@ function runBookGraphFiles(...arguments_) {
   });
 }
 
-function atomicWrite(filePath, contents) {
-  const temporaryPath = path.join(path.dirname(filePath), `.${path.basename(filePath)}.tmp-${process.pid}`);
-  try {
-    fs.writeFileSync(temporaryPath, contents, { encoding: "utf8" });
-    fs.renameSync(temporaryPath, filePath);
-  } finally {
-    if (fs.existsSync(temporaryPath)) fs.unlinkSync(temporaryPath);
-  }
-}
-
-function writeCandidateAndRefreshManifest(destination, candidateText) {
+function writeCandidateAndRefreshManifest(destination, candidate) {
   runBookGraphFiles("--check");
-  const originalText = fs.readFileSync(destination, "utf8");
-  try {
-    atomicWrite(destination, candidateText);
-    const output = runBookGraphFiles();
-    if (output) process.stdout.write(output);
-  } catch (error) {
-    atomicWrite(destination, originalText);
-    try {
-      runBookGraphFiles();
-    } catch (rollbackError) {
-      throw new AggregateError(
-        [error, rollbackError],
-        "Stacks import failed and the generated manifest could not be restored after rollback",
-        { cause: rollbackError },
-      );
-    }
-    throw error;
-  }
+  writeBookGraphFileAndRefreshSync(destination, candidate, () => {
+    const syncOutput = runBookGraphFiles();
+    if (syncOutput) process.stdout.write(syncOutput);
+  });
 }
 
 function report({ recordId, componentId, commit, capturedAt, sourceRepository, write, destination, stats }) {
@@ -199,7 +176,7 @@ if (sourceRepository !== "https://github.com/stacks/stacks-project") {
 }
 const destination = componentFilePath(recordId, componentId);
 if (!fs.existsSync(destination)) throw new Error(`Missing component file: ${destination}`);
-const baseFile = JSON.parse(fs.readFileSync(destination, "utf8"));
+const baseFile = readBookGraphFileSync(destination);
 if (baseFile.identity?.sourceRecordId !== recordId || baseFile.identity?.componentId !== componentId) {
   throw new Error("The destination component identity does not match the requested record/component");
 }
@@ -211,8 +188,8 @@ const built = buildStacksBookFile({
   capturedAt,
   sourceRepository,
 });
-await validateCandidate(built.file);
-if (write) writeCandidateAndRefreshManifest(destination, serializedBookJson(built.file));
+const candidate = await validateCandidate(built.file);
+if (write) writeCandidateAndRefreshManifest(destination, candidate);
 report({
   recordId,
   componentId,

@@ -6,6 +6,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
 import { buildPressbooksBookFile } from "./pressbooks-book-lib.mjs";
+import {
+  readBookGraphFileSync,
+  writeBookGraphFileAndRefreshSync,
+} from "./book-graph-codec.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const bookGraphSyncScript = path.join(repositoryRoot, "scripts", "book-graph-files.mjs");
@@ -61,10 +65,6 @@ function parseArguments(argv) {
   return values;
 }
 
-function canonicalJson(value) {
-  return `${JSON.stringify(value, null, 2)}\n`;
-}
-
 function assertSafeIdentity(recordId, componentId) {
   if (!/^S\d{4}$/u.test(recordId)) throw new Error(`Unsafe source record ID: ${recordId}`);
   if (!/^[a-z0-9][a-z0-9-]*$/u.test(componentId)) {
@@ -104,6 +104,7 @@ async function validateCandidate(candidate) {
   try {
     const schema = await server.ssrLoadModule("/src/data/book-graph-schema.ts");
     schema.validateBookGraphFile(candidate);
+    return candidate;
   } finally {
     await server.close();
   }
@@ -117,39 +118,12 @@ function runBookGraphFiles(...arguments_) {
   });
 }
 
-function atomicWrite(filePath, contents) {
-  const temporaryPath = path.join(
-    path.dirname(filePath),
-    `.${path.basename(filePath)}.tmp-${process.pid}`,
-  );
-  try {
-    fs.writeFileSync(temporaryPath, contents, { encoding: "utf8" });
-    fs.renameSync(temporaryPath, filePath);
-  } finally {
-    if (fs.existsSync(temporaryPath)) fs.unlinkSync(temporaryPath);
-  }
-}
-
-function writeCandidateAndRefreshManifest(destination, candidateText) {
+function writeCandidateAndRefreshManifest(destination, candidate) {
   runBookGraphFiles("--check");
-  const originalText = fs.readFileSync(destination, "utf8");
-  try {
-    atomicWrite(destination, candidateText);
+  writeBookGraphFileAndRefreshSync(destination, candidate, () => {
     const syncOutput = runBookGraphFiles();
     if (syncOutput) process.stdout.write(syncOutput);
-  } catch (error) {
-    atomicWrite(destination, originalText);
-    try {
-      runBookGraphFiles();
-    } catch (rollbackError) {
-      throw new AggregateError(
-        [error, rollbackError],
-        "Import failed and the manifest could not be restored after rolling back the book JSON",
-        { cause: rollbackError },
-      );
-    }
-    throw error;
-  }
+  });
 }
 
 function report({ built, recordId, componentId, sourcePath, sourceUrl, capturedAt, write, destination }) {
@@ -209,7 +183,7 @@ const destination = componentFilePath(recordId, componentId);
 if (!fs.existsSync(destination)) {
   throw new Error(`Missing component file ${path.relative(repositoryRoot, destination)}; synchronize the 717 book files first`);
 }
-const baseFile = JSON.parse(fs.readFileSync(destination, "utf8"));
+const baseFile = readBookGraphFileSync(destination);
 if (baseFile.identity?.sourceRecordId !== recordId || baseFile.identity?.componentId !== componentId) {
   throw new Error("The destination component identity does not match the requested source record and component");
 }
@@ -227,7 +201,7 @@ if (built.stats.artifactSha256 !== expectedArtifactSha256) {
     `Pressbooks artifact SHA-256 is ${built.stats.artifactSha256}, expected ${expectedArtifactSha256}`,
   );
 }
-await validateCandidate(built.file);
+const candidate = await validateCandidate(built.file);
 
-if (write) writeCandidateAndRefreshManifest(destination, canonicalJson(built.file));
+if (write) writeCandidateAndRefreshManifest(destination, candidate);
 report({ built, recordId, componentId, sourcePath, sourceUrl, capturedAt, write, destination });

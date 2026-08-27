@@ -109,7 +109,7 @@ describe("NisabaDB application", () => {
     expect(screen.getByRole("heading", { name: /what does not disappear/i })).toBeInTheDocument();
   }, lazyRouteTimeout);
 
-  it("loads an individual source-book graph from the manifest", async () => {
+  it("loads source-book status from the manifest without fetching a raw graph", async () => {
     const registry = {
       schemaVersion: "1.1.0",
       updatedAt: "2026-08-22",
@@ -177,52 +177,17 @@ describe("NisabaDB application", () => {
         unresolvedReferenceCount: 0,
       }],
     };
-    const graph = {
-      schemaVersion: "1.0.0",
-      phase: "source-dependency-graph",
-      identity: {
-        bookGraphId: "S0001:complete-source",
-        sourceSetRevision: "fixture-r1",
-        sourceRecordId: "S0001",
-        sourceOrdinal: 1,
-        familyId: "F01",
-        sourceTitle: "Fixture Mathematics",
-        sourceAuthorLine: "Ada Example",
-        sourceRawCitation: "Fixture Mathematics — Ada Example",
-        componentId: "complete-source",
-        componentLabel: "Complete fixture source",
-      },
-      exactEdition: null,
-      sourceUnits: [],
-      unitInventories: [],
-      graph: {
-        nodes: [],
-        externalInputs: [],
-        directDependencies: [],
-        proofRoutes: [],
-        references: [],
-      },
-      extractionState: {
-        status: "awaiting-edition",
-        extractionAudit: null,
-        independentReview: null,
-        note: "Awaiting the exact edition.",
-      },
-      graphState: {
-        status: "not-started",
-        graphAudit: null,
-        independentReview: null,
-        note: "The graph has not been extracted.",
-      },
-    };
-    vi.stubGlobal("fetch", vi.fn(async (input: string | URL | Request) => ({
-      ok: true,
-      json: async () => String(input).includes("source-records")
-        ? registry
-        : String(input).includes("manifest")
-          ? manifest
-          : graph,
-    })));
+    const fetchMock = vi.fn(async (input: string | URL | Request) => {
+      const url = String(input);
+      if (url.includes("source-records")) {
+        return { ok: true, json: async () => registry };
+      }
+      if (url.includes("manifest")) {
+        return { ok: true, json: async () => manifest };
+      }
+      throw new Error(`Unexpected raw graph fetch: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
 
     renderAt("/knowledge/coverage?source=S0001");
     expect(await screen.findByRole(
@@ -236,9 +201,13 @@ describe("NisabaDB application", () => {
       { timeout: lazyRouteTimeout },
     );
     await waitFor(() => expect(selectedSourceHeading).toHaveFocus());
-    expect(screen.getByLabelText(/source dependency graph status/i)).toHaveTextContent(/component json files\s*1 \/ 1/i);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(screen.getByLabelText(/source dependency graph status/i)).toHaveTextContent(/indexed source components\s*1 \/ 1/i);
     expect(screen.getByText("S0001/complete-source.json")).toBeInTheDocument();
-    expect(screen.getByText(/no theorem-like or supporting nodes have been published/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/selected component manifest counts/i)).toHaveTextContent(/theorem-like nodes\s*0/i);
+    expect(screen.getByText(/raw node, edge, route, and reference artifacts are validated in the data pipeline/i)).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /graph nodes/i })).not.toBeInTheDocument();
+    expect(fetchMock.mock.calls.some(([input]) => String(input).includes("complete-source.json"))).toBe(false);
   }, lazyRouteTimeout);
 
   it("reads rewritten knowledge with unified notation and searchable chapters", async () => {

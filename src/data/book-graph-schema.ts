@@ -278,6 +278,27 @@ export const bookGraphFileSchema = z.object({
   graphState: graphStateSchema,
 }).strict();
 
+const bookGraphManifestEntrySchema = z.object({
+  bookGraphId: z.string().regex(/^S\d{4}:[a-z0-9][a-z0-9-]*$/),
+  sourceRecordId: sourceRecordIdSchema,
+  sourceOrdinal: z.number().int().positive(),
+  componentId: stableIdSchema,
+  componentLabel: z.string().min(1),
+  path: relativeBookFileSchema,
+  extractionStatus: extractionStatusSchema,
+  graphStatus: graphStatusSchema,
+  exactEditionResolved: z.boolean(),
+  sourceUnitCount: z.number().int().nonnegative(),
+  inventoriedSourceUnitCount: z.number().int().nonnegative(),
+  reviewedSourceUnitCount: z.number().int().nonnegative(),
+  theoremNodeCount: z.number().int().nonnegative(),
+  unroutedTheoremCount: z.number().int().nonnegative(),
+  supportNodeCount: z.number().int().nonnegative(),
+  dependencyCount: z.number().int().nonnegative(),
+  reviewedDependencyCount: z.number().int().nonnegative(),
+  unresolvedReferenceCount: z.number().int().nonnegative(),
+}).strict();
+
 export const bookGraphManifestSchema = z.object({
   schemaVersion: z.literal("1.0.0"),
   sourceSetRevision: z.string().min(1),
@@ -298,26 +319,7 @@ export const bookGraphManifestSchema = z.object({
     reviewedDependencyCount: z.number().int().nonnegative(),
     unresolvedReferenceCount: z.number().int().nonnegative(),
   }).strict(),
-  entries: z.array(z.object({
-    bookGraphId: z.string().regex(/^S\d{4}:[a-z0-9][a-z0-9-]*$/),
-    sourceRecordId: sourceRecordIdSchema,
-    sourceOrdinal: z.number().int().positive(),
-    componentId: stableIdSchema,
-    componentLabel: z.string().min(1),
-    path: relativeBookFileSchema,
-    extractionStatus: extractionStatusSchema,
-    graphStatus: graphStatusSchema,
-    exactEditionResolved: z.boolean(),
-    sourceUnitCount: z.number().int().nonnegative(),
-    inventoriedSourceUnitCount: z.number().int().nonnegative(),
-    reviewedSourceUnitCount: z.number().int().nonnegative(),
-    theoremNodeCount: z.number().int().nonnegative(),
-    unroutedTheoremCount: z.number().int().nonnegative(),
-    supportNodeCount: z.number().int().nonnegative(),
-    dependencyCount: z.number().int().nonnegative(),
-    reviewedDependencyCount: z.number().int().nonnegative(),
-    unresolvedReferenceCount: z.number().int().nonnegative(),
-  }).strict()),
+  entries: z.array(bookGraphManifestEntrySchema),
 }).strict();
 
 export type BookGraphFile = z.infer<typeof bookGraphFileSchema>;
@@ -759,40 +761,35 @@ function manifestSummary(entries: readonly ManifestEntry[]): BookGraphManifest["
   };
 }
 
-export function validateBookGraphCorpus(
-  rawRegistry: unknown,
-  rawManifest: unknown,
-  rawFilesByPath: ReadonlyMap<string, unknown> | Readonly<Record<string, unknown>>,
-): { registry: SourceRegistry; manifest: BookGraphManifest; filesByPath: Map<string, BookGraphFile> } {
-  const registry = sourceRegistrySchema.parse(rawRegistry);
-  const manifest = bookGraphManifestSchema.parse(rawManifest);
-  const rawFiles = rawFilesByPath instanceof Map
-    ? new Map(rawFilesByPath)
-    : new Map(Object.entries(rawFilesByPath));
-
-  if (manifest.sourceSetRevision !== registry.sourceSetRevision) throw new Error("Book manifest targets a stale source-set revision");
-  if (manifest.sourceRecordCount !== registry.records.length) throw new Error("Book manifest source-record count is stale");
-
-  const expected = new Map<string, {
-    identity: BookGraphFile["identity"];
-    entry: ManifestBaseEntry;
-  }>();
+function expectedManifestComponents(registry: SourceRegistry) {
+  const expected = new Map<string, ManifestBaseEntry>();
   for (const record of registry.records) {
     for (const component of record.requiredEditionComponents) {
       const relativePath = `${record.id}/${component.id}.json`;
       expected.set(relativePath, {
-        identity: expectedIdentity(registry, record, component),
-        entry: {
-          bookGraphId: `${record.id}:${component.id}`,
-          sourceRecordId: record.id,
-          sourceOrdinal: record.ordinal,
-          componentId: component.id,
-          componentLabel: component.label,
-          path: relativePath,
-        },
+        bookGraphId: `${record.id}:${component.id}`,
+        sourceRecordId: record.id,
+        sourceOrdinal: record.ordinal,
+        componentId: component.id,
+        componentLabel: component.label,
+        path: relativePath,
       });
     }
   }
+  return expected;
+}
+
+export function validateBookGraphIndex(
+  rawRegistry: unknown,
+  rawManifest: unknown,
+): { registry: SourceRegistry; manifest: BookGraphManifest } {
+  const registry = sourceRegistrySchema.parse(rawRegistry);
+  const manifest = bookGraphManifestSchema.parse(rawManifest);
+
+  if (manifest.sourceSetRevision !== registry.sourceSetRevision) throw new Error("Book manifest targets a stale source-set revision");
+  if (manifest.sourceRecordCount !== registry.records.length) throw new Error("Book manifest source-record count is stale");
+
+  const expected = expectedManifestComponents(registry);
   if (manifest.componentFileCount !== expected.size || manifest.entries.length !== expected.size) {
     throw new Error(`Book manifest does not cover every required component (${manifest.entries.length}/${expected.size})`);
   }
@@ -812,49 +809,101 @@ export function validateBookGraphCorpus(
       componentLabel: entry.componentLabel,
       path: entry.path,
     };
-    if (!expectedItem || !sameJson(baseEntry, expectedItem.entry)) {
+    if (!expectedItem || !sameJson(baseEntry, expectedItem)) {
       throw new Error(`${entry.path} is not the exact registry component indexed by the manifest`);
     }
   }
-
-  if (rawFiles.size !== expected.size) {
-    throw new Error(`Book graph file set is not one-to-one with registry components (${rawFiles.size}/${expected.size})`);
+  if (!sameJson(manifest.summary, manifestSummary(manifest.entries))) {
+    throw new Error("Book manifest summary is stale");
   }
+
+  return { registry, manifest };
+}
+
+export function validateBookGraphManifestEntry(
+  registry: SourceRegistry,
+  rawEntry: unknown,
+  rawFile: unknown,
+): BookGraphFile {
+  const entry = bookGraphManifestEntrySchema.parse(rawEntry);
+  if (entry.path.includes("..") || entry.path.startsWith("/") || entry.path.includes("\\")) {
+    throw new Error(`Unsafe book graph path: ${entry.path}`);
+  }
+
+  const record = registry.records.find(({ id }) => id === entry.sourceRecordId);
+  const component = record?.requiredEditionComponents.find(({ id }) => id === entry.componentId);
+  if (!record || !component) {
+    throw new Error(`${entry.path} is not the exact registry component indexed by the manifest`);
+  }
+  const expectedEntry: ManifestBaseEntry = {
+    bookGraphId: `${record.id}:${component.id}`,
+    sourceRecordId: record.id,
+    sourceOrdinal: record.ordinal,
+    componentId: component.id,
+    componentLabel: component.label,
+    path: `${record.id}/${component.id}.json`,
+  };
+  const baseEntry: ManifestBaseEntry = {
+    bookGraphId: entry.bookGraphId,
+    sourceRecordId: entry.sourceRecordId,
+    sourceOrdinal: entry.sourceOrdinal,
+    componentId: entry.componentId,
+    componentLabel: entry.componentLabel,
+    path: entry.path,
+  };
+  if (!sameJson(baseEntry, expectedEntry)) {
+    throw new Error(`${entry.path} is not the exact registry component indexed by the manifest`);
+  }
+
+  const file = validateBookGraphFile(rawFile);
+  if (!sameJson(file.identity, expectedIdentity(registry, record, component))) {
+    throw new Error(`${entry.path} immutable identity does not match the source registry`);
+  }
+  if (!sameJson(manifestMetrics(file), {
+    extractionStatus: entry.extractionStatus,
+    graphStatus: entry.graphStatus,
+    exactEditionResolved: entry.exactEditionResolved,
+    sourceUnitCount: entry.sourceUnitCount,
+    inventoriedSourceUnitCount: entry.inventoriedSourceUnitCount,
+    reviewedSourceUnitCount: entry.reviewedSourceUnitCount,
+    theoremNodeCount: entry.theoremNodeCount,
+    unroutedTheoremCount: entry.unroutedTheoremCount,
+    supportNodeCount: entry.supportNodeCount,
+    dependencyCount: entry.dependencyCount,
+    reviewedDependencyCount: entry.reviewedDependencyCount,
+    unresolvedReferenceCount: entry.unresolvedReferenceCount,
+  })) {
+    throw new Error(`${entry.path} manifest metrics are stale`);
+  }
+  return file;
+}
+
+export function validateBookGraphCorpus(
+  rawRegistry: unknown,
+  rawManifest: unknown,
+  rawFilesByPath: ReadonlyMap<string, unknown> | Readonly<Record<string, unknown>>,
+): { registry: SourceRegistry; manifest: BookGraphManifest; filesByPath: Map<string, BookGraphFile> } {
+  const { registry, manifest } = validateBookGraphIndex(rawRegistry, rawManifest);
+  const rawFiles = rawFilesByPath instanceof Map
+    ? new Map(rawFilesByPath)
+    : new Map(Object.entries(rawFilesByPath));
+
+  if (rawFiles.size !== manifest.entries.length) {
+    throw new Error(`Book graph file set is not one-to-one with registry components (${rawFiles.size}/${manifest.entries.length})`);
+  }
+  const manifestEntriesByPath = new Map(manifest.entries.map((entry) => [entry.path, entry]));
   const parsedFiles = new Map<string, BookGraphFile>();
   for (const [relativePath, rawFile] of rawFiles) {
     if (!relativeBookFileSchema.safeParse(relativePath).success || relativePath.includes("..") || relativePath.includes("\\")) {
       throw new Error(`Unsafe book graph path: ${relativePath}`);
     }
-    const expectedItem = expected.get(relativePath);
-    if (!expectedItem) throw new Error(`Unexpected book graph file: ${relativePath}`);
-    const file = validateBookGraphFile(rawFile);
-    if (!sameJson(file.identity, expectedItem.identity)) {
-      throw new Error(`${relativePath} immutable identity does not match the source registry`);
-    }
-    const manifestEntry = manifest.entries.find((entry) => entry.path === relativePath);
-    if (!manifestEntry || !sameJson(manifestMetrics(file), {
-      extractionStatus: manifestEntry.extractionStatus,
-      graphStatus: manifestEntry.graphStatus,
-      exactEditionResolved: manifestEntry.exactEditionResolved,
-      sourceUnitCount: manifestEntry.sourceUnitCount,
-      inventoriedSourceUnitCount: manifestEntry.inventoriedSourceUnitCount,
-      reviewedSourceUnitCount: manifestEntry.reviewedSourceUnitCount,
-      theoremNodeCount: manifestEntry.theoremNodeCount,
-      unroutedTheoremCount: manifestEntry.unroutedTheoremCount,
-      supportNodeCount: manifestEntry.supportNodeCount,
-      dependencyCount: manifestEntry.dependencyCount,
-      reviewedDependencyCount: manifestEntry.reviewedDependencyCount,
-      unresolvedReferenceCount: manifestEntry.unresolvedReferenceCount,
-    })) {
-      throw new Error(`${relativePath} manifest metrics are stale`);
-    }
+    const manifestEntry = manifestEntriesByPath.get(relativePath);
+    if (!manifestEntry) throw new Error(`Unexpected book graph file: ${relativePath}`);
+    const file = validateBookGraphManifestEntry(registry, manifestEntry, rawFile);
     parsedFiles.set(relativePath, file);
   }
-  for (const relativePath of expected.keys()) {
+  for (const relativePath of manifestEntriesByPath.keys()) {
     if (!parsedFiles.has(relativePath)) throw new Error(`Missing book graph file: ${relativePath}`);
-  }
-  if (!sameJson(manifest.summary, manifestSummary(manifest.entries))) {
-    throw new Error("Book manifest summary is stale");
   }
 
   return { registry, manifest, filesByPath: parsedFiles };

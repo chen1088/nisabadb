@@ -2,6 +2,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
+import {
+  readBookGraphFileSync,
+  referencedBookGraphShardPaths,
+} from "./book-graph-codec.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const registryPath = path.join(repositoryRoot, "data/knowledge/source-records.json");
@@ -177,7 +181,7 @@ function manifestFor(registry, baseEntries) {
   const entries = baseEntries.map((baseEntry) => {
     const filePath = path.join(booksRoot, ...baseEntry.path.split("/"));
     if (!fs.existsSync(filePath)) throw new Error(`Missing book graph file: ${baseEntry.path}`);
-    return { ...baseEntry, ...metricsFor(readJson(filePath), baseEntry.path) };
+    return { ...baseEntry, ...metricsFor(readBookGraphFileSync(filePath), baseEntry.path) };
   });
   const summary = {
     exactEditionResolvedCount: entries.filter((entry) => entry.exactEditionResolved).length,
@@ -216,6 +220,36 @@ function listBookJsonFiles(directory, prefix = "") {
   return files.sort();
 }
 
+function listBookJsonlFiles(directory, prefix = "") {
+  if (!fs.existsSync(directory)) return [];
+  const files = [];
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+    const fullPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) files.push(...listBookJsonlFiles(fullPath, relative));
+    else if (entry.isFile() && entry.name.endsWith(".jsonl")) files.push(relative);
+  }
+  return files.sort();
+}
+
+function referencedShardFiles(baseEntries) {
+  const shardFiles = [];
+  const seen = new Set();
+  for (const baseEntry of baseEntries) {
+    const filePath = path.join(booksRoot, ...baseEntry.path.split("/"));
+    const storageIndex = readJson(filePath);
+    for (const shardPath of referencedBookGraphShardPaths(storageIndex)) {
+      const relativeShardPath = path.posix.join(path.posix.dirname(baseEntry.path), shardPath);
+      if (seen.has(relativeShardPath)) {
+        throw new Error(`Duplicate referenced book-graph shard: ${relativeShardPath}`);
+      }
+      seen.add(relativeShardPath);
+      shardFiles.push(relativeShardPath);
+    }
+  }
+  return shardFiles.sort();
+}
+
 function checkCorpus(registry, baseEntries, placeholders) {
   if (!fs.existsSync(manifestPath)) throw new Error("Missing data/books/manifest.json; run npm run books:sync");
   const manifest = manifestFor(registry, baseEntries);
@@ -230,9 +264,19 @@ function checkCorpus(registry, baseEntries, placeholders) {
     throw new Error(`Book graph file set differs from the registry (${actualFiles.length}/${expectedFiles.length})`);
   }
 
+  const expectedShardFiles = referencedShardFiles(baseEntries);
+  const actualShardFiles = listBookJsonlFiles(booksRoot);
+  if (canonicalJson(actualShardFiles) !== canonicalJson(expectedShardFiles)) {
+    const expectedShardSet = new Set(expectedShardFiles);
+    const actualShardSet = new Set(actualShardFiles);
+    const missingCount = expectedShardFiles.filter((shardPath) => !actualShardSet.has(shardPath)).length;
+    const orphanCount = actualShardFiles.filter((shardPath) => !expectedShardSet.has(shardPath)).length;
+    throw new Error(`Book graph shard file set differs from component indexes (${missingCount} missing, ${orphanCount} orphan)`);
+  }
+
   for (const [relativeFile, placeholder] of placeholders) {
     const filePath = path.join(booksRoot, ...relativeFile.split("/"));
-    const actual = readJson(filePath);
+    const actual = readBookGraphFileSync(filePath);
     const expectedIdentity = placeholder.identity;
     if (canonicalJson(actual.identity) !== canonicalJson(expectedIdentity)) {
       throw new Error(`${relativeFile} identity does not match the source registry`);
@@ -271,7 +315,7 @@ function syncCorpus(registry, baseEntries, placeholders) {
       continue;
     }
 
-    const current = readJson(filePath);
+    const current = readBookGraphFileSync(filePath);
     if (isSafePlaceholder(current)) {
       const next = canonicalJson(placeholder);
       if (fs.readFileSync(filePath, "utf8") !== next) {
@@ -287,7 +331,7 @@ function syncCorpus(registry, baseEntries, placeholders) {
   fs.writeFileSync(manifestPath, canonicalJson(manifest));
   checkCorpus(registry, baseEntries, placeholders);
   process.stdout.write(
-    `Book graph files synchronized: ${placeholders.size} total, ${created} created, ${refreshed} placeholders refreshed, ${preserved} populated files preserved.\n`,
+    `Book graph components synchronized: ${placeholders.size} total, ${created} created, ${refreshed} placeholders refreshed, ${preserved} populated indexes preserved.\n`,
   );
 }
 
@@ -297,7 +341,7 @@ const { baseEntries, placeholders } = desiredCorpus(registry);
 if (checkOnly) {
   checkCorpus(registry, baseEntries, placeholders);
   const manifest = manifestFor(registry, baseEntries);
-  process.stdout.write(`Book graph files valid: ${manifest.sourceRecordCount} source rows, ${manifest.componentFileCount} component files.\n`);
+  process.stdout.write(`Book graph data valid: ${manifest.sourceRecordCount} source rows, ${manifest.componentFileCount} component identities.\n`);
 } else {
   syncCorpus(registry, baseEntries, placeholders);
 }

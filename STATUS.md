@@ -12,7 +12,7 @@ The exact workload currently represented by the approved intake is:
 | --- | ---: |
 | Approved source rows | 688 |
 | Required book/volume components | 717 |
-| Individual book graph files | 717 / 717 |
+| Indexed component identities | 717 / 717 |
 | Candidate exact editions identified | 2 / 717 |
 | Components with complete theorem inventories | 0 / 717 |
 | Components with independently reviewed dependency graphs | 0 / 717 |
@@ -22,7 +22,7 @@ The exact workload currently represented by the approved intake is:
 | Candidate / reviewed source dependency edges | 36,292 / 0 |
 | Unresolved source-reference records | 2,602 |
 
-The provisional 126-chapter roadmap is not corpus coverage and is not a target to enlarge now. It is an early Phase-II hypothesis for a future compressed NisabaDB book. The 717 source components must first retain their own uncompressed theorem and support-node graphs under stable component identities; the two populated v1 JSON documents will migrate to sharded component directories before extraction expands.
+The provisional 126-chapter roadmap is not corpus coverage and is not a target to enlarge now. It is an early Phase-II hypothesis for a future compressed NisabaDB book. The 717 source components must first retain their own uncompressed theorem and support-node graphs under stable component identities. The two populated pilots now use sharded v1.1 storage; the other 715 components still await exact editions and extraction.
 
 The first pipeline pilot is `S0060`, Oscar Levin's *Discrete Mathematics: An Open Introduction*. Its official PreTeXt source is pinned to commit `730e5e3b96094148818603041222df6f3d1d96ba`. A deterministic, comment-aware pass found 109 active source files, captured an inventory for all 109 (including 93 candidate theorem-free attestations), found 38 explicitly tagged theorem-like nodes and 74 definition/notation support nodes, and retained three explicit proof-xref dependency candidates. This is an unreviewed candidate extraction, not a complete graph: 35 theorem-like nodes still have no route, exercise-embedded results still need semantic inventory, and no unit, edge, or extraction has independent review. The edition-level source says CC-BY-NC-SA-4.0 while the repository-level `LICENSE` says CC-BY-SA-4.0; the individual book JSON preserves that conflict for review.
 
@@ -34,7 +34,7 @@ The prior `S0002` Pressbooks checkpoint was rejected because its heuristic suppo
 
 Phase I proceeds in this order:
 
-1. Give every required source component a stable manifest identity. Migrate populated v1 monoliths to deterministic, size-bounded JSONL shards before dense extraction fans out.
+1. Give every required source component a stable manifest identity and store every populated graph in deterministic, size-bounded JSONL shards before dense extraction fans out.
 2. Resolve the component to an exact edition or an independently reviewed duplicate, recording access, license, stable locator, and artifact fingerprint.
 3. Build an immutable chapter/section/page/source-file or web-node manifest.
 4. Inventory every formal theorem, lemma, proposition, corollary, claim, and named result together with every definition, construction, assumption, or external input needed by those proofs. Worked examples and routine exercises are excluded; a genuinely proof-used formal claim inside one must be lifted and reviewed as a claim, not imported as an example node.
@@ -52,11 +52,11 @@ This file is the handoff for continuing NisabaDB in the current local checkout. 
 - Live Knowledge book: `https://chen1088.github.io/nisabadb/knowledge`
 - Dense-book checkpoint started from `779edbc2709163ecda0c95217df22b107a3d62d2` (`Build S0002 Pressbooks graph checkpoint`); that S0002 extraction is superseded and removed by this checkpoint.
 - Deployment: every push to `main` runs `.github/workflows/deploy-pages.yml`, executes the full check, builds with `VITE_BASE_PATH=/nisabadb/`, and publishes GitHub Pages.
-- Last verified deployment before this checkpoint: `https://github.com/chen1088/nisabadb/actions/runs/32612561177` completed successfully.
+- Last verified deployment before the storage checkpoint: `https://github.com/chen1088/nisabadb/actions/runs/33115788967` completed successfully for commit `1a46cf1`.
 - Hosting boundary: the public site is a static browser application. It currently has no runtime backend, cloud secrets, DigitalOcean worker, or proof-submission service.
 - Required runtime: Node.js 24 and the committed npm lockfile.
-- Pre-push verification for the section-delegation checkpoint: lint passes; 17 test files and 158 tests pass; the 10-test book-corpus check passes; the root-path production build publishes all 717 v1 per-book graphs; and deterministic regeneration from the clean pinned Stacks checkout produces the recorded graph counts.
-- The section-delegation checkpoint was developed from synchronized `main` commit `0e2f6e3` and is approved for direct publication to `main`. Its deployment result must be verified from the resulting Git commit and Pages workflow rather than inferred from this handoff.
+- Storage-checkpoint verification: lint passes; 19 test files / 175 tests pass; the 10-test book-corpus check validates all 717 components sequentially; the production build publishes only the registry and aggregate status manifest, not raw graphs; the development server returns 404 for direct component/shard paths, including Windows separator and case variants; and dry-run reconstruction gives exact logical parity for the 21 S0060/S0262 shards.
+- The storage checkpoint was developed from synchronized `main` commit `1a46cf1` within the user-approved data-only scope. Its deployment result must be verified from the resulting Git commit and Pages workflow rather than inferred from this handoff.
 
 Resume with:
 
@@ -83,8 +83,8 @@ Read these files before changing the mathematical model:
 | `src/data/knowledge-schema.ts` and `src/data/knowledge-roadmap-schema.ts` | Executable invariants for the written book and its planning map |
 | `src/data/compression.json` | Candidate whole-field compression clusters and residual hypotheses |
 | `data/knowledge/source-records.json` | The approved 688-record reference registry |
-| `data/books/manifest.json` | The generated index of all 717 individual book/volume graph files and their Phase-I counts |
-| `data/books/S####/<component>.json` | One source-faithful theorem dependency graph per actual book/volume component |
+| `data/books/manifest.json` | The generated index of all 717 book/volume components and their Phase-I counts |
+| `data/books/S####/<component>.json` | Stable component path: a v1.1 shard index when populated, or a transitional v1 placeholder while awaiting an edition |
 | `src/data/corpus.json` | Generated public paper corpus; regenerate it from the immutable inputs described in `README.md` rather than hand-editing it |
 | `src/pages/KnowledgePage.tsx` | Reader-first Knowledge interface; references must remain subordinate to the rewritten book |
 
@@ -92,13 +92,13 @@ Non-negotiable status boundaries:
 
 1. `initial-rewrite` means written but unreviewed. All 60 Knowledge lessons have that status; the reviewed count is 0.
 2. Only 20 roadmap chapters contain draft lessons. The other 106 are Planned, non-clickable, and must not be presented as written.
-3. Source books are Phase-I graph units and non-omission evidence, not chapters of the eventual rewritten curriculum. Each required component owns a stable manifest identity; populated components will own sharded data directories after the v1.1 migration.
+3. Source books are Phase-I graph units and non-omission evidence, not chapters of the eventual rewritten curriculum. Each required component owns a stable manifest identity; S0060 and S0262 now own sharded v1.1 data directories.
 4. The 688 source rows expand to 717 required components. Two candidate editions have been identified, but none of the 717 components yet has a complete theorem inventory or independently reviewed source graph.
 5. The 60-node Knowledge prerequisite graph is authoritative for written material and must remain acyclic and transitively reduced. A convenient reading order does not create a dependency.
 6. The 126 roadmap chapters and candidate compression clusters are frozen Phase-II hypotheses. Do not treat their count as source coverage or expand them before the source graphs are built.
 7. The static GitHub Pages application is deployed. The distributed DigitalOcean prompt-worker and prover-submission service are not implemented or deployed yet.
 
-Default continuation order is the seven-step Phase-I sequence above. The immediate infrastructure checkpoint is the v1.1 sharded raw-graph format, with count, identity, reference, and digest parity on S0262 and then S0060. Do not write `R003`, enlarge the 126-chapter roadmap, perform new compression work, or begin textbook-wide Lean 4 formulation while source-book graph construction is the active phase.
+Default continuation order is the seven-step Phase-I sequence above. The v1.1 sharded raw-graph checkpoint has exact identity, record, evidence, reference, and logical-digest parity on S0060 and S0262. The next corpus-storage cleanup is an absent-artifact root-manifest state so the 715 awaiting components no longer need physical placeholders; it does not block new component extraction. Do not write `R003`, enlarge the 126-chapter roadmap, perform new compression work, or begin textbook-wide Lean 4 formulation while source-book graph construction is the active phase.
 
 ## Product structure
 
@@ -109,7 +109,7 @@ Default continuation order is the seven-step Phase-I sequence above. The immedia
 - Proof routes distinguish their dependency role (`original`, `minimized`, or `reinterpretation`) from their review state. The current 61 populated routes are reviewed original/source routes; no minimized or reinterpretation route is claimed yet.
 - Knowledge is a frozen Phase-II prototype: 60 written nodes in 20 chapters, 33 notation entries, and 97 prerequisite edges. Its separate 126-chapter map contains 20 draft mappings and 106 planned entries; 126 is neither the number of source chapters nor a coverage target. All 60 nodes remain `initial-rewrite`; the reviewed count is 0.
 - The compression atlas is also a frozen Phase-II prototype: 18 candidate common-core clusters, 16 comparison lenses, and 35 residual decisions. No cluster or route is administrator-reviewed.
-- The exact approved registry contains 688 fingerprint-locked rows in 31 intake branches and 717 required components. The current v1 checkpoint stores one JSON graph per component plus a small aggregate manifest; this is migration input, not the all-corpus storage contract. S0060 and S0262 together contribute two pinned candidate editions, 225 source units, 13,176 theorem-like nodes, 1,929 support nodes, and 36,292 candidate edges; 715 components still await editions and all 717 graphs remain incomplete and unreviewed.
+- The exact approved registry contains 688 fingerprint-locked rows in 31 intake branches and 717 required components. S0060 and S0262 are stored as 21 content-addressed v1.1 JSONL shards (largest 5,242,811 bytes) behind small stable component indexes; 715 transitional placeholder files still await editions. The two pilots contribute 225 source units, 13,176 theorem-like nodes, 1,929 support nodes, and 36,292 candidate edges; all 717 graphs remain incomplete and unreviewed.
 - The 93 reviewed paper-local statements remain distinct from the canonical textbook nodes. Reusable content can be rewritten into Knowledge with explicit source lineage, notation normalization, and prerequisite review rather than copied or automatically promoted.
 - Train is the re-proving exercise surface. It randomly selects meaningful theorem-like nodes from the paper DAGs for a human or AI to prove, with dependency context and reviewed proof routes available for progressive disclosure.
 - A future published paperback is a curated excerpt of important parts of the same canonical Knowledge text, not a separate source collection.
@@ -211,10 +211,10 @@ The living textbook has one notation registry. Each entry records NisabaDB's can
 9. Continue the recursive citation queue, resolve the 36 identity-blocked records (starting with exact DOI/arXiv candidates), and promote provisional papers to gold only after source-level mathematical review.
 10. Add process-safe leases/locks, bounded provider pagination, rate budgets, retries, and recovery before distributing queue work across DigitalOcean nodes.
 11. Split the static client artifact or add a catalog service before scaling substantially beyond the current 2,143 records.
-12. Implement the v1.1 raw-graph storage contract: per-component manifests, canonical LF JSONL shards, deterministic size bounds, shard and component digests, distribution classes, streaming validation, and a root-manifest row for every one of the 717 components without requiring 715 physical placeholders.
-13. Migrate S0262 and then S0060 with exact node, edge, route, reference, identity, and aggregate-hash parity; stop copying raw graph data into the Pages artifact and keep any SQLite/DuckDB/search index derived and non-authoritative.
-14. Continue Phase I across all 717 components: resolve exact editions, build immutable unit manifests, record an inventory decision or theorem-free attestation for every unit, and give every theorem-like result a permanent local address.
-15. Complete and independently review every source-local dependency route or explicit root/external-input attestation. A Phase-I graph closes without requiring a Knowledge node, canonical-claim mapping, or residual disposition.
+12. Replace the 715 physical awaiting-edition placeholders with an absent-artifact state in the root manifest while preserving exactly 717 component identities and their queue statuses.
+13. Continue Phase I across all 717 components: resolve exact editions, build immutable unit manifests, record an inventory decision or theorem-free attestation for every unit, and give every theorem-like result a permanent local address. New importers must emit the v1.1 sharded format and pass exact logical reconstruction checks.
+14. Complete and independently review every source-local dependency route or explicit root/external-input attestation. A Phase-I graph closes without requiring a Knowledge node, canonical-claim mapping, or residual disposition.
+15. Keep SQLite, DuckDB, search indexes, and compressed release/object-store bundles derived and non-authoritative; raw graph shards remain outside the Pages and reader-UI payload.
 16. Keep the 126-chapter roadmap and all new compression/simplification work frozen until the source-graph gate passes; then derive the canonical textbook from the complete uncompressed corpus and attach Lean 4 formulations to its simplified theorem identities with source traceability.
 17. Define and audit Train eligibility so random exercises select meaningful paper results with enough exposed context to be attempted and never present a missing or source-omitted proof as a solved reference route.
 

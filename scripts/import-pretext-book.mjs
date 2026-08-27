@@ -6,6 +6,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
 import { buildPretextBookFile } from "./pretext-book-lib.mjs";
+import {
+  readBookGraphFileSync,
+  writeBookGraphFileAndRefreshSync,
+} from "./book-graph-codec.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const bookGraphSyncScript = path.join(repositoryRoot, "scripts", "book-graph-files.mjs");
@@ -50,10 +54,6 @@ function parseArguments(argv) {
     if (!values.has(required)) throw new Error(`Missing required option ${required}\n${usage()}`);
   }
   return values;
-}
-
-function canonicalJson(value) {
-  return `${JSON.stringify(value, null, 2)}\n`;
 }
 
 function git(checkout, args) {
@@ -147,6 +147,7 @@ async function validateCandidate(candidate) {
   try {
     const schema = await server.ssrLoadModule("/src/data/book-graph-schema.ts");
     schema.validateBookGraphFile(candidate);
+    return candidate;
   } finally {
     await server.close();
   }
@@ -160,42 +161,15 @@ function runBookGraphFiles(...arguments_) {
   });
 }
 
-function atomicWrite(filePath, contents) {
-  const temporaryPath = path.join(
-    path.dirname(filePath),
-    `.${path.basename(filePath)}.tmp-${process.pid}`,
-  );
-  try {
-    fs.writeFileSync(temporaryPath, contents, { encoding: "utf8" });
-    fs.renameSync(temporaryPath, filePath);
-  } finally {
-    if (fs.existsSync(temporaryPath)) fs.unlinkSync(temporaryPath);
-  }
-}
-
-function writeCandidateAndRefreshManifest(destination, candidateText) {
+function writeCandidateAndRefreshManifest(destination, candidate) {
   // A clean preflight prevents corpus-wide placeholder migrations from being
-  // hidden inside a one-component import. The post-write sync then changes
-  // only the generated manifest in addition to this requested book JSON.
+  // hidden inside a one-component import. The codec updates content-addressed
+  // shards and the component index before the generated manifest refresh.
   runBookGraphFiles("--check");
-  const originalText = fs.readFileSync(destination, "utf8");
-  try {
-    atomicWrite(destination, candidateText);
+  writeBookGraphFileAndRefreshSync(destination, candidate, () => {
     const syncOutput = runBookGraphFiles();
     if (syncOutput) process.stdout.write(syncOutput);
-  } catch (error) {
-    atomicWrite(destination, originalText);
-    try {
-      runBookGraphFiles();
-    } catch (rollbackError) {
-      throw new AggregateError(
-        [error, rollbackError],
-        "Import failed and the generated manifest could not be restored after rolling back the book JSON",
-        { cause: rollbackError },
-      );
-    }
-    throw error;
-  }
+  });
 }
 
 const argumentsMap = parseArguments(process.argv.slice(2));
@@ -225,7 +199,7 @@ const destination = componentFilePath(recordId, componentId);
 if (!fs.existsSync(destination)) {
   throw new Error(`Missing component file ${path.relative(repositoryRoot, destination)}; synchronize the 717 book files first`);
 }
-const baseFile = JSON.parse(fs.readFileSync(destination, "utf8"));
+const baseFile = readBookGraphFileSync(destination);
 if (baseFile.identity?.sourceRecordId !== recordId || baseFile.identity?.componentId !== componentId) {
   throw new Error("The destination component identity does not match the requested source record and component");
 }
@@ -239,10 +213,10 @@ const built = buildPretextBookFile({
   entryFile,
 });
 
-await validateCandidate(built.file);
+const candidate = await validateCandidate(built.file);
 
 if (write) {
-  writeCandidateAndRefreshManifest(destination, canonicalJson(built.file));
+  writeCandidateAndRefreshManifest(destination, candidate);
 }
 report({
   recordId,

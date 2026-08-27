@@ -12,7 +12,7 @@ The intended canonical domain is `nisabadb.org`. Until that domain is configured
 
 - Navigation for Knowledge, Papers, Unsolved, and Train
 - An exact 688-row registry expanding to 717 required book/volume components
-- One registry identity per required component, with two validated v1 pilot graphs and a planned sharded JSONL format for dense components
+- One registry identity per required component, with both populated pilots stored as validated, content-addressed v1.1 JSONL shards
 - A Phase-I source graph model for exact editions, chapter/section/page/source-file units, per-unit inventory decisions, theorem and support nodes, proof routes, evidence-bearing direct dependencies, external inputs, and independent review
 - A strict theorem-graph policy: formal results and proof-relevant definitions/assumptions are nodes; exact-label source-audited theorem-level claims may be promoted from prose, but worked examples, exercises, ordinary remarks, and routine calculations are not
 - A frozen Phase-II Knowledge prototype with chapter reading order, stable knowledge nodes, an acyclic prerequisite DAG, and a canonical notation registry
@@ -32,34 +32,36 @@ The intended canonical domain is `nisabadb.org`. Until that domain is configured
 
 The corpus contains 2,143 paper records: 2 gold rewrites and 2,141 provisional papers, connected by 2,284 citation records. The two reviewed paper graphs contain 93 mathematical nodes. The current Knowledge draft and its 126-chapter roadmap are frozen Phase-II prototypes: 126 is not a source-chapter count or a corpus-coverage target. Human-readable compressed paper routes are complete for 36 of 61 theorem-like paper nodes; source-omitted proofs and unresolved inconsistencies are never promoted to complete routes.
 
-The agreed whole-field intake contains 688 preserved source rows in 31 branches and 717 required book/volume components. The ordered list and component identities are fingerprint-locked. The current v1 pilots use `data/books/S####/<component>.json`; multi-volume rows therefore have distinct component identities. A Phase-I graph becomes complete only after its exact edition is fingerprinted, every immutable source unit has a reviewed node inventory or theorem-free attestation, every theorem-like result and needed support node is inventoried, and every direct source dependency or explicit root/external input is independently reviewed. No canonical Knowledge mapping is required for source-graph completion.
+The agreed whole-field intake contains 688 preserved source rows in 31 branches and 717 required book/volume components. The ordered list and component identities are fingerprint-locked. Each component keeps a stable `data/books/S####/<component>.json` index path; multi-volume rows therefore have distinct component identities. A Phase-I graph becomes complete only after its exact edition is fingerprinted, every immutable source unit has a reviewed node inventory or theorem-free attestation, every theorem-like result and needed support node is inventoried, and every direct source dependency or explicit root/external input is independently reviewed. No canonical Knowledge mapping is required for source-graph completion.
 
 ## Phase I book graph files
 
 [`THEOREM_GRAPH_POLICY.md`](THEOREM_GRAPH_POLICY.md) fixes the dictatorship-paper graph as the extraction model and defines the strict result/support inclusion and example-exclusion rules.
 
-`data/knowledge/source-records.json` is the approved index, not the theorem database. `data/books/manifest.json` is a generated summary. The current v1 mathematical data is isolated into one file per actual component, for example:
+`data/knowledge/source-records.json` is the approved index, not the theorem database. `data/books/manifest.json` is a generated summary. A populated v1.1 component uses a small index plus content-addressed collection shards, for example:
 
 ```text
 data/books/S0042/complete-source.json
-data/books/S0074/volume-1.json
-data/books/S0074/volume-2.json
-data/books/S0074/volume-3.json
+data/books/S0042/complete-source/nodes/000000-<sha256>.jsonl
+data/books/S0042/complete-source/direct-dependencies/000000-<sha256>.jsonl
+data/books/S0042/complete-source/proof-routes/000000-<sha256>.jsonl
 ```
 
-This logical component boundary remains, but the physical format must change before all-book extraction. S0262 alone is about 53 MB, while tests eagerly parse and the static build currently republishes every v1 file. The next infrastructure checkpoint replaces populated monoliths with deterministic, size-bounded JSONL shards indexed by a small per-component manifest; awaiting-edition components need only a row in the root manifest. Raw shards are data-only and will not be a GitHub Pages or reader-UI payload. Generated SQLite/DuckDB indexes and compressed snapshots are derivatives, never review authority. See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the digest, licensing, migration, and review boundaries.
+The logical component boundary remains, while v1.1 removes the 53 MB single-file bottleneck exposed by S0262. S0060 and S0262 now occupy 6 and 15 deterministic shards respectively; every shard is at most 5 MiB and carries its own schema version, record count, byte count, and SHA-256 digest. The component index also binds the exact reconstructed logical graph and a digest over its metadata and shard descriptors. The 715 awaiting-edition components remain small transitional placeholders until the root index gains an absent-artifact state.
+
+Raw shards are data-only: neither the development server nor GitHub Pages serves them, and the coverage route reads only the small registry and aggregate status manifest. Generated SQLite/DuckDB indexes and compressed snapshots are derivatives, never review authority. The current 5 MiB sequential layout is a v1.1 transport checkpoint; before bulk iterative extraction, collection shards should move to stable source-unit or stable-ID partitions so a local edit does not churn every later shard. Full-registry storage also needs an object-placement layer and a single promotion coordinator: current importers must not update the shared manifest concurrently. See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the digest, licensing, migration, and review boundaries.
 
 Candidate extractor edges remain visibly distinct from reviewed proof dependencies. Compression mappings live in a later layer and never overwrite source-faithful nodes or routes. After all source graphs have been built and reviewed, Phase II will unify and simplify them; textbook-wide Lean 4 formulations are attached only to the resulting canonical theorem identities, with traceability back to their raw source nodes.
 
 The old `data/knowledge/coverage-ledger.json` and its source-to-Knowledge disposition rules are retained only as a frozen Phase-II prototype. They are no longer published by the coverage page and cannot decide whether a Phase-I book graph is complete.
 
-`S0060/complete-source.json` is the first populated pilot. It pins Oscar Levin's official PreTeXt source for *Discrete Mathematics: An Open Introduction, 4th Edition* and currently contains captured inventories for 109 active source files, 38 explicitly tagged theorem-like nodes, 74 definition/notation nodes, and three candidate edges where a theorem proof explicitly cross-references another inventoried result. The pilot remains unreviewed and incomplete: 35 theorem-like nodes have no route, implicit prerequisites and exercise-embedded results are still pending, and the file discloses a conflict between the active edition's license statement and the repository-level license.
+The `S0060/complete-source.json` index and its component shards form the first populated pilot dataset. They pin Oscar Levin's official PreTeXt source for *Discrete Mathematics: An Open Introduction, 4th Edition* and currently contain captured inventories for 109 active source files, 38 explicitly tagged theorem-like nodes, 74 definition/notation nodes, and three candidate edges where a theorem proof explicitly cross-references another inventoried result. The pilot remains unreviewed and incomplete: 35 theorem-like nodes have no route, implicit prerequisites and exercise-embedded results are still pending, and the dataset discloses a conflict between the active edition's license statement and the repository-level license.
 
-`S0262/complete-source.json` is the first dense-book checkpoint. It pins the official LaTeX source of *The Stacks Project* at tag-synchronized commit `ed88ff783bcb4dd9a28518a33b028841094009cf`, inventories all 116 chapters, and gives every included result its permanent Stacks tag. The candidate graph contains 13,138 theorem-like nodes (12,587 lemmas, 330 propositions, 214 theorems, and 7 exact-label source-audited claims), 1,855 support nodes (1,726 definitions, 124 formal situations/assumptions, and 5 constructions), 11 typed external theorems, 36,289 proof-use edges, and 11,282 source or explicitly alternate proof routes. The edges comprise 36,036 explicit proof-xref edges and 253 owner-specific audited semantic edges: 71 named-result invocations, 4 curated-claim prerequisites, 12 primary-source bibliographic dependencies, 109 deictic-proof dependencies, 25 occurrence-level resolutions of a mixed recall remark, and 32 owner-specific section-delegation dependencies. It contains zero example nodes: 449 example environments, 386 exercises, and 1,042 ordinary remark environments remain excluded; no remark category was bulk-imported. Exact audits suppress 3 notation/optional proof xrefs and 11 attribution, corroboration, background, or example-based citation records instead of creating false dependencies. There are 2,596 remaining unresolved theorem-target records (1,302 unique permanent labels) and 6 unresolved bibliographic proof citations. The graph is extracted but not independently reviewed or complete; 1,893 theorem-like nodes still have no route with a resolved candidate prerequisite. Section-delegation mappings are guarded by exact owner, revision, statement, proof, and occurrence evidence; the cited section labels are never global aliases.
+The `S0262/complete-source.json` index and its component shards form the first dense-book checkpoint dataset. They pin the official LaTeX source of *The Stacks Project* at tag-synchronized commit `ed88ff783bcb4dd9a28518a33b028841094009cf`, inventory all 116 chapters, and give every included result its permanent Stacks tag. The candidate graph contains 13,138 theorem-like nodes (12,587 lemmas, 330 propositions, 214 theorems, and 7 exact-label source-audited claims), 1,855 support nodes (1,726 definitions, 124 formal situations/assumptions, and 5 constructions), 11 typed external theorems, 36,289 proof-use edges, and 11,282 source or explicitly alternate proof routes. The edges comprise 36,036 explicit proof-xref edges and 253 owner-specific audited semantic edges: 71 named-result invocations, 4 curated-claim prerequisites, 12 primary-source bibliographic dependencies, 109 deictic-proof dependencies, 25 occurrence-level resolutions of a mixed recall remark, and 32 owner-specific section-delegation dependencies. The dataset contains zero example nodes: 449 example environments, 386 exercises, and 1,042 ordinary remark environments remain excluded; no remark category was bulk-imported. Exact audits suppress 3 notation/optional proof xrefs and 11 attribution, corroboration, background, or example-based citation records instead of creating false dependencies. There are 2,596 remaining unresolved theorem-target records (1,302 unique permanent labels) and 6 unresolved bibliographic proof citations. The graph is extracted but not independently reviewed or complete; 1,893 theorem-like nodes still have no route with a resolved candidate prerequisite. Section-delegation mappings are guarded by exact owner, revision, statement, proof, and occurrence evidence; the cited section labels are never global aliases.
 
 The rejected example-heavy `S0002` checkpoint has been returned to its placeholder state. *Mathematics for Elementary Teachers* is not being counted as an extracted theorem graph and is not the next book in the queue.
 
-The PreTeXt importer defaults to a dry run. It requires a clean checkout at the exact requested commit, derives repository provenance from its GitHub origin, traverses only active comment-stripped includes, validates the candidate against the book schema, and writes only the requested component. A write also refreshes the generated manifest atomically:
+The PreTeXt importer defaults to a dry run. It requires a clean checkout at the exact requested commit, derives repository provenance from its GitHub origin, traverses only active comment-stripped includes, validates the candidate against the book schema, and writes only the requested component. A single-writer update also refreshes the generated manifest and is rollback-safe for ordinary errors:
 
 ```sh
 node scripts/import-pretext-book.mjs \
@@ -79,7 +81,7 @@ node scripts/import-pretext-book.mjs \
   --write
 ```
 
-The Stacks importer also defaults to a dry run. It accepts only a clean checkout of the official repository at the exact requested commit, reads the official ordered chapter and permanent-tag manifests, masks comments and verbatim examples, excludes worked examples/exercises/ordinary remarks, applies only source-audited exact owner/target overrides with drift guards, validates the complete candidate, and atomically updates only S0262 plus the generated manifest:
+The Stacks importer also defaults to a dry run. It accepts only a clean checkout of the official repository at the exact requested commit, reads the official ordered chapter and permanent-tag manifests, masks comments and verbatim examples, excludes worked examples/exercises/ordinary remarks, applies only source-audited exact owner/target overrides with drift guards, validates the complete candidate, and performs a single-writer, ordinary-error-rollback-safe update of only S0262 plus the generated manifest:
 
 ```sh
 node scripts/import-stacks-book.mjs \
@@ -101,7 +103,7 @@ The chapter order is a curated reading route through that DAG, not the definitio
 
 Per-node source lineage and internal editorial research still guide extraction, comparison, licensing review, and provenance. They do not appear as a public Materials architecture and are never assignments to read whole books. The published paperback will excerpt selected chapters and results from the same canonical text.
 
-`/knowledge/compression` exposes the frozen Phase-II atlas. `/knowledge/coverage` remains only as a temporary diagnostic for the two v1 pilots; no further raw-graph UI work is planned, and the v1.1 shards will not be a browser payload. Phase-I progress comes from small manifests and command-line validation. Every extracted node still receives a permanent address, and extraction and graph evidence must be approved by a different reviewer before becoming reviewed.
+`/knowledge/compression` exposes the frozen Phase-II atlas. `/knowledge/coverage` is a manifest-only Phase-I status diagnostic; no raw-graph UI is planned, and v1.1 shards are not a browser payload. Phase-I progress comes from small manifests and command-line validation. Every extracted node still receives a permanent address, and extraction and graph evidence must be approved by a different reviewer before becoming reviewed.
 
 Train is separate from textbook navigation. It samples meaningful theorem-like nodes from the paper DAGs and asks a human or AI to reconstruct a proof as an exercise; dependency context, hints, and the reviewed route can be disclosed progressively rather than shown up front.
 
@@ -123,9 +125,10 @@ npm run build
 npm run check
 npm run books:sync
 npm run books:check
+npm run books:migrate-storage
 ```
 
-`books:sync` creates missing component files and refreshes the generated manifest without overwriting a populated book graph. `books:check` rejects missing, extra, misnamed, or internally inconsistent book files. `npm run check` runs linting, all tests, TypeScript compilation, and the production build.
+`books:sync` creates missing transitional placeholders and refreshes the generated manifest without overwriting a populated graph. `books:check` reconstructs v1.1 components, validates all logical graphs, and rejects missing, altered, or orphan shards. `books:migrate-storage` performs a dry-run parity audit of S0060 and S0262; add `-- --write` only when migrating legacy pilot files. `npm run check` runs linting, all tests, TypeScript compilation, and the production build.
 
 ## Rebuild the mathematical corpus
 

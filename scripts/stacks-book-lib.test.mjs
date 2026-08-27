@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { extractStacksGraphFromUnits } from "./stacks-book-lib.mjs";
 
 const capturedAt = "2026-08-23T18:00:00.000Z";
+const stacksSourceRevision = "ed88ff783bcb4dd9a28518a33b028841094009cf";
 
 const tagText = [
   "0001,algebra-definition-input",
@@ -1123,6 +1124,92 @@ See above.
     }));
     expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0alc")
       ?.evidence.locator).toContain("L9-L18");
+  });
+
+  it("resolves an exact owner-specific section delegation without aliasing the section globally", () => {
+    const auditedOwnerAndProof = String.raw`\begin{lemma}
+\label{lemma-base-change-monomorphism}
+Let $\mathcal{X} \to \mathcal{Y}$ be a morphism of algebraic stacks.
+Let $\mathcal{Z} \to \mathcal{Y}$ be a monomorphism.
+Then $\mathcal{Z} \times_\mathcal{Y} \mathcal{X} \to \mathcal{X}$
+is a monomorphism.
+\end{lemma}
+
+\begin{proof}
+This follows from the general discussion in
+Section \ref{section-properties-morphisms}.
+\end{proof}`;
+    const unrelatedOwnerAndProof = String.raw`
+\begin{lemma}
+\label{lemma-unlisted-section-use}
+An unrelated assertion uses a different part of the same section.
+\end{lemma}
+\begin{proof}
+Compare Section \ref{section-properties-morphisms}.
+\end{proof}`;
+    const stacksPropertiesContent = [
+      ...Array.from({ length: 1429 }, () => "% audited padding"),
+      ...auditedOwnerAndProof.split("\n"),
+      ...unrelatedOwnerAndProof.split("\n"),
+    ].join("\n");
+    const fixtureUnits = [
+      {
+        stem: "algebraic",
+        path: "algebraic.tex",
+        title: "Algebraic Stacks",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-base-change-representable-transformations-property}
+Representable properties are preserved by base change.
+\end{lemma}
+`,
+      },
+      {
+        stem: "stacks-properties",
+        path: "stacks-properties.tex",
+        title: "Properties of Stacks",
+        content: stacksPropertiesContent,
+      },
+    ];
+    const fixtureTags = [
+      "045C,algebraic-lemma-base-change-representable-transformations-property",
+      "04XB,stacks-properties-section-properties-morphisms",
+      "04ZX,stacks-properties-lemma-base-change-monomorphism",
+      "0ZZZ,stacks-properties-lemma-unlisted-section-use",
+    ].join("\n");
+
+    const result = extractStacksGraphFromUnits(fixtureUnits, fixtureTags, {
+      capturedAt,
+      sourceRevision: stacksSourceRevision,
+    });
+
+    expect(result.stats).toMatchObject({
+      sectionDelegationDependencyCount: 1,
+      curatedResolvedSectionProofXrefCount: 1,
+    });
+    expect(result.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-04zx",
+      prerequisite: { type: "node", id: "tag-045c" },
+    }));
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-04zx")
+      ?.dependencyIds).toEqual(["dep-tag-04zx-to-tag-045c"]);
+    expect(result.graph.references.some(({ ownerNodeId }) => ownerNodeId === "tag-04zx"))
+      .toBe(false);
+    expect(result.graph.references).toContainEqual(expect.objectContaining({
+      ownerNodeId: "tag-0zzz",
+      ref: "stacks-properties-section-properties-morphisms",
+      resolution: expect.objectContaining({ status: "unresolved" }),
+    }));
+
+    const changedUnits = fixtureUnits.map((unit) => (
+      unit.stem === "stacks-properties"
+        ? { ...unit, content: unit.content.replace("general discussion", "discussion") }
+        : unit
+    ));
+    expect(() => extractStacksGraphFromUnits(changedUnits, fixtureTags, {
+      capturedAt,
+      sourceRevision: stacksSourceRevision,
+    })).toThrow(/section-delegation proof 04ZX changed/u);
   });
 
   it("decomposes the mixed Tag 03II recall bundle by audited occurrence", () => {

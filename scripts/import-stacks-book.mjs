@@ -156,7 +156,7 @@ function report({ recordId, componentId, commit, capturedAt, sourceRepository, w
     `Formal node kinds: ${JSON.stringify(stats.kindCounts)}`,
     `Candidate proof-reference edges: ${stats.directDependencyCount}`,
     `  Explicit proof-xref edges: ${stats.explicitProofXrefDependencyCount}`,
-    `  Source-audited semantic edges: ${stats.semanticDependencyCount} (${stats.namedResultDependencyCount} named-result / ${stats.curatedClaimDependencyCount} curated-claim / ${stats.externalCitationDependencyCount} external-citation / ${stats.deicticDependencyCount} deictic / ${stats.bundledRemarkDependencyCount} bundled-remark)`,
+    `  Source-audited semantic edges: ${stats.semanticDependencyCount} (${stats.namedResultDependencyCount} named-result / ${stats.curatedClaimDependencyCount} curated-claim / ${stats.externalCitationDependencyCount} external-citation / ${stats.deicticDependencyCount} deictic / ${stats.bundledRemarkDependencyCount} bundled-remark / ${stats.sectionDelegationDependencyCount} section-delegation)`,
     `Typed external inputs: ${stats.externalInputCount}`,
     `Candidate proof routes: ${stats.proofRouteCount}`,
     `Source-reference records: ${stats.referenceCount}`,

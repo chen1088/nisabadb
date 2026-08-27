@@ -177,11 +177,11 @@ describe("one Phase-I dependency graph file per source component", () => {
       inventoriedSourceUnitCount: 225,
       reviewedSourceUnitCount: 0,
       theoremNodeCount: 13176,
-      unroutedTheoremCount: 1940,
+      unroutedTheoremCount: 1928,
       supportNodeCount: 1929,
-      dependencyCount: 36260,
+      dependencyCount: 36292,
       reviewedDependencyCount: 0,
-      unresolvedReferenceCount: 2617,
+      unresolvedReferenceCount: 2602,
     });
     expect(validated.filesByPath.get("S0001/level-1.json")?.identity.bookGraphId).toBe("S0001:level-1");
     expect(validated.filesByPath.get("S0074/volume-3.json")?.identity.componentLabel).toBe("Volume 3");
@@ -212,7 +212,7 @@ describe("one Phase-I dependency graph file per source component", () => {
       id: "external-deligne-weight-bound",
       kind: "external-theorem",
     }));
-    expect(densestBook?.graph.directDependencies).toHaveLength(36257);
+    expect(densestBook?.graph.directDependencies).toHaveLength(36289);
     expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
       dependentNodeId: "tag-0eq8",
       prerequisite: { type: "node", id: "tag-0eq6" },
@@ -249,14 +249,85 @@ describe("one Phase-I dependency graph file per source component", () => {
         prerequisite: { type: "external-input", id: "external-zorns-lemma" },
       }));
     }
-    expect(densestBook?.graph.proofRoutes).toHaveLength(11270);
+    const sectionDelegationTargets = new Map([
+      ["tag-03z1", ["tag-03bx", "tag-03h5", "tag-03h4"]],
+      ["tag-0cfq", ["tag-03bx", "tag-03h5", "tag-03h4"]],
+      ["tag-03xd", ["tag-03bx", "tag-03h5", "tag-03h4"]],
+      ["tag-04p1", ["tag-03bx", "tag-03bz"]],
+      ["tag-0e07", ["tag-03bu"]],
+      ["tag-06u1", ["tag-04xl", "tag-04xi", "tag-04xh"]],
+      ["tag-0chx", ["tag-04xl", "tag-04xi", "tag-04xh"]],
+      ["tag-0512", ["tag-04xl", "tag-04xi", "tag-04xh"]],
+      ["tag-0ci1", ["tag-04xl", "tag-04xi", "tag-04xh"]],
+      ["tag-0ci6", ["tag-04xl", "tag-04xi", "tag-04xh"]],
+      ["tag-0e86", ["tag-04xl"]],
+      ["tag-04zx", ["tag-045c"]],
+      ["tag-0501", ["tag-045c"]],
+      ["tag-0chr", ["tag-045c"]],
+      ["tag-0chv", ["tag-045c"]],
+    ]);
+    const sectionReferenceByOwner = new Map([
+      ...["tag-03z1", "tag-0cfq", "tag-03xd", "tag-04p1", "tag-0e07"].map((owner) => (
+        [owner, "spaces-properties-section-points"] as const
+      )),
+      ...["tag-06u1", "tag-0chx", "tag-0512", "tag-0ci1", "tag-0ci6", "tag-0e86"].map((owner) => (
+        [owner, "stacks-properties-section-points"] as const
+      )),
+      ...["tag-04zx", "tag-0501", "tag-0chr", "tag-0chv"].map((owner) => (
+        [owner, "stacks-properties-section-properties-morphisms"] as const
+      )),
+    ]);
+    for (const [ownerNodeId, targetNodeIds] of sectionDelegationTargets) {
+      const actualTargets = densestBook?.graph.directDependencies
+        .filter(({ dependentNodeId, prerequisite }) => (
+          dependentNodeId === ownerNodeId && prerequisite.type === "node"
+        ))
+        .map(({ prerequisite }) => prerequisite.id)
+        .sort();
+      expect(actualTargets).toEqual(expect.arrayContaining([...targetNodeIds]));
+      expect(densestBook?.graph.proofRoutes
+        .find(({ theoremNodeId }) => theoremNodeId === ownerNodeId)
+        ?.dependencyIds).toEqual(expect.arrayContaining(
+          targetNodeIds.map((targetNodeId) => `dep-${ownerNodeId}-to-${targetNodeId}`),
+        ));
+      expect(densestBook?.graph.references.some(({ ownerNodeId: referenceOwner, ref }) => (
+        referenceOwner === ownerNodeId && ref === sectionReferenceByOwner.get(ownerNodeId)
+      ))).toBe(false);
+    }
+    expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-0e07",
+      prerequisite: { type: "node", id: "tag-03bu" },
+      role: "definition",
+      rationale: expect.stringContaining("not self-contained"),
+    }));
+    expect(densestBook?.graph.proofRoutes
+      .find(({ theoremNodeId }) => theoremNodeId === "tag-04p1")
+      ?.evidence.note).toContain("omits the final descent verification");
+    expect(densestBook?.graph.proofRoutes
+      .find(({ theoremNodeId }) => theoremNodeId === "tag-0e86")
+      ?.evidence.note).toContain("open substack");
+    expect(densestBook?.graph.proofRoutes).toHaveLength(11282);
     expect(densestBook?.graph.proofRoutes.filter((route) => route.routeKind === "alternate-proof"))
       .toHaveLength(40);
     expect(densestBook?.graph.references.every((reference) => (
       ["proof-xref", "proof-citation"].includes(reference.basis)
     ))).toBe(true);
     expect(densestBook?.graph.references.filter((reference) => reference.basis === "proof-xref"))
-      .toHaveLength(2611);
+      .toHaveLength(2596);
+    expect(new Map([
+      "spaces-properties-section-points",
+      "stacks-properties-section-points",
+      "stacks-properties-section-properties-morphisms",
+    ].map((ref) => [
+      ref,
+      densestBook?.graph.references.filter((reference) => (
+        reference.basis === "proof-xref" && reference.ref === ref
+      )).length,
+    ]))).toEqual(new Map([
+      ["spaces-properties-section-points", 0],
+      ["stacks-properties-section-points", 0],
+      ["stacks-properties-section-properties-morphisms", 24],
+    ]));
     expect(densestBook?.graph.references.filter((reference) => reference.basis === "proof-citation"))
       .toHaveLength(19);
     expect(densestBook?.graph.references.filter((reference) => (

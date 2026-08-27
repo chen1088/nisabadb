@@ -95,6 +95,7 @@ const CURATED_CLAIM_INCOMING_REFERENCE_COUNTS = new Map([
 ]);
 
 const CURATED_CITATION_SOURCE_REVISION = "ed88ff783bcb4dd9a28518a33b028841094009cf";
+const CURATED_SECTION_DELEGATION_SOURCE_REVISION = "ed88ff783bcb4dd9a28518a33b028841094009cf";
 
 // Exact bibliographic theorem invocations verified against primary sources.
 // Multiple citations or owners can attest one reusable external theorem input;
@@ -443,6 +444,155 @@ const CURATED_ESSENTIAL_DEICTIC_PROOF_DEPENDENCIES = [
     ownerTag: "01JS",
     targetTags: ["01JQ", "01JR"],
     proofPattern: "^See discussion above the lemma\\.$",
+  },
+];
+
+// Some proofs cite an expository section and then use a small, exact subset
+// of the formal results developed there. These mappings are deliberately
+// owner-specific: the same section labels occur in other proofs with different
+// logical needs, so they must never become global reference aliases. The full
+// proof hash and complete occurrence count make every promotion fail closed if
+// the pinned source changes.
+const CURATED_SECTION_PROOF_DEPENDENCIES = [
+  {
+    ownerTag: "03Z1",
+    referenceTag: "03BT",
+    targetTags: ["03BX", "03H5", "03H4"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "c97019b545f3456a60dfea35e7a7008b9e6b5144da7a8763a2e25246078c0ced",
+    proofSourceTextSha256: "79178f392d2389efd6ee295833d14bb09865f3d8d51be77874d39619210f7d4f",
+    referenceArtifactSha256: "7bd2a2b399cf590c9d39f52855629b1638675c6a606fbd9b38626fc1d605824a",
+  },
+  {
+    ownerTag: "0CFQ",
+    referenceTag: "03BT",
+    targetTags: ["03BX", "03H5", "03H4"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "391d97db53e42034087f16db767b4337a3978087e10d08d74ad39d9a652f235e",
+    proofSourceTextSha256: "eb6723def8d90afa85f0beff5925d758185ee399f5a75c0f3c6a67775c116e0c",
+    referenceArtifactSha256: "7f301e1022d745c1b45c5078411950916c35e5ee80e0fdf51b4aed8a76601ad1",
+  },
+  {
+    ownerTag: "03XD",
+    referenceTag: "03BT",
+    targetTags: ["03BX", "03H5", "03H4"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "d0ccc234fa5c379408ea7f14d4478100c58558541adbd7d5a6edfbdd785cc5c1",
+    proofSourceTextSha256: "0481c690f94914b05469a482a2ea6adf02c79b45b87dcdd75d7a5404870252d9",
+    referenceArtifactSha256: "93468ff00acab5c4a8cb16c25f740c51dcc4bf1d5c759911123ecb3c5445a9ec",
+  },
+  {
+    ownerTag: "04P1",
+    referenceTag: "03BT",
+    targetTags: ["03BX", "03BZ"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "dd220de2e7c8b081881854b4bc9f4380bfdb8f1877f28adb6ad56fd72cba0140",
+    proofSourceTextSha256: "1c6f1f8b957aa60ab975c4b95313115093c935c636fac10bdba3b4a0e2c15f98",
+    referenceArtifactSha256: "b415d548e89a259708e03595d444774a45719d191d4fbd1c078346b0b6766503",
+    rationaleNote: "Tag 03BX makes the presentation map open, and Tag 03BZ turns its open image into the required open subspace.",
+    routeDebtNote: "The pinned source later writes U -> X and subsets of X where the lemma data use U -> T and subsets of T, and it explicitly omits the final descent verification; this candidate route preserves that source-level proof debt.",
+  },
+  {
+    ownerTag: "0E07",
+    referenceTag: "03BT",
+    targetTags: ["03BU"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "d93a16805c380372f3e97a7dd3f6c0b7baaee10bb99490fed97a433873381c99",
+    proofSourceTextSha256: "89e795b64ee8f85d9f4556605ddf52e8d5662a0fa07bd047b622b80a955d153f",
+    referenceArtifactSha256: "7e1864d01248408d2e925c0dbd99431b70d6e1681f72e8dc9ba04048800e10b4",
+    rationaleNote: "The concrete equivalence relation is specified in the unlabelled prose immediately preceding Tag 03BU, so the dependency is definitional but the target statement is not self-contained.",
+  },
+  {
+    ownerTag: "06U1",
+    referenceTag: "04XE",
+    targetTags: ["04XL", "04XI", "04XH"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "cbe79be8d02403a417a5e9d88f50fc262eacb90bd6b9c8c786de2449b7946dff",
+    proofSourceTextSha256: "ad31abe8a3c6fd2dd7508e82ff0903915756aeb1c0d51ae3d7ff38acd0d11af4",
+    referenceArtifactSha256: "bb8c1625679c0cd4c3f6eeb52aa2ec3fd8cd72dc132acab2eaa69ac2760428db",
+  },
+  {
+    ownerTag: "0CHX",
+    referenceTag: "04XE",
+    targetTags: ["04XL", "04XI", "04XH"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "f8470821622052108d9b91def694b65891be42a8138b974aeda9cc77fca5b50d",
+    proofSourceTextSha256: "626505d6b1b01a5ffe391816295e1baea94f88f39c47b5e01f374ba11282769a",
+    referenceArtifactSha256: "d2455ced061e3d6eebed03c101d703ef2711a1956d142c96614e29a727a644b8",
+  },
+  {
+    ownerTag: "0512",
+    referenceTag: "04XE",
+    targetTags: ["04XL", "04XI", "04XH"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "f13be3463985f58b40e7341ad1fff9cc31d8ed3a9bd412538e07ce4b21cbf716",
+    proofSourceTextSha256: "114b8dc269e6ce4ecebf03eb0ba0da9b08888f3b0e8e436488431dc511fcc2e3",
+    referenceArtifactSha256: "8d0c64be4ec3eca75b777a613b8183a712d6cf63c95435c198e9571c58aac377",
+  },
+  {
+    ownerTag: "0CI1",
+    referenceTag: "04XE",
+    targetTags: ["04XL", "04XI", "04XH"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "9e16d91528b356c6792ba6b085283de3f9831e75a83b2d86185738ac3435e840",
+    proofSourceTextSha256: "c52a661b0cd9be733f20458f78cf20d34411fc5835d3288d8ee06d1177a70916",
+    referenceArtifactSha256: "a7acfe04d4a1f3acf13bc8cd53544dc3eebd11e3d87b32825186dc56dc021451",
+  },
+  {
+    ownerTag: "0CI6",
+    referenceTag: "04XE",
+    targetTags: ["04XL", "04XI", "04XH"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "e0eb44810aaf1d596d6c3588eb0fa337d18ac7b69461d66a793a86bc70ae4c3c",
+    proofSourceTextSha256: "27c29e0d11786e999091f8e1a084d01509ee1f884469f59ff4d974b6bcd6e9c0",
+    referenceArtifactSha256: "ecc96d46272c755b45c2f334296fffdc7fe1d180f0534ee162e6f63a65134887",
+  },
+  {
+    ownerTag: "0E86",
+    referenceTag: "04XE",
+    targetTags: ["04XL"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "76d2cb54d8f1c1b0f098ef55f45ec94857129450f4bf50457f5bd435a9e2e05f",
+    proofSourceTextSha256: "498e2973251b43f8f0c9662c315c1e44fe0790e156ea6cfe3e815e6373dc1636",
+    referenceArtifactSha256: "52e676d217677207fefa71dd0c5f6995698041c86604b684231723b778b1a13b",
+    rationaleNote: "Tag 04XL is the exact construction of the topology used to identify the smooth locus as open; no surjectivity or fibre-product fact from the section is imported.",
+    routeDebtNote: "The proof also assumes that the smooth-curves locus is an open substack; that implicit prerequisite remains separate review debt.",
+  },
+  {
+    ownerTag: "04ZX",
+    referenceTag: "04XB",
+    targetTags: ["045C"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "b7a92b06d5b2a6983676c589c34abfbefacbf06f55b73eef09fd1147a230154b",
+    proofSourceTextSha256: "8cb15bbd5804d9c3831d46e278c93e5519b1a35386ac2342086df7eaee344911",
+    referenceArtifactSha256: "5c46c3c1fa1dada59e1bcd94f36daab46c28f87a2de79a41a9323bbf4245e77f",
+  },
+  {
+    ownerTag: "0501",
+    referenceTag: "04XB",
+    targetTags: ["045C"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "81fedda827bb673aa68da61407d8a9fe800ba94b675e9291c1179a6e50bbf9c3",
+    proofSourceTextSha256: "8cb15bbd5804d9c3831d46e278c93e5519b1a35386ac2342086df7eaee344911",
+    referenceArtifactSha256: "0d9759c3e6793157fbf314833109f703aa8af1e43bd1745c83865eb8b8abfd49",
+  },
+  {
+    ownerTag: "0CHR",
+    referenceTag: "04XB",
+    targetTags: ["045C"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "ae9c5b5ac73ec0de4b318288bef74cf62c21bf2595b2a807dbdd0b99051099c4",
+    proofSourceTextSha256: "a575bba667327928cb81f55a9fc0e70b926cbfcb752e83fe221d9a8d27c6279b",
+    referenceArtifactSha256: "eac278e86de21a054c42e45c03790b2a0591224c2cc4d97819af7891e1515978",
+  },
+  {
+    ownerTag: "0CHV",
+    referenceTag: "04XB",
+    targetTags: ["045C"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "5154589af3510426b2784349355dc4a3f049443f7c2aea9ca274f92d64d68f8d",
+    proofSourceTextSha256: "a575bba667327928cb81f55a9fc0e70b926cbfcb752e83fe221d9a8d27c6279b",
+    referenceArtifactSha256: "f0fd12e48ac734f59058da4de6caedaba92eb08d27617d845c1486e5e92cc6eb",
   },
 ];
 
@@ -1697,6 +1847,65 @@ export function extractStacksGraphFromUnits(
     }
   }
 
+  const activeSectionDelegations = CURATED_SECTION_PROOF_DEPENDENCIES
+    .map((config) => ({
+      config,
+      owner: metadataForTag(config.ownerTag, "section-delegation owner"),
+    }))
+    .filter(({ owner }) => owner);
+  if (activeSectionDelegations.length > 0
+    && sourceRevision !== CURATED_SECTION_DELEGATION_SOURCE_REVISION) {
+    throw new Error(`Curated section-delegation audit requires source revision ${CURATED_SECTION_DELEGATION_SOURCE_REVISION}`);
+  }
+  const curatedResolvedSectionProofGroupKeys = new Set();
+  for (const { config, owner } of activeSectionDelegations) {
+    if (owner.node.sourceTextSha256 !== config.ownerSourceTextSha256) {
+      throw new Error(`Curated section-delegation owner ${config.ownerTag} statement changed`);
+    }
+    const sectionFullLabel = tags.tagToFullLabel.get(config.referenceTag);
+    if (!sectionFullLabel) {
+      throw new Error(`Curated section-delegation reference tag ${config.referenceTag} is absent`);
+    }
+    if (nodeByFullLabel.has(sectionFullLabel)) {
+      throw new Error(`Curated section-delegation reference ${config.referenceTag} unexpectedly resolves to a formal node`);
+    }
+    const matchingProofs = (owner.proofs ?? []).filter(({ rawProof }) => (
+      sha256(rawProof) === config.proofSourceTextSha256
+    ));
+    if (matchingProofs.length !== 1) {
+      throw new Error(`Curated section-delegation proof ${config.ownerTag} changed from its audited source text`);
+    }
+    const proof = matchingProofs[0];
+    const occurrences = (owner.proofs ?? [])
+      .flatMap(({ references }) => references)
+      .filter(({ ref }) => (
+        resolveFullLabel(ref, owner.unit.stem, tags.fullLabelToTag) === sectionFullLabel
+      ));
+    if (occurrences.length !== config.expectedSectionReferenceCount) {
+      throw new Error(`Curated section-delegation ${config.ownerTag}->${config.referenceTag} expected ${config.expectedSectionReferenceCount} occurrence(s), found ${occurrences.length}`);
+    }
+    if (sha256(canonicalJson(occurrences)) !== config.referenceArtifactSha256) {
+      throw new Error(`Curated section-delegation reference ${config.ownerTag}->${config.referenceTag} changed from its audited occurrence`);
+    }
+    for (const targetTag of config.targetTags) {
+      const target = targetForTag(targetTag, "section-delegation prerequisite");
+      assertTargetPrecedesOwner(target, owner, "section-delegation prerequisite");
+      addSemanticGroup({
+        owner,
+        basis: "audited-section-delegation",
+        targetNode: target.node,
+        externalInput: null,
+        occurrences,
+        proofStartLines: [proof.startLine],
+        routeEvidenceRegions: [],
+        routeDebtNotes: config.routeDebtNote ? [config.routeDebtNote] : [],
+        rationale: `An exact owner-specific audit of the pinned Stacks proof resolves the facts imported from Section (Tag ${config.referenceTag}) to ${target.node.sourceLabel}.${config.rationaleNote ? ` ${config.rationaleNote}` : ""}`,
+        evidenceNote: `Exact section-reference occurrence in a proof guarded by its full source hash; the shared section label was not globally aliased.`,
+      });
+    }
+    curatedResolvedSectionProofGroupKeys.add(`${owner.node.id}|${sectionFullLabel}`);
+  }
+
   const curatedResolvedProofGroupKeys = new Set();
   const resolvedRangesByGroupKey = new Map();
   for (const config of CURATED_BUNDLED_REMARK_DEPENDENCIES) {
@@ -1884,6 +2093,7 @@ export function extractStacksGraphFromUnits(
   let externalCitationDependencyCount = 0;
   let deicticDependencyCount = 0;
   let bundledRemarkDependencyCount = 0;
+  let sectionDelegationDependencyCount = 0;
   for (const ownerGroups of semanticGroupsByOwner.values()) {
     for (const group of ownerGroups.values()) {
       const targetId = group.targetNode?.id ?? group.externalInput.id;
@@ -1917,6 +2127,7 @@ export function extractStacksGraphFromUnits(
       else if (group.basis === "audited-external-citation") externalCitationDependencyCount += 1;
       else if (group.basis.includes("deictic")) deicticDependencyCount += 1;
       else if (group.basis === "audited-bundled-remark") bundledRemarkDependencyCount += 1;
+      else if (group.basis === "audited-section-delegation") sectionDelegationDependencyCount += 1;
     }
   }
 
@@ -1987,7 +2198,7 @@ export function extractStacksGraphFromUnits(
           capturedAt,
           note: routeKind === "alternate-proof"
             ? `Candidate alternative route from a separately titled source proof${hasSemanticDependencies ? " with owner-specific audited prose dependencies" : ""}; implicit prerequisites remain pending and no independent review is claimed.${routeDebtNotes.length ? ` ${routeDebtNotes.join(" ")}` : ""}`
-            : `Candidate route from ${hasSemanticDependencies ? "explicit proof references plus owner-specific audited named-result, curated-claim, external-citation, deictic, or bundled-remark dependencies" : "explicit proof references only"}; implicit prerequisites remain pending and no independent review is claimed.${routeDebtNotes.length ? ` ${routeDebtNotes.join(" ")}` : ""}`,
+            : `Candidate route from ${hasSemanticDependencies ? "explicit proof references plus owner-specific audited named-result, curated-claim, external-citation, deictic, bundled-remark, or section-delegation dependencies" : "explicit proof references only"}; implicit prerequisites remain pending and no independent review is claimed.${routeDebtNotes.length ? ` ${routeDebtNotes.join(" ")}` : ""}`,
         }),
       });
     }
@@ -1999,6 +2210,7 @@ export function extractStacksGraphFromUnits(
       for (const group of proofGroupsByOwner.get(owner.node.id) ?? []) {
         if (group.targetNode) continue;
         if (curatedResolvedProofGroupKeys.has(`${owner.node.id}|${group.fullLabel}`)) continue;
+        if (curatedResolvedSectionProofGroupKeys.has(`${owner.node.id}|${group.fullLabel}`)) continue;
         references.push(referenceEntity({ group, dependencyId: null, capturedAt, usedIds }));
       }
       for (const group of citationGroupsByOwner.get(owner.node.id) ?? []) {
@@ -2121,14 +2333,17 @@ export function extractStacksGraphFromUnits(
       externalCitationDependencyCount,
       deicticDependencyCount,
       bundledRemarkDependencyCount,
+      sectionDelegationDependencyCount,
       semanticDependencyCount: namedResultDependencyCount
         + curatedClaimDependencyCount
         + externalCitationDependencyCount
         + deicticDependencyCount
-        + bundledRemarkDependencyCount,
+        + bundledRemarkDependencyCount
+        + sectionDelegationDependencyCount,
       suppressedProofXrefDependencyCount,
       suppressedProofCitationReferenceCount: auditedNondependencyCitationGroupKeys.size,
       curatedResolvedBundledProofXrefCount: curatedResolvedProofGroupKeys.size,
+      curatedResolvedSectionProofXrefCount: curatedResolvedSectionProofGroupKeys.size,
       externalInputCount: externalInputs.length,
       proofRouteCount: proofRoutes.length,
       referenceCount: references.length,
@@ -2290,7 +2505,7 @@ export function buildStacksBookFile({
           referenceCount: extracted.graph.references.length,
         },
         independentReview: null,
-        note: `${extracted.stats.directDependencyCount} candidate edges comprise ${extracted.stats.explicitProofXrefDependencyCount} explicit proof-xref edges and ${extracted.stats.semanticDependencyCount} owner-specific source-audited semantic edges (${extracted.stats.namedResultDependencyCount} named-result, ${extracted.stats.curatedClaimDependencyCount} curated-claim, ${extracted.stats.externalCitationDependencyCount} external-citation, ${extracted.stats.deicticDependencyCount} deictic-proof, ${extracted.stats.bundledRemarkDependencyCount} bundled-remark); resolved occurrences are merged into edge evidence, and ${extracted.stats.suppressedProofXrefDependencyCount} exact owner-target proof-xref record(s) were audited as notation-only or optional nonlogical uses and suppressed. The graph has ${extracted.stats.externalInputCount} typed external theorem input(s): Zorn's lemma under the declared choice convention plus primary-source-audited bibliographic results. Of ${extracted.stats.totalProofCitationReferenceCount} original bibliographic proof-citation records, ${extracted.stats.resolvedProofCitationReferenceCount} resolve to ${extracted.stats.externalCitationDependencyCount} owner-input edges, ${extracted.stats.suppressedProofCitationReferenceCount} are audited nondependencies, and ${extracted.stats.proofCitationReferenceCount} remain unresolved. ${extracted.stats.unresolvedTaggedProofReferenceCount} unresolved tagged proof-xref records (${extracted.stats.uniqueUnresolvedTaggedProofTargetCount} unique permanent labels) and ${extracted.stats.proofCitationReferenceCount} bibliographic records (${extracted.stats.distinctProofCitationKeyCount} keys) remain review candidates. ${extracted.stats.pendingTheoremCount} theorem-like nodes have no route with a resolved candidate prerequisite and remain pending, not roots. No independent mathematical review or graph-completeness claim is made.`,
+        note: `${extracted.stats.directDependencyCount} candidate edges comprise ${extracted.stats.explicitProofXrefDependencyCount} explicit proof-xref edges and ${extracted.stats.semanticDependencyCount} owner-specific source-audited semantic edges (${extracted.stats.namedResultDependencyCount} named-result, ${extracted.stats.curatedClaimDependencyCount} curated-claim, ${extracted.stats.externalCitationDependencyCount} external-citation, ${extracted.stats.deicticDependencyCount} deictic-proof, ${extracted.stats.bundledRemarkDependencyCount} bundled-remark, ${extracted.stats.sectionDelegationDependencyCount} section-delegation); resolved occurrences are merged into edge evidence, and ${extracted.stats.suppressedProofXrefDependencyCount} exact owner-target proof-xref record(s) were audited as notation-only or optional nonlogical uses and suppressed. The graph has ${extracted.stats.externalInputCount} typed external theorem input(s): Zorn's lemma under the declared choice convention plus primary-source-audited bibliographic results. Of ${extracted.stats.totalProofCitationReferenceCount} original bibliographic proof-citation records, ${extracted.stats.resolvedProofCitationReferenceCount} resolve to ${extracted.stats.externalCitationDependencyCount} owner-input edges, ${extracted.stats.suppressedProofCitationReferenceCount} are audited nondependencies, and ${extracted.stats.proofCitationReferenceCount} remain unresolved. ${extracted.stats.unresolvedTaggedProofReferenceCount} unresolved tagged proof-xref records (${extracted.stats.uniqueUnresolvedTaggedProofTargetCount} unique permanent labels) and ${extracted.stats.proofCitationReferenceCount} bibliographic records (${extracted.stats.distinctProofCitationKeyCount} keys) remain review candidates. ${extracted.stats.pendingTheoremCount} theorem-like nodes have no route with a resolved candidate prerequisite and remain pending, not roots. No independent mathematical review or graph-completeness claim is made.`,
       },
     },
     stats: {

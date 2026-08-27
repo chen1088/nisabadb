@@ -293,8 +293,16 @@ describe("one Phase-I dependency graph identity per source component", () => {
     if (densestBook) {
     expect(densestBook?.exactEdition?.sourceFormat).toBe("latex");
     expect(densestBook?.sourceUnits).toHaveLength(116);
-    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like")).toHaveLength(13138);
+    expect(densestBook?.graph.nodes).toHaveLength(14994);
+    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like")).toHaveLength(13139);
     expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "support")).toHaveLength(1855);
+    expect(densestBook?.graph.nodes.filter((node) => node.kind === "claim")).toHaveLength(8);
+    expect(densestBook?.graph.nodes).toContainEqual(expect.objectContaining({
+      id: "tag-0f0k",
+      nodeClass: "theorem-like",
+      kind: "claim",
+      sourceXmlId: "algebra-item-cauchy-binet",
+    }));
     expect(densestBook?.graph.nodes.every((node) => /^tag-[a-z0-9]{4}$/u.test(node.id))).toBe(true);
     expect(densestBook?.graph.nodes.some((node) => (
       node.kind === "example" || node.kind === "calculation" || node.kind === "algorithm"
@@ -308,7 +316,13 @@ describe("one Phase-I dependency graph identity per source component", () => {
       id: "external-deligne-weight-bound",
       kind: "external-theorem",
     }));
-    expect(densestBook?.graph.directDependencies).toHaveLength(36289);
+    expect(densestBook?.graph.directDependencies).toHaveLength(36295);
+    expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
+      id: "dep-tag-07dq-to-tag-0f0k",
+      dependentNodeId: "tag-07dq",
+      prerequisite: { type: "node", id: "tag-0f0k" },
+      role: "logical",
+    }));
     expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
       dependentNodeId: "tag-0eq8",
       prerequisite: { type: "node", id: "tag-0eq6" },
@@ -361,6 +375,11 @@ describe("one Phase-I dependency graph identity per source component", () => {
       ["tag-0501", ["tag-045c"]],
       ["tag-0chr", ["tag-045c"]],
       ["tag-0chv", ["tag-045c"]],
+      ["tag-0bb4", ["tag-0262"]],
+      ["tag-06qz", ["tag-0262"]],
+      ["tag-07sk", ["tag-0262"]],
+      ["tag-0duj", ["tag-0262"]],
+      ["tag-09cn", ["tag-07jw"]],
     ]);
     const sectionReferenceByOwner = new Map([
       ...["tag-03z1", "tag-0cfq", "tag-03xd", "tag-04p1", "tag-0e07"].map((owner) => (
@@ -372,6 +391,10 @@ describe("one Phase-I dependency graph identity per source component", () => {
       ...["tag-04zx", "tag-0501", "tag-0chr", "tag-0chv"].map((owner) => (
         [owner, "stacks-properties-section-properties-morphisms"] as const
       )),
+      ...["tag-0bb4", "tag-06qz", "tag-07sk", "tag-0duj"].map((owner) => (
+        [owner, "spaces-section-presentations"] as const
+      )),
+      ["tag-09cn", "algebra-section-snake"],
     ]);
     for (const [ownerNodeId, targetNodeIds] of sectionDelegationTargets) {
       const actualTargets = densestBook?.graph.directDependencies
@@ -402,18 +425,44 @@ describe("one Phase-I dependency graph identity per source component", () => {
     expect(densestBook?.graph.proofRoutes
       .find(({ theoremNodeId }) => theoremNodeId === "tag-0e86")
       ?.evidence.note).toContain("open substack");
-    expect(densestBook?.graph.proofRoutes).toHaveLength(11282);
+    expect(densestBook?.graph.proofRoutes
+      .find(({ theoremNodeId }) => theoremNodeId === "tag-0bb4")
+      ?.evidence.note).toContain("omits the precise formulation and proof of the functoriality");
+    expect(densestBook?.graph.proofRoutes
+      .find(({ theoremNodeId }) => theoremNodeId === "tag-07sk")
+      ?.evidence.note).toContain("omits details that R' is of finite presentation over R");
+    expect(densestBook?.graph.proofRoutes
+      .find(({ theoremNodeId }) => theoremNodeId === "tag-09cn")
+      ?.evidence.note).toContain("excluded example for the free-module case");
+    expect(densestBook?.graph.proofRoutes).toHaveLength(11284);
+    expect(densestBook?.graph.proofRoutes.filter(({ theoremNodeId }) => (
+      theoremNodeId === "tag-0f0k"
+    ))).toHaveLength(0);
+    expect(densestBook?.graph.proofRoutes
+      .find(({ theoremNodeId }) => theoremNodeId === "tag-07dq")
+      ?.dependencyIds).toContain("dep-tag-07dq-to-tag-0f0k");
+    const routedTheoremNodeIds = new Set(densestBook?.graph.proofRoutes.map(({ theoremNodeId }) => (
+      theoremNodeId
+    )));
+    expect(densestBook?.graph.nodes.filter(({ id, nodeClass }) => (
+      nodeClass === "theorem-like" && !routedTheoremNodeIds.has(id)
+    ))).toHaveLength(1892);
     expect(densestBook?.graph.proofRoutes.filter((route) => route.routeKind === "alternate-proof"))
       .toHaveLength(40);
     expect(densestBook?.graph.references.every((reference) => (
       ["proof-xref", "proof-citation"].includes(reference.basis)
     ))).toBe(true);
     expect(densestBook?.graph.references.filter((reference) => reference.basis === "proof-xref"))
-      .toHaveLength(2596);
+      .toHaveLength(2590);
+    expect(densestBook?.graph.references.some(({ ownerNodeId, ref }) => (
+      ownerNodeId === "tag-07dq" && ref === "algebra-item-cauchy-binet"
+    ))).toBe(false);
     expect(new Map([
       "spaces-properties-section-points",
       "stacks-properties-section-points",
       "stacks-properties-section-properties-morphisms",
+      "spaces-section-presentations",
+      "algebra-section-snake",
     ].map((ref) => [
       ref,
       densestBook?.graph.references.filter((reference) => (
@@ -423,7 +472,16 @@ describe("one Phase-I dependency graph identity per source component", () => {
       ["spaces-properties-section-points", 0],
       ["stacks-properties-section-points", 0],
       ["stacks-properties-section-properties-morphisms", 24],
+      ["spaces-section-presentations", 0],
+      ["algebra-section-snake", 0],
     ]));
+    expect(densestBook?.graph.references).toContainEqual(expect.objectContaining({
+      ownerNodeId: "tag-09cn",
+      basis: "proof-xref",
+      ref: "algebra-example-derivations-and-differential-operators",
+      locator: "algebra.tex:L34869",
+      resolution: expect.objectContaining({ status: "unresolved" }),
+    }));
     expect(densestBook?.graph.references.filter((reference) => reference.basis === "proof-citation"))
       .toHaveLength(19);
     expect(densestBook?.graph.references.filter((reference) => (

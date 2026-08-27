@@ -41,16 +41,33 @@ const CURATED_CLAIMS = new Map([
   }],
 ]);
 
-// This exact labeled prose/display span states and derives a general result,
-// rather than merely defining notation for the displayed equation. The raw
-// span hash is pinned so that source drift fails extraction instead of silently
-// changing the promoted claim.
+// These exact labeled prose/display spans state general results rather than
+// merely defining notation. A claim supplies an inline proof only when its
+// configuration does not explicitly keep that proof pending. Every raw span
+// hash is pinned so source drift fails extraction instead of silently changing
+// the promoted claim.
 const CURATED_PROSE_CLAIMS = new Map([
   ["derived-equation-long-exact-cohomology-sequence", {
     title: "Long exact sequence associated to a distinguished triangle",
     startLine: 277,
     endLine: 296,
     sourceTextSha256: "7681c73366465bd0ef97fb5f144a2780d4b47dd88f49a42759bcdf08729072cc",
+  }],
+  ["algebra-item-cauchy-binet", {
+    title: "Cauchy-Binet determinant formula",
+    startLine: 282,
+    endLine: 288,
+    sourceTextSha256: "55088a1bf9d258441577a7296199733c88fd44ffbb7e1e0a05dc5edb7c6ef457",
+    hasInlineDerivation: false,
+    pendingProofAudit: {
+      sourceRevision: "ed88ff783bcb4dd9a28518a33b028841094009cf",
+      targetTag: "0F0K",
+      ownerTag: "07DQ",
+      ownerSourceTextSha256: "e903a3537f44a9d56cddc86aa206615a6bb2b98aa5e336379d144c67bdcc1faf",
+      proofSourceTextSha256: "b647329bb9ab0fcfee71c8b305fd14ca75ba88b3632ec7e6c298fe8c023ac155",
+      expectedReferenceCount: 1,
+      referenceArtifactSha256: "db8f86361ff953442c2bab45ec86550f342e67fe602f29dd222b63f6d7ab42db",
+    },
   }],
 ]);
 
@@ -91,6 +108,7 @@ const CURATED_CLAIM_INCOMING_REFERENCE_COUNTS = new Map([
   ["0148", { "05SR": 1, "05R5": 2, "05RD": 1, "05RE": 1, "05RM": 1, "0CQQ": 1 }],
   ["00E6", { "00E7": 1, "00GT": 1, "05DR": 1, "00HQ": 1, "0BRB": 2, "09EF": 1, "00QE": 1, "00SJ": 1, "0BK8": 1, "01K1": 1 }],
   ["0EQ8", { "0EQB": 1, "0EQR": 1, "0ER5": 1, "0ER6": 1, "0ERC": 1, "0ERG": 1, "0ERU": 1, "0ERV": 1 }],
+  ["0F0K", { "07DQ": 1 }],
   ["0FFR", { "0FFS": 1, "0FFT": 1, "0FFU": 1, "0FPA": 1, "0FPS": 1, "0FNW": 1, "0FNZ": 1 }],
 ]);
 
@@ -557,6 +575,59 @@ const CURATED_SECTION_PROOF_DEPENDENCIES = [
     referenceArtifactSha256: "52e676d217677207fefa71dd0c5f6995698041c86604b684231723b778b1a13b",
     rationaleNote: "Tag 04XL is the exact construction of the topology used to identify the smooth locus as open; no surjectivity or fibre-product fact from the section is imported.",
     routeDebtNote: "The proof also assumes that the smooth-curves locus is an open substack; that implicit prerequisite remains separate review debt.",
+  },
+  {
+    ownerTag: "0BB4",
+    referenceTag: "0261",
+    targetTags: ["0262"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "69e4f67d56a604bad0c430cdea5e3633754efc9d0db62d27ce87892e8686522d",
+    proofSourceTextSha256: "d7f1d87e81998388a29adc05eab6510606bf3f0b27a144f1bbef092e54d95b4d",
+    referenceArtifactSha256: "1748bbd28555598887409d845c5e70a22529cfe02f00b7a5067243f893d59376",
+    rationaleNote: "Tag 0262 is the exact quotient/coequalizer result identifying the algebraic space U x_X Z with the displayed etale groupoid quotient.",
+    routeDebtNote: "The pinned source later omits the precise formulation and proof of the functoriality used in the descent to Z -> X^nu; this candidate route preserves that source-level proof debt.",
+  },
+  {
+    ownerTag: "06QZ",
+    referenceTag: "0261",
+    targetTags: ["0262"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "31cd1642d5772c7615d6d8ad6003563bd3e7789130dad6c9b263eae02919d300",
+    proofSourceTextSha256: "e8b686b0f94063a88e16ea45a0bf28f454089bdb84c4b17a69fce521b274f3d2",
+    referenceArtifactSha256: "419175f41d38584217cbea1f31d433e9355e6e34e7848709d23d57e7e388cc3a",
+    rationaleNote: "Tag 0262 supplies the presentation equality X = U/R used to construct the singleton quotient.",
+  },
+  {
+    ownerTag: "07SK",
+    referenceTag: "0261",
+    targetTags: ["0262"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "fd5ffbfae52ce321952e910c25ea219354372c0154153e50de084379862f97f9",
+    proofSourceTextSha256: "e14e5a17ba98d9e793710758522cbe5abe14670da7274e8aa7a148387d543e5d",
+    referenceArtifactSha256: "cd6e358b6657df9f6692c2215a5a35b155072e08823a5eb48c85b9a56732d976",
+    rationaleNote: "Tag 0262 supplies the quotient presentation Y = W/R' for the chosen surjective etale cover.",
+    routeDebtNote: "The pinned source explicitly omits details that R' is of finite presentation over R; this candidate route preserves that separate proof debt.",
+  },
+  {
+    ownerTag: "0DUJ",
+    referenceTag: "0261",
+    targetTags: ["0262"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "80b6da528a6866274f77ce2fd76c157a4ca894edbb75950c16cf7994464f3315",
+    proofSourceTextSha256: "7ecbba2f3cba022a999770c2a6ea9ca5f83ff15a281a6ecda41445cb790ecc3b",
+    referenceArtifactSha256: "47f14d79e7ec75a54dbbd834fe576c568998754252ae586de4f4a311a1097392",
+    rationaleNote: "Tag 0262 is the coequalizer property used to glue the compatible maps h_i into the unique morphism Y -> W.",
+  },
+  {
+    ownerTag: "09CN",
+    referenceTag: "07JV",
+    targetTags: ["07JW"],
+    expectedSectionReferenceCount: 1,
+    ownerSourceTextSha256: "e1b60c9ecfaa46dc39edb0280afcee9aa60d43ebcb0b8233f87bd75684c6a86f",
+    proofSourceTextSha256: "a624cd81fc19949ce63b101872d03772954c107d1f3a38de11adf5806f754050",
+    referenceArtifactSha256: "1204b24c55f89e554e84eaed93d3c8b658a266f726ff232f037a596f94912fe8",
+    rationaleNote: "Tag 07JW is the exact snake lemma invoked to reduce injectivity to exactness for the free module.",
+    routeDebtNote: "The pinned source omits bilinearity details and later appeals to an excluded example for the free-module case; that example occurrence remains unresolved and is not promoted by this audit.",
   },
   {
     ownerTag: "04ZX",
@@ -1177,13 +1248,16 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
     const locator = `${unit.path}:L${range.startLine}-L${range.endLine}`;
     const label = sourceLabel("claim", tag);
     const artifactSha256 = sha256(rawClaim);
-    const inlineProof = {
-      ...range,
-      title: "Inline derivation in source prose",
-      rawProof: rawClaim,
-      references: referencesInLines(lines, range.startLine, range.endLine),
-      citations: citationsInLines(lines, range.startLine, range.endLine),
-    };
+    const hasInlineDerivation = curatedConfig.hasInlineDerivation !== false;
+    const proofs = hasInlineDerivation
+      ? [{
+          ...range,
+          title: "Inline derivation in source prose",
+          rawProof: rawClaim,
+          references: referencesInLines(lines, range.startLine, range.endLine),
+          citations: citationsInLines(lines, range.startLine, range.endLine),
+        }]
+      : [];
     metadata.push({
       node: {
         id: nodeId,
@@ -1200,7 +1274,9 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
           locator,
           artifactSha256,
           capturedAt,
-          note: "Exact labeled Stacks prose/display span promoted after source audit because it states and derives a theorem-level claim; equation labels are not promoted generally.",
+          note: hasInlineDerivation
+            ? "Exact labeled Stacks prose/display span promoted after source audit because it states and derives a theorem-level claim; equation labels are not promoted generally."
+            : "Exact labeled Stacks prose/list span promoted after source audit because it states a theorem-level claim; the source supplies no proof here, so the claim remains dependency-pending and item labels are not promoted generally.",
         }),
       },
       unit,
@@ -1212,7 +1288,7 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
         .filter((labelArgument) => labelArgument !== localLabel)
         .map((labelArgument) => `${unit.stem}-${labelArgument}`),
       statementReferences: [],
-      proofs: [inlineProof],
+      proofs,
       curatedClaim: true,
     });
   }
@@ -2001,6 +2077,41 @@ export function extractStacksGraphFromUnits(
     if (canonicalJson(orderedCountEntries(actualOwnerOccurrenceCounts))
       !== canonicalJson(orderedCountEntries(expectedOwnerOccurrenceCounts))) {
       throw new Error(`Curated claim ${targetTag} incoming owner/count inventory changed`);
+    }
+  }
+
+  for (const [fullLabel, config] of CURATED_PROSE_CLAIMS) {
+    const audit = config.pendingProofAudit;
+    if (!audit || !tags.fullLabelToTag.has(fullLabel)) continue;
+    if (sourceRevision !== audit.sourceRevision) {
+      throw new Error(`Pending-proof claim ${audit.targetTag} requires source revision ${audit.sourceRevision}`);
+    }
+    const targetTag = tags.fullLabelToTag.get(fullLabel);
+    if (targetTag !== audit.targetTag) {
+      throw new Error(`Pending-proof claim ${fullLabel} changed permanent tag from ${audit.targetTag} to ${targetTag}`);
+    }
+    const target = metadataForTag(targetTag, "pending-proof claim");
+    if (!target.curatedClaim || (target.proofs ?? []).length !== 0) {
+      throw new Error(`Pending-proof claim ${targetTag} unexpectedly has a source proof`);
+    }
+    const owner = metadataForTag(audit.ownerTag, "pending-proof claim owner");
+    if (owner.node.sourceTextSha256 !== audit.ownerSourceTextSha256) {
+      throw new Error(`Pending-proof claim owner ${audit.ownerTag} statement changed`);
+    }
+    const matchingProofs = (owner.proofs ?? []).filter(({ rawProof }) => (
+      sha256(rawProof) === audit.proofSourceTextSha256
+    ));
+    if (matchingProofs.length !== 1) {
+      throw new Error(`Pending-proof claim owner ${audit.ownerTag} proof changed from its audited source text`);
+    }
+    const occurrences = matchingProofs[0].references.filter(({ ref }) => (
+      resolveFullLabel(ref, owner.unit.stem, tags.fullLabelToTag) === fullLabel
+    ));
+    if (occurrences.length !== audit.expectedReferenceCount) {
+      throw new Error(`Pending-proof claim ${audit.ownerTag}->${targetTag} expected ${audit.expectedReferenceCount} occurrence(s), found ${occurrences.length}`);
+    }
+    if (sha256(canonicalJson(occurrences)) !== audit.referenceArtifactSha256) {
+      throw new Error(`Pending-proof claim reference ${audit.ownerTag}->${targetTag} changed from its audited occurrence`);
     }
   }
 

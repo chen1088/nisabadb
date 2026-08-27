@@ -333,9 +333,13 @@ describe("committed-shape book-source corpus", () => {
     const graphEntries = graphManifest.entries.filter(({ artifactPath }) => artifactPath !== null);
     expect(manifest.componentCount).toBe(717);
     expect(manifest.entries).toHaveLength(717);
-    expect(manifest.resolutionRecordCount).toBeGreaterThanOrEqual(graphEntries.length);
-    expect(manifest.summary.candidateExactEditionCount).toBeGreaterThanOrEqual(graphEntries.length);
+    expect(graphEntries).toHaveLength(0);
+    expect(manifest.entries.filter(({ graphArtifactPath }) => graphArtifactPath !== null)).toHaveLength(0);
+    expect(manifest.resolutionRecordCount).toBe(4);
+    expect(manifest.summary.candidateExactEditionCount).toBe(4);
     expect(manifest.summary.verifiedExactEditionCount).toBe(0);
+    expect(manifest.summary.importerCandidateProducedCount).toBe(4);
+    expect(manifest.summary.blockedComponentCount).toBe(2);
     expect(manifest.summary.unresolvedComponentCount
       + manifest.summary.candidateExactEditionCount
       + manifest.summary.verifiedExactEditionCount
@@ -351,9 +355,7 @@ describe("committed-shape book-source corpus", () => {
       });
     expect(manifest.entries.find(({ bookGraphId }) => bookGraphId === "S0060:complete-source")?.openBlockerDomains)
       .toContain("license");
-    if (graphEntries.some(({ bookGraphId }) => bookGraphId === "S0164:complete-source")) {
-      expect(manifest.entries.find(({ bookGraphId }) => bookGraphId === "S0164:complete-source")?.openBlockerDomains)
-        .toContain("license");
-    }
+    expect(manifest.entries.find(({ bookGraphId }) => bookGraphId === "S0164:complete-source")?.openBlockerDomains)
+      .toContain("license");
   });
 });

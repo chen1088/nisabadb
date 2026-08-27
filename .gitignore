@@ -2,6 +2,7 @@ node_modules/
 dist/
 coverage/
 .vite/
+data/books/S[0-9][0-9][0-9][0-9]/
 *.local
 .DS_Store
 npm-debug.log*

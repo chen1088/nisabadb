@@ -2,11 +2,9 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   BOOK_GRAPH_STORAGE_VERSION,
-  MAX_BOOK_GRAPH_SHARD_BYTES,
   decodeBookGraphFile,
   encodeBookGraphFile,
   readBookGraphFileSync,
@@ -21,7 +19,6 @@ import {
   readBookGraphBaseOrInitialSync,
 } from "./book-graph-source-components.mjs";
 
-const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const temporaryDirectories = [];
 
 afterEach(() => {
@@ -439,19 +436,4 @@ describe("book-graph v1.1 sharded codec", () => {
     expect(canonicalNeutralArtifactPathsSync(indexPath, neutral)).toEqual([indexPath]);
   });
 
-  it("round-trips the two current populated components without writing", { timeout: 30_000 }, () => {
-    for (const relativePath of [
-      "data/books/S0060/complete-source.json",
-      "data/books/S0262/complete-source.json",
-    ]) {
-      const file = readBookGraphFileSync(path.join(repositoryRoot, relativePath));
-      const encoded = encodeBookGraphFile(file);
-      expect([...encoded.shards.values()].every((bytes) => bytes.length <= MAX_BOOK_GRAPH_SHARD_BYTES)).toBe(true);
-      const decoded = decodeEncoded(encoded);
-      expect(decoded).toEqual(file);
-      expect(sha256(JSON.stringify(decoded))).toBe(encoded.index.logicalContentSha256);
-      expect(decoded.graph.nodes.length).toBe(file.graph.nodes.length);
-      expect(decoded.graph.references.at(-1)?.evidence).toEqual(file.graph.references.at(-1)?.evidence);
-    }
-  });
 });

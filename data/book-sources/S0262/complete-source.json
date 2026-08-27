@@ -52,7 +52,7 @@
       "graphArtifactSha256": "92ded5e1cac2441958d39849a10cc2f0a765db343b1f9f63e9a44bfdb7711073",
       "assessedBy": "stacks-latex-importer",
       "assessedAt": "2026-08-23T18:00:00.000Z",
-      "note": "The recorded importer produced this stored candidate graph; no independent review or completeness is claimed."
+      "note": "The recorded importer produced this ignored local candidate graph; Git retains only its provenance and hashes, and no independent review or completeness is claimed."
     }
   ]
 }

@@ -11,6 +11,9 @@ import {
   canonicalNeutralArtifactPathsSync,
   initialBookGraphFor,
 } from "./book-graph-source-components.mjs";
+import {
+  trackedBookGraphPayloadPathsSync,
+} from "./book-graph-publication-policy.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const registryPath = path.join(repositoryRoot, "data/knowledge/source-records.json");
@@ -147,18 +150,10 @@ function metricsFor(file, relativeFile) {
 function manifestFor(registry, baseEntries, neutralFiles) {
   const entries = baseEntries.map((baseEntry) => {
     const { canonicalArtifactPath, ...identity } = baseEntry;
-    const filePath = path.join(booksRoot, ...canonicalArtifactPath.split("/"));
-    if (!fs.existsSync(filePath)) {
-      return {
-        ...identity,
-        artifactPath: null,
-        ...metricsFor(neutralFiles.get(canonicalArtifactPath), canonicalArtifactPath),
-      };
-    }
     return {
       ...identity,
-      artifactPath: canonicalArtifactPath,
-      ...metricsFor(readBookGraphFileSync(filePath), canonicalArtifactPath),
+      artifactPath: null,
+      ...metricsFor(neutralFiles.get(canonicalArtifactPath), canonicalArtifactPath),
     };
   });
   const summary = {
@@ -282,8 +277,25 @@ function validateArtifactFiles(baseEntries, neutralFiles) {
     throw new Error(`Book graph shard file set differs from component indexes (${missingCount} missing, ${orphanCount} orphan)`);
   }
 
+  const trackedPayloadPaths = trackedBookGraphPayloadPathsSync(repositoryRoot);
+  const classifiedPayloadPaths = new Set();
   for (const relativeFile of actualFiles) {
     const filePath = path.join(booksRoot, ...relativeFile.split("/"));
+    const storageIndex = readJson(filePath);
+    const relativePayloadPaths = [
+      relativeFile,
+      ...referencedBookGraphShardPaths(storageIndex).map((shardPath) => (
+        path.posix.join(path.posix.dirname(relativeFile), shardPath)
+      )),
+    ];
+    const repositoryPayloadPaths = relativePayloadPaths.map((relativePath) => `data/books/${relativePath}`);
+    repositoryPayloadPaths.forEach((relativePath) => classifiedPayloadPaths.add(relativePath));
+    const trackedForArtifact = repositoryPayloadPaths.filter((relativePath) => trackedPayloadPaths.has(relativePath));
+    if (trackedForArtifact.length > 0) {
+      throw new Error(
+        `${relativeFile} is local/private graph data but ${trackedForArtifact.length} payload file(s) are tracked by public Git`,
+      );
+    }
     const actual = readBookGraphFileSync(filePath);
     const expectedIdentity = neutralFiles.get(relativeFile).identity;
     if (canonicalJson(actual.identity) !== canonicalJson(expectedIdentity)) {
@@ -304,6 +316,11 @@ function validateArtifactFiles(baseEntries, neutralFiles) {
       && actual.graphState.graphAudit.artifactSha256 !== digestJson(actual.graph)) {
       throw new Error(`${relativeFile} graph-audit fingerprint is stale`);
     }
+  }
+  const unclassifiedTrackedPaths = [...trackedPayloadPaths]
+    .filter((relativePath) => !classifiedPayloadPaths.has(relativePath));
+  if (unclassifiedTrackedPaths.length > 0) {
+    throw new Error(`Tracked book-graph payloads are missing or unclassified: ${unclassifiedTrackedPaths.join(", ")}`);
   }
 }
 
@@ -338,7 +355,7 @@ function syncCorpus(registry, baseEntries, neutralFiles) {
   }
   process.stdout.write(
     `Book graph manifest synchronized: ${manifest.componentCount} component identities, `
-      + `${manifest.artifactCount} stored artifacts, ${manifest.componentCount - manifest.artifactCount} absent.\n`,
+      + `${manifest.artifactCount} public payload paths, ${manifest.componentCount - manifest.artifactCount} absent.\n`,
   );
 }
 
@@ -384,7 +401,7 @@ function removeCanonicalNeutralPlaceholders(registry, baseEntries, neutralFiles)
     checkCorpus(registry, baseEntries, neutralFiles);
     process.stdout.write(
       `Removed ${removableArtifacts.length} exact canonical neutral placeholders; `
-        + `${manifest.artifactCount} stored artifacts remain for ${manifest.componentCount} components.\n`,
+        + `${manifest.artifactCount} public payload paths remain for ${manifest.componentCount} components.\n`,
     );
   } catch (error) {
     restoreBackups(backups);
@@ -401,7 +418,7 @@ if (checkOnly) {
   const manifest = manifestFor(registry, baseEntries, neutralFiles);
   process.stdout.write(
     `Book graph data valid: ${manifest.sourceRecordCount} source rows, `
-      + `${manifest.componentCount} component identities, ${manifest.artifactCount} stored artifacts.\n`,
+      + `${manifest.componentCount} component identities, ${manifest.artifactCount} public payload paths.\n`,
   );
 } else if (removeNeutralPlaceholders) {
   removeCanonicalNeutralPlaceholders(registry, baseEntries, neutralFiles);

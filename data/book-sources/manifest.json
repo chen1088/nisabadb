@@ -974,7 +974,7 @@
         "license"
       ],
       "importerState": "candidate-produced",
-      "graphArtifactPath": "S0060/complete-source.json"
+      "graphArtifactPath": null
     },
     {
       "bookGraphId": "S0061:complete-source",
@@ -1529,7 +1529,7 @@
       "proposalCount": 1,
       "openBlockerDomains": [],
       "importerState": "candidate-produced",
-      "graphArtifactPath": "S0091/complete-source.json"
+      "graphArtifactPath": null
     },
     {
       "bookGraphId": "S0092:complete-source",
@@ -2641,7 +2641,7 @@
         "license"
       ],
       "importerState": "candidate-produced",
-      "graphArtifactPath": "S0164/complete-source.json"
+      "graphArtifactPath": null
     },
     {
       "bookGraphId": "S0165:complete-source",
@@ -4111,7 +4111,7 @@
       "proposalCount": 1,
       "openBlockerDomains": [],
       "importerState": "candidate-produced",
-      "graphArtifactPath": "S0262/complete-source.json"
+      "graphArtifactPath": null
     },
     {
       "bookGraphId": "S0263:complete-source",

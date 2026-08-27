@@ -68,7 +68,7 @@
       "graphArtifactSha256": "cbb631c7934a1bb62608dd7a25e57334b4d1b34c3a1af08cb4d640c70ba03116",
       "assessedBy": "pretext-book-importer",
       "assessedAt": "2026-08-22T23:04:40.841Z",
-      "note": "The recorded importer produced this stored candidate graph; no independent review or completeness is claimed."
+      "note": "The recorded importer produced this ignored local candidate graph; Git retains only its provenance and hashes, and no independent review or completeness is claimed."
     }
   ]
 }

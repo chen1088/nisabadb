@@ -133,17 +133,20 @@ function loadResolutionRecords({ registry, expectedComponents, administratorIds 
 }
 
 function readGraphArtifact(entry) {
-  if (entry.artifactPath === null) return null;
-  if (typeof entry.artifactPath !== "string"
-    || !/^S\d{4}\/[a-z0-9][a-z0-9-]*\.json$/u.test(entry.artifactPath)
-    || entry.artifactPath.includes("\\")
-    || path.posix.normalize(entry.artifactPath) !== entry.artifactPath) {
-    throw new Error(`Unsafe graph artifact path: ${String(entry.artifactPath)}`);
+  const artifactPath = entry.artifactPath
+    ?? `${entry.sourceRecordId}/${entry.componentId}.json`;
+  if (typeof artifactPath !== "string"
+    || !/^S\d{4}\/[a-z0-9][a-z0-9-]*\.json$/u.test(artifactPath)
+    || artifactPath.includes("\\")
+    || path.posix.normalize(artifactPath) !== artifactPath) {
+    throw new Error(`Unsafe graph artifact path: ${String(artifactPath)}`);
   }
-  const raw = readJson(path.join(graphRoot, ...entry.artifactPath.split("/")));
+  const filePath = path.join(graphRoot, ...artifactPath.split("/"));
+  if (!fs.existsSync(filePath)) return null;
+  const raw = readJson(filePath);
   if (raw?.schemaVersion === "1.0.0") return raw;
   if (raw?.storageSchemaVersion !== "1.1.0" || !raw.metadata) {
-    throw new Error(`${entry.artifactPath} has an unsupported graph storage index`);
+    throw new Error(`${artifactPath} has an unsupported graph storage index`);
   }
   return {
     identity: raw.metadata.identity,
@@ -386,7 +389,7 @@ function bootstrapRecordForGraph(graph) {
       graphArtifactSha256: graphAudit.artifactSha256,
       assessedBy: graphAudit.actorId,
       assessedAt: graphAudit.completedAt,
-      note: "The recorded importer produced this stored candidate graph; no independent review or completeness is claimed.",
+      note: "The recorded importer produced this ignored local candidate graph; no independent review or completeness is claimed.",
     }],
   };
 }
@@ -440,8 +443,9 @@ function bootstrapFromGraphs() {
   const pending = [];
   for (const component of initialContext.expectedComponents) {
     const graphEntry = graphEntries.get(component.bookGraphId);
-    if (graphEntry?.artifactPath === null || initialContext.records.has(component.bookGraphId)) continue;
+    if (!graphEntry || initialContext.records.has(component.bookGraphId)) continue;
     const graph = readGraphArtifact(graphEntry);
+    if (!graph) continue;
     const record = bootstrapRecordForGraph(graph);
     validateSourceResolutionRecord(record, {
       expectedBookGraphId: component.bookGraphId,

@@ -12,6 +12,7 @@ import {
   readBookGraphFileSync,
   writeBookGraphFileAtomicSync,
 } from "./book-graph-codec.mjs";
+import { assertPrivateCandidateDestinationSync } from "./book-graph-publication-policy.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const booksRoot = path.join(repositoryRoot, "data", "books");
@@ -148,6 +149,7 @@ try {
 if (write) {
   try {
     for (const plan of plans) {
+      assertPrivateCandidateDestinationSync(repositoryRoot, plan.absolutePath);
       const result = writeBookGraphFileAtomicSync(plan.absolutePath, plan.logicalFile, {
         distribution: distributionFor(plan.logicalFile),
       });

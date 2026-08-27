@@ -130,6 +130,9 @@ for (const [index, entry] of bookManifest.entries.entries()) {
 if (bookManifest.artifactCount !== artifactCount) {
   throw new Error("The per-book graph manifest artifact count is stale.");
 }
+if (artifactCount !== 0) {
+  throw new Error("The public book manifest must remain queue-only and contain no raw graph payload path.");
+}
 await copyFile(join("data", "books", "manifest.json"), join(publishedBookDirectory, "manifest.json"));
 
 const corpus = JSON.parse(await readFile("src/data/corpus.json", "utf8"));
@@ -172,5 +175,5 @@ for (const route of routes) {
 
 console.log(`Created static entry shells for ${routes.size} canonical client routes.`);
 console.log(
-  `Published ${sourceRegistry.records.length} source records and the ${bookManifest.componentCount}-component status manifest (${bookManifest.artifactCount} graph artifacts created); raw book graphs remain internal data.`,
+  `Published ${sourceRegistry.records.length} source records and the queue-only ${bookManifest.componentCount}-component status manifest; raw book graphs remain ignored local/private data.`,
 );

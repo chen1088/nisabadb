@@ -13,6 +13,7 @@ import {
   createRollbackSafeManifestRefreshSync,
   readBookGraphBaseOrInitialSync,
 } from "./book-graph-source-components.mjs";
+import { assertPrivateCandidateDestinationSync } from "./book-graph-publication-policy.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const bookGraphSyncScript = path.join(repositoryRoot, "scripts", "book-graph-files.mjs");
@@ -119,6 +120,7 @@ function runBookGraphFiles(...arguments_) {
 }
 
 function writeCandidateAndRefreshManifest(destination, candidate) {
+  assertPrivateCandidateDestinationSync(repositoryRoot, destination);
   runBookGraphFiles("--check");
   const refreshManifest = createRollbackSafeManifestRefreshSync({
     manifestPath: bookGraphManifestPath,

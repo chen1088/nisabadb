@@ -13,6 +13,7 @@ import {
   createRollbackSafeManifestRefreshSync,
   readBookGraphBaseOrInitialSync,
 } from "./book-graph-source-components.mjs";
+import { assertPrivateCandidateDestinationSync } from "./book-graph-publication-policy.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const bookGraphSyncScript = path.join(repositoryRoot, "scripts", "book-graph-files.mjs");
@@ -171,6 +172,7 @@ function runBookGraphFiles(...arguments_) {
 }
 
 function writeCandidateAndRefreshManifest(destination, candidate) {
+  assertPrivateCandidateDestinationSync(repositoryRoot, destination);
   // A clean preflight prevents unrelated corpus-wide artifact changes from
   // being hidden inside a one-component import. The codec updates content-addressed
   // shards and the component index before the generated manifest refresh.

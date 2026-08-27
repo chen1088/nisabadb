@@ -58,11 +58,11 @@ This file is the handoff for continuing NisabaDB in the current local checkout. 
 - Live Knowledge book: `https://chen1088.github.io/nisabadb/knowledge`
 - Dense-book checkpoint started from `779edbc2709163ecda0c95217df22b107a3d62d2` (`Build S0002 Pressbooks graph checkpoint`); that S0002 extraction is superseded and removed by this checkpoint.
 - Deployment: every push to `main` runs `.github/workflows/deploy-pages.yml`, executes the full check, builds with `VITE_BASE_PATH=/nisabadb/`, and publishes GitHub Pages.
-- Last verified deployment: `https://github.com/chen1088/nisabadb/actions/runs/33120174333` completed successfully for commit `c3858fe`.
+- Last verified deployment: `https://github.com/chen1088/nisabadb/actions/runs/33123258523` completed successfully for data checkpoint `f6e4c32`.
 - Hosting boundary: the public site is a static browser application. It currently has no runtime backend, cloud secrets, DigitalOcean worker, or proof-submission service.
 - Required runtime: Node.js 24 and the committed npm lockfile.
-- Current pre-push verification: lint passes; 20 test files / 206 tests pass; the combined 27-test graph/source-ledger check validates all 717 identities, four sparse source records, four graph artifacts, 30 shards, four candidate editions, zero verified editions, and both open license blockers. The production build publishes only the registry and 717-component aggregate status manifest, not graph shards or the operational source ledger; the development server returns 404 for direct raw-graph and source-ledger paths, including encoded Windows separators and case variants. Push, Pages, and live verification remain pending for this checkpoint.
-- The current data-only checkpoint was developed from synchronized `main` commit `c3858fe` within the user-approved scope. Its deployment result must be verified from the resulting Git commit and Pages workflow rather than inferred from this handoff.
+- Checkpoint verification: lint passes; 20 test files / 206 tests pass; the combined 27-test graph/source-ledger check validates all 717 identities, four sparse source records, four graph artifacts, 30 shards, four candidate editions, zero verified editions, and both open license blockers. The production build publishes only the registry and 717-component aggregate status manifest, not graph shards or the operational source ledger; the development server returns 404 for direct raw-graph and source-ledger paths, including encoded Windows separators and case variants.
+- Data checkpoint `f6e4c32`, developed from synchronized `main` commit `c3858fe`, is pushed to `main` and deployed. The live manifest reports 4 artifacts, 713 absent artifacts, 13,518 theorem-like nodes, 2,036 support nodes, and 36,362 candidate dependencies; direct live graph and source-ledger URLs return 404.
 
 Resume with:
 

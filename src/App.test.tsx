@@ -137,7 +137,7 @@ describe("NisabaDB application", () => {
       }],
     };
     const manifest = {
-      schemaVersion: "1.1.0",
+      schemaVersion: "1.2.0",
       sourceSetRevision: "fixture-r1",
       sourceRecordCount: 1,
       componentCount: 1,
@@ -152,7 +152,9 @@ describe("NisabaDB application", () => {
         reviewedSourceUnitCount: 0,
         theoremNodeCount: 0,
         unroutedTheoremCount: 0,
+        dependencyPendingTheoremCount: 0,
         supportNodeCount: 0,
+        sourceArtifactNodeCount: 0,
         dependencyCount: 0,
         reviewedDependencyCount: 0,
         unresolvedReferenceCount: 0,
@@ -172,7 +174,9 @@ describe("NisabaDB application", () => {
         reviewedSourceUnitCount: 0,
         theoremNodeCount: 0,
         unroutedTheoremCount: 0,
+        dependencyPendingTheoremCount: 0,
         supportNodeCount: 0,
+        sourceArtifactNodeCount: 0,
         dependencyCount: 0,
         reviewedDependencyCount: 0,
         unresolvedReferenceCount: 0,

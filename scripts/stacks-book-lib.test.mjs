@@ -137,7 +137,7 @@ describe("strict Stacks formal graph extraction", () => {
   it("includes formal definitions/results and excludes worked examples", () => {
     const result = extractStacksGraphFromUnits(units, tagText, { capturedAt });
 
-    expect(result.graph.nodes).toHaveLength(8);
+    expect(result.graph.nodes).toHaveLength(9);
     expect(result.stats.kindCounts).toEqual({
       assumption: 1,
       definition: 1,
@@ -145,11 +145,23 @@ describe("strict Stacks formal graph extraction", () => {
       proposition: 2,
       theorem: 2,
     });
-    expect(result.graph.nodes.some((node) => node.kind === "example")).toBe(false);
+    expect(result.graph.nodes.some((node) => (
+      node.nodeClass !== "source-artifact" && node.kind === "example"
+    ))).toBe(false);
+    expect(result.graph.nodes.find(({ id }) => id === "tag-0005")).toMatchObject({
+      nodeClass: "source-artifact",
+      kind: "example",
+      sourceXmlId: "algebra-example-worked",
+    });
+    expect(result.stats).toMatchObject({
+      sourceArtifactCount: 1,
+      sourceArtifactKindCounts: { example: 1 },
+    });
     expect(result.stats.excludedEnvironmentCounts.example).toBe(1);
     expect(result.unitInventories[0]).toMatchObject({
       theoremNodeIds: ["tag-0003", "tag-0004", "tag-0012", "tag-0013"],
       supportNodeIds: ["tag-0001", "tag-0002"],
+      sourceArtifactNodeIds: ["tag-0005"],
       theoremFreeAttestation: false,
     });
   });
@@ -162,6 +174,7 @@ describe("strict Stacks formal graph extraction", () => {
 
     expect(outputEdges.map((edge) => edge.prerequisite.id).sort()).toEqual([
       "tag-0003",
+      "tag-0005",
       "tag-0006",
     ]);
     expect(result.graph.directDependencies).toContainEqual(expect.objectContaining({
@@ -175,7 +188,12 @@ describe("strict Stacks formal graph extraction", () => {
       role: "logical",
     }));
     expect(result.graph.proofRoutes.find((route) => route.theoremNodeId === "tag-0004")?.dependencyIds)
-      .toHaveLength(2);
+      .toHaveLength(3);
+    expect(result.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-0004",
+      prerequisite: { type: "node", id: "tag-0005" },
+      role: "source-reference",
+    }));
   });
 
   it("keeps explicit alternative proofs as separate dependency routes", () => {
@@ -187,7 +205,7 @@ describe("strict Stacks formal graph extraction", () => {
       id: "route-tag-0004-source-proof",
       routeKind: "source-proof",
     });
-    expect(routes[0].dependencyIds).toHaveLength(2);
+    expect(routes[0].dependencyIds).toHaveLength(3);
     expect(routes[1]).toMatchObject({
       id: "route-tag-0004-alternate-proof-2",
       routeKind: "alternate-proof",
@@ -222,11 +240,15 @@ describe("strict Stacks formal graph extraction", () => {
     expect(result.graph.references.some((reference) => reference.basis === "statement-xref")).toBe(false);
     expect(excludedProofReference).toMatchObject({
       basis: "proof-xref",
-      resolution: { status: "unresolved" },
+      resolution: {
+        status: "resolved",
+        target: { type: "node", id: "tag-0005" },
+      },
     });
-    expect(result.graph.directDependencies.some((dependency) => (
-      dependency.prerequisite.id === "tag-0005"
-    ))).toBe(false);
+    expect(result.graph.directDependencies).toContainEqual(expect.objectContaining({
+      prerequisite: { type: "node", id: "tag-0005" },
+      role: "source-reference",
+    }));
   });
 
   it("surfaces bibliographic proof citations without inventing dependencies", () => {
@@ -592,7 +614,7 @@ Use Equation \ref{equation-compare-big-small}.
     ];
     const result = extractStacksGraphFromUnits(restatementUnits, restatementTags, { capturedAt });
     const prerequisitesByOwner = new Map([
-      ["tag-0x01", ["tag-02vb", "tag-02ye", "tag-03c6"]],
+      ["tag-0x01", ["tag-02vb", "tag-02ye", "tag-03c6", "tag-0x02"]],
       ["tag-0x03", ["tag-043z", "tag-044b", "tag-0450"]],
       ["tag-0x04", ["tag-0d60"]],
       ["tag-0x05", ["tag-0d6k"]],
@@ -624,7 +646,19 @@ Use Equation \ref{equation-compare-big-small}.
     expect(result.graph.references).toContainEqual(expect.objectContaining({
       ownerNodeId: "tag-0x01",
       ref: "more-groupoids-equation-unrelated",
-      resolution: expect.objectContaining({ status: "unresolved" }),
+      resolution: expect.objectContaining({
+        status: "resolved",
+        target: { type: "node", id: "tag-0x02" },
+      }),
+    }));
+    expect(result.graph.nodes.find(({ id }) => id === "tag-0x02")).toMatchObject({
+      nodeClass: "source-artifact",
+      kind: "equation",
+    });
+    expect(result.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-0x01",
+      prerequisite: { type: "node", id: "tag-0x02" },
+      role: "source-reference",
     }));
   });
 
@@ -637,6 +671,74 @@ Use Equation \ref{equation-compare-big-small}.
     expect(boundaryEdges.some(({ prerequisite }) => prerequisite.id === "tag-0006")).toBe(false);
     expect(result.graph.proofRoutes.find((route) => route.theoremNodeId === "tag-0013")
       ?.evidence.locator).not.toContain("Detached prose");
+  });
+
+  it("promotes only proof-referenced sections as aggregate support dependencies", () => {
+    const sectionUnits = [{
+      stem: "foundations",
+      path: "foundations.tex",
+      title: "Foundations",
+      content: String.raw`
+\section{Referenced background}
+\label{section-referenced-background}
+
+\section{Unreferenced background}
+\label{section-unreferenced-background}
+
+\begin{theorem}
+\label{theorem-uses-section}
+The conclusion holds.
+\end{theorem}
+\begin{proof}
+Use Section \ref{section-referenced-background}.
+\end{proof}
+`,
+    }];
+    const sectionTags = [
+      "0100,foundations-section-referenced-background",
+      "0101,foundations-section-unreferenced-background",
+      "0102,foundations-theorem-uses-section",
+    ].join("\n");
+
+    const result = extractStacksGraphFromUnits(sectionUnits, sectionTags, { capturedAt });
+    const sectionNode = result.graph.nodes.find(({ id }) => id === "tag-0100");
+    const sectionDependency = result.graph.directDependencies.find(({ id }) => (
+      id === "dep-tag-0102-to-tag-0100"
+    ));
+
+    expect(sectionNode).toMatchObject({
+      nodeClass: "source-artifact",
+      kind: "section",
+      sourceXmlId: "foundations-section-referenced-background",
+    });
+    expect(sectionNode.evidence.note).toContain("outside the mathematical theorem/support inventory");
+    expect(sectionNode.evidence.note).toContain("decomposition");
+    expect(result.graph.nodes.some(({ id }) => id === "tag-0101")).toBe(false);
+    expect(sectionDependency).toMatchObject({
+      dependentNodeId: "tag-0102",
+      prerequisite: { type: "node", id: "tag-0100" },
+      role: "source-reference",
+    });
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0102"))
+      .toMatchObject({
+        routeKind: "source-proof",
+        dependencyIds: ["dep-tag-0102-to-tag-0100"],
+      });
+    expect(result.graph.references).toContainEqual(expect.objectContaining({
+      ownerNodeId: "tag-0102",
+      ref: "foundations-section-referenced-background",
+      resolution: expect.objectContaining({
+        status: "resolved",
+        target: { type: "node", id: "tag-0100" },
+      }),
+    }));
+    expect(result.stats).toMatchObject({
+      sourceArtifactCount: 1,
+      sourceArtifactKindCounts: { section: 1 },
+      sourceArtifactDependencyCount: 1,
+      sourceArtifactRouteCount: 1,
+      unresolvedTaggedProofReferenceCount: 0,
+    });
   });
 
   it("promotes only exact-label audited remark claims and resolves the audited Tor alias", () => {
@@ -868,7 +970,16 @@ The conclusion follows from Nakayama's lemma.
         prerequisite: { type: "node", id: "tag-00dv" },
       }),
     ]));
-    expect(result.graph.proofRoutes).toHaveLength(3);
+    expect(result.graph.proofRoutes).toHaveLength(6);
+    const emptySourceRoutes = result.graph.proofRoutes.filter(({ dependencyIds }) => (
+      dependencyIds.length === 0
+    ));
+    expect(emptySourceRoutes).toHaveLength(3);
+    expect(emptySourceRoutes.every(({ summary, evidence }) => (
+      summary.includes("not a root attestation")
+      && evidence.note.includes("not a root attestation")
+    ))).toBe(true);
+    expect(result.stats.emptySourceRouteCount).toBe(3);
   });
 
   it("promotes the audited long-exact-sequence prose claim with both direct prerequisites", () => {
@@ -1035,7 +1146,8 @@ indices in $I$.
       curatedClaimCount: 1,
       directDependencyCount: 1,
       explicitProofXrefDependencyCount: 1,
-      proofRouteCount: 1,
+      proofRouteCount: 2,
+      emptySourceRouteCount: 1,
       pendingTheoremCount: 1,
     });
     expect(result.graph.nodes.find(({ id }) => id === "tag-0f0k")).toMatchObject({
@@ -1049,8 +1161,13 @@ indices in $I$.
       dependentNodeId: "tag-07dq",
       prerequisite: { type: "node", id: "tag-0f0k" },
     }));
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0f0k"))
+      .toMatchObject({
+        dependencyIds: [],
+        summary: expect.stringContaining("not a root attestation"),
+      });
     expect(result.graph.proofRoutes.filter(({ theoremNodeId }) => theoremNodeId === "tag-0f0k"))
-      .toHaveLength(0);
+      .toHaveLength(1);
     expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-07dq")
       ?.dependencyIds).toEqual(["dep-tag-07dq-to-tag-0f0k"]);
     expect(result.graph.references).toHaveLength(0);
@@ -1258,6 +1375,476 @@ ${references.map((reference) => String.raw`Use (\ref{${reference}}).`).join(" ")
       ]);
   });
 
+  it("promotes audited equation-labelled support spans with complete owner inventories", () => {
+    const owner = (label, target, occurrenceCount) => [
+      String.raw`\begin{lemma}`,
+      String.raw`\label{${label}}`,
+      "The audited support span is used.",
+      String.raw`\end{lemma}`,
+      String.raw`\begin{proof}`,
+      Array.from({ length: occurrenceCount }, () => (
+        String.raw`Use Equation \ref{${target}}.`
+      )).join(" "),
+      String.raw`\end{proof}`,
+    ].join("\n");
+    const atLine = (startLine, rawSpan) => [
+      ...Array.from({ length: startLine - 1 }, () => "% audited padding"),
+      ...rawSpan.split("\n"),
+    ].join("\n");
+    const supportCases = [
+      {
+        tag: "0F6J",
+        stem: "more-etale",
+        localLabel: "equation-formal-sum",
+        kind: "construction",
+        title: "Finite formal-sum presentation of f_{p!}F(V)",
+        locator: "more-etale.tex:L811-L846",
+        hash: "4bbbf03c3bafcc55c0b366d044c3f6c8afc4efbf0afe39eb674bd47a944c5089",
+        owners: { "0F6P": 2, "0F6Q": 1, "0F5J": 2, "0F79": 2 },
+      },
+      {
+        tag: "0FZC",
+        stem: "functors",
+        localLabel: "equation-FM-QCoh",
+        kind: "construction",
+        title: "Kernel-transform functor on quasi-coherent modules",
+        locator: "functors.tex:L817-L834",
+        hash: "5986ee8ab6736f8b0f471dae31ed6cf12e0ff584ebf665d7286047c4f79c8bf2",
+        owners: { "0FZD": 2, "0FZH": 2, "0FZN": 1, "0FZR": 1 },
+      },
+      {
+        tag: "0AL4",
+        stem: "restricted",
+        localLabel: "equation-C-prime",
+        kind: "definition",
+        title: "I-adically complete algebras with finite-type reduction",
+        locator: "restricted.tex:L107-L118",
+        hash: "3b2e77c46f505201b0dd5b7b870349ad251080846f31d2cca5780b74f467df10",
+        owners: { "0GAF": 1, "0ALM": 1, "0GCK": 1, "0AQL": 1 },
+      },
+      {
+        tag: "08S4",
+        stem: "defos",
+        localLabel: "equation-to-solve",
+        kind: "definition",
+        title: "Square-zero ring deformation problem",
+        locator: "defos.tex:L35-L55",
+        hash: "79b3461325c58a9904db6772e826e6df4e4459be40177c83f6bd401826cbf039",
+        owners: { "08S7": 1, "0GPT": 1, "0GPX": 1, "08S6": 1 },
+      },
+      {
+        tag: "08U7",
+        stem: "defos",
+        localLabel: "equation-to-solve-ringed-spaces",
+        kind: "definition",
+        title: "Square-zero ringed-space deformation problem",
+        locator: "defos.tex:L1704-L1736",
+        hash: "0cdc51e61c5afc65448ac7eb344799a2ccdda74f45ecca546b96c207f858f1e0",
+        owners: { "08UC": 1, "0GPZ": 1, "0GQ3": 1, "0D14": 1 },
+      },
+      {
+        tag: "0E29",
+        stem: "dualizing",
+        localLabel: "equation-base-change",
+        kind: "construction",
+        title: "Canonical base-change map for trivial duality",
+        locator: "dualizing.tex:L2441-L2476",
+        hash: "93febbd4a788e3ab3a0e3c1d994af5892d503b4242363192e8591a52f6b8d6cd",
+        owners: { "0E2A": 1, "0BZN": 1, "0BZR": 1, "0E2M": 1 },
+      },
+      {
+        tag: "05NN",
+        stem: "injectives",
+        localLabel: "equation-compare",
+        kind: "construction",
+        title: "Comparison map from a colimit of morphism sets",
+        locator: "injectives.tex:L54-L71",
+        hash: "bf72cf5bfda8a4e1bf93dc9aa6b243774a6b1610d4502b73da6f95352b61f575",
+        owners: { "05NR": 2, "05NT": 1, "079F": 1 },
+      },
+    ];
+    const moreEtale = String.raw`\medskip\noindent
+Let $f : X \to Y$ be a locally quasi-finite morphism of schemes.
+Let $\mathcal{F}$ be an abelian sheaf on $X_\etale$. Given $V$ in
+$Y_\etale$ denote $X_V = X \times_Y V$ the base change. We are going
+to consider the group of finite formal sums
+\begin{equation}
+\label{equation-formal-sum}
+s = \sum\nolimits_{i = 1, \ldots, n} (Z_i, s_i)
+\end{equation}
+where $Z_i \subset X_V$ is a locally closed subscheme such that the
+morphism $Z_i \to V$ is finite\footnote{Since $f$ is locally quasi-finite,
+the morphism $Z_i \to V$ is finite if and only if it is proper.}
+and where $s_i \in H_{Z_i}(\mathcal{F})$. Here, as in
+Section \ref{section-growing}, we set
+$$
+H_{Z_i}(\mathcal{F}) =
+\{s_i \in \mathcal{F}(U_i) \mid \text{Supp}(s_i) \subset Z_i\}
+$$
+where $U_i \subset X_V$ is an open subscheme containing $Z_i$ as a
+closed subscheme. We are going to consider these formal sums modulo the
+following relations
+\begin{enumerate}
+\item
+\label{item-sum}
+$(Z, s) + (Z, s') = (Z, s + s')$,
+\item
+\label{item-sub}
+$(Z, s) = (Z', s)$ if $Z \subset Z'$.
+\end{enumerate}
+Observe that the second relation makes sense: since $Z \to V$ is finite
+and $Z' \to V$ is separated, the inclusion $Z \to Z'$ is closed and we
+can use the map discussed in (\ref{item-inclusion}).
+
+\medskip\noindent
+Let us denote $f_{p!}\mathcal{F}(V)$ the quotient of the abelian
+group of formal sums (\ref{equation-formal-sum}) by these relations.`;
+    const functorsExample = String.raw`\begin{example}
+\label{example-functor-quasi-coherent}
+Let $R$ be a ring. Let $X$ and $Y$ be
+schemes over $R$ with $X$ quasi-compact and quasi-separated.
+Let $\mathcal{K}$ be a quasi-coherent $\mathcal{O}_{X \times_R Y}$-module.
+Then we can consider the functor
+\begin{equation}
+\label{equation-FM-QCoh}
+F : \QCoh(\mathcal{O}_X) \longrightarrow \QCoh(\mathcal{O}_Y),\quad
+\mathcal{F} \longmapsto
+\text{pr}_{2, *}(\text{pr}_1^*\mathcal{F}
+\otimes_{\mathcal{O}_{X \times_R Y}} \mathcal{K})
+\end{equation}
+The morphism $\text{pr}_2$ is quasi-compact and quasi-separated
+(Schemes, Lemmas \ref{schemes-lemma-quasi-compact-preserved-base-change}
+and \ref{schemes-lemma-separated-permanence}). Hence pushforward along
+this morphism preserves quasi-coherent modules, see
+Schemes, Lemma \ref{schemes-lemma-push-forward-quasi-coherent}.
+Moreover, our functor is $R$-linear and commutes with arbitrary direct sums,
+see Cohomology of Schemes, Lemma \ref{coherent-lemma-colimit-cohomology}.
+\end{example}`;
+    const restricted = String.raw`Let $\mathcal{C}'$ be the category
+\begin{equation}
+\label{equation-C-prime}
+\mathcal{C}' =
+\left\{
+\begin{matrix}
+A\text{-algebras }B\text{ which are }I\text{-adically complete}\\
+\text{such that }B/IB\text{ is of finite type over }A/I
+\end{matrix}
+\right\}
+\end{equation}
+Morphisms in $\mathcal{C}'$ are $A$-algebra maps. There is a functor`;
+    const ringDeformation = String.raw`\noindent
+In this section we use the naive cotangent complex to do a little bit
+of deformation theory. We start with a surjective ring map $A' \to A$
+whose kernel is an ideal $I$ of square zero. Moreover we assume
+given a ring map $A \to B$, a $B$-module $N$, and an $A$-module map
+$c : I \to N$. In this section we ask ourselves whether we can find
+the question mark fitting into the following diagram
+\begin{equation}
+\label{equation-to-solve}
+\vcenter{
+\xymatrix{
+0 \ar[r] & N \ar[r] & {?} \ar[r] & B \ar[r] & 0 \\
+0 \ar[r] & I \ar[u]^c \ar[r] & A' \ar[u] \ar[r] & A \ar[u] \ar[r] & 0
+}
+}
+\end{equation}
+and moreover how unique the solution is (if it exists). More precisely,
+we look for a surjection of $A'$-algebras $B' \to B$ whose kernel is
+an ideal of square zero and is
+identified with $N$ such that $A' \to B'$ induces the given map $c$.
+We will say $B'$ is a {\it solution} to (\ref{equation-to-solve}).`;
+    const ringedSpaceDeformation = String.raw`\noindent
+In this section we use the naive cotangent complex to do a little bit
+of deformation theory. We start with a first order thickening
+$t : (S, \mathcal{O}_S) \to (S', \mathcal{O}_{S'})$ of ringed spaces.
+We denote $\mathcal{J} = \Ker(t^\sharp)$ and we
+identify the underlying topological spaces of $S$ and $S'$.
+Moreover we assume given a morphism of ringed spaces
+$f : (X, \mathcal{O}_X) \to (S, \mathcal{O}_S)$, an $\mathcal{O}_X$-module
+$\mathcal{G}$, and an $f$-map $c : \mathcal{J} \to \mathcal{G}$
+of sheaves of modules (Sheaves, Definition \ref{sheaves-definition-f-map}
+and Section \ref{sheaves-section-ringed-spaces-functoriality-modules}).
+In this section we ask ourselves whether we can find
+the question mark fitting into the following diagram
+\begin{equation}
+\label{equation-to-solve-ringed-spaces}
+\vcenter{
+\xymatrix{
+0 \ar[r] & \mathcal{G} \ar[r] & {?} \ar[r] & \mathcal{O}_X \ar[r] & 0 \\
+0 \ar[r] & \mathcal{J} \ar[u]^c \ar[r] & \mathcal{O}_{S'} \ar[u] \ar[r] &
+\mathcal{O}_S \ar[u] \ar[r] & 0
+}
+}
+\end{equation}
+(where the vertical arrows are $f$-maps)
+and moreover how unique the solution is (if it exists). More precisely,
+we look for a first order thickening
+$i : (X, \mathcal{O}_X) \to (X', \mathcal{O}_{X'})$
+and a morphism of thickenings $(f, f')$ as in
+(\ref{equation-morphism-thickenings})
+where $\Ker(i^\sharp)$ is identified with $\mathcal{G}$
+such that $(f')^\sharp$ induces the given map $c$.
+We will say $X'$ is a {\it solution} to
+(\ref{equation-to-solve-ringed-spaces}).`;
+    const dualizing = String.raw`\noindent
+In this section we consider a cocartesian square of rings
+$$
+\xymatrix{
+A \ar[r]_\alpha & A' \\
+R \ar[u]^\varphi \ar[r]^\rho & R' \ar[u]_{\varphi'}
+}
+$$
+In other words, we have $A' = A \otimes_R R'$. If $A$ and $R'$
+are {\bf tor independent over} $R$ then there is a canonical base change map
+\begin{equation}
+\label{equation-base-change}
+R\Hom(A, K) \otimes_A^\mathbf{L} A'
+\longrightarrow
+R\Hom(A', K \otimes_R^\mathbf{L} R')
+\end{equation}
+in $D(A')$ functorial for $K$ in $D(R)$. Namely, by the adjointness
+of Lemma \ref{lemma-right-adjoint} such an arrow is the same thing as a map
+$$
+\varphi'_*\left(R\Hom(A, K) \otimes_A^\mathbf{L} A'\right)
+\longrightarrow
+K \otimes_R^\mathbf{L} R'
+$$
+in $D(R')$ where $\varphi'_* : D(A') \to D(R')$ is the restriction functor.
+We may apply
+More on Algebra, Lemma \ref{more-algebra-lemma-base-change-comparison}
+to the left hand side to get that this is the same thing as a map
+$$
+\varphi_*(R\Hom(A, K)) \otimes_R^\mathbf{L} R'
+\longrightarrow
+K \otimes_R^\mathbf{L} R'
+$$
+in $D(R')$ where $\varphi_* : D(A) \to D(R)$ is the restriction functor.
+For this we can choose $can \otimes^\mathbf{L} \text{id}_{R'}$
+where $can : \varphi_*(R\Hom(A, K)) \to K$ is the
+counit of the adjunction between $R\Hom(A, -)$ and $\varphi_*$.`;
+    const injectives = String.raw`\medskip\noindent
+We begin with a few set theoretic remarks.
+Let $\{B_{\beta}\}_{\beta \in \alpha}$ be an inductive system of
+objects in some category $\mathcal{C}$, indexed by
+an ordinal $\alpha$. Assume that $\colim_{\beta \in \alpha} B_\beta$
+exists in $\mathcal{C}$. If $A$ is an object of $\mathcal{C}$, then there is a
+natural map
+\begin{equation}
+\label{equation-compare}
+\colim_{\beta \in \alpha} \Mor_\mathcal{C}(A, B_\beta)
+\longrightarrow
+\Mor_\mathcal{C}(A, \colim_{\beta \in \alpha} B_\beta).
+\end{equation}
+because if one is given a map $A \to B_\beta$ for some $\beta$, one
+naturally gets a map from $A$  into the colimit by composing with
+$B_\beta \to \colim_{\beta \in \alpha} B_\alpha$.
+Note that the left colimit is one of sets! In general, (\ref{equation-compare})
+is neither injective or surjective.`;
+    const firstDefos = atLine(35, ringDeformation).split("\n");
+    const baseUnits = [
+      { stem: "more-etale", content: atLine(811, moreEtale) },
+      { stem: "functors", content: atLine(815, functorsExample) },
+      { stem: "restricted", content: atLine(107, restricted) },
+      {
+        stem: "defos",
+        content: [
+          ...firstDefos,
+          ...Array.from({ length: 1703 - firstDefos.length }, () => "% audited padding"),
+          ...ringedSpaceDeformation.split("\n"),
+        ].join("\n"),
+      },
+      { stem: "dualizing", content: atLine(2441, dualizing) },
+      { stem: "injectives", content: atLine(54, injectives) },
+      { stem: "duality", content: "" },
+    ];
+    const ownerEntries = supportCases.flatMap((supportCase) => (
+      Object.entries(supportCase.owners).map(([tag, occurrenceCount]) => ({
+        tag,
+        occurrenceCount,
+        stem: tag === "0E2M" ? "duality" : supportCase.stem,
+        label: `lemma-owner-${tag.toLowerCase()}`,
+        target: tag === "0E2M"
+          ? `${supportCase.stem}-${supportCase.localLabel}`
+          : supportCase.localLabel,
+      }))
+    ));
+    const fixtureUnits = baseUnits.map((unit) => ({
+      ...unit,
+      path: `${unit.stem}.tex`,
+      title: unit.stem,
+      content: [
+        unit.content,
+        ...ownerEntries.filter(({ stem }) => stem === unit.stem)
+          .map(({ label, target, occurrenceCount }) => owner(label, target, occurrenceCount)),
+      ].filter(Boolean).join("\n"),
+    }));
+    const result = extractStacksGraphFromUnits(fixtureUnits, [
+      ...supportCases.map(({ tag, stem, localLabel }) => `${tag},${stem}-${localLabel}`),
+      "0FZB,functors-example-functor-quasi-coherent",
+      ...ownerEntries.map(({ tag, stem, label }) => `${tag},${stem}-${label}`),
+    ].join("\n"), {
+      capturedAt,
+      sourceRevision: stacksSourceRevision,
+    });
+
+    expect(result.stats).toMatchObject({
+      theoremCount: 27,
+      supportCount: 7,
+      curatedSupportCount: 7,
+      directDependencyCount: 27,
+      explicitProofXrefDependencyCount: 27,
+      excludedEnvironmentCounts: expect.objectContaining({ example: 0 }),
+    });
+    for (const supportCase of supportCases) {
+      const supportId = `tag-${supportCase.tag.toLowerCase()}`;
+      expect(result.graph.nodes.find(({ id }) => id === supportId)).toMatchObject({
+        nodeClass: "support",
+        kind: supportCase.kind,
+        title: supportCase.title,
+        sourceLocator: supportCase.locator,
+        sourceTextSha256: supportCase.hash,
+      });
+      expect(result.graph.directDependencies
+        .filter(({ prerequisite }) => prerequisite.id === supportId)
+        .map(({ dependentNodeId, role, evidence }) => [
+          dependentNodeId,
+          role,
+          evidence.note.match(/^\d+/u)?.[0],
+        ])
+        .sort()).toEqual(Object.entries(supportCase.owners)
+          .map(([tag, count]) => [
+            `tag-${tag.toLowerCase()}`,
+            supportCase.kind,
+            String(count),
+          ])
+          .sort());
+      expect(result.graph.directDependencies.some(({ dependentNodeId }) => (
+        dependentNodeId === supportId
+      ))).toBe(false);
+      expect(result.graph.proofRoutes.some(({ theoremNodeId }) => theoremNodeId === supportId))
+        .toBe(false);
+    }
+    expect(result.graph.nodes.find(({ id }) => id === "tag-0fzc")?.evidence.note)
+      .toContain("surrounding example remains excluded");
+    expect(result.graph.nodes.find(({ id }) => id === "tag-0f6j")?.evidence.note)
+      .toMatch(/0F71.*0F6H.*02LS/u);
+    expect(result.graph.nodes.find(({ id }) => id === "tag-08u7")?.evidence.note)
+      .toMatch(/008J.*0094.*08L0/u);
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0f6p")
+      ?.evidence.note).toContain("geometric-point and residue-field");
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0fzd")
+      ?.evidence.note).toContain("fully faithfulness");
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0gck")
+      ?.evidence.note).toContain("base-change-for-derived-Hom");
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-08uc")
+      ?.evidence.note).toContain("obstruction class");
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0fzr")
+      ?.evidence.note).not.toContain("fully faithfulness");
+  });
+
+  it("promotes the extension-by-zero sections claim with explicit and semantic prerequisites", () => {
+    const claim = String.raw`\noindent
+Note that we have in the situation of
+Definition \ref{definition-localize-ringed-site} we have
+\begin{equation}
+\label{equation-map-lower-shriek-OU-into-module}
+\Hom_\mathcal{O}(j_{U!}\mathcal{O}_U, \mathcal{F}) =
+\Hom_{\mathcal{O}_U}(\mathcal{O}_U, j_U^*\mathcal{F}) =
+\mathcal{F}(U)
+\end{equation}
+for every $\mathcal{O}$-module $\mathcal{F}$. Namely, the first equality
+holds by the adjointness of $j_{U!}$ and $j_U^*$ and the second because
+$\Hom_{\mathcal{O}_U}(\mathcal{O}_U, j_U^*\mathcal{F}) =
+j_U^*\mathcal{F}(U/U) = \mathcal{F}|_U(U/U) = \mathcal{F}(U)$.`;
+    const owner = (label, target) => String.raw`\begin{lemma}
+\label{${label}}
+The represented-sections identity has the asserted consequence.
+\end{lemma}
+\begin{proof}
+Use Equation \ref{${target}}.
+\end{proof}`;
+    const prefix = String.raw`\begin{definition}
+\label{definition-localize-ringed-site}
+The localization of a ringed site at $U$ is fixed.
+\end{definition}
+\begin{lemma}
+\label{lemma-extension-by-zero}
+Extension by zero is left adjoint to restriction.
+\end{lemma}`.split("\n");
+    const sitesModulesOwners = {
+      "0934": "lemma-owner-0934",
+      "0G1W": "lemma-owner-0g1w",
+      "0936": "lemma-owner-0936",
+    };
+    const sitesModulesContent = [
+      ...prefix,
+      ...Array.from({ length: 2144 - prefix.length }, () => "% audited padding"),
+      ...claim.split("\n"),
+      ...Object.values(sitesModulesOwners).map((label) => (
+        owner(label, "equation-map-lower-shriek-OU-into-module")
+      )),
+    ].join("\n");
+    const result = extractStacksGraphFromUnits([
+      {
+        stem: "sites-modules",
+        path: "sites-modules.tex",
+        title: "Modules on Sites",
+        content: sitesModulesContent,
+      },
+      {
+        stem: "sites-cohomology",
+        path: "sites-cohomology.tex",
+        title: "Cohomology on Sites",
+        content: owner(
+          "lemma-owner-0g21",
+          "sites-modules-equation-map-lower-shriek-OU-into-module",
+        ),
+      },
+    ], [
+      "04IX,sites-modules-definition-localize-ringed-site",
+      "03DI,sites-modules-lemma-extension-by-zero",
+      "0G1V,sites-modules-equation-map-lower-shriek-OU-into-module",
+      ...Object.entries(sitesModulesOwners)
+        .map(([tag, label]) => `${tag},sites-modules-${label}`),
+      "0G21,sites-cohomology-lemma-owner-0g21",
+    ].join("\n"), {
+      capturedAt,
+      sourceRevision: stacksSourceRevision,
+    });
+
+    expect(result.graph.nodes.find(({ id }) => id === "tag-0g1v")).toMatchObject({
+      nodeClass: "theorem-like",
+      kind: "claim",
+      title: "Sections represented by extension-by-zero of the structure module",
+      sourceLocator: "sites-modules.tex:L2145-L2157",
+      sourceTextSha256: "433c4b00fa7a5dea5cb4a1ea87cf422eb3193a5f92be9bff0c6c1e2e86f282b8",
+    });
+    expect(result.graph.directDependencies
+      .filter(({ dependentNodeId }) => dependentNodeId === "tag-0g1v")
+      .map(({ prerequisite, role }) => [prerequisite.id, role])
+      .sort()).toEqual([
+        ["tag-03di", "logical"],
+        ["tag-04ix", "definition"],
+      ]);
+    expect(result.graph.directDependencies
+      .filter(({ prerequisite }) => prerequisite.id === "tag-0g1v")
+      .map(({ dependentNodeId }) => dependentNodeId)
+      .sort()).toEqual(["tag-0934", "tag-0936", "tag-0g1w", "tag-0g21"]);
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0g1v"))
+      .toMatchObject({
+        dependencyIds: ["dep-tag-0g1v-to-tag-04ix", "dep-tag-0g1v-to-tag-03di"],
+      });
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0g1v")
+      ?.evidence.note).toContain("mutually inverse");
+    expect(result.stats).toMatchObject({
+      curatedClaimCount: 1,
+      curatedClaimDependencyCount: 1,
+      explicitProofXrefDependencyCount: 5,
+      directDependencyCount: 6,
+    });
+    expect(result.graph.references).toHaveLength(0);
+  });
+
   it("promotes the exact bivariant restriction remark without retaining it as excluded", () => {
     const restrictionRemark = String.raw`\begin{remark}
 \label{remark-restriction-bivariant}
@@ -1340,6 +1927,541 @@ This ordinary remark remains outside the graph.
     expect(result.graph.nodes.some(({ sourceXmlId }) => (
       sourceXmlId === "chow-remark-unpromoted-control"
     ))).toBe(false);
+  });
+
+  it("promotes the audited successive-blowup reduction with its complete owner inventory", () => {
+    const claim = String.raw`\begin{remark}
+\label{remark-successive-blowups}
+Let $S$ be a quasi-compact and quasi-separated scheme. Let $f : X \to S$
+be a morphism of schemes. Let $\mathcal{F}$ be a quasi-coherent module on $X$.
+Let $U \subset S$ be a quasi-compact open subscheme. Given a $U$-admissible
+blowup $S' \to S$ we denote $X'$ the strict transform of $X$ and $\mathcal{F}'$
+the strict transform of $\mathcal{F}$ which we think of as a quasi-coherent
+module on $X'$ (via Divisors, Lemma \ref{divisors-lemma-strict-transform}).
+Let $P$ be a property of $\mathcal{F}/X/S$ which is stable under strict
+transform (as above) for $U$-admissible blowups. The general problem in
+this section is: Show (under auxiliary conditions on $\mathcal{F}/X/S$)
+there exists a $U$-admissible blowup $S' \to S$
+such that the strict transform $\mathcal{F}'/X'/S'$ has $P$.
+
+\medskip\noindent
+The general strategy will be to use that a composition of
+$U$-admissible blowups is a $U$-admissible blowup, see
+Divisors, Lemma \ref{divisors-lemma-composition-admissible-blowups}.
+In fact, we will make use of the more precise
+Divisors, Lemma \ref{divisors-lemma-composition-finite-type-blowups}
+and combine it with
+Divisors, Lemma \ref{divisors-lemma-strict-transform-composition-blowups}.
+The result is that it suffices to find a sequence of $U$-admissible
+blowups
+$$
+S = S_0 \leftarrow S_1 \leftarrow \ldots \leftarrow S_n
+$$
+such that, setting $\mathcal{F}_0 = \mathcal{F}$ and $X_0 = X$ and setting
+$\mathcal{F}_i/X_i$ equal to the strict transform of
+$\mathcal{F}_{i - 1}/X_{i - 1}$, we
+arrive at $\mathcal{F}_n/X_n/S_n$ with property $P$.
+
+\medskip\noindent
+In particular, choose a finite type quasi-coherent sheaf of ideals
+$\mathcal{I} \subset \mathcal{O}_S$ such that $V(\mathcal{I}) = S \setminus U$,
+see Properties, Lemma \ref{properties-lemma-quasi-coherent-finite-type-ideals}.
+Let $S' \to S$ be the blowup in $\mathcal{I}$ and let $E \subset S'$
+be the exceptional divisor (Divisors, Lemma
+\ref{divisors-lemma-blowing-up-gives-effective-Cartier-divisor}).
+Then we see that we've reduced the
+problem to the case where there exists an effective Cartier divisor
+$D \subset S$ whose support is $X \setminus U$. In particular we may
+assume $U$ is scheme theoretically dense in $S$
+(Divisors, Lemma \ref{divisors-lemma-complement-effective-Cartier-divisor}).
+
+\medskip\noindent
+Suppose that $P$ is local on $S$: If $S = \bigcup S_i$ is a finite open
+covering by quasi-compact opens and $P$ holds for
+$\mathcal{F}_{S_i}/X_{S_i}/S_i$ then $P$ holds for $\mathcal{F}/X/S$.
+In this case the general problem above is local on $S$ as well, i.e.,
+if given $s \in S$ we can find a quasi-compact open neighbourhood $W$ of $s$
+such that the problem for $\mathcal{F}_W/X_W/W$ is solvable, then the
+problem is solvable for $\mathcal{F}/X/S$. This follows from
+Divisors, Lemmas \ref{divisors-lemma-extend-admissible-blowups} and
+\ref{divisors-lemma-dominate-admissible-blowups}.
+\end{remark}`;
+    const formalLemma = (label) => String.raw`\begin{lemma}
+\label{${label}}
+The audited prerequisite holds.
+\end{lemma}`;
+    const owner = (environment, label, occurrenceCount) => String.raw`
+\begin{${environment}}
+\label{${label}}
+The reduction gives the desired result.
+\end{${environment}}
+\begin{proof}
+${Array.from({ length: occurrenceCount }, () => (
+    String.raw`Use Remark \ref{remark-successive-blowups}.`
+  )).join(" ")}
+\end{proof}`;
+    const ownerLabelsByTag = {
+      "0811": ["lemma", "lemma-flatten-module-pre", 3],
+      "0814": ["lemma", "lemma-flatten-module-etale-localize", 2],
+      "0815": ["theorem", "theorem-flatten-module", 1],
+      "081R": ["lemma", "lemma-flat-after-blowing-up", 1],
+      "081S": ["lemma", "lemma-zariski-after-blowup", 1],
+      "081T": ["lemma", "lemma-dominate-modification-by-blowup", 1],
+      "0ETR": ["lemma", "lemma-equivalence-h-v-locally-finite-presentation", 1],
+      "0ETT": ["lemma", "lemma-Noetherian-h-covering", 1],
+    };
+    const flatContent = [
+      ...Array.from({ length: 8609 }, () => "% audited padding"),
+      ...claim.split("\n"),
+      String.raw`\begin{remark}
+\label{remark-unpromoted-control}
+This ordinary remark remains excluded.
+\end{remark}`,
+      ...Object.values(ownerLabelsByTag).map((args) => owner(...args)),
+    ].join("\n");
+    const result = extractStacksGraphFromUnits([
+      {
+        stem: "properties",
+        path: "properties.tex",
+        title: "Properties of Schemes",
+        content: formalLemma("lemma-quasi-coherent-finite-type-ideals"),
+      },
+      {
+        stem: "divisors",
+        path: "divisors.tex",
+        title: "Divisors",
+        content: [
+          "lemma-strict-transform",
+          "lemma-composition-admissible-blowups",
+          "lemma-composition-finite-type-blowups",
+          "lemma-strict-transform-composition-blowups",
+          "lemma-blowing-up-gives-effective-Cartier-divisor",
+          "lemma-complement-effective-Cartier-divisor",
+          "lemma-extend-admissible-blowups",
+          "lemma-dominate-admissible-blowups",
+        ].map(formalLemma).join("\n"),
+      },
+      {
+        stem: "flat",
+        path: "flat.tex",
+        title: "More on Flatness",
+        content: flatContent,
+      },
+    ], [
+      "01PH,properties-lemma-quasi-coherent-finite-type-ideals",
+      "080E,divisors-lemma-strict-transform",
+      "080L,divisors-lemma-composition-admissible-blowups",
+      "080B,divisors-lemma-composition-finite-type-blowups",
+      "080I,divisors-lemma-strict-transform-composition-blowups",
+      "02OS,divisors-lemma-blowing-up-gives-effective-Cartier-divisor",
+      "07ZU,divisors-lemma-complement-effective-Cartier-divisor",
+      "080M,divisors-lemma-extend-admissible-blowups",
+      "080N,divisors-lemma-dominate-admissible-blowups",
+      "080Y,flat-remark-successive-blowups",
+      ...Object.entries(ownerLabelsByTag).map(([tag, [, label]]) => `${tag},flat-${label}`),
+    ].join("\n"), {
+      capturedAt,
+      sourceRevision: stacksSourceRevision,
+    });
+
+    const prerequisiteIds = [
+      "tag-080e", "tag-080l", "tag-080b", "tag-080i", "tag-01ph",
+      "tag-02os", "tag-07zu", "tag-080m", "tag-080n",
+    ].sort();
+    expect(result.graph.nodes.find(({ id }) => id === "tag-080y")).toMatchObject({
+      nodeClass: "theorem-like",
+      kind: "claim",
+      title: "Successive admissible-blowup reductions",
+      sourceLocator: "flat.tex:L8610-L8665",
+      sourceTextSha256: "f7df6d2fb4c463e5883419506cb03224f4e355f4262e2255bb2419215ea5c3a1",
+    });
+    expect(result.graph.directDependencies
+      .filter(({ dependentNodeId }) => dependentNodeId === "tag-080y")
+      .map(({ prerequisite }) => prerequisite.id)
+      .sort()).toEqual(prerequisiteIds);
+    expect(result.graph.directDependencies
+      .filter(({ prerequisite }) => prerequisite.id === "tag-080y")
+      .map(({ dependentNodeId }) => dependentNodeId)
+      .sort()).toEqual(Object.keys(ownerLabelsByTag)
+        .map((tag) => `tag-${tag.toLowerCase()}`)
+        .sort());
+    expect(result.graph.directDependencies.find(({ id }) => (
+      id === "dep-tag-0811-to-tag-080y"
+    ))?.evidence.note).toContain("3 explicit proof reference occurrence(s)");
+    expect(result.graph.directDependencies.find(({ id }) => (
+      id === "dep-tag-0814-to-tag-080y"
+    ))?.evidence.note).toContain("2 explicit proof reference occurrence(s)");
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-080y")
+      ?.dependencyIds.sort()).toEqual(prerequisiteIds.map((id) => `dep-tag-080y-to-${id}`));
+    expect(result.stats).toMatchObject({
+      curatedClaimCount: 1,
+      excludedEnvironmentCounts: expect.objectContaining({ remark: 1 }),
+    });
+    expect(result.graph.references).toHaveLength(0);
+  });
+
+  it("promotes arbitrary-category simplicial homotopy as a claim with functoriality", () => {
+    const claim = String.raw`\begin{remark}
+\label{remark-homotopy-better}
+Let $\mathcal{C}$ be any category (no assumptions whatsoever). Let
+$U$ and $V$ be simplicial objects of $\mathcal{C}$. Let $a, b : U \to V$
+be morphisms of simplicial objects of $\mathcal{C}$. A
+{\it homotopy from $a$ to $b$} is given by
+morphisms\footnote{In the literature, often the maps
+$h_{n + 1, i} \circ s_i : U_n \to V_{n + 1}$ are used instead
+of the maps $h_{n, i}$. Of course the relations these maps satisfy
+are different from the ones in Lemma \ref{lemma-relations-homotopy}.}
+$h_{n, i} : U_n \to V_n$, for $n \geq 0$, $i = 0, \ldots, n + 1$
+satisfying the relations of Lemma \ref{lemma-relations-homotopy}.
+As in Definition \ref{definition-homotopy} we say the morphisms $a$ and $b$
+are {\it homotopic} if there exists a sequence of morphisms
+$a = a_0, a_1, \ldots, a_n = b$ from $U$ to $V$ such that for each
+$i = 1, \ldots, n$ there either exists a homotopy from $a_{i - 1}$ to $a_i$
+or there exists a homotopy from $a_i$ to $a_{i - 1}$.
+Clearly, if $F : \mathcal{C} \to \mathcal{C}'$ is any functor
+and $\{h_{n, i}\}$ is a homotopy from $a$ to $b$, then
+$\{F(h_{n, i})\}$ is a homotopy from $F(a)$ to $F(b)$.
+Similarly, if $a$ and $b$ are homotopic, then $F(a)$ and $F(b)$
+are homotopic.
+Since the lemma says that the newer notion is the same
+as the old one in case finite coproduct exist, we deduce
+in particular that functors preserve the original notion
+whenever both categories have finite coproducts.
+\end{remark}`;
+    const owner = (label, target = "remark-homotopy-better") => String.raw`
+\begin{lemma}
+\label{${label}}
+The homotopy construction has the asserted consequence.
+\end{lemma}
+\begin{proof}
+Use Remark \ref{${target}}.
+\end{proof}`;
+    const prefix = String.raw`\begin{definition}
+\label{definition-homotopy}
+Homotopy is defined using the simplicial interval.
+\end{definition}
+
+\begin{lemma}
+\label{lemma-relations-homotopy}
+The component maps characterize a simplicial homotopy.
+\end{lemma}`.split("\n");
+    const simplicialOwners = {
+      "019P": "lemma-fibre-products-simplicial-object-w-section",
+      "08Q4": "lemma-products-homotopy",
+      "019X": "lemma-compare-homotopies",
+      "019Y": "lemma-functorial-homotopy",
+      "0G5R": "lemma-godement-two-maps",
+      "0G5S": "lemma-godement-before-after",
+    };
+    const crossOwners = {
+      "08Q9": ["sites-cohomology", "lemma-compute-by-cosimplicial-resolution"],
+      "09W5": ["spaces-simplicial", "lemma-simplicial-resolution-Z"],
+      "09WI": ["spaces-simplicial", "lemma-simplicial-resolution-Z-site"],
+      "0D9B": ["spaces-simplicial", "lemma-simplicial-resolution-ringed"],
+    };
+    const simplicialContent = [
+      ...prefix,
+      ...Array.from({ length: 4518 - prefix.length }, () => "% audited padding"),
+      ...claim.split("\n"),
+      String.raw`\begin{remark}
+\label{remark-unpromoted-control}
+This ordinary remark remains excluded.
+\end{remark}`,
+      ...Object.values(simplicialOwners).map((label) => owner(label)),
+    ].join("\n");
+    const crossUnit = (stem) => ({
+      stem,
+      path: `${stem}.tex`,
+      title: stem,
+      content: Object.values(crossOwners)
+        .filter(([ownerStem]) => ownerStem === stem)
+        .map(([, label]) => owner(label, "simplicial-remark-homotopy-better"))
+        .join("\n"),
+    });
+    const result = extractStacksGraphFromUnits([
+      {
+        stem: "simplicial",
+        path: "simplicial.tex",
+        title: "Simplicial Methods",
+        content: simplicialContent,
+      },
+      crossUnit("sites-cohomology"),
+      crossUnit("spaces-simplicial"),
+    ], [
+      "019K,simplicial-definition-homotopy",
+      "019L,simplicial-lemma-relations-homotopy",
+      "019M,simplicial-remark-homotopy-better",
+      ...Object.entries(simplicialOwners).map(([tag, label]) => `${tag},simplicial-${label}`),
+      ...Object.entries(crossOwners).map(([tag, [stem, label]]) => `${tag},${stem}-${label}`),
+    ].join("\n"), {
+      capturedAt,
+      sourceRevision: stacksSourceRevision,
+    });
+
+    const expectedOwnerIds = [
+      ...Object.keys(simplicialOwners),
+      ...Object.keys(crossOwners),
+    ].map((tag) => `tag-${tag.toLowerCase()}`).sort();
+    expect(result.graph.nodes.find(({ id }) => id === "tag-019m")).toMatchObject({
+      nodeClass: "theorem-like",
+      kind: "claim",
+      title: "Componentwise simplicial homotopy and functoriality",
+      sourceLocator: "simplicial.tex:L4519-L4545",
+      sourceTextSha256: "d651d6ec33fedd7b753489405702c8c75d9695a6cf56717fa95bdcf9dd688b7b",
+    });
+    expect(result.graph.directDependencies
+      .filter(({ dependentNodeId }) => dependentNodeId === "tag-019m")
+      .map(({ prerequisite }) => prerequisite.id)
+      .sort()).toEqual(["tag-019k", "tag-019l"]);
+    expect(result.graph.directDependencies
+      .filter(({ prerequisite }) => prerequisite.id === "tag-019m")
+      .map(({ dependentNodeId }) => dependentNodeId)
+      .sort()).toEqual(expectedOwnerIds);
+    expect(result.graph.directDependencies.find(({ id }) => (
+      id === "dep-tag-019m-to-tag-019l"
+    ))?.evidence.note).toContain("2 explicit proof reference occurrence(s)");
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-019m")
+      ?.dependencyIds.sort()).toEqual([
+        "dep-tag-019m-to-tag-019k",
+        "dep-tag-019m-to-tag-019l",
+      ]);
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-08q4")
+      ?.dependencyIds).toEqual(["dep-tag-08q4-to-tag-019m"]);
+    expect(result.stats).toMatchObject({
+      curatedClaimCount: 1,
+      excludedEnvironmentCounts: expect.objectContaining({ remark: 1 }),
+    });
+    expect(result.graph.references).toHaveLength(0);
+  });
+
+  it("promotes the relative-dualizing claim and preserves aggregate trace-section debt", () => {
+    const claim = String.raw`\begin{remark}
+\label{remark-relative-dualizing-complex}
+Let $Y$ be a quasi-compact and quasi-separated scheme.
+Let $f : X \to Y$ be a proper, flat morphism of finite presentation.
+Let $a$ be the adjoint of Lemma \ref{lemma-twisted-inverse-image} for $f$.
+In this situation, $\omega_{X/Y}^\bullet = a(\mathcal{O}_Y)$
+is sometimes called the {\it relative dualizing complex}. By
+Lemma \ref{lemma-compare-with-pullback-flat-proper}
+there is a functorial isomorphism
+$a(K) = Lf^*K \otimes_{\mathcal{O}_X}^\mathbf{L} \omega_{X/Y}^\bullet$
+for $K \in D_\QCoh(\mathcal{O}_Y)$. Moreover, the trace map
+$$
+\text{Tr}_{f, \mathcal{O}_Y} : Rf_*\omega_{X/Y}^\bullet \to \mathcal{O}_Y
+$$
+of Section \ref{section-trace} induces the trace map for all $K$
+in $D_\QCoh(\mathcal{O}_Y)$. More precisely the diagram
+$$
+\xymatrix{
+Rf_*a(K) \ar[rrr]_{\text{Tr}_{f, K}} \ar@{=}[d] & & &
+K \ar@{=}[d] \\
+Rf_*(Lf^*K \otimes_{\mathcal{O}_X}^\mathbf{L} \omega_{X/Y}^\bullet)
+\ar@{=}[r] &
+K \otimes_{\mathcal{O}_Y}^\mathbf{L} Rf_*\omega_{X/Y}^\bullet
+\ar[rr]^-{\text{id}_K \otimes \text{Tr}_{f, \mathcal{O}_Y}} & & K
+}
+$$
+where the equality on the lower right is
+Derived Categories of Schemes, Lemma \ref{perfect-lemma-cohomology-base-change}.
+If $g : Y' \to Y$ is a
+morphism of quasi-compact and quasi-separated schemes
+and $X' = Y' \times_Y X$, then by
+Lemma \ref{lemma-proper-flat-base-change} we have
+$\omega_{X'/Y'}^\bullet = L(g')^*\omega_{X/Y}^\bullet$ where $g' : X' \to X$
+is the projection and by Lemma \ref{lemma-trace-map-and-base-change}
+the trace map
+$$
+\text{Tr}_{f', \mathcal{O}_{Y'}} :
+Rf'_*\omega_{X'/Y'}^\bullet \to \mathcal{O}_{Y'}
+$$
+for $f' : X' \to Y'$ is the base change of $\text{Tr}_{f, \mathcal{O}_Y}$
+via the base change isomorphism.
+\end{remark}`;
+    const formalLemma = (label) => String.raw`\begin{lemma}
+\label{${label}}
+The audited prerequisite holds.
+\end{lemma}`;
+    const owner = (
+      label,
+      occurrenceCount,
+      target = "remark-relative-dualizing-complex",
+      extraProofText = "",
+    ) => (
+      String.raw`
+\begin{lemma}
+\label{${label}}
+The relative-duality conclusion holds.
+\end{lemma}
+\begin{proof}
+${Array.from({ length: occurrenceCount }, () => (
+    String.raw`Use Remark \ref{${target}}.`
+  )).join(" ")} ${extraProofText}
+\end{proof}`
+    );
+    const dualityOwners = {
+      "0E4L": ["lemma-properties-relative-dualizing", 1, "Apply the Yoneda lemma."],
+      "0BRT": ["lemma-smooth-proper", 1],
+      "0FVV": ["lemma-duality-proper-over-field", 1],
+      "0FW1": ["lemma-sanity-check-duality", 1],
+    };
+    const crossOwners = {
+      "0G8I": ["derham", "lemma-relative-duality-hodge", 1],
+      "0BS2": ["curves", "lemma-duality-dim-1", 1],
+      "0E32": ["curves", "lemma-sanity-check-duality", 1],
+      "0FYX": ["equiv", "lemma-fourier-mukai-left-adjoint", 1],
+      "0FYY": ["equiv", "lemma-fourier-mukai-flat-proper-over-noetherian", 2],
+    };
+    const prefix = [
+      formalLemma("lemma-twisted-inverse-image"),
+      formalLemma("lemma-compare-with-pullback-flat-proper"),
+      formalLemma("lemma-proper-flat-base-change"),
+      formalLemma("lemma-trace-map-and-base-change"),
+      String.raw`\section{Trace map}
+\label{section-trace}`,
+    ].join("\n").split("\n");
+    const dualityContent = [
+      ...prefix,
+      ...Array.from({ length: 2726 - prefix.length }, () => "% audited padding"),
+      ...claim.split("\n"),
+      String.raw`\begin{remark}
+\label{remark-unpromoted-control}
+This ordinary remark remains excluded.
+\end{remark}`,
+      ...Object.values(dualityOwners).map(([label, count, extra]) => owner(
+        label,
+        count,
+        "remark-relative-dualizing-complex",
+        extra,
+      )),
+      String.raw`\begin{lemma}
+\label{lemma-section-trigger}
+The trace construction is available.
+\end{lemma}
+\begin{proof}
+Use Section \ref{section-trace}.
+\end{proof}`,
+    ].join("\n");
+    const crossUnit = (stem) => ({
+      stem,
+      path: `${stem}.tex`,
+      title: stem,
+      content: Object.values(crossOwners)
+        .filter(([ownerStem]) => ownerStem === stem)
+        .map(([, label, count]) => owner(
+          label,
+          count,
+          "duality-remark-relative-dualizing-complex",
+        ))
+        .join("\n"),
+    });
+    const result = extractStacksGraphFromUnits([
+      {
+        stem: "categories",
+        path: "categories.tex",
+        title: "Categories",
+        content: formalLemma("lemma-yoneda"),
+      },
+      {
+        stem: "perfect",
+        path: "perfect.tex",
+        title: "Derived Categories of Schemes",
+        content: formalLemma("lemma-cohomology-base-change"),
+      },
+      {
+        stem: "duality",
+        path: "duality.tex",
+        title: "Duality for Schemes",
+        content: dualityContent,
+      },
+      crossUnit("derham"),
+      crossUnit("curves"),
+      crossUnit("equiv"),
+    ], [
+      "001P,categories-lemma-yoneda",
+      "08EU,perfect-lemma-cohomology-base-change",
+      "0A9E,duality-lemma-twisted-inverse-image",
+      "0E4K,duality-lemma-compare-with-pullback-flat-proper",
+      "0AAB,duality-lemma-proper-flat-base-change",
+      "0B6J,duality-lemma-trace-map-and-base-change",
+      "0AWG,duality-section-trace",
+      "0B6S,duality-remark-relative-dualizing-complex",
+      "0ZZ1,duality-lemma-section-trigger",
+      ...Object.entries(dualityOwners).map(([tag, [label]]) => `${tag},duality-${label}`),
+      ...Object.entries(crossOwners).map(([tag, [stem, label]]) => `${tag},${stem}-${label}`),
+    ].join("\n"), {
+      capturedAt,
+      sourceRevision: stacksSourceRevision,
+    });
+
+    const prerequisiteIds = [
+      "tag-0a9e", "tag-0e4k", "tag-08eu", "tag-0aab", "tag-0b6j", "tag-0awg",
+    ].sort();
+    const expectedOwnerIds = [
+      ...Object.keys(dualityOwners),
+      ...Object.keys(crossOwners),
+    ].map((tag) => `tag-${tag.toLowerCase()}`).sort();
+    expect(result.graph.nodes.find(({ id }) => id === "tag-0b6s")).toMatchObject({
+      nodeClass: "theorem-like",
+      kind: "claim",
+      title: "Relative dualizing complex, trace, and base-change compatibilities",
+      sourceLocator: "duality.tex:L2727-L2768",
+      sourceTextSha256: "80700177e1bd893b674206641bf9b5f555f30df451f21609f44001f6930c6f61",
+    });
+    expect(result.graph.directDependencies
+      .filter(({ dependentNodeId }) => dependentNodeId === "tag-0b6s")
+      .map(({ prerequisite }) => prerequisite.id)
+      .sort()).toEqual(prerequisiteIds);
+    expect(result.graph.directDependencies).toContainEqual(expect.objectContaining({
+      id: "dep-tag-0b6s-to-tag-0awg",
+      dependentNodeId: "tag-0b6s",
+      prerequisite: { type: "node", id: "tag-0awg" },
+      role: "source-reference",
+    }));
+    expect(result.graph.nodes.find(({ id }) => id === "tag-0awg")).toMatchObject({
+      nodeClass: "source-artifact",
+      kind: "section",
+    });
+    expect(result.graph.directDependencies
+      .filter(({ prerequisite }) => prerequisite.id === "tag-0b6s")
+      .map(({ dependentNodeId }) => dependentNodeId)
+      .sort()).toEqual(expectedOwnerIds);
+    expect(result.graph.directDependencies.find(({ id }) => (
+      id === "dep-tag-0fyy-to-tag-0b6s"
+    ))?.evidence.note).toContain("2 explicit proof reference occurrence(s)");
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0b6s"))
+      .toMatchObject({
+        dependencyIds: expect.arrayContaining(prerequisiteIds.map((id) => (
+          `dep-tag-0b6s-to-${id}`
+        ))),
+        evidence: {
+          note: expect.stringContaining(
+            "classifying, decomposing, or suppressing that occurrence remains route debt",
+          ),
+        },
+      });
+    expect(result.graph.nodes.find(({ id }) => id === "tag-0awg")).toMatchObject({
+      nodeClass: "source-artifact",
+      kind: "section",
+      evidence: {
+        note: expect.stringContaining(
+          "classification, decomposition, or an occurrence-specific nondependency decision remains graph-audit debt",
+        ),
+      },
+    });
+    expect(result.graph.references).toContainEqual(expect.objectContaining({
+      ownerNodeId: "tag-0b6s",
+      ref: "duality-section-trace",
+      resolution: expect.objectContaining({
+        status: "resolved",
+        target: { type: "node", id: "tag-0awg" },
+      }),
+    }));
+    expect(result.stats).toMatchObject({
+      curatedClaimCount: 1,
+      sourceArtifactCount: 1,
+      sourceArtifactKindCounts: { section: 1 },
+      excludedEnvironmentCounts: expect.objectContaining({ remark: 1 }),
+    });
   });
 
   it("represents audited Zorn invocations as one shared typed external theorem", () => {
@@ -1442,8 +2564,11 @@ An unrelated assertion uses a different part of the same section.
 \begin{proof}
 Compare Section \ref{section-properties-morphisms}.
 \end{proof}`;
+    const stacksPropertiesPadding = Array.from({ length: 1429 }, () => "% audited padding");
+    stacksPropertiesPadding[0] = String.raw`\section{Properties of morphisms}`;
+    stacksPropertiesPadding[1] = String.raw`\label{section-properties-morphisms}`;
     const stacksPropertiesContent = [
-      ...Array.from({ length: 1429 }, () => "% audited padding"),
+      ...stacksPropertiesPadding,
       ...auditedOwnerAndProof.split("\n"),
       ...unrelatedOwnerAndProof.split("\n"),
     ].join("\n");
@@ -1493,8 +2618,23 @@ Representable properties are preserved by base change.
     expect(result.graph.references).toContainEqual(expect.objectContaining({
       ownerNodeId: "tag-0zzz",
       ref: "stacks-properties-section-properties-morphisms",
-      resolution: expect.objectContaining({ status: "unresolved" }),
+      resolution: expect.objectContaining({
+        status: "resolved",
+        target: { type: "node", id: "tag-04xb" },
+      }),
     }));
+    expect(result.graph.nodes.find(({ id }) => id === "tag-04xb")).toMatchObject({
+      nodeClass: "source-artifact",
+      kind: "section",
+    });
+    expect(result.graph.directDependencies).toContainEqual(expect.objectContaining({
+      dependentNodeId: "tag-0zzz",
+      prerequisite: { type: "node", id: "tag-04xb" },
+      role: "source-reference",
+    }));
+    expect(result.graph.directDependencies.some(({ dependentNodeId, prerequisite }) => (
+      dependentNodeId === "tag-04zx" && prerequisite.id === "tag-04xb"
+    ))).toBe(false);
 
     const changedUnits = fixtureUnits.map((unit) => (
       unit.stem === "stacks-properties"
@@ -1505,6 +2645,434 @@ Representable properties are preserved by base change.
       capturedAt,
       sourceRevision: stacksSourceRevision,
     })).toThrow(/section-delegation proof 04ZX changed/u);
+  });
+
+  it("promotes the audited item support batch with exact owner inventories", () => {
+    const sparseUnit = (stem, length, placements) => {
+      const lines = Array(length).fill("% audited padding");
+      for (const [startLine, rawSpan] of placements) {
+        rawSpan.split("\n").forEach((line, index) => {
+          lines[startLine - 1 + index] = line;
+        });
+      }
+      return {
+        stem,
+        path: `${stem}.tex`,
+        title: stem,
+        content: lines.join("\n"),
+      };
+    };
+    const lemma = (label) => String.raw`\begin{lemma}
+\label{${label}}
+Audited owner statement.
+\end{lemma}`;
+    const resultUnits = [
+      sparseUnit("more-etale", 1460, [
+        [833, String.raw`\item
+\label{item-sum}
+$(Z, s) + (Z, s') = (Z, s + s')$,
+\item
+\label{item-sub}
+$(Z, s) = (Z', s)$ if $Z \subset Z'$.`],
+        [930, lemma("lemma-finite-support-stalk")],
+        [940, String.raw`\begin{proof}`],
+        [963, String.raw`maps and that the relations (\ref{item-sum}) $(Z, s) + (Z, s') - (Z, s + s')$`],
+        [964, String.raw`and (\ref{item-sub}) $(Z, s) - (Z', s)$ if $Z \subset Z'$ are sent to zero.`],
+        [1022, String.raw`(\ref{item-sum}) and (\ref{item-sub}) to replace $s$ by`],
+        [1043, String.raw`Thus by the relation (\ref{item-sub})`],
+        [1050, String.raw`\end{proof}`],
+        [1320, lemma("lemma-lqf-base-change-f-shriek")],
+        [1330, String.raw`\begin{proof}`],
+        [1363, String.raw`(\ref{item-sum}) and (\ref{item-sub}) and compatible`],
+        [1380, String.raw`\end{proof}`],
+        [1400, lemma("lemma-lqf-separated-shriek-composition")],
+        [1410, String.raw`\begin{proof}`],
+        [1450, String.raw`(\ref{item-sum}) and (\ref{item-sub})`],
+        [1460, String.raw`\end{proof}`],
+      ]),
+      sparseUnit("derham", 3670, [
+        [3230, String.raw`\item
+\label{item-degree-zero}
+$c_{Y/X}^0(1) = \delta(\NL_{Y/X})$ see
+Discriminants, Section \ref{discriminant-section-tate-map},
+\item
+\label{item-multiplicative}
+$c_{Y/X}^{q + p}(\omega \wedge \eta) = \omega \wedge c_{Y/X}^p(\eta)$
+for local sections $\omega$ of $f^*\Omega^q_{X/\mathbf{Z}}$
+and $\eta$ of $\Omega^p_{Y/\mathbf{Z}}$,`],
+        [3400, lemma("lemma-base-change-Garel-upstairs")],
+        [3440, String.raw`\begin{proof}`],
+        [3463, String.raw`is surjective. Conditions (\ref{item-degree-zero}) and`],
+        [3464, String.raw`(\ref{item-multiplicative}) combined with the commutativity`],
+        [3470, String.raw`\end{proof}`],
+        [3515, lemma("lemma-Garel-upstairs")],
+        [3540, String.raw`\begin{proof}`],
+        [3555, String.raw`with properties (\ref{item-degree-zero}) and (\ref{item-multiplicative}),`],
+        [3571, String.raw`with properties (\ref{item-degree-zero}) and (\ref{item-multiplicative}).`],
+        [3597, String.raw`$c^p_{Y/X}$, $p \geq 0$ satisfying conditions (\ref{item-degree-zero})`],
+        [3598, String.raw`and (\ref{item-multiplicative}). If $b/a : Y'/X' \to Y/X$`],
+        [3615, String.raw`maps $c^p_{Y'/X'}$, $p \geq 0$  satisfying conditions (\ref{item-degree-zero})`],
+        [3616, String.raw`and (\ref{item-multiplicative}) compatible with the already constructed`],
+        [3662, String.raw`(\ref{item-degree-zero}) and (\ref{item-multiplicative}).`],
+        [3670, String.raw`\end{proof}`],
+      ]),
+      sparseUnit("more-algebra", 19220, [
+        [18384, String.raw`\item
+\label{item-shift-tensor}
+There is a canonical isomorphism
+$$
+\text{Tot}(M^\bullet \otimes_R N^\bullet)[a + b] \to
+\text{Tot}(M^\bullet[a] \otimes_R N^\bullet[b])
+$$
+which uses the sign $(-1)^{pb}$ on the summand $M^p \otimes_R N^q$,
+see Homology, Remark \ref{homology-remark-shift-double-complex}. It
+is often more convenient to consider the corresponding shifted map
+$\text{Tot}(M^\bullet \otimes_R N^\bullet) \to
+\text{Tot}(M^\bullet[a] \otimes_R N^\bullet[b])[-a - b]$.`],
+        [18532, String.raw`\item
+\label{item-compatible}
+The choice above is such that if $M^\bullet$ has a left
+dual $N^\bullet$ as in Lemma \ref{lemma-left-dual-complex},
+then we have a canonical isomorphism
+$$
+\text{Tot}(K^\bullet \otimes_R N^\bullet)
+\longrightarrow
+\Hom^\bullet(M^\bullet, K^\bullet)
+$$
+defined without the intervention of signs sending the summand
+$K^p \otimes_R N^q$ to the summand $\Hom_R(M^{-q}, K^p)$
+via $N^q = \Hom_R(M^{-q}, R)$ and the canonical map
+$K^p \otimes_R \Hom_R(M^{-q}, R) \to \Hom_R(M^{-q}, K^p)$.`],
+        [19175, lemma("lemma-dual-perfect-complex")],
+        [19190, String.raw`\begin{proof}`],
+        [19213, String.raw`By Section \ref{section-sign-rules} item (\ref{item-compatible})`],
+        [19220, String.raw`\end{proof}`],
+      ]),
+      sparseUnit("cohomology", 7264, [
+        [7214, lemma("lemma-second-cup-equals-first")],
+        [7220, String.raw`\begin{proof}`],
+        [7240, String.raw`More on Algebra, Item (\ref{more-algebra-item-shift-tensor})`],
+        [7264, String.raw`\end{proof}`],
+      ]),
+    ];
+    const resultTags = [
+      "0F6K,more-etale-item-sum",
+      "0F6L,more-etale-item-sub",
+      "0F6P,more-etale-lemma-finite-support-stalk",
+      "0F5J,more-etale-lemma-lqf-base-change-f-shriek",
+      "0F79,more-etale-lemma-lqf-separated-shriek-composition",
+      "0H9C,derham-item-degree-zero",
+      "0H9D,derham-item-multiplicative",
+      "0H9G,derham-lemma-base-change-Garel-upstairs",
+      "0FLA,derham-lemma-Garel-upstairs",
+      "0FNH,more-algebra-item-shift-tensor",
+      "0FNL,more-algebra-item-compatible",
+      "07VI,more-algebra-lemma-dual-perfect-complex",
+      "0FP2,cohomology-lemma-second-cup-equals-first",
+    ].join("\n");
+    const result = extractStacksGraphFromUnits(resultUnits, resultTags, {
+      capturedAt,
+      sourceRevision: stacksSourceRevision,
+    });
+
+    const expectedSupports = [
+      ["0F6K", "construction", "more-etale.tex:L833-L835", "a8083e56b7c5743ad707da713435b5e1952867ae43ba2bee857cef98df30bfd3", { "0F6P": 2, "0F5J": 1, "0F79": 1 }],
+      ["0F6L", "construction", "more-etale.tex:L836-L838", "2240b1942b521183a9a70cfdc60e3da7031a91dfd7c8ba6580fce5a6945a7c27", { "0F6P": 3, "0F5J": 1, "0F79": 1 }],
+      ["0H9C", "definition", "derham.tex:L3230-L3233", "7ffd73f0087f0d245adff1275ea16532769d0ded0e0c31125ad3e9e514525e21", { "0H9G": 1, "0FLA": 5 }],
+      ["0H9D", "definition", "derham.tex:L3234-L3238", "6cecbaae66743545770abc9c0d92ab5545fc20d85b9de6510572c7e6eed958bb", { "0H9G": 1, "0FLA": 5 }],
+      ["0FNH", "construction", "more-algebra.tex:L18384-L18395", "33114700942851fecab52ffd651d4648922766b521bce150885665a9f6c9638d", { "0FP2": 1 }],
+      ["0FNL", "construction", "more-algebra.tex:L18532-L18545", "035e8a2d0b5fa90aad787b77674be7fba6f7a336f0153a9052fc1d3ce9861df4", { "07VI": 1 }],
+    ];
+    for (const [tag, kind, sourceLocator, sourceTextSha256, owners] of expectedSupports) {
+      const supportId = `tag-${tag.toLowerCase()}`;
+      expect(result.graph.nodes.find(({ id }) => id === supportId)).toMatchObject({
+        nodeClass: "support",
+        kind,
+        sourceLocator,
+        sourceTextSha256,
+      });
+      expect(result.graph.directDependencies
+        .filter(({ prerequisite }) => prerequisite.id === supportId)
+        .map(({ dependentNodeId, role, evidence }) => [
+          dependentNodeId.slice(4).toUpperCase(),
+          role,
+          Number(evidence.note.match(/^\d+/u)?.[0]),
+        ])
+        .sort()).toEqual(Object.entries(owners)
+          .map(([ownerTag, count]) => [ownerTag, kind, count])
+          .sort());
+      expect(result.graph.proofRoutes.some(({ theoremNodeId }) => theoremNodeId === supportId))
+        .toBe(false);
+    }
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0h9g")
+      ?.dependencyIds.sort()).toEqual([
+      "dep-tag-0h9g-to-tag-0h9c",
+      "dep-tag-0h9g-to-tag-0h9d",
+    ]);
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0fp2")
+      ?.dependencyIds).toEqual(["dep-tag-0fp2-to-tag-0fnh"]);
+    expect(result.graph.nodes.find(({ id }) => id === "tag-0fnh")?.evidence.note)
+      .toContain("Remark Tag 0FLG");
+    expect(result.stats).toMatchObject({
+      curatedSupportCount: 6,
+      supportCount: 6,
+      explicitProofXrefDependencyCount: 12,
+    });
+    expect(result.graph.references).toHaveLength(0);
+
+    const changedUnits = resultUnits.map((unit) => (
+      unit.stem === "more-etale"
+        ? { ...unit, content: unit.content.replace("maps and that the relations", "maps and also that the relations") }
+        : unit
+    ));
+    expect(() => extractStacksGraphFromUnits(changedUnits, resultTags, {
+      capturedAt,
+      sourceRevision: stacksSourceRevision,
+    })).toThrow(/support 0F6K incoming occurrence artifacts changed/u);
+  });
+
+  it("promotes the audited item claims with guarded routes, debt, and goal suppressions", () => {
+    const sparseUnit = (stem, length, placements) => {
+      const lines = Array(length).fill("% audited padding");
+      for (const [startLine, rawSpan] of placements) {
+        rawSpan.split("\n").forEach((line, index) => {
+          lines[startLine - 1 + index] = line;
+        });
+      }
+      return {
+        stem,
+        path: `${stem}.tex`,
+        title: stem,
+        content: lines.join("\n"),
+      };
+    };
+    const lemma = (label) => String.raw`\begin{lemma}
+\label{${label}}
+Audited theorem statement.
+\end{lemma}`;
+    const claimUnits = [
+      sparseUnit("chow", 12710, [
+        [640, lemma("lemma-prepare-tame-symbol")],
+        [781, String.raw`\item $\partial_A(aa', b) = \partial_A(a, b)\partial_A(a', b)$
+\label{item-bilinear-better}
+and $\partial_A(a, bb') = \partial_A(a, b)\partial_A(a, b')$
+for $a, a', b, b' \in A$ nonzerodivisors,`],
+        [785, String.raw`\item $\partial_A(b, b) = (-1)^m$
+\label{item-skew-better}
+with $m = \text{length}_A(A/bA)$
+for $b \in A$ a nonzerodivisor,`],
+        [789, String.raw`\item $\partial_A(u, b) = u^m \bmod \mathfrak m$
+\label{item-normalization}
+with $m = \text{length}_A(A/bA)$ for $u \in A$ a unit and
+$b \in A$ a nonzerodivisor, and`],
+        [793, String.raw`\item
+\label{item-1-x-better}
+$\partial_A(a, b - a)\partial_A(b, b) = \partial_A(b, b - a)\partial_A(a, b)$
+for $a, b \in A$ such that $a, b, b - a$ are nonzerodivisors.`],
+        [901, lemma("lemma-tame-symbol")],
+        [910, String.raw`\begin{proof}`],
+        [911, String.raw`Let us prove (\ref{item-bilinear-better}).
+Let $a_1, a_2, a_3 \in A$ be nonzerodivisors.
+Choose $A \subset B$ as in Lemma \ref{lemma-prepare-tame-symbol}
+for $a_1, a_2, a_3$. Then the equality
+$$
+\partial_A(a_1a_2, a_3) = \partial_A(a_1, a_3) \partial_A(a_2, a_3)
+$$
+follows from the equality
+$$
+(-1)^{(e_{1, j} + e_{2, j})e_{3, j}}
+(u_{1, j}u_{2, j})^{e_{3, j}}u_{3, j}^{-e_{1, j} - e_{2, j}} =
+(-1)^{e_{1, j}e_{3, j}}
+u_{1, j}^{e_{3, j}}u_{3, j}^{-e_{1, j}}
+(-1)^{e_{2, j}e_{3, j}}
+u_{2, j}^{e_{3, j}}u_{3, j}^{-e_{2, j}}
+$$
+in $B_j$. Properties (\ref{item-skew-better}) and
+(\ref{item-normalization}) are equally immediate.
+
+\medskip\noindent
+Let us prove (\ref{item-1-x-better}). Let $a_1, a_2, a_1 - a_2 \in A$
+be nonzerodivisors and set $a_3 = a_1 - a_2$.
+Choose $A \subset B$ as in Lemma \ref{lemma-prepare-tame-symbol}
+for $a_1, a_2, a_3$. Then it suffices to show
+$$
+(-1)^{e_{1, j}e_{2, j} + e_{1, j}e_{3, j} + e_{2, j}e_{3, j} + e_{2, j}}
+u_{1, j}^{e_{2, j} - e_{3, j}}
+u_{2, j}^{e_{3, j} - e_{1, j}}
+u_{3, j}^{e_{1, j} - e_{2, j}} \bmod \mathfrak m_j = 1
+$$
+This is clear if $e_{1, j} = e_{2, j} = e_{3, j}$.
+Say $e_{1, j} > e_{2, j}$. Then we see that $e_{3, j} = e_{2, j}$
+because $a_3 = a_1 - a_2$ and we see that $u_{3, j}$
+has the same residue class as $-u_{2, j}$. Hence
+the formula is true -- the signs work out as well
+and this verification is the reason for the choice of signs
+in (\ref{equation-tame-symbol}).
+The other cases are handled in exactly the same manner.
+\end{proof}`],
+        [4740, lemma("lemma-key-formula")],
+        [4760, String.raw`\begin{proof}`],
+        [4775, String.raw`(\ref{item-normalization}) of the tame symbol.`],
+        [4780, String.raw`\end{proof}`],
+        [11677, String.raw`\item
+\label{item-find-Z-in-blowup}
+there is a closed immersion $\mathbf{P}^1_Z \to W$ whose
+composition with $b$ is the inclusion morphism
+$\mathbf{P}^1_Z \to \mathbf{P}^1_X$ and whose base change by $\infty$
+is the composition $Z \to C_ZX \to E \to W_\infty$ where the first
+arrow is the vertex of the cone.`],
+        [11715, String.raw`\medskip\noindent
+The intersection of $\infty(Z)$ with $\mathbf{P}^1_Z$ is the effective
+Cartier divisor $(\mathbf{P}^1_Z)_\infty$ hence the strict transform
+of $\mathbf{P}^1_Z$ by the blowing up $b$ maps isomorphically to
+$\mathbf{P}^1_Z$ (see Divisors, Lemmas \ref{divisors-lemma-strict-transform}
+and \ref{divisors-lemma-blow-up-effective-Cartier-divisor}).
+This gives us the morphism $\mathbf{P}^1_Z \to W$ mentioned in (8).
+It is a closed immersion as $b$ is separated, see
+Schemes, Lemma \ref{schemes-lemma-section-immersion}.`],
+        [11815, String.raw`\medskip\noindent
+Finally, we have to prove the last part of (8). This is clear
+because the map $\mathbf{P}^1_Z \to W$ is affine locally
+given by the surjection
+$$
+B \to B \otimes_{A[s]} A/I =
+(A/I \oplus I/I^2 \oplus I^2/I^3 \oplus \ldots)[S] \to
+A/I[S]
+$$
+and the identification $\text{Proj}(A/I[S]) = \Spec(A/I)$.
+Some details omitted.`],
+        [12250, lemma("lemma-relation-normal-cones")],
+        [12270, String.raw`\begin{proof}`],
+        [12295, String.raw`from (\ref{item-find-Z-in-blowup}) and its associated bivariant class`],
+        [12310, String.raw`\end{proof}`],
+        [12600, lemma("lemma-agreement-with-loc-chern")],
+        [12630, String.raw`\begin{proof}`],
+        [12651, String.raw`as in Section \ref{section-blowup-Z-first}. By (\ref{item-find-Z-in-blowup})`],
+        [12680, String.raw`\end{proof}`],
+      ]),
+      sparseUnit("spaces-chow", 3065, [
+        [2960, lemma("lemma-key-formula")],
+        [2970, String.raw`\begin{proof}`],
+        [2977, String.raw`Chow Homology, Equation (\ref{chow-item-normalization}).`],
+        [2990, String.raw`\end{proof}`],
+      ]),
+      sparseUnit("divisors", 20, [
+        [1, lemma("lemma-strict-transform")],
+        [10, lemma("lemma-blow-up-effective-Cartier-divisor")],
+      ]),
+      sparseUnit("schemes", 10, [[1, lemma("lemma-section-immersion")]]),
+      sparseUnit("duality", 5230, [
+        [1, lemma("lemma-shriek-open-immersion")],
+        [10, lemma("lemma-upper-shriek-composition")],
+        [20, lemma("lemma-pseudo-functor")],
+        [5067, String.raw`\item
+\label{item-cocycle-glueing}
+for each $i, j, k$ we have
+$$
+\varphi_{ik}|_{U_i \cap U_j \cap U_k} =
+\varphi_{jk}|_{U_i \cap U_j \cap U_k} \circ
+\varphi_{ij}|_{U_i \cap U_j \cap U_k}
+$$
+in $D(\mathcal{O}_{U_i \cap U_j \cap U_k})$.
+\end{enumerate}
+Here, in (2) we use that $(U_i \cap U_j \to U_i)^!$
+is given by restriction (Lemma \ref{lemma-shriek-open-immersion})
+and that we have canonical isomorphisms
+$$
+(U_i \cap U_j \to U_i)^! \circ p_i^! = p_{ij}^! =
+(U_i \cap U_j \to U_j)^! \circ p_j^!
+$$
+by Lemma \ref{lemma-upper-shriek-composition} and to get (3) we use
+that the upper shriek functors form a pseudo functor by
+Lemma \ref{lemma-pseudo-functor}.`],
+        [5130, lemma("lemma-good-dualizing-independence-covering")],
+        [5140, String.raw`\begin{proof}`],
+        [5160, String.raw`On the other hand, by condition (\ref{item-cocycle-glueing}) the pair`],
+        [5165, String.raw`\end{proof}`],
+        [5174, lemma("lemma-existence-good-dualizing")],
+        [5183, String.raw`\begin{proof}`],
+        [5194, String.raw`On the other hand, by condition (\ref{item-cocycle-glueing}) the pair`],
+        [5200, String.raw`\end{proof}`],
+      ]),
+    ];
+    const claimTags = [
+      "0EAG,chow-lemma-prepare-tame-symbol",
+      "0EAL,chow-item-bilinear-better",
+      "0EAM,chow-item-skew-better",
+      "0EAN,chow-item-normalization",
+      "0EAP,chow-item-1-x-better",
+      "0EAS,chow-lemma-tame-symbol",
+      "0AYC,chow-lemma-key-formula",
+      "0EQV,spaces-chow-lemma-key-formula",
+      "0FE9,chow-item-find-Z-in-blowup",
+      "0FEB,chow-lemma-relation-normal-cones",
+      "0FEG,chow-lemma-agreement-with-loc-chern",
+      "080E,divisors-lemma-strict-transform",
+      "0807,divisors-lemma-blow-up-effective-Cartier-divisor",
+      "01KT,schemes-lemma-section-immersion",
+      "0AU6,duality-item-cocycle-glueing",
+      "0AU8,duality-lemma-good-dualizing-independence-covering",
+      "0AU9,duality-lemma-existence-good-dualizing",
+      "0AU0,duality-lemma-shriek-open-immersion",
+      "0ATX,duality-lemma-upper-shriek-composition",
+      "0ATY,duality-lemma-pseudo-functor",
+    ].join("\n");
+    const result = extractStacksGraphFromUnits(claimUnits, claimTags, {
+      capturedAt,
+      sourceRevision: stacksSourceRevision,
+    });
+
+    for (const tag of ["0EAL", "0EAM", "0EAN", "0EAP", "0FE9", "0AU6"]) {
+      expect(result.graph.nodes.find(({ id }) => id === `tag-${tag.toLowerCase()}`))
+        .toMatchObject({ nodeClass: "theorem-like", kind: "claim" });
+    }
+    const routePrerequisites = (tag) => result.graph.proofRoutes
+      .find(({ theoremNodeId }) => theoremNodeId === `tag-${tag.toLowerCase()}`)
+      ?.dependencyIds.map((id) => id.split("-to-tag-")[1].toUpperCase()).sort();
+    expect(routePrerequisites("0EAL")).toEqual(["0EAG"]);
+    expect(routePrerequisites("0EAP")).toEqual(["0EAG"]);
+    expect(routePrerequisites("0FE9")).toEqual(["01KT", "0807", "080E"]);
+    expect(routePrerequisites("0AU6")).toEqual(["0ATX", "0ATY", "0AU0"]);
+    expect(routePrerequisites("0EAM")).toEqual([]);
+    expect(routePrerequisites("0EAN")).toEqual([]);
+    for (const tag of ["0EAM", "0EAN"]) {
+      expect(result.graph.nodes.find(({ id }) => id === `tag-${tag.toLowerCase()}`)
+        ?.evidence.note).toMatch(/equally immediate.*proof debt/u);
+      expect(result.graph.proofRoutes.find(({ theoremNodeId }) => (
+        theoremNodeId === `tag-${tag.toLowerCase()}`
+      ))?.summary).toContain("not a root attestation");
+    }
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0eal")
+      ?.evidence.note).toContain("excluded defining formula");
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0eap")
+      ?.evidence.note).toContain("symmetric remaining cases");
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-0fe9")
+      ?.evidence.note).toContain("Rees-algebra setup");
+    const incomingOwners = (tag) => result.graph.directDependencies
+      .filter(({ prerequisite }) => prerequisite.id === `tag-${tag.toLowerCase()}`)
+      .map(({ dependentNodeId }) => dependentNodeId.slice(4).toUpperCase())
+      .sort();
+    expect(incomingOwners("0EAL")).toEqual([]);
+    expect(incomingOwners("0EAM")).toEqual([]);
+    expect(incomingOwners("0EAN")).toEqual(["0AYC", "0EQV"]);
+    expect(incomingOwners("0EAP")).toEqual([]);
+    expect(incomingOwners("0FE9")).toEqual(["0FEB", "0FEG"]);
+    expect(incomingOwners("0AU6")).toEqual(["0AU8", "0AU9"]);
+    expect(result.stats).toMatchObject({
+      curatedClaimCount: 6,
+      suppressedProofXrefDependencyCount: 4,
+    });
+    expect(result.graph.references).toHaveLength(0);
+
+    const changedUnits = claimUnits.map((unit) => (
+      unit.stem === "chow"
+        ? { ...unit, content: unit.content.replace("of the tame symbol.", "for the tame symbol.") }
+        : unit
+    ));
+    expect(() => extractStacksGraphFromUnits(changedUnits, claimTags, {
+      capturedAt,
+      sourceRevision: stacksSourceRevision,
+    })).toThrow(/claim 0EAN incoming occurrence artifacts changed/u);
   });
 
   it("decomposes the mixed Tag 03II recall bundle by audited occurrence", () => {
@@ -1567,8 +3135,8 @@ Unramified morphisms are locally quasi-finite.
     expect(result.graph.references.some(({ ref }) => (
       ref === "decent-spaces-remark-recall"
     ))).toBe(false);
-    expect(result.graph.nodes.some(({ sourceXmlId }) => (
-      sourceXmlId === "decent-spaces-remark-recall"
+    expect(result.graph.directDependencies.some(({ dependentNodeId, prerequisite }) => (
+      dependentNodeId === "tag-03js" && prerequisite.id === "tag-03ii"
     ))).toBe(false);
   });
 
@@ -1622,11 +3190,18 @@ The listed goal clauses hold.
 ${references.map((reference) => String.raw`We establish \ref{${reference}}.`).join(" ")}
 \end{proof}`;
     const content = [
-      String.raw`\label{item-vanishing}`,
-      String.raw`\label{item-finite-proper}`,
-      String.raw`\label{item-base-change-prime-to-p}`,
-      String.raw`\label{item-base-change-proper}`,
-      String.raw`\label{item-surjective}`,
+      String.raw`\begin{enumerate}
+\item \label{item-vanishing}
+The vanishing goal.
+\item \label{item-finite-proper}
+The finite-proper goal.
+\item \label{item-base-change-prime-to-p}
+The prime-to-p base-change goal.
+\item \label{item-base-change-proper}
+The proper base-change goal.
+\item \label{item-surjective}
+The surjectivity goal.
+\end{enumerate}`,
       owner("lemma", "lemma-constant-smooth-statements", [
         "item-base-change-prime-to-p",
         "item-base-change-proper",
@@ -1668,24 +3243,42 @@ ${references.map((reference) => String.raw`We establish \ref{${reference}}.`).jo
 
     expect(result.stats).toMatchObject({
       theoremCount: 4,
-      directDependencyCount: 0,
+      sourceArtifactCount: 1,
+      sourceArtifactKindCounts: { item: 1 },
+      directDependencyCount: 1,
+      sourceArtifactDependencyCount: 1,
+      sourceArtifactRouteCount: 1,
       suppressedProofXrefDependencyCount: 9,
-      unresolvedTaggedProofReferenceCount: 1,
-      uniqueUnresolvedTaggedProofTargetCount: 1,
+      unresolvedTaggedProofReferenceCount: 0,
+      uniqueUnresolvedTaggedProofTargetCount: 0,
+      emptySourceRouteCount: 3,
+    });
+    expect(result.graph.nodes.find(({ id }) => id === "tag-0a53")).toMatchObject({
+      nodeClass: "source-artifact",
+      kind: "item",
     });
     expect(result.graph.nodes.some(({ id }) => [
-      "tag-0a53",
       "tag-0a57",
       "tag-0a58",
       "tag-0a59",
       "tag-0a5a",
     ].includes(id))).toBe(false);
+    expect(result.graph.directDependencies).toEqual([
+      expect.objectContaining({
+        dependentNodeId: "tag-0a5b",
+        prerequisite: { type: "node", id: "tag-0a53" },
+        role: "source-reference",
+      }),
+    ]);
     expect(result.graph.references).toEqual([
       expect.objectContaining({
         ownerNodeId: "tag-0a5b",
         ref: "etale-cohomology-item-vanishing",
         basis: "proof-xref",
-        resolution: expect.objectContaining({ status: "unresolved" }),
+        resolution: expect.objectContaining({
+          status: "resolved",
+          target: { type: "node", id: "tag-0a53" },
+        }),
       }),
     ]);
   });

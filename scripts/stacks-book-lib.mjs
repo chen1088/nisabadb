@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
+import { locateStacksSourceArtifacts } from "./stacks-source-artifacts.mjs";
 
 const GRAPH_ENVIRONMENTS = new Map([
   ["definition", { nodeClass: "support", kind: "definition" }],
@@ -12,7 +13,7 @@ const GRAPH_ENVIRONMENTS = new Map([
 
 const EXCLUDED_ENVIRONMENTS = ["example", "exercise", "remark", "remarks"];
 
-// A remark is not a theorem merely because later proofs cite it. These three
+// A remark is not a theorem merely because later proofs cite it. These exact-label
 // pinned-source remarks are exceptional: each states an explicit mathematical
 // claim and gives its derivation inline. They were individually reviewed before
 // promotion. Keep this allowlist label-exact and do not generalize it by wording,
@@ -38,6 +39,24 @@ const CURATED_CLAIMS = new Map([
     startLine: 9385,
     endLine: 9438,
     sourceTextSha256: "befc4e009ad1ef5308039a0453426673be611cbaf2aa09918ad979058d06241b",
+  }],
+  ["flat-remark-successive-blowups", {
+    title: "Successive admissible-blowup reductions",
+    startLine: 8610,
+    endLine: 8665,
+    sourceTextSha256: "f7df6d2fb4c463e5883419506cb03224f4e355f4262e2255bb2419215ea5c3a1",
+  }],
+  ["simplicial-remark-homotopy-better", {
+    title: "Componentwise simplicial homotopy and functoriality",
+    startLine: 4519,
+    endLine: 4545,
+    sourceTextSha256: "d651d6ec33fedd7b753489405702c8c75d9695a6cf56717fa95bdcf9dd688b7b",
+  }],
+  ["duality-remark-relative-dualizing-complex", {
+    title: "Relative dualizing complex, trace, and base-change compatibilities",
+    startLine: 2727,
+    endLine: 2768,
+    sourceTextSha256: "80700177e1bd893b674206641bf9b5f555f30df451f21609f44001f6930c6f61",
   }],
 ]);
 
@@ -191,6 +210,86 @@ const CURATED_PROSE_CLAIMS = new Map([
       "075B": "The source omits verification that the pointwise bijection commutes with restriction maps; that compatibility remains route debt.",
     },
   }],
+  ["sites-modules-equation-map-lower-shriek-OU-into-module", {
+    title: "Sections represented by extension-by-zero of the structure module",
+    sourceStem: "sites-modules",
+    startLine: 2145,
+    endLine: 2157,
+    sourceTextSha256: "433c4b00fa7a5dea5cb4a1ea87cf422eb3193a5f92be9bff0c6c1e2e86f282b8",
+    routeDebtNote: "Its Tag 03DI adjunction prerequisite has a source proof that omits verification that the two constructions are mutually inverse; that upstream verification remains route debt.",
+  }],
+  ["chow-item-bilinear-better", {
+    title: "Bilinearity of the tame symbol on nonzerodivisors",
+    sourceStem: "chow",
+    startLine: 781,
+    endLine: 784,
+    sourceTextSha256: "da2927444464ce4fb829b2dcfe704b705981699fdffe59b937cb8459a1344534",
+    proofSpans: [
+      { startLine: 911, endLine: 926, sourceTextSha256: "d3879aac9e6c36ec589ca669936533ed0ad915e62364b10015d8e91d22d2f039" },
+    ],
+    routeDebtNote: "The calculation also unfolds the excluded defining formula in Tag 0EAQ; that formula remains separate proof debt.",
+  }],
+  ["chow-item-skew-better", {
+    title: "Diagonal formula for the tame symbol on a nonzerodivisor",
+    sourceStem: "chow",
+    startLine: 785,
+    endLine: 788,
+    sourceTextSha256: "7683e7cbe0a029ba0c123251c92d9493820f4ad9b7bdbff6045c7a58405dd184",
+    hasInlineDerivation: false,
+    pendingProofSpan: {
+      startLine: 927,
+      endLine: 928,
+      sourceTextSha256: "78817f8e298215775dfd525d7c1cff0cc81535a70fe9c1364ea58ff8a2f8cca0",
+    },
+    pendingProofDebtNote: "The later source proof only calls this calculation equally immediate; the excluded defining formula in Tag 0EAQ and the omitted calculation remain proof debt, so no candidate route is asserted.",
+  }],
+  ["chow-item-normalization", {
+    title: "Unit normalization of the tame symbol",
+    sourceStem: "chow",
+    startLine: 789,
+    endLine: 792,
+    sourceTextSha256: "9cbf0540796f106ddea9620e6767bd9cced49db1d901547d5e77cda83cda52bc",
+    hasInlineDerivation: false,
+    pendingProofSpan: {
+      startLine: 927,
+      endLine: 928,
+      sourceTextSha256: "78817f8e298215775dfd525d7c1cff0cc81535a70fe9c1364ea58ff8a2f8cca0",
+    },
+    pendingProofDebtNote: "The later source proof only calls this calculation equally immediate; the excluded defining formula in Tag 0EAQ and the omitted calculation remain proof debt, so no candidate route is asserted.",
+  }],
+  ["chow-item-1-x-better", {
+    title: "Tame-symbol one-minus identity on nonzerodivisors",
+    sourceStem: "chow",
+    startLine: 793,
+    endLine: 796,
+    sourceTextSha256: "8833e0ab1460b2b504047b9bc929489dc78cdb4a91fcbbbd6f9eb6221b1f1c6f",
+    proofSpans: [
+      { startLine: 931, endLine: 948, sourceTextSha256: "f081dfdff7407f9e0d57c8983b336e5eb78aa5f7ba531f1601ae409de6ec10c1" },
+    ],
+    routeDebtNote: "The calculation also unfolds the excluded defining formula in Tag 0EAQ and leaves the symmetric remaining cases to the reader; those points remain proof debt.",
+  }],
+  ["chow-item-find-Z-in-blowup", {
+    title: "Closed immersion of the projective line over the blowup center",
+    sourceStem: "chow",
+    startLine: 11677,
+    endLine: 11683,
+    sourceTextSha256: "0476085e5d0ffdb65c20c11615390763fc9ec572f858ad186a69c30aacedd2d0",
+    proofSpans: [
+      { startLine: 11715, endLine: 11723, sourceTextSha256: "3bb40bbc9abecedf2a1be6f61b804b0603dfcd612ae8674d9adb40d1f1b9d60c" },
+      { startLine: 11815, endLine: 11825, sourceTextSha256: "624e481a8f783965160eab15bfa74384ea91657ca7a2b0a6d916fe100560b2d1" },
+    ],
+    routeDebtNote: "The split source proof uses the intervening Rees-algebra setup and explicitly omits local calculation details; those steps remain route debt.",
+  }],
+  ["duality-item-cocycle-glueing", {
+    title: "Cocycle identity for local dualizing complexes",
+    sourceStem: "duality",
+    startLine: 5067,
+    endLine: 5075,
+    sourceTextSha256: "a38fc4b5890af69f4cac01e13cb0fdc72b4edc4addac556b392a4e2d8324616b",
+    proofSpans: [
+      { startLine: 5077, endLine: 5086, sourceTextSha256: "3942c4f61e1e35d6166d6ab040e3ca0fd50976053aa2c10582e984e0b3f425f7" },
+    ],
+  }],
 ]);
 
 // Direct prerequisites of promoted claims whose derivations are stated in
@@ -227,6 +326,12 @@ const CURATED_CLAIM_DEPENDENCIES = [
     phrasePattern: "\\$2\\$-Yoneda lemma",
     expectedOccurrenceCount: 1,
   },
+  {
+    ownerTag: "0G1V",
+    targetTag: "03DI",
+    phrasePattern: "adjointness of \\$j_\\{U!\\}\\$ and \\$j_U\\^\\*\\$",
+    expectedOccurrenceCount: 1,
+  },
 ];
 
 // Complete incoming proof-reference inventories for the newly promoted claims.
@@ -246,6 +351,38 @@ const CURATED_CLAIM_INCOMING_REFERENCE_COUNTS = new Map([
   ["0F0K", { "07DQ": 1 }],
   ["0GQT", { "0GRD": 1 }],
   ["0FFR", { "0FFS": 1, "0FFT": 1, "0FFU": 1, "0FPA": 1, "0FPS": 1, "0FNW": 1, "0FNZ": 1 }],
+  ["080Y", { "0811": 3, "0814": 2, "0815": 1, "081R": 1, "081S": 1, "081T": 1, "0ETR": 1, "0ETT": 1 }],
+  ["019M", { "019P": 1, "08Q4": 1, "019X": 1, "019Y": 1, "0G5R": 1, "0G5S": 1, "08Q9": 1, "09W5": 1, "09WI": 1, "0D9B": 1 }],
+  ["0B6S", { "0E4L": 1, "0BRT": 1, "0FVV": 1, "0FW1": 1, "0G8I": 1, "0BS2": 1, "0E32": 1, "0FYX": 1, "0FYY": 2 }],
+  ["0G1V", { "0934": 1, "0G1W": 1, "0936": 1, "0G21": 1 }],
+  ["0EAL", { "0EAS": 1 }],
+  ["0EAM", { "0EAS": 1 }],
+  ["0EAN", { "0EAS": 1, "0AYC": 1, "0EQV": 1 }],
+  ["0EAP", { "0EAS": 1 }],
+  ["0FE9", { "0FEB": 1, "0FEG": 1 }],
+  ["0AU6", { "0AU8": 1, "0AU9": 1 }],
+]);
+
+// Full canonical occurrence hashes complement the owner/count inventories for
+// this item batch. A source edit that preserves counts but changes the guarded
+// proof context must fail rather than silently inherit the audit.
+const CURATED_CLAIM_INCOMING_REFERENCE_ARTIFACTS = new Map([
+  ["0EAL", { "0EAS": "080fd47ac95e76f8a47f460953dc20774dbc0dd56eb63ee8c4c9f890dc71c3fd" }],
+  ["0EAM", { "0EAS": "172feec068ff522ee0e8c488c0bc43a2a6f2161c38db408a97e65b3774baea9c" }],
+  ["0EAN", {
+    "0EAS": "11364fae85e0a9b3a37b43cef61d008ef0de03287c63213cd78d9a3a4eec3543",
+    "0AYC": "3f2b206a003cd301cb68023e950de7a6c19061ad34fd64625e09515ecc46775c",
+    "0EQV": "a76c4bde7eca33a307efdb27b07d8a0594627b7ce38bce5f1dd400b7bbf0049d",
+  }],
+  ["0EAP", { "0EAS": "09ba4ea38f69ace0ff3667979b25ce1cd917021883ac74cbd3504a300948167c" }],
+  ["0FE9", {
+    "0FEB": "fe1a7030e860cdb01f697ac38eadbe7ab6c052e8209b7618e88df4d0620919f9",
+    "0FEG": "afd03346cad79b8e5ece89542c39490091a13ef27e9afb0b529dfffa6e76e125",
+  }],
+  ["0AU6", {
+    "0AU8": "3bec01c6d16ae95e658892b6d5f4c634901d63a780705b293c1ba4d16609133f",
+    "0AU9": "de8fa65c73a0004a884033f439d8c8f0a4c90cd46b3a46909bb2bb2ed373733d",
+  }],
 ]);
 
 const CURATED_CITATION_SOURCE_REVISION = "ed88ff783bcb4dd9a28518a33b028841094009cf";
@@ -846,6 +983,12 @@ const CURATED_NONDEPENDENCY_PROOF_XREFS = new Set([
   "0GJA|0A5A",
   "03SC|0A53",
   "03SC|0A5A",
+  // These labels are the four tame-symbol subgoals proved inside Tag 0EAS,
+  // not prerequisites imported by that proof.
+  "0EAS|0EAL",
+  "0EAS|0EAM",
+  "0EAS|0EAN",
+  "0EAS|0EAP",
 ]);
 
 // These labeled prose/display spans are assumptions, definitions, predicates,
@@ -1035,6 +1178,315 @@ const CURATED_PROSE_SUPPORT_NODES = [
     },
   },
   {
+    targetTag: "0F6J",
+    kind: "construction",
+    title: "Finite formal-sum presentation of f_{p!}F(V)",
+    sourceStem: "more-etale",
+    startLine: 811,
+    endLine: 846,
+    sourceTextSha256: "4bbbf03c3bafcc55c0b366d044c3f6c8afc4efbf0afe39eb674bd47a944c5089",
+    ownerOccurrenceCounts: { "0F6P": 2, "0F6Q": 1, "0F5J": 2, "0F79": 2 },
+    dependencyDebtNote: "The construction reuses aggregate Section Tag 0F71, the item-level inclusion map in Tag 0F6H, and implicitly Tag 02LS for the finite/proper equivalence; support-node prerequisites remain provenance debt rather than outgoing proof routes.",
+    ownerRouteDebtNotes: {
+      "0F6P": "The source omits compatibility of the stalk map with restriction maps and Tags 0F6K and 0F6L, and omits the translation between geometric-point and residue-field formulations; those verifications remain route debt.",
+      "0F6Q": "The source omits compatibility of the constructed map with restriction mappings and functoriality in the sheaf; those verifications remain route debt.",
+      "0F5J": "The source omits compatibility with Tags 0F6K and 0F6L and with restriction maps; those verifications remain route debt.",
+      "0F79": "The source skips a base-change diagram verification, omits the proof details for part (c), and omits the direct-sum reduction details; those verifications remain route debt.",
+    },
+  },
+  {
+    targetTag: "0F6K",
+    kind: "construction",
+    title: "Additivity relation for finite-support sections",
+    sourceStem: "more-etale",
+    startLine: 833,
+    endLine: 835,
+    sourceTextSha256: "a8083e56b7c5743ad707da713435b5e1952867ae43ba2bee857cef98df30bfd3",
+    ownerOccurrenceCounts: { "0F6P": 2, "0F5J": 1, "0F79": 1 },
+    ownerOccurrenceArtifactSha256: {
+      "0F6P": "56b2977c73c45eca8d7fd7f1d6f672f9080c2f35f5b1cc998682b42fb5e47ffc",
+      "0F5J": "35a3c98f52737bb63098de0f29e150c7a58a41c9ffa2ea6c46573bddc336a375",
+      "0F79": "b914082665d05df6dbc21baf168270263eebd2b7961c4dd7b82b464021efa578",
+    },
+    dependencyDebtNote: "This defining relation depends on the surrounding formal-sum construction in Tag 0F6J; support-node prerequisites remain provenance debt rather than outgoing proof routes.",
+    ownerRouteDebtNotes: {
+      "0F6P": "The source explicitly omits verification that the stalk map kills the defining relations; that well-definedness check remains route debt.",
+      "0F5J": "The source omits compatibility with the defining relations and restriction mappings; those verifications remain route debt.",
+    },
+  },
+  {
+    targetTag: "0F6L",
+    kind: "construction",
+    title: "Enlargement-of-support relation for finite-support sections",
+    sourceStem: "more-etale",
+    startLine: 836,
+    endLine: 838,
+    sourceTextSha256: "2240b1942b521183a9a70cfdc60e3da7031a91dfd7c8ba6580fce5a6945a7c27",
+    ownerOccurrenceCounts: { "0F6P": 3, "0F5J": 1, "0F79": 1 },
+    ownerOccurrenceArtifactSha256: {
+      "0F6P": "d3cd866b1efe0f2e0e34f07035c12255e3c522a1c659ab6c6be8d5dc2c5373b9",
+      "0F5J": "4ef037174fabb4b3fe9d8240c153dacec8f5f303e526cb17405076a7f5b5a619",
+      "0F79": "e0eb06088b506f427cf6f34874edc038daa1b24ac696dfa55d2ca34b803a33ef",
+    },
+    dependencyDebtNote: "This defining relation depends on Tag 0F6J and the item-level inclusion map in Tag 0F6H; those support prerequisites remain provenance debt rather than outgoing proof routes.",
+    ownerRouteDebtNotes: {
+      "0F6P": "The source explicitly omits verification that the stalk map kills the defining relations; that well-definedness check remains route debt.",
+      "0F5J": "The source omits compatibility with the defining relations and restriction mappings; those verifications remain route debt.",
+    },
+  },
+  {
+    targetTag: "0H9C",
+    kind: "definition",
+    title: "Degree-zero normalization condition for c_{Y/X}",
+    sourceStem: "derham",
+    startLine: 3230,
+    endLine: 3233,
+    sourceTextSha256: "7ffd73f0087f0d245adff1275ea16532769d0ded0e0c31125ad3e9e514525e21",
+    ownerOccurrenceCounts: { "0H9G": 1, "0FLA": 5 },
+    ownerOccurrenceArtifactSha256: {
+      "0H9G": "12f18f7b82bac5550664b255897dc6646dc31c024293acd8a0ceeea4885b798a",
+      "0FLA": "24cf2a1d5f51a9f2f3ddc35e8d094cdb7bd6a2bd81f93e9d66d9e8225942c539",
+    },
+    dependencyDebtNote: "The condition delegates the discriminant section and Tate-map normalization to aggregate Section Tag 0FKB; that learner prerequisite remains support provenance debt.",
+  },
+  {
+    targetTag: "0H9D",
+    kind: "definition",
+    title: "Multiplicativity condition for c_{Y/X}",
+    sourceStem: "derham",
+    startLine: 3234,
+    endLine: 3238,
+    sourceTextSha256: "6cecbaae66743545770abc9c0d92ab5545fc20d85b9de6510572c7e6eed958bb",
+    ownerOccurrenceCounts: { "0H9G": 1, "0FLA": 5 },
+    ownerOccurrenceArtifactSha256: {
+      "0H9G": "3b26a26f66e563926418875700b7f1009b3f97a4b545537a578c62e1c5fa59ef",
+      "0FLA": "a1395502be6a6b3a290779aba01fa57a48538f0487cb91fcd7ce1c26581cf845",
+    },
+    dependencyDebtNote: "The condition relies on the surrounding differential-form and wedge-product setup; those learner prerequisites remain support provenance debt.",
+  },
+  {
+    targetTag: "0FNH",
+    kind: "construction",
+    title: "Shift-tensor canonical isomorphism",
+    sourceStem: "more-algebra",
+    startLine: 18384,
+    endLine: 18395,
+    sourceTextSha256: "33114700942851fecab52ffd651d4648922766b521bce150885665a9f6c9638d",
+    ownerOccurrenceCounts: { "0FP2": 1 },
+    ownerOccurrenceArtifactSha256: {
+      "0FP2": "9dce9288bb574acc3868b8c7ffe0281ea4dd98d5232ef83906bf410e95f631a4",
+    },
+    dependencyDebtNote: "The sign convention delegates its justification to excluded Remark Tag 0FLG; that learner prerequisite remains unresolved support provenance debt.",
+  },
+  {
+    targetTag: "0FNL",
+    kind: "construction",
+    title: "Tensor-dual and Hom-complex sign compatibility",
+    sourceStem: "more-algebra",
+    startLine: 18532,
+    endLine: 18545,
+    sourceTextSha256: "035e8a2d0b5fa90aad787b77674be7fba6f7a336f0153a9052fc1d3ce9861df4",
+    ownerOccurrenceCounts: { "07VI": 1 },
+    ownerOccurrenceArtifactSha256: {
+      "07VI": "78818e74e53583f0d388715dfa67e84edc2a1bf50f008d9af538b19d29f082ab",
+    },
+    dependencyDebtNote: "The construction explicitly uses the left-dual-complex result in Tag 0FNK; that learner prerequisite remains support provenance debt rather than an outgoing proof route.",
+  },
+  {
+    targetTag: "0FZC",
+    kind: "construction",
+    title: "Kernel-transform functor on quasi-coherent modules",
+    sourceStem: "functors",
+    startLine: 817,
+    endLine: 834,
+    sourceTextSha256: "5986ee8ab6736f8b0f471dae31ed6cf12e0ff584ebf665d7286047c4f79c8bf2",
+    ownerOccurrenceCounts: { "0FZD": 2, "0FZH": 2, "0FZN": 1, "0FZR": 1 },
+    excludedEnvironment: "example",
+    dependencyDebtNote: "The construction explicitly uses Tags 01K5, 01KU, 01LC, and 07TB; support-node prerequisites remain provenance debt rather than outgoing proof routes.",
+    ownerRouteDebtNotes: {
+      "0FZD": "The source omits verification of fully faithfulness; that verification remains route debt.",
+      "0FZH": "The source omits functoriality and the verification that the two constructions are quasi-inverse; those verifications remain route debt.",
+    },
+  },
+  {
+    targetTag: "0AL4",
+    kind: "definition",
+    title: "I-adically complete algebras with finite-type reduction",
+    sourceStem: "restricted",
+    startLine: 107,
+    endLine: 118,
+    sourceTextSha256: "3b2e77c46f505201b0dd5b7b870349ad251080846f31d2cca5780b74f467df10",
+    ownerOccurrenceCounts: { "0GAF": 1, "0ALM": 1, "0GCK": 1, "0AQL": 1 },
+    dependencyDebtNote: "The definition uses the fixed ring and ideal setup of aggregate Section Tag 0AL2; that contextual prerequisite remains support provenance debt.",
+    ownerRouteDebtNotes: {
+      "0GCK": "The source omits minor details in the base-change-for-derived-Hom step; those details remain route debt.",
+    },
+  },
+  {
+    targetTag: "08S4",
+    kind: "definition",
+    title: "Square-zero ring deformation problem",
+    sourceStem: "defos",
+    startLine: 35,
+    endLine: 55,
+    sourceTextSha256: "79b3461325c58a9904db6772e826e6df4e4459be40177c83f6bd401826cbf039",
+    ownerOccurrenceCounts: { "08S7": 1, "0GPT": 1, "0GPX": 1, "08S6": 1 },
+  },
+  {
+    targetTag: "08U7",
+    kind: "definition",
+    title: "Square-zero ringed-space deformation problem",
+    sourceStem: "defos",
+    startLine: 1704,
+    endLine: 1736,
+    sourceTextSha256: "0cdc51e61c5afc65448ac7eb344799a2ccdda74f45ecca546b96c207f858f1e0",
+    ownerOccurrenceCounts: { "08UC": 1, "0GPZ": 1, "0GQ3": 1, "0D14": 1 },
+    dependencyDebtNote: "The definition explicitly uses Tag 008J, aggregate Section Tag 0094, and Tag 08L0; support-node prerequisites remain provenance debt rather than outgoing proof routes.",
+    ownerRouteDebtNotes: {
+      "08UC": "The source omits the calculation identifying the obstruction class with the chosen extension class; that calculation remains route debt.",
+    },
+  },
+  {
+    targetTag: "0E29",
+    kind: "construction",
+    title: "Canonical base-change map for trivial duality",
+    sourceStem: "dualizing",
+    startLine: 2441,
+    endLine: 2476,
+    sourceTextSha256: "93febbd4a788e3ab3a0e3c1d994af5892d503b4242363192e8591a52f6b8d6cd",
+    ownerOccurrenceCounts: { "0E2A": 1, "0BZN": 1, "0BZR": 1, "0E2M": 1 },
+    dependencyDebtNote: "The construction explicitly uses Tags 0A70 and 0661; support-node prerequisites remain provenance debt rather than outgoing proof routes.",
+  },
+  {
+    targetTag: "05NN",
+    kind: "construction",
+    title: "Comparison map from a colimit of morphism sets",
+    sourceStem: "injectives",
+    startLine: 54,
+    endLine: 71,
+    sourceTextSha256: "bf72cf5bfda8a4e1bf93dc9aa6b243774a6b1610d4502b73da6f95352b61f575",
+    ownerOccurrenceCounts: { "05NR": 2, "05NT": 1, "079F": 1 },
+  },
+  {
+    targetTag: "07Q0",
+    kind: "assumption",
+    title: "Vanishing of d(a)",
+    sourceStem: "crystalline",
+    startLine: 5018,
+    endLine: 5019,
+    sourceTextSha256: "0cdad9cb2932c5f3842c51ef2b5462e3fc1a25a0d6d334cf470d9e20921b1596",
+    ownerOccurrenceCounts: { "07Q7": 1, "07N1": 2 },
+    ownerRouteDebtNotes: {
+      "07Q7": "The referenced situation also assumes Tag 07Q2, although this proof never explicitly cites that label; the implicit dependency remains route debt.",
+    },
+  },
+  {
+    targetTag: "07Q1",
+    kind: "assumption",
+    title: "Differential direct-sum decomposition",
+    sourceStem: "crystalline",
+    startLine: 5021,
+    endLine: 5025,
+    sourceTextSha256: "b5166be3112be94bf3497af7f8459b307c913809b80c21bb4b965a132cc0dda4",
+    ownerOccurrenceCounts: { "07Q7": 1, "07N1": 2 },
+  },
+  {
+    targetTag: "07Q2",
+    kind: "assumption",
+    title: "B-linearity of theta",
+    sourceStem: "crystalline",
+    startLine: 5027,
+    endLine: 5028,
+    sourceTextSha256: "621c8fc4880b50727e821fca1cde710333ffc5f42c23da2de53f8e0cd2ade7b8",
+    ownerOccurrenceCounts: { "07N1": 2 },
+  },
+  {
+    targetTag: "07Q3",
+    kind: "assumption",
+    title: "Integration identity for theta",
+    sourceStem: "crystalline",
+    startLine: 5030,
+    endLine: 5031,
+    sourceTextSha256: "d05c633548c4d81c1e5b55c558339ac5bbbc91b95264d3d77d0754709c100eb5",
+    ownerOccurrenceCounts: { "07Q7": 1, "07N1": 3 },
+  },
+  {
+    targetTag: "07Q4",
+    kind: "assumption",
+    title: "Universal injectivity of B into B-prime",
+    sourceStem: "crystalline",
+    startLine: 5033,
+    endLine: 5035,
+    sourceTextSha256: "9fc3e90d0d49f453448acd9dc53163a960b2128c2525abe75da55c866a570a41",
+    ownerOccurrenceCounts: { "07Q7": 1, "07N1": 2 },
+  },
+  {
+    targetTag: "07Q5",
+    kind: "assumption",
+    title: "Factorization condition for theta",
+    sourceStem: "crystalline",
+    startLine: 5037,
+    endLine: 5038,
+    sourceTextSha256: "c04d9c4127feccf6941cadfdd3a968a28e4dcf08643b06ddb783a1e148e5ce9d",
+    ownerOccurrenceCounts: { "07Q7": 1, "07N1": 4 },
+    dependencyDebtNote: "The source derives this condition from Tag 07Q3 only under an additional kernel hypothesis; it remains a distinct assumption here.",
+  },
+  {
+    targetTag: "07Q6",
+    kind: "assumption",
+    title: "Horizontality condition for theta",
+    sourceStem: "crystalline",
+    startLine: 5040,
+    endLine: 5043,
+    sourceTextSha256: "505e03fc5ee216da9d00aa23d126821a7fcbda26c03a699ab3a627d0363c9190",
+    ownerOccurrenceCounts: { "07Q7": 1, "07N1": 3 },
+    dependencyDebtNote: "The source derives this condition from Tag 07Q3 only under additional kernel hypotheses; it remains a distinct assumption here.",
+  },
+  {
+    targetTag: "07JB",
+    kind: "definition",
+    title: "p-adically complete D-module condition",
+    sourceStem: "crystalline",
+    startLine: 2972,
+    endLine: 2973,
+    sourceTextSha256: "3b61c406e8bea52f6ef9cd024c61e051b561b4c088433f384a676d8ad8974ff8",
+    ownerOccurrenceCounts: { "07L5": 2 },
+    ownerRouteDebtNotes: {
+      "07L5": "The source explicitly omits horizontality of the final isomorphism and says transfer of topological quasi-nilpotence to the primed object is tricky to formulate; those points remain route debt.",
+    },
+  },
+  {
+    targetTag: "07JC",
+    kind: "definition",
+    title: "Connection on a p-adically complete D-module",
+    sourceStem: "crystalline",
+    startLine: 2975,
+    endLine: 2977,
+    sourceTextSha256: "fb598848311e19d102662e9bd25e8aeaa57d1a496b341fd7d4c93777b11195d3",
+    ownerOccurrenceCounts: { "07L5": 2 },
+  },
+  {
+    targetTag: "07JD",
+    kind: "definition",
+    title: "Integrable connection condition",
+    sourceStem: "crystalline",
+    startLine: 2979,
+    endLine: 2981,
+    sourceTextSha256: "a6a7eed4396b5f6de3d86acc97b91b5edbc90d63f8fff3f8192a046075ddc430",
+    ownerOccurrenceCounts: { "07L5": 2 },
+    dependencyDebtNote: "The condition delegates the meaning of integrability to excluded Remark Tag 07I0; that learner prerequisite remains unresolved.",
+  },
+  {
+    targetTag: "07JE",
+    kind: "definition",
+    title: "Topologically quasi-nilpotent connection condition",
+    sourceStem: "crystalline",
+    startLine: 2983,
+    endLine: 2987,
+    sourceTextSha256: "556256d8abc8841793f9f51cb9963bcc4a517d62a5fb0f75fc6c4bf2faebb97e",
+    ownerOccurrenceCounts: { "07L5": 2 },
+  },
+  {
     targetTag: "0880",
     kind: "construction",
     title: "Adic completion functor on coherent modules",
@@ -1195,6 +1647,7 @@ function sourceLabel(kind, tag) {
 }
 
 function dependencyRole(node) {
+  if (node.nodeClass === "source-artifact") return "source-reference";
   if (node.kind === "definition") return "definition";
   if (node.kind === "notation") return "notation";
   if (node.kind === "construction") return "construction";
@@ -1462,7 +1915,7 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
           locator,
           artifactSha256: sha256(rawEnvironment),
           capturedAt,
-          note: "Formal Stacks environment captured from the pinned LaTeX source; examples, exercises, and uncurated remarks are outside the graph policy.",
+          note: "Formal Stacks environment captured from the pinned LaTeX source; worked examples and exercises are not theorem-like nodes, exact configured support spans are handled separately, and uncurated remarks remain outside the graph policy.",
         }),
       };
       metadata.push({
@@ -1574,16 +2027,43 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
     const label = sourceLabel("claim", tag);
     const artifactSha256 = rawClaimSha256;
     const normalizedClaim = normalizeWhitespace(rawClaim.replace(/^\s*\\item\s*/u, ""));
-    const hasInlineDerivation = curatedConfig.hasInlineDerivation !== false;
-    const proofs = hasInlineDerivation
-      ? [{
+    const auditedProofSpans = (curatedConfig.proofSpans ?? []).map((proofSpan, index) => {
+      const rawProof = lines.slice(proofSpan.startLine - 1, proofSpan.endLine).join("\n");
+      const rawProofSha256 = sha256(rawProof);
+      if (rawProofSha256 !== proofSpan.sourceTextSha256) {
+        throw new Error(`Curated prose claim ${fullLabel} proof span ${index + 1} changed from its audited source text`);
+      }
+      return {
+        startLine: proofSpan.startLine,
+        endLine: proofSpan.endLine,
+        title: null,
+        rawProof,
+        references: referencesInLines(lines, proofSpan.startLine, proofSpan.endLine),
+        citations: citationsInLines(lines, proofSpan.startLine, proofSpan.endLine),
+      };
+    });
+    if (curatedConfig.pendingProofSpan) {
+      const pendingProofSpan = curatedConfig.pendingProofSpan;
+      const rawPendingProof = lines
+        .slice(pendingProofSpan.startLine - 1, pendingProofSpan.endLine)
+        .join("\n");
+      if (sha256(rawPendingProof) !== pendingProofSpan.sourceTextSha256) {
+        throw new Error(`Curated prose claim ${fullLabel} pending-proof span changed from its audited source text`);
+      }
+    }
+    const hasInlineDerivation = auditedProofSpans.length > 0
+      || curatedConfig.hasInlineDerivation !== false;
+    const proofs = auditedProofSpans.length > 0
+      ? auditedProofSpans
+      : hasInlineDerivation
+        ? [{
           ...range,
           title: "Inline derivation in source prose",
           rawProof: rawClaim,
           references: referencesInLines(lines, range.startLine, range.endLine),
           citations: citationsInLines(lines, range.startLine, range.endLine),
         }]
-      : [];
+        : [];
     metadata.push({
       node: {
         id: nodeId,
@@ -1600,9 +2080,11 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
           locator,
           artifactSha256,
           capturedAt,
-          note: hasInlineDerivation
-            ? "Exact labeled Stacks prose/display span promoted after source audit because it states and derives a theorem-level claim; equation labels are not promoted generally."
-            : "Exact labeled Stacks prose/list span promoted after source audit because it states a theorem-level claim; the source supplies no proof here, so the claim remains dependency-pending and item labels are not promoted generally.",
+          note: auditedProofSpans.length > 0
+            ? "Exact labeled Stacks prose/list span promoted after source audit because it states a theorem-level claim and is paired with separately hash-guarded source derivation span(s); item labels are not promoted generally."
+            : hasInlineDerivation
+              ? "Exact labeled Stacks prose/display span promoted after source audit because it states and derives a theorem-level claim; equation labels are not promoted generally."
+              : `Exact labeled Stacks prose/list span promoted after source audit because it states a theorem-level claim; no dependency-bearing candidate proof route is supplied, so the claim remains pending and item labels are not promoted generally.${curatedConfig.pendingProofDebtNote ? ` ${curatedConfig.pendingProofDebtNote}` : ""}`,
         }),
       },
       unit,
@@ -1659,7 +2141,7 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
           locator,
           artifactSha256,
           capturedAt,
-          note: `Exact labeled Stacks prose/display span promoted as a source-audited assumption, definition, or construction because formal proofs use it directly; no theorem-like claim is asserted.${curatedConfig.dependencyDebtNote ? ` ${curatedConfig.dependencyDebtNote}` : ""}`,
+          note: `Exact labeled Stacks prose/display span promoted as a source-audited assumption, definition, or construction because formal proofs use it directly; no theorem-like claim is asserted.${curatedConfig.excludedEnvironment ? ` The surrounding ${curatedConfig.excludedEnvironment} remains excluded as an environment; only this exact support span is represented.` : ""}${curatedConfig.dependencyDebtNote ? ` ${curatedConfig.dependencyDebtNote}` : ""}`,
         }),
       },
       unit,
@@ -1675,6 +2157,7 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
       curatedSupport: true,
     });
   }
+
   metadata.sort((left, right) => left.startLine - right.startLine);
 
   const proofRanges = environmentRanges(lines, "proof");
@@ -1773,7 +2256,9 @@ function referenceEntity({ group, dependencyId, capturedAt, usedIds }) {
         target: { type: "node", id: targetNode.id },
         directDependencyId: dependencyId,
         note: basis === "proof-xref"
-          ? "The stable Stacks label resolves to an inventoried formal node and its proof citation is represented by the linked direct dependency."
+          ? targetNode.nodeClass === "source-artifact"
+            ? "The stable Stacks label resolves to an exact raw source artifact and its occurrence is represented by the linked source-reference dependency; mathematical classification, decomposition, or suppression remains pending."
+            : "The stable Stacks label resolves to an inventoried mathematical node and its proof citation is represented by the linked direct dependency."
           : "The stable Stacks label resolves to an inventoried formal node; statement citations are retained but are not promoted to proof dependencies.",
       }
       : {
@@ -1847,10 +2332,9 @@ export function extractStacksGraphFromUnits(
     locator: unit.path,
     contentSha256: sha256(unit.content),
   }));
-  const metadata = units.flatMap((unit) => graphNodesFromUnit(unit, tags, capturedAt));
-  const nodes = metadata.map(({ node }) => node);
+  let metadata = units.flatMap((unit) => graphNodesFromUnit(unit, tags, capturedAt));
   const nodeByFullLabel = new Map();
-  for (const { node, aliasFullLabels } of metadata) {
+  const registerMetadataLabels = ({ node, aliasFullLabels }) => {
     for (const fullLabel of [node.sourceXmlId, ...new Set(aliasFullLabels)]) {
       const existing = nodeByFullLabel.get(fullLabel);
       if (existing && existing.id !== node.id) {
@@ -1858,7 +2342,8 @@ export function extractStacksGraphFromUnits(
       }
       nodeByFullLabel.set(fullLabel, node);
     }
-  }
+  };
+  for (const item of metadata) registerMetadataLabels(item);
   for (const [aliasFullLabel, targetFullLabel] of CURATED_FORMAL_REFERENCE_ALIASES) {
     if (!tags.fullLabelToTag.has(aliasFullLabel)) continue;
     const targetNode = nodeByFullLabel.get(targetFullLabel);
@@ -1872,9 +2357,66 @@ export function extractStacksGraphFromUnits(
     nodeByFullLabel.set(aliasFullLabel, targetNode);
   }
 
+  const sourceArtifactFullLabels = new Set();
+  for (const owner of metadata.filter(({ node }) => node.nodeClass === "theorem-like")) {
+    for (const { ref } of (owner.proofs ?? []).flatMap(({ references }) => references)) {
+      const fullLabel = resolveFullLabel(ref, owner.unit.stem, tags.fullLabelToTag);
+      if (fullLabel && !nodeByFullLabel.has(fullLabel)) sourceArtifactFullLabels.add(fullLabel);
+    }
+  }
+  const sourceArtifactMetadata = locateStacksSourceArtifacts(
+    units,
+    sourceArtifactFullLabels,
+  ).map((artifact) => {
+    const tag = tags.fullLabelToTag.get(artifact.fullLabel);
+    if (!tag) throw new Error(`Raw source artifact ${artifact.fullLabel} has no permanent tag`);
+    const locator = `${artifact.unit.path}:L${artifact.startLine}-L${artifact.endLine}`;
+    const artifactSha256 = sha256(artifact.rawSource);
+    const label = `Source ${artifact.kind} (Tag ${tag})`;
+    const sourceDescription = artifact.title && artifact.title !== label
+      ? `${label}: ${artifact.title}`
+      : label;
+    return {
+      node: {
+        id: tagNodeId(tag),
+        nodeClass: "source-artifact",
+        kind: artifact.kind,
+        sourceLabel: label,
+        title: artifact.title || label,
+        sourceXmlId: artifact.fullLabel,
+        sourceLocator: locator,
+        normalizedStatement: sourceDescription,
+        sourceTextSha256: artifactSha256,
+        evidence: capturedEvidence({
+          sourceUnitId: unitId(artifact.unit.stem),
+          locator,
+          artifactSha256,
+          capturedAt,
+          note: "Exact source span for a proof-referenced label outside the mathematical theorem/support inventory. It preserves the original route without promoting the source container; classification, decomposition, or an occurrence-specific nondependency decision remains graph-audit debt.",
+        }),
+      },
+      unit: artifact.unit,
+      environment: "source-artifact",
+      startLine: artifact.startLine,
+      endLine: artifact.endLine,
+      rawEnvironment: artifact.rawSource,
+      aliasFullLabels: [],
+      statementReferences: [],
+      sourceArtifact: true,
+    };
+  });
+  metadata.push(...sourceArtifactMetadata);
+  for (const item of sourceArtifactMetadata) registerMetadataLabels(item);
+  const unitOrderByStem = new Map(units.map((unit, index) => [unit.stem, index]));
+  metadata.sort((left, right) => (
+    unitOrderByStem.get(left.unit.stem) - unitOrderByStem.get(right.unit.stem)
+    || left.startLine - right.startLine
+    || left.node.id.localeCompare(right.node.id)
+  ));
+  let nodes = metadata.map(({ node }) => node);
+
   const metadataByFullLabel = new Map(metadata.map((item) => [item.node.sourceXmlId, item]));
   const metadataByNodeId = new Map(metadata.map((item) => [item.node.id, item]));
-  const unitOrderByStem = new Map(units.map((unit, index) => [unit.stem, index]));
   const metadataForTag = (tag, role) => {
     const fullLabel = tags.tagToFullLabel.get(tag);
     if (!fullLabel) return null;
@@ -2270,8 +2812,9 @@ export function extractStacksGraphFromUnits(
     if (!sectionFullLabel) {
       throw new Error(`Curated section-delegation reference tag ${config.referenceTag} is absent`);
     }
-    if (nodeByFullLabel.has(sectionFullLabel)) {
-      throw new Error(`Curated section-delegation reference ${config.referenceTag} unexpectedly resolves to a formal node`);
+    const aggregateSectionNode = nodeByFullLabel.get(sectionFullLabel);
+    if (aggregateSectionNode && aggregateSectionNode.kind !== "section") {
+      throw new Error(`Curated section-delegation reference ${config.referenceTag} unexpectedly resolves to a non-section node`);
     }
     const matchingProofs = (owner.proofs ?? []).filter(({ rawProof }) => (
       sha256(rawProof) === config.proofSourceTextSha256
@@ -2392,19 +2935,30 @@ export function extractStacksGraphFromUnits(
       throw new Error(`Incoming-reference audit target ${targetTag} is not a promoted claim`);
     }
     const actualOwnerOccurrenceCounts = {};
-    for (const owner of metadata.filter(({ node }) => node.nodeClass === "theorem-like")) {
-      const occurrenceCount = (owner.proofs ?? [])
+    const actualOwnerOccurrenceArtifacts = {};
+    for (const owner of metadata.filter(({ node }) => (
+      node.nodeClass === "theorem-like" && node.id !== target.node.id
+    ))) {
+      const occurrences = (owner.proofs ?? [])
         .flatMap(({ references }) => references)
         .filter(({ ref }) => (
           resolveFullLabel(ref, owner.unit.stem, tags.fullLabelToTag) === fullLabel
-        )).length;
-      if (occurrenceCount === 0) continue;
+        ));
+      if (occurrences.length === 0) continue;
       const ownerTag = tags.fullLabelToTag.get(owner.node.sourceXmlId);
-      actualOwnerOccurrenceCounts[ownerTag] = occurrenceCount;
+      actualOwnerOccurrenceCounts[ownerTag] = occurrences.length;
+      actualOwnerOccurrenceArtifacts[ownerTag] = sha256(canonicalJson(occurrences));
     }
     if (canonicalJson(orderedCountEntries(actualOwnerOccurrenceCounts))
       !== canonicalJson(orderedCountEntries(expectedOwnerOccurrenceCounts))) {
       throw new Error(`Curated claim ${targetTag} incoming owner/count inventory changed`);
+    }
+    const expectedOccurrenceArtifacts = CURATED_CLAIM_INCOMING_REFERENCE_ARTIFACTS
+      .get(targetTag);
+    if (expectedOccurrenceArtifacts
+      && canonicalJson(orderedCountEntries(actualOwnerOccurrenceArtifacts))
+        !== canonicalJson(orderedCountEntries(expectedOccurrenceArtifacts))) {
+      throw new Error(`Curated claim ${targetTag} incoming occurrence artifacts changed`);
     }
   }
 
@@ -2451,6 +3005,7 @@ export function extractStacksGraphFromUnits(
       throw new Error(`Curated prose support ${config.targetTag} is not an audited support node`);
     }
     const actualOwnerOccurrenceCounts = {};
+    const actualOwnerOccurrenceArtifacts = {};
     for (const owner of metadata.filter(({ node }) => node.nodeClass === "theorem-like")) {
       const occurrences = (owner.proofs ?? [])
         .flatMap(({ references }) => references)
@@ -2460,10 +3015,16 @@ export function extractStacksGraphFromUnits(
       if (occurrences.length === 0) continue;
       const ownerTag = tags.fullLabelToTag.get(owner.node.sourceXmlId);
       actualOwnerOccurrenceCounts[ownerTag] = occurrences.length;
+      actualOwnerOccurrenceArtifacts[ownerTag] = sha256(canonicalJson(occurrences));
     }
     if (canonicalJson(orderedCountEntries(actualOwnerOccurrenceCounts))
       !== canonicalJson(orderedCountEntries(config.ownerOccurrenceCounts))) {
       throw new Error(`Curated prose support ${config.targetTag} owner/count inventory changed`);
+    }
+    if (config.ownerOccurrenceArtifactSha256
+      && canonicalJson(orderedCountEntries(actualOwnerOccurrenceArtifacts))
+        !== canonicalJson(orderedCountEntries(config.ownerOccurrenceArtifactSha256))) {
+      throw new Error(`Curated prose support ${config.targetTag} incoming occurrence artifacts changed`);
     }
   }
 
@@ -2497,6 +3058,12 @@ export function extractStacksGraphFromUnits(
       if (!group.targetNode || group.targetNode.id === owner.node.id) continue;
       const ownerTag = tags.fullLabelToTag.get(owner.node.sourceXmlId);
       const targetTag = tags.fullLabelToTag.get(group.targetNode.sourceXmlId);
+      if (curatedResolvedProofGroupKeys.has(`${owner.node.id}|${group.fullLabel}`)) {
+        continue;
+      }
+      if (curatedResolvedSectionProofGroupKeys.has(`${owner.node.id}|${group.fullLabel}`)) {
+        continue;
+      }
       if (CURATED_NONDEPENDENCY_PROOF_XREFS.has(`${ownerTag}|${targetTag}`)) {
         suppressedProofXrefDependencyCount += 1;
         continue;
@@ -2615,7 +3182,6 @@ export function extractStacksGraphFromUnits(
         })
         .filter(Boolean);
       const dependencyIds = [...new Set([...explicitDependencyIds, ...semanticDependencyIds])];
-      if (dependencyIds.length === 0) continue;
       const isAlternativeSet = routeGroups.length >= 2;
       const routeKind = isAlternativeSet && groupIndex > 0 ? "alternate-proof" : "source-proof";
       const ordinalSuffix = routeKind === "alternate-proof" ? `-${routeGroup.ordinal}` : "";
@@ -2643,6 +3209,9 @@ export function extractStacksGraphFromUnits(
         ...(curatedOwnerRouteDebtNotes.get(
           tags.fullLabelToTag.get(owner.node.sourceXmlId),
         ) ?? []),
+        routeReferenceGroups.some(({ targetNode }) => targetNode?.nodeClass === "source-artifact")
+          ? "At least one direct dependency is an exact raw source artifact outside the mathematical node inventory; classifying, decomposing, or suppressing that occurrence remains route debt."
+          : null,
         ...routeSemanticGroups.flatMap(({ routeDebtNotes }) => routeDebtNotes),
       ].filter(Boolean))];
       const hasSemanticDependencies = routeSemanticGroups.length > 0;
@@ -2651,17 +3220,21 @@ export function extractStacksGraphFromUnits(
         theoremNodeId: owner.node.id,
         routeKind,
         dependencyIds,
-        summary: routeKind === "alternate-proof"
-          ? "Source-faithful alternate route containing only direct prerequisites explicitly cited or selected by an owner-specific source audit of this separately titled Stacks proof."
-          : "Source-faithful candidate route containing direct prerequisites explicitly cited or selected by owner-specific audits of semantic proof language and bibliographic theorem invocations in the pinned Stacks source.",
+        summary: dependencyIds.length === 0
+          ? "Captured source proof with no resolved explicit prerequisite; this records source coverage and is not a root attestation."
+          : routeKind === "alternate-proof"
+            ? "Source-faithful alternate route containing only direct prerequisites explicitly cited or selected by an owner-specific source audit of this separately titled Stacks proof."
+            : "Source-faithful candidate route containing direct prerequisites explicitly cited or selected by owner-specific audits of semantic proof language and bibliographic theorem invocations in the pinned Stacks source.",
         evidence: capturedEvidence({
           sourceUnitId: unitId(owner.unit.stem),
           locator: locator || owner.node.sourceLocator,
           artifactSha256: sha256(routeEvidenceText),
           capturedAt,
-          note: routeKind === "alternate-proof"
-            ? `Candidate alternative route from a separately titled source proof${hasSemanticDependencies ? " with owner-specific audited prose dependencies" : ""}; implicit prerequisites remain pending and no independent review is claimed.${routeDebtNotes.length ? ` ${routeDebtNotes.join(" ")}` : ""}`
-            : `Candidate route from ${hasSemanticDependencies ? "explicit proof references plus owner-specific audited named-result, curated-claim, external-citation, deictic, bundled-remark, or section-delegation dependencies" : "explicit proof references only"}; implicit prerequisites remain pending and no independent review is claimed.${routeDebtNotes.length ? ` ${routeDebtNotes.join(" ")}` : ""}`,
+          note: dependencyIds.length === 0
+            ? `Captured ${routeKind === "alternate-proof" ? "separately titled alternate " : ""}source proof with no resolved explicit prerequisite. This empty source route records proof coverage, is not a root attestation, and leaves mathematical dependency identification pending; no independent review is claimed.${routeDebtNotes.length ? ` ${routeDebtNotes.join(" ")}` : ""}`
+            : routeKind === "alternate-proof"
+              ? `Candidate alternative route from a separately titled source proof${hasSemanticDependencies ? " with owner-specific audited prose dependencies" : ""}; implicit prerequisites remain pending and no independent review is claimed.${routeDebtNotes.length ? ` ${routeDebtNotes.join(" ")}` : ""}`
+              : `Candidate route from ${hasSemanticDependencies ? "explicit proof references plus owner-specific audited named-result, curated-claim, external-citation, deictic, bundled-remark, or section-delegation dependencies" : "explicit proof references only"}; implicit prerequisites remain pending and no independent review is claimed.${routeDebtNotes.length ? ` ${routeDebtNotes.join(" ")}` : ""}`,
         }),
       });
     }
@@ -2671,16 +3244,26 @@ export function extractStacksGraphFromUnits(
   for (const owner of metadata) {
     if (owner.node.nodeClass === "theorem-like") {
       for (const group of proofGroupsByOwner.get(owner.node.id) ?? []) {
-        if (group.targetNode) continue;
         const ownerTag = tags.fullLabelToTag.get(owner.node.sourceXmlId);
         const targetTag = tags.fullLabelToTag.get(group.fullLabel);
+        const groupKey = `${owner.node.id}|${group.fullLabel}`;
+        if (curatedResolvedProofGroupKeys.has(groupKey)) continue;
+        if (curatedResolvedSectionProofGroupKeys.has(groupKey)) continue;
         if (targetTag
           && CURATED_NONDEPENDENCY_PROOF_XREFS.has(`${ownerTag}|${targetTag}`)) {
-          suppressedProofXrefDependencyCount += 1;
+          if (!group.targetNode) suppressedProofXrefDependencyCount += 1;
           continue;
         }
-        if (curatedResolvedProofGroupKeys.has(`${owner.node.id}|${group.fullLabel}`)) continue;
-        if (curatedResolvedSectionProofGroupKeys.has(`${owner.node.id}|${group.fullLabel}`)) continue;
+        if (group.targetNode) {
+          if (group.targetNode.nodeClass === "source-artifact") {
+            const dependencyId = dependencyIdByPair.get(`${owner.node.id}|${group.targetNode.id}`);
+            if (!dependencyId) {
+              throw new Error(`Raw source-artifact proof reference ${groupKey} lacks its direct dependency`);
+            }
+            references.push(referenceEntity({ group, dependencyId, capturedAt, usedIds }));
+          }
+          continue;
+        }
         references.push(referenceEntity({ group, dependencyId: null, capturedAt, usedIds }));
       }
       for (const group of citationGroupsByOwner.get(owner.node.id) ?? []) {
@@ -2705,24 +3288,40 @@ export function extractStacksGraphFromUnits(
     }
   }
 
+  const retainedSourceArtifactNodeIds = new Set(directDependencies
+    .filter((dependency) => (
+      dependency.prerequisite.type === "node"
+      && metadataByNodeId.get(dependency.prerequisite.id)?.node.nodeClass === "source-artifact"
+    ))
+    .map((dependency) => dependency.prerequisite.id));
+  metadata = metadata.filter(({ node }) => (
+    node.nodeClass !== "source-artifact" || retainedSourceArtifactNodeIds.has(node.id)
+  ));
+  nodes = metadata.map(({ node }) => node);
+
   const inventoryByUnitId = new Map(sourceUnits.map(({ id }) => [id, {
     theoremNodeIds: [],
     supportNodeIds: [],
+    sourceArtifactNodeIds: [],
     curatedClaimCount: 0,
     curatedSupportCount: 0,
+    sourceArtifactCount: 0,
   }]));
   for (const {
     node,
     unit,
     curatedClaim = false,
     curatedSupport = false,
+    sourceArtifact = false,
   } of metadata) {
     const inventory = inventoryByUnitId.get(unitId(unit.stem));
     if (!inventory) throw new Error(`Missing source-unit inventory for ${unit.path}`);
     if (node.nodeClass === "theorem-like") inventory.theoremNodeIds.push(node.id);
-    else inventory.supportNodeIds.push(node.id);
+    else if (node.nodeClass === "support") inventory.supportNodeIds.push(node.id);
+    else inventory.sourceArtifactNodeIds.push(node.id);
     if (curatedClaim) inventory.curatedClaimCount += 1;
     if (curatedSupport) inventory.curatedSupportCount += 1;
+    if (sourceArtifact) inventory.sourceArtifactCount += 1;
   }
   const unitInventories = sourceUnits.map((unit) => {
     const inventory = inventoryByUnitId.get(unit.id);
@@ -2731,6 +3330,7 @@ export function extractStacksGraphFromUnits(
       sourceUnitId: unit.id,
       theoremNodeIds: inventory.theoremNodeIds,
       supportNodeIds: inventory.supportNodeIds,
+      sourceArtifactNodeIds: inventory.sourceArtifactNodeIds,
       theoremFreeAttestation: inventory.theoremNodeIds.length === 0,
       evidence: capturedEvidence({
         sourceUnitId: unit.id,
@@ -2738,14 +3338,15 @@ export function extractStacksGraphFromUnits(
         artifactSha256: unit.contentSha256,
         capturedAt,
         note: inventory.theoremNodeIds.length === 0
-          ? "Formal-environment plus curated-claim scan found no theorem-like result in this complete pinned chapter; examples and exercises do not count as theorem nodes."
-          : `Formal-environment plus curated-span scan assigned ${inventory.theoremNodeIds.length} theorem-like and ${inventory.supportNodeIds.length} support node(s), including ${inventory.curatedClaimCount} exact-label source-audited claim(s) and ${inventory.curatedSupportCount} source-audited prose/display support node(s); examples, exercises, and all other remarks were excluded.`,
+          ? `Formal-environment plus curated-claim scan found no theorem-like result in this complete pinned chapter. ${inventory.sourceArtifactCount} exact proof-referenced raw source artifact(s) are inventoried separately from mathematical support; examples and exercises do not count as theorem nodes.`
+          : `Formal-environment plus curated-span scan assigned ${inventory.theoremNodeIds.length} theorem-like and ${inventory.supportNodeIds.length} mathematical support node(s), including ${inventory.curatedClaimCount} exact-label source-audited claim(s) and ${inventory.curatedSupportCount} source-audited prose/display support node(s). ${inventory.sourceArtifactCount} exact proof-referenced raw source artifact(s) are inventoried separately; excluded environments remain outside the mathematical inventory unless an exact claim/support span was promoted.`,
       }),
     };
   });
 
   const curatedClaimCount = metadata.filter(({ curatedClaim }) => curatedClaim).length;
   const curatedSupportCount = metadata.filter(({ curatedSupport }) => curatedSupport).length;
+  const sourceArtifactCount = nodes.filter((node) => node.nodeClass === "source-artifact").length;
   const excludedEnvironmentCounts = Object.fromEntries(EXCLUDED_ENVIRONMENTS.map((environment) => [
     environment,
     units.reduce((total, unit) => total + environmentRanges(
@@ -2757,7 +3358,26 @@ export function extractStacksGraphFromUnits(
     )).length,
   ]));
   const theoremCount = nodes.filter((node) => node.nodeClass === "theorem-like").length;
+  const supportCount = nodes.filter((node) => node.nodeClass === "support").length;
   const routedTheoremIds = new Set(proofRoutes.map(({ theoremNodeId }) => theoremNodeId));
+  const nodeById = new Map(nodes.map((node) => [node.id, node]));
+  const dependencyById = new Map(directDependencies.map((dependency) => [dependency.id, dependency]));
+  const routeHasMathematicalPrerequisite = (route) => route.dependencyIds.some((dependencyId) => {
+    const dependency = dependencyById.get(dependencyId);
+    if (!dependency) return false;
+    if (dependency.prerequisite.type === "external-input") return true;
+    const prerequisiteNode = nodeById.get(dependency.prerequisite.id);
+    return prerequisiteNode !== undefined && prerequisiteNode.nodeClass !== "source-artifact";
+  });
+  const mathematicallyRoutedTheoremIds = new Set(proofRoutes
+    .filter(routeHasMathematicalPrerequisite)
+    .map(({ theoremNodeId }) => theoremNodeId));
+  const sourceArtifactDependencyIds = new Set(directDependencies
+    .filter((dependency) => (
+      dependency.prerequisite.type === "node"
+      && nodeById.get(dependency.prerequisite.id)?.nodeClass === "source-artifact"
+    ))
+    .map(({ id }) => id));
   const unresolvedTaggedProofReferences = references.filter((reference) => (
     reference.basis === "proof-xref" && reference.resolution.status === "unresolved"
   ));
@@ -2795,10 +3415,22 @@ export function extractStacksGraphFromUnits(
     },
     stats: {
       theoremCount,
-      supportCount: nodes.length - theoremCount,
-      kindCounts: Object.fromEntries([...new Set(nodes.map(({ kind }) => kind))]
+      supportCount,
+      sourceArtifactCount,
+      kindCounts: Object.fromEntries([...new Set(nodes
+        .filter((node) => node.nodeClass !== "source-artifact")
+        .map(({ kind }) => kind))]
         .sort()
-        .map((kind) => [kind, nodes.filter((node) => node.kind === kind).length])),
+        .map((kind) => [kind, nodes.filter((node) => (
+          node.nodeClass !== "source-artifact" && node.kind === kind
+        )).length])),
+      sourceArtifactKindCounts: Object.fromEntries([...new Set(nodes
+        .filter((node) => node.nodeClass === "source-artifact")
+        .map(({ kind }) => kind))]
+        .sort()
+        .map((kind) => [kind, nodes.filter((node) => (
+          node.nodeClass === "source-artifact" && node.kind === kind
+        )).length])),
       directDependencyCount: directDependencies.length,
       explicitProofXrefDependencyCount,
       namedResultDependencyCount,
@@ -2819,6 +3451,11 @@ export function extractStacksGraphFromUnits(
       curatedResolvedSectionProofXrefCount: curatedResolvedSectionProofGroupKeys.size,
       externalInputCount: externalInputs.length,
       proofRouteCount: proofRoutes.length,
+      emptySourceRouteCount: proofRoutes.filter(({ dependencyIds }) => dependencyIds.length === 0).length,
+      sourceArtifactRouteCount: proofRoutes.filter(({ dependencyIds }) => (
+        dependencyIds.some((id) => sourceArtifactDependencyIds.has(id))
+      )).length,
+      sourceArtifactDependencyCount: sourceArtifactDependencyIds.size,
       referenceCount: references.length,
       unresolvedReferenceCount,
       statementXrefCount: 0,
@@ -2836,7 +3473,8 @@ export function extractStacksGraphFromUnits(
       uniqueUnresolvedTaggedProofTargetCount: new Set(
         unresolvedTaggedProofReferences.map(({ ref }) => ref),
       ).size,
-      pendingTheoremCount: theoremCount - routedTheoremIds.size,
+      pendingTheoremCount: theoremCount - mathematicallyRoutedTheoremIds.size,
+      unroutedTheoremCount: theoremCount - routedTheoremIds.size,
       unitInventoryCount: unitInventories.length,
       theoremFreeUnitCount: unitInventories.filter(({ theoremFreeAttestation }) => theoremFreeAttestation).length,
       curatedClaimCount,
@@ -2926,6 +3564,9 @@ export function buildStacksBookFile({
   const kindSummary = Object.entries(extracted.stats.kindCounts)
     .map(([kind, count]) => `${count} ${kind}`)
     .join(", ");
+  const sourceArtifactSummary = Object.entries(extracted.stats.sourceArtifactKindCounts)
+    .map(([kind, count]) => `${count} ${kind}`)
+    .join(", ");
   const excludedSummary = Object.entries(extracted.stats.excludedEnvironmentCounts)
     .map(([kind, count]) => `${count} ${kind}`)
     .join(", ");
@@ -2963,7 +3604,7 @@ export function buildStacksBookFile({
           unitInventoryCount: extracted.unitInventories.length,
         },
         independentReview: null,
-        note: `Formal-environment extraction plus ${extracted.stats.curatedClaimCount} exact-label, source-audited theorem-level claim(s) and ${extracted.stats.curatedSupportCount} proof-used definition/construction span(s) outside formal environments from all ${extracted.sourceUnits.length} chapters in the pinned official source: ${kindSummary}. Deliberately excluded ${excludedSummary}; no worked example is a graph node and no unlisted remark or display was promoted.`,
+        note: `Mathematical inventory from all ${extracted.sourceUnits.length} chapters in the pinned official source: ${kindSummary}, including ${extracted.stats.curatedClaimCount} exact-label source-audited theorem-level claim(s) and ${extracted.stats.curatedSupportCount} proof-used assumption/definition/construction span(s) outside formal environments. A separate provenance inventory preserves ${extracted.stats.sourceArtifactCount} exact proof-referenced raw source artifact(s): ${sourceArtifactSummary}. These artifacts are not mathematical theorem/support nodes. Deliberately excluded from the mathematical inventory: ${excludedSummary}; no worked example is theorem-like, and no unlisted remark, display, item, or section was promoted to a mathematical node.`,
       },
       graphState: {
         status: "extracted",
@@ -2978,7 +3619,7 @@ export function buildStacksBookFile({
           referenceCount: extracted.graph.references.length,
         },
         independentReview: null,
-        note: `${extracted.stats.directDependencyCount} candidate edges comprise ${extracted.stats.explicitProofXrefDependencyCount} explicit proof-xref edges and ${extracted.stats.semanticDependencyCount} owner-specific source-audited semantic edges (${extracted.stats.namedResultDependencyCount} named-result, ${extracted.stats.curatedClaimDependencyCount} curated-claim, ${extracted.stats.externalCitationDependencyCount} external-citation, ${extracted.stats.deicticDependencyCount} deictic-proof, ${extracted.stats.bundledRemarkDependencyCount} bundled-remark, ${extracted.stats.sectionDelegationDependencyCount} section-delegation); resolved occurrences are merged into edge evidence, and ${extracted.stats.suppressedProofXrefDependencyCount} exact owner-target proof-xref record(s) were audited as notation-only or optional nonlogical uses and suppressed. The graph has ${extracted.stats.externalInputCount} typed external theorem input(s): Zorn's lemma under the declared choice convention plus primary-source-audited bibliographic results. Of ${extracted.stats.totalProofCitationReferenceCount} original bibliographic proof-citation records, ${extracted.stats.resolvedProofCitationReferenceCount} resolve to ${extracted.stats.externalCitationDependencyCount} owner-input edges, ${extracted.stats.suppressedProofCitationReferenceCount} are audited nondependencies, and ${extracted.stats.proofCitationReferenceCount} remain unresolved. ${extracted.stats.unresolvedTaggedProofReferenceCount} unresolved tagged proof-xref records (${extracted.stats.uniqueUnresolvedTaggedProofTargetCount} unique permanent labels) and ${extracted.stats.proofCitationReferenceCount} bibliographic records (${extracted.stats.distinctProofCitationKeyCount} keys) remain review candidates. ${extracted.stats.pendingTheoremCount} theorem-like nodes have no route with a resolved candidate prerequisite and remain pending, not roots. No independent mathematical review or graph-completeness claim is made.`,
+        note: `${extracted.stats.directDependencyCount} raw candidate edges comprise ${extracted.stats.explicitProofXrefDependencyCount} explicit proof-xref edges and ${extracted.stats.semanticDependencyCount} owner-specific source-audited semantic edges (${extracted.stats.namedResultDependencyCount} named-result, ${extracted.stats.curatedClaimDependencyCount} curated-claim, ${extracted.stats.externalCitationDependencyCount} external-citation, ${extracted.stats.deicticDependencyCount} deictic-proof, ${extracted.stats.bundledRemarkDependencyCount} bundled-remark, ${extracted.stats.sectionDelegationDependencyCount} section-delegation). Of the explicit edges, ${extracted.stats.sourceArtifactDependencyCount} target raw source artifacts and have role source-reference: they preserve original proof provenance but are not yet mathematical DAG edges. Resolved occurrences are merged into edge evidence, and ${extracted.stats.suppressedProofXrefDependencyCount} exact owner-target proof-xref record(s) were audited as notation-only or optional nonlogical uses and suppressed. The graph has ${extracted.stats.externalInputCount} typed external theorem input(s): Zorn's lemma under the declared choice convention plus primary-source-audited bibliographic results. Of ${extracted.stats.totalProofCitationReferenceCount} original bibliographic proof-citation records, ${extracted.stats.resolvedProofCitationReferenceCount} resolve to ${extracted.stats.externalCitationDependencyCount} owner-input edges, ${extracted.stats.suppressedProofCitationReferenceCount} are audited nondependencies, and ${extracted.stats.proofCitationReferenceCount} remain unresolved. All tagged proof xrefs are now structurally accounted for: ${extracted.stats.unresolvedTaggedProofReferenceCount} remain unresolved. The remaining unresolved references are ${extracted.stats.proofCitationReferenceCount} bibliographic records (${extracted.stats.distinctProofCitationKeyCount} keys). The source contains ${extracted.stats.proofRouteCount} captured proof routes, including ${extracted.stats.emptySourceRouteCount} empty source routes that record proof coverage but are not roots; ${extracted.stats.unroutedTheoremCount} theorem-like nodes lack any captured source route. Independently, ${extracted.stats.pendingTheoremCount} theorem-like nodes still lack a route with a mathematical prerequisite and remain dependency-pending. Raw source artifacts require classification, decomposition, or occurrence-specific suppression before the graph can be reviewed complete. No independent mathematical review or graph-completeness claim is made.`,
       },
     },
     stats: {

@@ -83,7 +83,7 @@ for (const filename of ["source-records.json", "verification-policy.json"]) {
 }
 
 const bookManifest = JSON.parse(await readFile(join("data", "books", "manifest.json"), "utf8"));
-if (bookManifest.schemaVersion !== "1.1.0"
+if (bookManifest.schemaVersion !== "1.2.0"
   || bookManifest.sourceRecordCount !== sourceRegistry.records.length
   || bookManifest.componentCount !== bookManifest.entries?.length) {
   throw new Error("The per-book graph manifest does not match the approved source registry.");

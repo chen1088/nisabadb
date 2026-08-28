@@ -120,11 +120,23 @@ function metricsFor(file, relativeFile) {
   if (!Array.isArray(nodes) || !Array.isArray(directDependencies) || !Array.isArray(references)) {
     throw new Error(`${relativeFile} lacks required graph arrays`);
   }
-  const routedTheoremIds = new Set(
-    Array.isArray(file.graph.proofRoutes)
-      ? file.graph.proofRoutes.map((route) => route?.theoremNodeId)
-      : [],
-  );
+  const proofRoutes = Array.isArray(file.graph.proofRoutes) ? file.graph.proofRoutes : [];
+  const routedTheoremIds = new Set(proofRoutes.map((route) => route?.theoremNodeId));
+  const nodeById = new Map(nodes.map((node) => [node?.id, node]));
+  const dependencyById = new Map(directDependencies.map((dependency) => [
+    dependency?.id,
+    dependency,
+  ]));
+  const dependencyRoutedTheoremIds = new Set(proofRoutes
+    .filter((route) => route?.routeKind === "root-attestation"
+      || route?.dependencyIds?.some((id) => {
+        const dependency = dependencyById.get(id);
+        if (!dependency) return false;
+        if (dependency.prerequisite?.type === "external-input") return true;
+        const prerequisiteNode = nodeById.get(dependency.prerequisite?.id);
+        return prerequisiteNode !== undefined && prerequisiteNode.nodeClass !== "source-artifact";
+      }))
+    .map((route) => route?.theoremNodeId));
   return {
     extractionStatus: file.extractionState?.status,
     graphStatus: file.graphState?.status,
@@ -140,7 +152,11 @@ function metricsFor(file, relativeFile) {
     unroutedTheoremCount: nodes.filter((node) => (
       node?.nodeClass === "theorem-like" && !routedTheoremIds.has(node.id)
     )).length,
+    dependencyPendingTheoremCount: nodes.filter((node) => (
+      node?.nodeClass === "theorem-like" && !dependencyRoutedTheoremIds.has(node.id)
+    )).length,
     supportNodeCount: nodes.filter((node) => node?.nodeClass === "support").length,
+    sourceArtifactNodeCount: nodes.filter((node) => node?.nodeClass === "source-artifact").length,
     dependencyCount: directDependencies.length,
     reviewedDependencyCount: directDependencies.filter((dependency) => dependency?.evidence?.status === "reviewed").length,
     unresolvedReferenceCount: references.filter((reference) => reference?.resolution?.status === "unresolved").length,
@@ -166,13 +182,17 @@ function manifestFor(registry, baseEntries, neutralFiles) {
     reviewedSourceUnitCount: entries.reduce((sum, entry) => sum + entry.reviewedSourceUnitCount, 0),
     theoremNodeCount: entries.reduce((sum, entry) => sum + entry.theoremNodeCount, 0),
     unroutedTheoremCount: entries.reduce((sum, entry) => sum + entry.unroutedTheoremCount, 0),
+    dependencyPendingTheoremCount: entries.reduce((sum, entry) => (
+      sum + entry.dependencyPendingTheoremCount
+    ), 0),
     supportNodeCount: entries.reduce((sum, entry) => sum + entry.supportNodeCount, 0),
+    sourceArtifactNodeCount: entries.reduce((sum, entry) => sum + entry.sourceArtifactNodeCount, 0),
     dependencyCount: entries.reduce((sum, entry) => sum + entry.dependencyCount, 0),
     reviewedDependencyCount: entries.reduce((sum, entry) => sum + entry.reviewedDependencyCount, 0),
     unresolvedReferenceCount: entries.reduce((sum, entry) => sum + entry.unresolvedReferenceCount, 0),
   };
   return {
-    schemaVersion: "1.1.0",
+    schemaVersion: "1.2.0",
     sourceSetRevision: registry.sourceSetRevision,
     sourceRecordCount: registry.records.length,
     componentCount: entries.length,

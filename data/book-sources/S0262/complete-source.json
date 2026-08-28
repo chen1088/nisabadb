@@ -32,9 +32,9 @@
       },
       "proposalAudit": {
         "actorId": "stacks-latex-importer",
-        "proposedAt": "2026-08-23T18:00:00.000Z",
+        "proposedAt": "2026-08-28T00:35:00.000Z",
         "subjectSha256": "f3a757e14997d73f28de0fc0e74a45b14e23b4110034d8c991e80235dc8d4b1f",
-        "note": "Formal-environment extraction plus 16 exact-label, source-audited theorem-level claim(s) and 25 proof-used definition/construction span(s) outside formal environments from all 116 chapters in the pinned official source: 127 assumption, 16 claim, 13 construction, 1730 definition, 12587 lemma, 330 proposition, 214 theorem. Deliberately excluded 449 example, 386 exercise, 1036 remark, 5 remarks; no worked example is a graph node and no unlisted remark or display was promoted."
+        "note": "The 116 pinned source chapters now inventory 13,157 theorem-like nodes, 1,894 mathematical support nodes, and 1,237 exact proof-referenced raw source artifacts in a separate provenance class. All tagged proof xrefs are structurally accounted for, while raw source artifacts, 1,883 mathematically dependency-pending theorems, and 6 unresolved bibliographic proof citations remain explicit review debt; no independent mathematical review or completeness is claimed."
       },
       "administrativeReview": null
     }
@@ -43,16 +43,16 @@
   "blockers": [],
   "importerAssessments": [
     {
-      "id": "assessment-s0262-stacks-ed88ff783bcb-dcf3ca6fcd81",
+      "id": "assessment-s0262-stacks-ed88ff783bcb-5f263240bbe6",
       "proposalId": "s0262-stacks-ed88ff783bcb",
       "adapterId": "stacks-latex-importer",
       "outcome": "candidate-produced",
       "sourcePinSha256": "914a3713e8d385f1d6c8bf6950aad0ad2f468b8e3da91ec24ef89cbf0b576122",
-      "extractionArtifactSha256": "1128215d690e01c23eade73aa3eb6040d24fce69e1a4555faa1259d0bbdc34f2",
-      "graphArtifactSha256": "dcf3ca6fcd8188b169cb0e669cc396930d185a2bd922413534681c016f240d2b",
+      "extractionArtifactSha256": "6d91024db4b18076f32ebcf64272888bef60a59cc2b049bc432b317186c352a6",
+      "graphArtifactSha256": "5f263240bbe68f54ab25f240d7018d275099d816faa3c94c107c113121cde483",
       "assessedBy": "stacks-latex-importer",
-      "assessedAt": "2026-08-27T23:13:46.374Z",
-      "note": "The recorded importer produced this ignored local candidate graph; Git retains only its provenance and hashes, and no independent review or completeness is claimed."
+      "assessedAt": "2026-08-28T00:35:00.000Z",
+      "note": "The recorded importer produced the ignored local raw candidate graph with complete tagged-xref/source-proof coverage; Git retains only its provenance and hashes, and mathematical dependency review and completeness are not claimed."
     }
   ]
 }

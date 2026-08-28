@@ -92,6 +92,7 @@ export const sourceUnitInventorySchema = z.object({
   sourceUnitId: stableIdSchema,
   theoremNodeIds: z.array(stableIdSchema),
   supportNodeIds: z.array(stableIdSchema),
+  sourceArtifactNodeIds: z.array(stableIdSchema).default([]),
   theoremFreeAttestation: z.boolean(),
   evidence: graphEvidenceSchema,
 }).strict();
@@ -117,6 +118,17 @@ export const supportNodeKindSchema = z.enum([
   "calculation",
 ]);
 
+export const sourceArtifactNodeKindSchema = z.enum([
+  "section",
+  "remark",
+  "remarks",
+  "equation",
+  "item",
+  "example",
+  "exercise",
+  "prose",
+]);
+
 const graphNodeBase = z.object({
   id: stableIdSchema,
   sourceLabel: z.string().min(1),
@@ -138,9 +150,15 @@ const supportNodeSchema = graphNodeBase.extend({
   kind: supportNodeKindSchema,
 }).strict();
 
+const sourceArtifactNodeSchema = graphNodeBase.extend({
+  nodeClass: z.literal("source-artifact"),
+  kind: sourceArtifactNodeKindSchema,
+}).strict();
+
 export const bookGraphNodeSchema = z.discriminatedUnion("nodeClass", [
   theoremNodeSchema,
   supportNodeSchema,
+  sourceArtifactNodeSchema,
 ]);
 
 export const externalInputSchema = z.object({
@@ -162,7 +180,7 @@ export const directDependencySchema = z.object({
   id: stableIdSchema,
   dependentNodeId: stableIdSchema,
   prerequisite: prerequisiteReferenceSchema,
-  role: z.enum(["logical", "definition", "notation", "construction", "calculation", "citation"]),
+  role: z.enum(["logical", "definition", "notation", "construction", "source-reference", "calculation", "citation"]),
   rationale: z.string().min(1),
   evidence: graphEvidenceSchema,
 }).strict();
@@ -293,7 +311,9 @@ const bookGraphManifestEntrySchema = z.object({
   reviewedSourceUnitCount: z.number().int().nonnegative(),
   theoremNodeCount: z.number().int().nonnegative(),
   unroutedTheoremCount: z.number().int().nonnegative(),
+  dependencyPendingTheoremCount: z.number().int().nonnegative(),
   supportNodeCount: z.number().int().nonnegative(),
+  sourceArtifactNodeCount: z.number().int().nonnegative(),
   dependencyCount: z.number().int().nonnegative(),
   reviewedDependencyCount: z.number().int().nonnegative(),
   unresolvedReferenceCount: z.number().int().nonnegative(),
@@ -308,7 +328,9 @@ const bookGraphManifestEntrySchema = z.object({
     || entry.reviewedSourceUnitCount !== 0
     || entry.theoremNodeCount !== 0
     || entry.unroutedTheoremCount !== 0
+    || entry.dependencyPendingTheoremCount !== 0
     || entry.supportNodeCount !== 0
+    || entry.sourceArtifactNodeCount !== 0
     || entry.dependencyCount !== 0
     || entry.reviewedDependencyCount !== 0
     || entry.unresolvedReferenceCount !== 0;
@@ -321,7 +343,7 @@ const bookGraphManifestEntrySchema = z.object({
 });
 
 export const bookGraphManifestSchema = z.object({
-  schemaVersion: z.literal("1.1.0"),
+  schemaVersion: z.literal("1.2.0"),
   sourceSetRevision: z.string().min(1),
   sourceRecordCount: z.number().int().positive(),
   componentCount: z.number().int().positive(),
@@ -336,7 +358,9 @@ export const bookGraphManifestSchema = z.object({
     reviewedSourceUnitCount: z.number().int().nonnegative(),
     theoremNodeCount: z.number().int().nonnegative(),
     unroutedTheoremCount: z.number().int().nonnegative(),
+    dependencyPendingTheoremCount: z.number().int().nonnegative(),
     supportNodeCount: z.number().int().nonnegative(),
+    sourceArtifactNodeCount: z.number().int().nonnegative(),
     dependencyCount: z.number().int().nonnegative(),
     reviewedDependencyCount: z.number().int().nonnegative(),
     unresolvedReferenceCount: z.number().int().nonnegative(),
@@ -537,6 +561,12 @@ export function validateBookGraphFile(rawFile: unknown): BookGraphFile {
   const theoremNodeIds = new Set(
     file.graph.nodes.filter((node) => node.nodeClass === "theorem-like").map((node) => node.id),
   );
+  const supportNodeIds = new Set(
+    file.graph.nodes.filter((node) => node.nodeClass === "support").map((node) => node.id),
+  );
+  const sourceArtifactNodeIds = new Set(
+    file.graph.nodes.filter((node) => node.nodeClass === "source-artifact").map((node) => node.id),
+  );
   const externalInputIds = new Set(file.graph.externalInputs.map((input) => input.id));
   const dependencyIds = new Set(file.graph.directDependencies.map((dependency) => dependency.id));
   const dependencyById = new Map(file.graph.directDependencies.map((dependency) => [dependency.id, dependency]));
@@ -562,6 +592,7 @@ export function validateBookGraphFile(rawFile: unknown): BookGraphFile {
     }
     unique(inventory.theoremNodeIds, `${inventory.sourceUnitId} theorem inventory relation`);
     unique(inventory.supportNodeIds, `${inventory.sourceUnitId} support inventory relation`);
+    unique(inventory.sourceArtifactNodeIds, `${inventory.sourceUnitId} source-artifact inventory relation`);
     if (inventory.theoremFreeAttestation !== (inventory.theoremNodeIds.length === 0)) {
       throw new Error(`${inventory.sourceUnitId} has an inconsistent theorem-free attestation`);
     }
@@ -574,8 +605,18 @@ export function validateBookGraphFile(rawFile: unknown): BookGraphFile {
       inventoriedNodeIds.add(nodeId);
     }
     for (const nodeId of inventory.supportNodeIds) {
-      if (!nodeIds.has(nodeId) || theoremNodeIds.has(nodeId)) {
+      if (!supportNodeIds.has(nodeId)) {
         throw new Error(`${inventory.sourceUnitId} inventories missing or non-support node ${nodeId}`);
+      }
+      if (!new Set<string>(nodeById.get(nodeId)?.evidence.sourceUnitIds ?? []).has(inventory.sourceUnitId)) {
+        throw new Error(`${nodeId} inventory does not match the node's source evidence`);
+      }
+      if (inventoriedNodeIds.has(nodeId)) throw new Error(`${nodeId} appears in more than one source-unit inventory`);
+      inventoriedNodeIds.add(nodeId);
+    }
+    for (const nodeId of inventory.sourceArtifactNodeIds) {
+      if (!sourceArtifactNodeIds.has(nodeId)) {
+        throw new Error(`${inventory.sourceUnitId} inventories missing or non-source-artifact node ${nodeId}`);
       }
       if (!new Set<string>(nodeById.get(nodeId)?.evidence.sourceUnitIds ?? []).has(inventory.sourceUnitId)) {
         throw new Error(`${nodeId} inventory does not match the node's source evidence`);
@@ -634,8 +675,6 @@ export function validateBookGraphFile(rawFile: unknown): BookGraphFile {
     unique(route.dependencyIds, `${route.id} dependency relation`);
     if (route.routeKind === "root-attestation") {
       if (route.dependencyIds.length !== 0) throw new Error(`${route.id} root attestation has dependencies`);
-    } else if (route.dependencyIds.length === 0) {
-      throw new Error(`${route.id} proof route has no dependencies; use a root attestation`);
     }
     for (const dependencyId of route.dependencyIds) {
       if (!dependencyIds.has(dependencyId)) throw new Error(`${route.id} cites missing dependency ${dependencyId}`);
@@ -644,7 +683,7 @@ export function validateBookGraphFile(rawFile: unknown): BookGraphFile {
         throw new Error(`${route.id} cites a dependency owned by another node`);
       }
     }
-    const signature = `${route.theoremNodeId}|${route.routeKind}|${[...route.dependencyIds].sort().join(",")}`;
+    const signature = `${route.theoremNodeId}|${route.routeKind}|${[...route.dependencyIds].sort().join(",")}|${route.evidence.locator}|${route.evidence.captureAudit?.artifactSha256 ?? "pending"}`;
     if (routeSignatures.has(signature)) throw new Error(`${route.id} duplicates a proof route`);
     routeSignatures.add(signature);
   }
@@ -690,6 +729,9 @@ export function validateBookGraphFile(rawFile: unknown): BookGraphFile {
 
   if (file.graphState.status === "reviewed-complete") {
     if (theoremNodeIds.size === 0) throw new Error(`${file.identity.bookGraphId} reviewed graph has no theorem-like nodes`);
+    if (sourceArtifactNodeIds.size > 0) {
+      throw new Error(`${file.identity.bookGraphId} reviewed graph still contains raw source artifacts requiring mathematical classification, decomposition, or suppression`);
+    }
     const evidenceItems = [
       ...file.graph.nodes.map((node) => [node.id, node.evidence] as const),
       ...file.graph.externalInputs.map((input) => [input.id, input.evidence] as const),
@@ -704,7 +746,15 @@ export function validateBookGraphFile(rawFile: unknown): BookGraphFile {
       const reviewedRoutes = file.graph.proofRoutes.filter((route) => (
         route.theoremNodeId === theoremNodeId && route.evidence.status === "reviewed"
       ));
-      if (reviewedRoutes.length === 0) {
+      if (!reviewedRoutes.some((route) => route.routeKind === "root-attestation" || (
+        route.dependencyIds.some((dependencyId) => {
+          const dependency = dependencyById.get(dependencyId);
+          if (!dependency) return false;
+          if (dependency.prerequisite.type === "external-input") return true;
+          const prerequisiteNode = nodeById.get(dependency.prerequisite.id);
+          return prerequisiteNode !== undefined && prerequisiteNode.nodeClass !== "source-artifact";
+        })
+      ))) {
         throw new Error(`${theoremNodeId} lacks a reviewed proof route or root attestation`);
       }
     }
@@ -748,6 +798,20 @@ type ExpectedManifestComponent = ManifestIdentity & { canonicalArtifactPath: str
 
 function manifestMetrics(file: BookGraphFile): ManifestMetrics {
   const routedTheoremIds = new Set(file.graph.proofRoutes.map((route) => route.theoremNodeId));
+  const nodeById = new Map(file.graph.nodes.map((node) => [node.id, node]));
+  const dependencyById = new Map(file.graph.directDependencies.map((dependency) => [
+    dependency.id,
+    dependency,
+  ]));
+  const dependencyRoutedTheoremIds = new Set(file.graph.proofRoutes
+    .filter((route) => route.routeKind === "root-attestation" || route.dependencyIds.some((id) => {
+      const dependency = dependencyById.get(id);
+      if (!dependency) return false;
+      if (dependency.prerequisite.type === "external-input") return true;
+      const prerequisiteNode = nodeById.get(dependency.prerequisite.id);
+      return prerequisiteNode !== undefined && prerequisiteNode.nodeClass !== "source-artifact";
+    }))
+    .map((route) => route.theoremNodeId));
   return {
     extractionStatus: file.extractionState.status,
     graphStatus: file.graphState.status,
@@ -759,7 +823,13 @@ function manifestMetrics(file: BookGraphFile): ManifestMetrics {
     unroutedTheoremCount: file.graph.nodes.filter((node) => (
       node.nodeClass === "theorem-like" && !routedTheoremIds.has(node.id)
     )).length,
+    dependencyPendingTheoremCount: file.graph.nodes.filter((node) => (
+      node.nodeClass === "theorem-like" && !dependencyRoutedTheoremIds.has(node.id)
+    )).length,
     supportNodeCount: file.graph.nodes.filter((node) => node.nodeClass === "support").length,
+    sourceArtifactNodeCount: file.graph.nodes.filter((node) => (
+      node.nodeClass === "source-artifact"
+    )).length,
     dependencyCount: file.graph.directDependencies.length,
     reviewedDependencyCount: file.graph.directDependencies.filter((dependency) => dependency.evidence.status === "reviewed").length,
     unresolvedReferenceCount: file.graph.references.filter((reference) => reference.resolution.status === "unresolved").length,
@@ -777,7 +847,11 @@ function manifestSummary(entries: readonly ManifestEntry[]): BookGraphManifest["
     reviewedSourceUnitCount: entries.reduce((sum, entry) => sum + entry.reviewedSourceUnitCount, 0),
     theoremNodeCount: entries.reduce((sum, entry) => sum + entry.theoremNodeCount, 0),
     unroutedTheoremCount: entries.reduce((sum, entry) => sum + entry.unroutedTheoremCount, 0),
+    dependencyPendingTheoremCount: entries.reduce((sum, entry) => (
+      sum + entry.dependencyPendingTheoremCount
+    ), 0),
     supportNodeCount: entries.reduce((sum, entry) => sum + entry.supportNodeCount, 0),
+    sourceArtifactNodeCount: entries.reduce((sum, entry) => sum + entry.sourceArtifactNodeCount, 0),
     dependencyCount: entries.reduce((sum, entry) => sum + entry.dependencyCount, 0),
     reviewedDependencyCount: entries.reduce((sum, entry) => sum + entry.reviewedDependencyCount, 0),
     unresolvedReferenceCount: entries.reduce((sum, entry) => sum + entry.unresolvedReferenceCount, 0),
@@ -911,7 +985,9 @@ export function validateBookGraphManifestEntry(
     reviewedSourceUnitCount: entry.reviewedSourceUnitCount,
     theoremNodeCount: entry.theoremNodeCount,
     unroutedTheoremCount: entry.unroutedTheoremCount,
+    dependencyPendingTheoremCount: entry.dependencyPendingTheoremCount,
     supportNodeCount: entry.supportNodeCount,
+    sourceArtifactNodeCount: entry.sourceArtifactNodeCount,
     dependencyCount: entry.dependencyCount,
     reviewedDependencyCount: entry.reviewedDependencyCount,
     unresolvedReferenceCount: entry.unresolvedReferenceCount,

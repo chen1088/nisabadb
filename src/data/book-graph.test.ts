@@ -105,6 +105,7 @@ function reviewedGraphFixture(): BookGraphFile {
       sourceUnitId: "unit-1",
       theoremNodeIds: ["theorem-1"],
       supportNodeIds: ["definition-1"],
+      sourceArtifactNodeIds: [],
       theoremFreeAttestation: false,
       evidence: structuredClone(reviewedEvidence),
     }],
@@ -209,7 +210,9 @@ function manifestWithReviewedFixture() {
     reviewedSourceUnitCount: 1,
     theoremNodeCount: 1,
     unroutedTheoremCount: 0,
+    dependencyPendingTheoremCount: 0,
     supportNodeCount: 1,
+    sourceArtifactNodeCount: 0,
     dependencyCount: 1,
     reviewedDependencyCount: 1,
     unresolvedReferenceCount: 0,
@@ -225,7 +228,9 @@ function manifestWithReviewedFixture() {
     reviewedSourceUnitCount: 1,
     theoremNodeCount: 1,
     unroutedTheoremCount: 0,
+    dependencyPendingTheoremCount: 0,
     supportNodeCount: 1,
+    sourceArtifactNodeCount: 0,
     dependencyCount: 1,
     reviewedDependencyCount: 1,
     unresolvedReferenceCount: 0,
@@ -249,7 +254,7 @@ describe("one Phase-I dependency graph identity per source component", () => {
       .filter(({ artifactPath }) => artifactPath === null).length;
 
     expect(validated.registry.records).toHaveLength(688);
-    expect(validated.manifest.schemaVersion).toBe("1.1.0");
+    expect(validated.manifest.schemaVersion).toBe("1.2.0");
     expect(validated.manifest.sourceRecordCount).toBe(688);
     expect(validated.manifest.componentCount).toBe(717);
     expect(validated.manifest.artifactCount).toBe(0);
@@ -265,7 +270,9 @@ describe("one Phase-I dependency graph identity per source component", () => {
       reviewedSourceUnitCount: 0,
       theoremNodeCount: 0,
       unroutedTheoremCount: 0,
+      dependencyPendingTheoremCount: 0,
       supportNodeCount: 0,
+      sourceArtifactNodeCount: 0,
       dependencyCount: 0,
       reviewedDependencyCount: 0,
       unresolvedReferenceCount: 0,
@@ -293,10 +300,40 @@ describe("one Phase-I dependency graph identity per source component", () => {
     if (densestBook) {
     expect(densestBook?.exactEdition?.sourceFormat).toBe("latex");
     expect(densestBook?.sourceUnits).toHaveLength(116);
-    expect(densestBook?.graph.nodes).toHaveLength(15017);
-    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like")).toHaveLength(13147);
-    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "support")).toHaveLength(1870);
-    expect(densestBook?.graph.nodes.filter((node) => node.kind === "claim")).toHaveLength(16);
+    expect(densestBook?.graph.nodes).toHaveLength(16288);
+    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like")).toHaveLength(13157);
+    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "support")).toHaveLength(1894);
+    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "source-artifact")).toHaveLength(1237);
+    expect(densestBook?.graph.nodes.filter((node) => node.kind === "claim")).toHaveLength(26);
+    const mathematicalKindCounts = densestBook?.graph.nodes
+      .filter(({ nodeClass }) => nodeClass !== "source-artifact")
+      .reduce<Record<string, number>>((counts, { kind }) => ({
+        ...counts,
+        [kind]: (counts[kind] ?? 0) + 1,
+      }), {});
+    const sourceArtifactKindCounts = densestBook?.graph.nodes
+      .filter(({ nodeClass }) => nodeClass === "source-artifact")
+      .reduce<Record<string, number>>((counts, { kind }) => ({
+        ...counts,
+        [kind]: (counts[kind] ?? 0) + 1,
+      }), {});
+    expect(mathematicalKindCounts).toEqual({
+      lemma: 12587,
+      proposition: 330,
+      theorem: 214,
+      definition: 1739,
+      claim: 26,
+      assumption: 134,
+      construction: 21,
+    });
+    expect(sourceArtifactKindCounts).toEqual({
+      section: 572,
+      equation: 171,
+      remark: 370,
+      example: 119,
+      remarks: 3,
+      item: 2,
+    });
     expect(densestBook?.graph.nodes).toContainEqual(expect.objectContaining({
       id: "tag-0f0k",
       nodeClass: "theorem-like",
@@ -331,13 +368,15 @@ describe("one Phase-I dependency graph identity per source component", () => {
         }),
       }),
     ]));
-    expect(densestBook?.extractionState.note).toContain("1036 remark");
+    expect(densestBook?.extractionState.note).toContain("1237 exact proof-referenced raw source artifact");
+    expect(densestBook?.extractionState.note).toContain("1033 remark");
     expect(densestBook?.graph.nodes.some(({ id }) => (
       ["tag-0a53", "tag-0a57", "tag-0a58", "tag-0a59", "tag-0a5a"].includes(id)
     ))).toBe(false);
     expect(densestBook?.graph.nodes.every((node) => /^tag-[a-z0-9]{4}$/u.test(node.id))).toBe(true);
     expect(densestBook?.graph.nodes.some((node) => (
-      node.kind === "example" || node.kind === "calculation" || node.kind === "algorithm"
+      node.nodeClass !== "source-artifact"
+      && (node.kind === "example" || node.kind === "calculation" || node.kind === "algorithm")
     ))).toBe(false);
     expect(densestBook?.graph.externalInputs).toHaveLength(11);
     expect(densestBook?.graph.externalInputs).toContainEqual(expect.objectContaining({
@@ -348,7 +387,11 @@ describe("one Phase-I dependency graph identity per source component", () => {
       id: "external-deligne-weight-bound",
       kind: "external-theorem",
     }));
-    expect(densestBook?.graph.directDependencies).toHaveLength(36350);
+    expect(densestBook?.graph.directDependencies).toHaveLength(38904);
+    expect(densestBook?.graph.directDependencies.filter(({ prerequisite }) => (
+      prerequisite.type === "node"
+      && densestBook.graph.nodes.find(({ id }) => id === prerequisite.id)?.nodeClass === "source-artifact"
+    ))).toHaveLength(2435);
     expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
       id: "dep-tag-07dq-to-tag-0f0k",
       dependentNodeId: "tag-07dq",
@@ -504,10 +547,18 @@ describe("one Phase-I dependency graph identity per source component", () => {
     expect(densestBook?.graph.proofRoutes
       .find(({ theoremNodeId }) => theoremNodeId === "tag-09cn")
       ?.evidence.note).toContain("excluded example for the free-module case");
-    expect(densestBook?.graph.proofRoutes).toHaveLength(11298);
+    expect(densestBook?.graph.proofRoutes).toHaveLength(13201);
     expect(densestBook?.graph.proofRoutes.filter(({ theoremNodeId }) => (
       theoremNodeId === "tag-0f0k"
-    ))).toHaveLength(0);
+    ))).toEqual([
+      expect.objectContaining({
+        routeKind: "source-proof",
+        dependencyIds: [],
+        evidence: expect.objectContaining({
+          note: expect.stringContaining("not a root attestation"),
+        }),
+      }),
+    ]);
     expect(densestBook?.graph.proofRoutes
       .find(({ theoremNodeId }) => theoremNodeId === "tag-07dq")
       ?.dependencyIds).toContain("dep-tag-07dq-to-tag-0f0k");
@@ -539,14 +590,32 @@ describe("one Phase-I dependency graph identity per source component", () => {
     )));
     expect(densestBook?.graph.nodes.filter(({ id, nodeClass }) => (
       nodeClass === "theorem-like" && !routedTheoremNodeIds.has(id)
-    ))).toHaveLength(1886);
+    ))).toHaveLength(0);
+    const dependencyById = new Map(densestBook?.graph.directDependencies.map((dependency) => (
+      [dependency.id, dependency] as const
+    )));
+    const nodeById = new Map(densestBook?.graph.nodes.map((node) => [node.id, node] as const));
+    const dependencyRoutedTheoremNodeIds = new Set(densestBook?.graph.proofRoutes
+      .filter((route) => route.routeKind === "root-attestation" || route.dependencyIds.some((id) => {
+        const dependency = dependencyById.get(id);
+        if (!dependency) return false;
+        return dependency.prerequisite.type === "external-input"
+          || nodeById.get(dependency.prerequisite.id)?.nodeClass !== "source-artifact";
+      }))
+      .map(({ theoremNodeId }) => theoremNodeId));
+    expect(densestBook?.graph.nodes.filter(({ id, nodeClass }) => (
+      nodeClass === "theorem-like" && !dependencyRoutedTheoremNodeIds.has(id)
+    ))).toHaveLength(1883);
     expect(densestBook?.graph.proofRoutes.filter((route) => route.routeKind === "alternate-proof"))
-      .toHaveLength(40);
+      .toHaveLength(44);
     expect(densestBook?.graph.references.every((reference) => (
       ["proof-xref", "proof-citation"].includes(reference.basis)
     ))).toBe(true);
     expect(densestBook?.graph.references.filter((reference) => reference.basis === "proof-xref"))
-      .toHaveLength(2530);
+      .toHaveLength(2435);
+    expect(densestBook?.graph.references.filter((reference) => (
+      reference.basis === "proof-xref" && reference.resolution.status === "unresolved"
+    ))).toHaveLength(0);
     expect(densestBook?.graph.references.some(({ ownerNodeId, ref }) => (
       ownerNodeId === "tag-07dq" && ref === "algebra-item-cauchy-binet"
     ))).toBe(false);
@@ -589,7 +658,16 @@ describe("one Phase-I dependency graph identity per source component", () => {
       basis: "proof-xref",
       ref: "algebra-example-derivations-and-differential-operators",
       locator: "algebra.tex:L34869",
-      resolution: expect.objectContaining({ status: "unresolved" }),
+      resolution: expect.objectContaining({
+        status: "resolved",
+        target: { type: "node", id: "tag-09cm" },
+        directDependencyId: "dep-tag-09cn-to-tag-09cm",
+      }),
+    }));
+    expect(densestBook?.graph.nodes).toContainEqual(expect.objectContaining({
+      id: "tag-09cm",
+      nodeClass: "source-artifact",
+      kind: "example",
     }));
     expect(densestBook?.graph.references.filter((reference) => reference.basis === "proof-citation"))
       .toHaveLength(19);
@@ -803,6 +881,31 @@ describe("book dependency graph integrity", () => {
     if (!root.graphState.graphAudit) throw new Error("missing graph audit fixture");
     root.graphState.graphAudit.directDependencyCount = 0;
     expect(validateBookGraphFile(root).graph.proofRoutes[0]?.routeKind).toBe("root-attestation");
+
+    const rawEmptyRoute = reviewedGraphFixture();
+    rawEmptyRoute.graph.directDependencies = [];
+    rawEmptyRoute.graph.proofRoutes[0] = {
+      id: "route-1",
+      theoremNodeId: "theorem-1",
+      routeKind: "source-proof",
+      dependencyIds: [],
+      summary: "The raw source proof contains no explicit resolved cross-reference.",
+      evidence: structuredClone(reviewedEvidence),
+    };
+    if (!rawEmptyRoute.graphState.graphAudit) throw new Error("missing graph audit fixture");
+    rawEmptyRoute.graphState.graphAudit.directDependencyCount = 0;
+    rawEmptyRoute.graphState.status = "extracted";
+    rawEmptyRoute.graphState.independentReview = null;
+    expect(validateBookGraphFile(rawEmptyRoute).graph.proofRoutes[0]?.dependencyIds).toEqual([]);
+
+    rawEmptyRoute.graphState.status = "reviewed-complete";
+    rawEmptyRoute.graphState.independentReview = {
+      actorId: "reviewer:graph",
+      reviewedAt: "2026-08-22T15:00:00Z",
+      evidenceSha256: "e".repeat(64),
+      note: "The graph was reviewed but no root decision was supplied.",
+    };
+    expect(() => validateBookGraphFile(rawEmptyRoute)).toThrow(/route or root attestation/i);
   });
 
   it("does not permit an extracted graph before source extraction", () => {
@@ -895,6 +998,94 @@ describe("book dependency graph integrity", () => {
     firstRoute.dependencyIds.push("dependency-2");
     duplicate.graphState.graphAudit.directDependencyCount = 2;
     expect(() => validateBookGraphFile(duplicate)).toThrow(/duplicates a direct dependency/i);
+  });
+
+  it("keeps raw source artifacts separate from mathematical support nodes", () => {
+    const file = reviewedGraphFixture();
+    const inventory = file.unitInventories[0];
+    const route = file.graph.proofRoutes[0];
+    const audit = file.graphState.graphAudit;
+    if (!inventory || !route || !audit) throw new Error("missing source-artifact fixture state");
+
+    file.graph.nodes.push({
+      id: "artifact-section-1",
+      nodeClass: "source-artifact",
+      kind: "section",
+      sourceLabel: "Section artifact 1",
+      sourceXmlId: "section-artifact-1",
+      sourceLocator: "page 1",
+      title: "Referenced source section",
+      normalizedStatement: "The source proof imports this section as a whole.",
+      sourceTextSha256: "4".repeat(64),
+      evidence: structuredClone(reviewedEvidence),
+    });
+    inventory.sourceArtifactNodeIds.push("artifact-section-1");
+    file.graph.directDependencies.push({
+      id: "dependency-source-artifact-1",
+      dependentNodeId: "theorem-1",
+      prerequisite: { type: "node", id: "artifact-section-1" },
+      role: "source-reference",
+      rationale: "The original proof cites the aggregate source section.",
+      evidence: structuredClone(reviewedEvidence),
+    });
+    route.dependencyIds.push("dependency-source-artifact-1");
+    file.graph.references.push({
+      id: "reference-source-artifact-1",
+      ownerNodeId: "theorem-1",
+      basis: "proof-xref",
+      ref: "section-artifact-1",
+      context: "Use the referenced section.",
+      locator: "page 1",
+      resolution: {
+        status: "resolved",
+        target: { type: "node", id: "artifact-section-1" },
+        directDependencyId: "dependency-source-artifact-1",
+        note: "Resolved to a raw source artifact pending mathematical decomposition.",
+      },
+      evidence: structuredClone(reviewedEvidence),
+    });
+    audit.nodeCount = 3;
+    audit.directDependencyCount = 2;
+    audit.referenceCount = 1;
+
+    expect(() => validateBookGraphFile(file)).toThrow(/reviewed graph still contains raw source artifacts/i);
+
+    file.graphState.status = "extracted";
+    file.graphState.independentReview = null;
+    file.graphState.note = "The extracted graph retains a raw source artifact pending mathematical decomposition.";
+    const validated = validateBookGraphFile(file);
+    expect(validated.graph.nodes.filter(({ nodeClass }) => nodeClass === "support")).toHaveLength(1);
+    expect(validated.graph.nodes.filter(({ nodeClass }) => nodeClass === "source-artifact"))
+      .toHaveLength(1);
+    const kindCounts = validated.graph.nodes
+      .filter(({ nodeClass }) => nodeClass !== "source-artifact")
+      .reduce<Record<string, number>>((counts, { kind }) => ({
+        ...counts,
+        [kind]: (counts[kind] ?? 0) + 1,
+      }), {});
+    const sourceArtifactKindCounts = validated.graph.nodes
+      .filter(({ nodeClass }) => nodeClass === "source-artifact")
+      .reduce<Record<string, number>>((counts, { kind }) => ({
+        ...counts,
+        [kind]: (counts[kind] ?? 0) + 1,
+      }), {});
+    expect(kindCounts).toEqual({ definition: 1, theorem: 1 });
+    expect(sourceArtifactKindCounts).toEqual({ section: 1 });
+    expect({
+      theoremCount: validated.graph.nodes.filter(({ nodeClass }) => nodeClass === "theorem-like").length,
+      supportCount: validated.graph.nodes.filter(({ nodeClass }) => nodeClass === "support").length,
+      sourceArtifactCount: validated.graph.nodes.filter(({ nodeClass }) => nodeClass === "source-artifact").length,
+    }).toEqual({ theoremCount: 1, supportCount: 1, sourceArtifactCount: 1 });
+    expect(validated.graphState.graphAudit).toMatchObject({
+      nodeCount: 3,
+      directDependencyCount: 2,
+      referenceCount: 1,
+    });
+
+    const misclassifiedInventory = structuredClone(file);
+    misclassifiedInventory.unitInventories[0]?.supportNodeIds.push("artifact-section-1");
+    misclassifiedInventory.unitInventories[0]?.sourceArtifactNodeIds.splice(0);
+    expect(() => validateBookGraphFile(misclassifiedInventory)).toThrow(/non-support node/i);
   });
 
   it("retains proof and statement xrefs explicitly until they resolve", () => {

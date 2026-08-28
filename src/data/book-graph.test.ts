@@ -26,6 +26,7 @@ const localCandidatePaths = [
   "S0091/complete-source.json",
   "S0164/complete-source.json",
   "S0262/complete-source.json",
+  "S0321/complete-source.json",
 ];
 
 function readLocalCandidateGraphs() {
@@ -693,6 +694,47 @@ describe("one Phase-I dependency graph identity per source component", () => {
     ]);
     expect(densestBook?.extractionState.status).toBe("extracted");
     expect(densestBook?.graphState.status).toBe("extracted");
+    }
+    const openLogicBook = localCandidateFiles.get("S0321/complete-source.json");
+    if (openLogicBook) {
+    expect(openLogicBook.exactEdition).toMatchObject({
+      label: "The Open Logic Text — Complete Build",
+      sourceRepository: "https://github.com/OpenLogicProject/OpenLogic",
+      sourceRevision: "1e960beff9ed7835bf3e3f1335e21af3439cd107",
+      sourceFormat: "latex",
+      licenseSpdx: "CC-BY-4.0",
+      artifactSha256: "9215bbb42456d4e6b24d7f630dbf0e8442728b969da63129f30e419bec336353",
+    });
+    expect(openLogicBook.sourceUnits).toHaveLength(694);
+    expect(openLogicBook.unitInventories).toHaveLength(694);
+    expect(openLogicBook.unitInventories.filter(({ theoremFreeAttestation }) => theoremFreeAttestation))
+      .toHaveLength(378);
+    expect(openLogicBook.graph.nodes).toHaveLength(1463);
+    expect(openLogicBook.graph.nodes.filter(({ nodeClass }) => nodeClass === "theorem-like"))
+      .toHaveLength(786);
+    expect(openLogicBook.graph.nodes.filter(({ nodeClass }) => nodeClass === "support"))
+      .toHaveLength(522);
+    expect(openLogicBook.graph.nodes.filter(({ nodeClass }) => nodeClass === "source-artifact"))
+      .toHaveLength(155);
+    expect(openLogicBook.graph.nodes.filter(({ kind }) => kind === "theorem")).toHaveLength(182);
+    expect(openLogicBook.graph.nodes.filter(({ kind }) => kind === "proposition")).toHaveLength(410);
+    expect(openLogicBook.graph.nodes.filter(({ kind }) => kind === "lemma")).toHaveLength(121);
+    expect(openLogicBook.graph.nodes.filter(({ kind }) => kind === "corollary")).toHaveLength(73);
+    expect(openLogicBook.graph.directDependencies).toHaveLength(700);
+    expect(openLogicBook.graph.proofRoutes).toHaveLength(693);
+    expect(openLogicBook.graph.references).toHaveLength(892);
+    expect(openLogicBook.graph.references.filter(({ resolution }) => resolution.status === "unresolved"))
+      .toHaveLength(18);
+    expect(openLogicBook.graph.references).toContainEqual(expect.objectContaining({
+      basis: "proof-xref",
+      ref: "sfr:siz:red:prob:nat-nat",
+      resolution: expect.objectContaining({
+        status: "unresolved",
+        note: expect.stringContaining("ambiguous"),
+      }),
+    }));
+    expect(openLogicBook.extractionState.status).toBe("extracted");
+    expect(openLogicBook.graphState.status).toBe("extracted");
     }
     const linearAlgebraBook = localCandidateFiles.get("S0091/complete-source.json");
     if (linearAlgebraBook) {

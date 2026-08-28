@@ -3,15 +3,15 @@
   "sourceSetRevision": "approved-2026-08-22-r1",
   "sourceRecordCount": 688,
   "componentCount": 717,
-  "resolutionRecordCount": 4,
+  "resolutionRecordCount": 5,
   "summary": {
-    "unresolvedComponentCount": 713,
-    "candidateExactEditionCount": 4,
+    "unresolvedComponentCount": 712,
+    "candidateExactEditionCount": 5,
     "verifiedExactEditionCount": 0,
     "candidateDuplicateCount": 0,
     "verifiedDuplicateCount": 0,
     "blockedComponentCount": 2,
-    "importerCandidateProducedCount": 4
+    "importerCandidateProducedCount": 5
   },
   "entries": [
     {
@@ -5004,13 +5004,13 @@
       "sourceOrdinal": 321,
       "componentId": "complete-source",
       "componentLabel": "Complete source named by this row",
-      "resolutionPath": null,
-      "resolutionState": "unresolved",
+      "resolutionPath": "S0321/complete-source.json",
+      "resolutionState": "candidate-exact-edition",
       "selectedProposalId": null,
       "leadCount": 0,
-      "proposalCount": 0,
+      "proposalCount": 1,
       "openBlockerDomains": [],
-      "importerState": "not-assessed",
+      "importerState": "candidate-produced",
       "graphArtifactPath": null
     },
     {

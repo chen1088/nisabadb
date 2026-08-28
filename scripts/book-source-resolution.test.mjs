@@ -335,10 +335,10 @@ describe("committed-shape book-source corpus", () => {
     expect(manifest.entries).toHaveLength(717);
     expect(graphEntries).toHaveLength(0);
     expect(manifest.entries.filter(({ graphArtifactPath }) => graphArtifactPath !== null)).toHaveLength(0);
-    expect(manifest.resolutionRecordCount).toBe(4);
-    expect(manifest.summary.candidateExactEditionCount).toBe(4);
+    expect(manifest.resolutionRecordCount).toBe(5);
+    expect(manifest.summary.candidateExactEditionCount).toBe(5);
     expect(manifest.summary.verifiedExactEditionCount).toBe(0);
-    expect(manifest.summary.importerCandidateProducedCount).toBe(4);
+    expect(manifest.summary.importerCandidateProducedCount).toBe(5);
     expect(manifest.summary.blockedComponentCount).toBe(2);
     expect(manifest.summary.unresolvedComponentCount
       + manifest.summary.candidateExactEditionCount
@@ -352,6 +352,13 @@ describe("committed-shape book-source corpus", () => {
         resolutionPath: "S0091/complete-source.json",
         resolutionState: "candidate-exact-edition",
         importerState: "candidate-produced",
+      });
+    expect(manifest.entries.find(({ bookGraphId }) => bookGraphId === "S0321:complete-source"))
+      .toMatchObject({
+        resolutionPath: "S0321/complete-source.json",
+        resolutionState: "candidate-exact-edition",
+        importerState: "candidate-produced",
+        openBlockerDomains: [],
       });
     expect(manifest.entries.find(({ bookGraphId }) => bookGraphId === "S0060:complete-source")?.openBlockerDomains)
       .toContain("license");

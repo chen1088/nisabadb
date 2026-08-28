@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "sourceSetRevision": "approved-2026-08-22-r1",
+  "bookGraphId": "S0321:complete-source",
+  "leads": [],
+  "proposals": [
+    {
+      "kind": "exact-edition",
+      "id": "s0321-open-logic-1e960beff9ed",
+      "edition": {
+        "editionId": "s0321-open-logic-1e960beff9ed",
+        "label": "The Open Logic Text — Complete Build",
+        "publicationYear": null,
+        "publisher": "The Open Logic Project",
+        "stableLocator": "https://github.com/OpenLogicProject/OpenLogic/tree/1e960beff9ed7835bf3e3f1335e21af3439cd107",
+        "sourceFormat": "latex",
+        "accessKind": "open",
+        "licenseSpdx": "CC-BY-4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "licenseNote": "Candidate edition-level license metadata follows the official project source and README for the pinned repository revision; not independently reviewed.",
+        "sourceRepository": "https://github.com/OpenLogicProject/OpenLogic",
+        "sourceRevision": "1e960beff9ed7835bf3e3f1335e21af3439cd107",
+        "artifactSha256": "9215bbb42456d4e6b24d7f630dbf0e8442728b969da63129f30e419bec336353",
+        "unitManifestSha256": "9179359bb661d97d2c9e9aece559799f9026d2e136bc4f4f07037f1b6f7ade29",
+        "sourceUnitKind": "source-file"
+      },
+      "licenseAssessment": {
+        "status": "candidate",
+        "distributionClass": "review-required",
+        "administrativeReview": null,
+        "note": "License and derived-data distribution remain candidates until independent administrative review."
+      },
+      "proposalAudit": {
+        "actorId": "open-logic-book-importer",
+        "proposedAt": "2026-08-28T02:10:10.042Z",
+        "subjectSha256": "757a326e7492b321005cdde98308f67700690dd38bfd79c32064ff62229ad67d",
+        "note": "Deterministic candidate inventory from 694 ordered active import instances (642 unique paths, 52 duplicate-context instances) rooted at open-logic-complete.tex in the pinned official source. Default and complete-build tag declarations plus balanced \\iftag/\\tagitem branches were evaluated; no independent review is claimed. Source-boundary manifest SHA-256: dc3f50ca46bb1b32f36a422116d7193f260067d2da1a43647fb3e6303a8a5837."
+      },
+      "administrativeReview": null
+    }
+  ],
+  "selectedProposalId": null,
+  "blockers": [],
+  "importerAssessments": [
+    {
+      "id": "assessment-s0321-open-logic-1e960beff9ed-d1bcbf540f8c",
+      "proposalId": "s0321-open-logic-1e960beff9ed",
+      "adapterId": "open-logic-book-importer",
+      "outcome": "candidate-produced",
+      "sourcePinSha256": "1d84d3a80c54acff2093ca308489cfe07a2d0d7d74f793cb52c893ae3b57539d",
+      "extractionArtifactSha256": "6864377b87fd8d2f0cda1bfba09e620d5dfaac86c69fede65f9c137d9722bd4f",
+      "graphArtifactSha256": "d1bcbf540f8c2b2bcb66d6ff67b9faa3f9a9a644e1daaaf89844d2390ed259e9",
+      "assessedBy": "open-logic-book-importer",
+      "assessedAt": "2026-08-28T02:10:10.042Z",
+      "note": "The recorded importer produced this ignored local candidate graph; no independent review or completeness is claimed."
+    }
+  ]
+}

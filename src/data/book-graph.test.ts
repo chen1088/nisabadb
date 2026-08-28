@@ -293,16 +293,48 @@ describe("one Phase-I dependency graph identity per source component", () => {
     if (densestBook) {
     expect(densestBook?.exactEdition?.sourceFormat).toBe("latex");
     expect(densestBook?.sourceUnits).toHaveLength(116);
-    expect(densestBook?.graph.nodes).toHaveLength(14994);
-    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like")).toHaveLength(13139);
-    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "support")).toHaveLength(1855);
-    expect(densestBook?.graph.nodes.filter((node) => node.kind === "claim")).toHaveLength(8);
+    expect(densestBook?.graph.nodes).toHaveLength(15017);
+    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "theorem-like")).toHaveLength(13147);
+    expect(densestBook?.graph.nodes.filter((node) => node.nodeClass === "support")).toHaveLength(1870);
+    expect(densestBook?.graph.nodes.filter((node) => node.kind === "claim")).toHaveLength(16);
     expect(densestBook?.graph.nodes).toContainEqual(expect.objectContaining({
       id: "tag-0f0k",
       nodeClass: "theorem-like",
       kind: "claim",
       sourceXmlId: "algebra-item-cauchy-binet",
     }));
+    expect(densestBook?.graph.nodes).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: "tag-0gqt",
+        nodeClass: "theorem-like",
+        kind: "claim",
+        sourceXmlId: "stacks-cohomology-item-hom-restriction",
+      }),
+      expect.objectContaining({
+        id: "tag-06w6",
+        nodeClass: "theorem-like",
+        kind: "claim",
+        sourceXmlId: "stacks-sheaves-equation-pushforward",
+      }),
+      expect.objectContaining({
+        id: "tag-0880",
+        nodeClass: "support",
+        kind: "construction",
+      }),
+      expect.objectContaining({
+        id: "tag-0f9z",
+        nodeClass: "support",
+        kind: "construction",
+        sourceXmlId: "chow-remark-restriction-bivariant",
+        evidence: expect.objectContaining({
+          note: expect.stringContaining("Tag 0B76"),
+        }),
+      }),
+    ]));
+    expect(densestBook?.extractionState.note).toContain("1036 remark");
+    expect(densestBook?.graph.nodes.some(({ id }) => (
+      ["tag-0a53", "tag-0a57", "tag-0a58", "tag-0a59", "tag-0a5a"].includes(id)
+    ))).toBe(false);
     expect(densestBook?.graph.nodes.every((node) => /^tag-[a-z0-9]{4}$/u.test(node.id))).toBe(true);
     expect(densestBook?.graph.nodes.some((node) => (
       node.kind === "example" || node.kind === "calculation" || node.kind === "algorithm"
@@ -316,7 +348,7 @@ describe("one Phase-I dependency graph identity per source component", () => {
       id: "external-deligne-weight-bound",
       kind: "external-theorem",
     }));
-    expect(densestBook?.graph.directDependencies).toHaveLength(36295);
+    expect(densestBook?.graph.directDependencies).toHaveLength(36350);
     expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
       id: "dep-tag-07dq-to-tag-0f0k",
       dependentNodeId: "tag-07dq",
@@ -353,6 +385,44 @@ describe("one Phase-I dependency graph identity per source component", () => {
       dependentNodeId: "tag-0dga",
       prerequisite: { type: "node", id: "tag-0df6" },
     }));
+    expect(densestBook?.graph.directDependencies).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        dependentNodeId: "tag-0grd",
+        prerequisite: { type: "node", id: "tag-0gqt" },
+      }),
+      expect.objectContaining({
+        dependentNodeId: "tag-06w6",
+        prerequisite: { type: "node", id: "tag-004b" },
+      }),
+      expect.objectContaining({
+        dependentNodeId: "tag-075b",
+        prerequisite: { type: "node", id: "tag-06w6" },
+      }),
+      expect.objectContaining({
+        dependentNodeId: "tag-0883",
+        prerequisite: { type: "node", id: "tag-0880" },
+        role: "construction",
+      }),
+      expect.objectContaining({
+        dependentNodeId: "tag-0guc",
+        prerequisite: { type: "node", id: "tag-0f9z" },
+        role: "construction",
+      }),
+    ]));
+    expect(densestBook?.graph.directDependencies
+      .filter(({ prerequisite }) => prerequisite.type === "node" && prerequisite.id === "tag-0f9z")
+      .map(({ dependentNodeId }) => dependentNodeId)
+      .sort()).toEqual([
+        "tag-0fau",
+        "tag-0fbk",
+        "tag-0fbt",
+        "tag-0fc1",
+        "tag-0fca",
+        "tag-0feb",
+        "tag-0ff2",
+        "tag-0guc",
+        "tag-0gud",
+      ]);
     for (const ownerNodeId of ["tag-08zp", "tag-08xs"]) {
       expect(densestBook?.graph.directDependencies).toContainEqual(expect.objectContaining({
         dependentNodeId: ownerNodeId,
@@ -434,29 +504,68 @@ describe("one Phase-I dependency graph identity per source component", () => {
     expect(densestBook?.graph.proofRoutes
       .find(({ theoremNodeId }) => theoremNodeId === "tag-09cn")
       ?.evidence.note).toContain("excluded example for the free-module case");
-    expect(densestBook?.graph.proofRoutes).toHaveLength(11284);
+    expect(densestBook?.graph.proofRoutes).toHaveLength(11298);
     expect(densestBook?.graph.proofRoutes.filter(({ theoremNodeId }) => (
       theoremNodeId === "tag-0f0k"
     ))).toHaveLength(0);
     expect(densestBook?.graph.proofRoutes
       .find(({ theoremNodeId }) => theoremNodeId === "tag-07dq")
       ?.dependencyIds).toContain("dep-tag-07dq-to-tag-0f0k");
+    expect(densestBook?.graph.proofRoutes
+      .find(({ theoremNodeId }) => theoremNodeId === "tag-06w6")
+      ?.dependencyIds).toContain("dep-tag-06w6-to-tag-004b");
+    expect(densestBook?.graph.proofRoutes
+      .find(({ theoremNodeId }) => theoremNodeId === "tag-075b")
+      ?.evidence.note).toContain("commutes with restriction maps");
+    for (const theoremNodeId of ["tag-073n", "tag-075g", "tag-07at"]) {
+      expect(densestBook?.graph.proofRoutes
+        .find((route) => route.theoremNodeId === theoremNodeId)
+        ?.evidence.note).not.toContain("commutes with restriction maps");
+    }
+    expect(densestBook?.graph.proofRoutes
+      .find(({ theoremNodeId }) => theoremNodeId === "tag-0gqt")
+      ?.evidence.note).toContain("c = d composed with Q");
+    expect(densestBook?.graph.proofRoutes
+      .find(({ theoremNodeId }) => theoremNodeId === "tag-06cw")
+      ?.evidence.note).toContain("final commutativity verification");
+    expect(densestBook?.graph.proofRoutes
+      .find(({ theoremNodeId }) => theoremNodeId === "tag-0evf")
+      ?.evidence.note).toContain("affine-cover argument");
+    expect(densestBook?.graph.proofRoutes.some(({ theoremNodeId }) => (
+      theoremNodeId === "tag-0f9z"
+    ))).toBe(false);
     const routedTheoremNodeIds = new Set(densestBook?.graph.proofRoutes.map(({ theoremNodeId }) => (
       theoremNodeId
     )));
     expect(densestBook?.graph.nodes.filter(({ id, nodeClass }) => (
       nodeClass === "theorem-like" && !routedTheoremNodeIds.has(id)
-    ))).toHaveLength(1892);
+    ))).toHaveLength(1886);
     expect(densestBook?.graph.proofRoutes.filter((route) => route.routeKind === "alternate-proof"))
       .toHaveLength(40);
     expect(densestBook?.graph.references.every((reference) => (
       ["proof-xref", "proof-citation"].includes(reference.basis)
     ))).toBe(true);
     expect(densestBook?.graph.references.filter((reference) => reference.basis === "proof-xref"))
-      .toHaveLength(2590);
+      .toHaveLength(2530);
     expect(densestBook?.graph.references.some(({ ownerNodeId, ref }) => (
       ownerNodeId === "tag-07dq" && ref === "algebra-item-cauchy-binet"
     ))).toBe(false);
+    const etaleGoalNondependencies = [
+      ["tag-0a5b", "etale-cohomology-item-base-change-prime-to-p"],
+      ["tag-0a5b", "etale-cohomology-item-surjective"],
+      ["tag-0a5b", "etale-cohomology-item-finite-proper"],
+      ["tag-0a5b", "etale-cohomology-item-base-change-proper"],
+      ["tag-0a5d", "etale-cohomology-item-surjective"],
+      ["tag-0gja", "etale-cohomology-item-vanishing"],
+      ["tag-0gja", "etale-cohomology-item-surjective"],
+      ["tag-03sc", "etale-cohomology-item-vanishing"],
+      ["tag-03sc", "etale-cohomology-item-surjective"],
+    ];
+    for (const [ownerNodeId, ref] of etaleGoalNondependencies) {
+      expect(densestBook?.graph.references.some((reference) => (
+        reference.ownerNodeId === ownerNodeId && reference.ref === ref
+      ))).toBe(false);
+    }
     expect(new Map([
       "spaces-properties-section-points",
       "stacks-properties-section-points",

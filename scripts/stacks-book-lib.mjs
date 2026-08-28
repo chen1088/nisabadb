@@ -49,12 +49,14 @@ const CURATED_CLAIMS = new Map([
 const CURATED_PROSE_CLAIMS = new Map([
   ["derived-equation-long-exact-cohomology-sequence", {
     title: "Long exact sequence associated to a distinguished triangle",
+    sourceStem: "derived",
     startLine: 277,
     endLine: 296,
     sourceTextSha256: "7681c73366465bd0ef97fb5f144a2780d4b47dd88f49a42759bcdf08729072cc",
   }],
   ["algebra-item-cauchy-binet", {
     title: "Cauchy-Binet determinant formula",
+    sourceStem: "algebra",
     startLine: 282,
     endLine: 288,
     sourceTextSha256: "55088a1bf9d258441577a7296199733c88fd44ffbb7e1e0a05dc5edb7c6ef457",
@@ -67,6 +69,126 @@ const CURATED_PROSE_CLAIMS = new Map([
       proofSourceTextSha256: "b647329bb9ab0fcfee71c8b305fd14ca75ba88b3632ec7e6c298fe8c023ac155",
       expectedReferenceCount: 1,
       referenceArtifactSha256: "db8f86361ff953442c2bab45ec86550f342e67fe602f29dd222b63f6d7ab42db",
+    },
+  }],
+  ["algebra-item-inverse-image-prime", {
+    title: "Inverse images of prime ideals",
+    sourceStem: "algebra",
+    startLine: 172,
+    endLine: 175,
+    sourceTextSha256: "9d85b2c13fcb8f9c9c33fff3a3bac57f2a593d9c54a5f098e0e2759dcaea995c",
+    hasInlineDerivation: false,
+    pendingProofAudit: {
+      sourceRevision: "ed88ff783bcb4dd9a28518a33b028841094009cf",
+      targetTag: "00BV",
+      ownerTag: "00E2",
+      ownerSourceTextSha256: "b8b34997347f12e654afed14bf77f4ff27b88cb070fa73382cbaaeaad2933189",
+      proofSourceTextSha256: "443c62b477a181a5e1cccf149c227f1fb744d4eee38c1294cf8e75b2f52dfdd0",
+      expectedReferenceCount: 1,
+      referenceArtifactSha256: "de4d3548f1f3f8ed8617bee6f7f82b22dddfd94d256a38c4fe3e9c9fda226f19",
+    },
+  }],
+  ["algebra-item-extension-free", {
+    title: "Extensions of free modules are free",
+    sourceStem: "algebra",
+    startLine: 195,
+    endLine: 197,
+    sourceTextSha256: "6351725178140d114b116f073c73c5df583947b90144a738a824a78b2e75aa3c",
+    hasInlineDerivation: false,
+    pendingProofAudit: {
+      sourceRevision: "ed88ff783bcb4dd9a28518a33b028841094009cf",
+      targetTag: "0516",
+      ownerTag: "051R",
+      ownerSourceTextSha256: "91936c81caf770535cecc29f841451a992c021eeda23624da00c816ba3f7940c",
+      proofSourceTextSha256: "c557947cb27d805c20326c80be2b46cb3f9aadae6e8d9516c015ddbe00485533",
+      expectedReferenceCount: 1,
+      referenceArtifactSha256: "83d0706cf0f7aec1e11dee5b9eae55634ea9f35bdee0306703264c7413adcddf",
+    },
+  }],
+  ["algebra-item-isomorphism-theorem", {
+    title: "Quotient-of-quotient isomorphism for modules",
+    sourceStem: "algebra",
+    startLine: 198,
+    endLine: 199,
+    sourceTextSha256: "763df0a880fd61dfe02ff584d3b3f2f78731f4e6e06a96b7d2265a82170d8707",
+    hasInlineDerivation: false,
+    pendingProofAudit: {
+      sourceRevision: "ed88ff783bcb4dd9a28518a33b028841094009cf",
+      targetTag: "00C3",
+      ownerTag: "00E5",
+      ownerSourceTextSha256: "2b1ab378535fdb1986d01a33f9c926dddf1d69a469b2282392d3e798c853ecd9",
+      proofSourceTextSha256: "e512692e21c82818055505dbf44ca1ccdd573b94a2b5170f18fc9033461db913",
+      expectedReferenceCount: 1,
+      referenceArtifactSha256: "56a5311fae5da6f96b3598e4c03295f7bdb2cc61797ec0cc098992ed2bb80c12",
+    },
+  }],
+  ["algebra-item-localization-zero", {
+    title: "A localization is zero exactly when zero is inverted",
+    sourceStem: "algebra",
+    startLine: 205,
+    endLine: 207,
+    sourceTextSha256: "7dd9207b486e2f0fa44ac3739f1e6f4d08fe29c71bbac9982c4cedb0d24d9d3b",
+    hasInlineDerivation: false,
+    pendingProofAudit: {
+      sourceRevision: "ed88ff783bcb4dd9a28518a33b028841094009cf",
+      targetTag: "00C6",
+      ownerTag: "00E3",
+      ownerSourceTextSha256: "93963b9b3435502790790a0fd294af0e74361dbd0b3db6675a2c898c0bae2f08",
+      proofSourceTextSha256: "4c95159d68b5c086135b7d79f728d236c7df0f9b200d84e33c2af9abc01cb1cd",
+      expectedReferenceCount: 1,
+      referenceArtifactSha256: "32acfeda97fec6abba0a7871c56177af32ad85be93e08836704d59e538d69916",
+    },
+  }],
+  ["algebra-item-localize-nonzerodivisors", {
+    title: "Localization at nonzerodivisors is injective",
+    sourceStem: "algebra",
+    startLine: 209,
+    endLine: 212,
+    sourceTextSha256: "48e2966fe9ed699b95a330a4a0cc25b45c717dce3ac3fb2257dde3a48db53e8b",
+    hasInlineDerivation: false,
+    pendingProofAudit: {
+      sourceRevision: "ed88ff783bcb4dd9a28518a33b028841094009cf",
+      targetTag: "00C7",
+      ownerTag: "00E3",
+      ownerSourceTextSha256: "93963b9b3435502790790a0fd294af0e74361dbd0b3db6675a2c898c0bae2f08",
+      proofSourceTextSha256: "4c95159d68b5c086135b7d79f728d236c7df0f9b200d84e33c2af9abc01cb1cd",
+      expectedReferenceCount: 1,
+      referenceArtifactSha256: "aacbee3f86c42d24d72f7ba9aaadb15a3759353c83d7ef719bb6352d0b2587c4",
+    },
+  }],
+  ["algebra-item-localize-ideal", {
+    title: "Localization commutes with quotient by an ideal",
+    sourceStem: "algebra",
+    startLine: 239,
+    endLine: 243,
+    sourceTextSha256: "c0d08367cac7b024a56890e04e5aad5d881033065f7eaf9ddec941ffe4c157e7",
+    hasInlineDerivation: false,
+    pendingProofAudit: {
+      sourceRevision: "ed88ff783bcb4dd9a28518a33b028841094009cf",
+      targetTag: "00CD",
+      ownerTag: "00E3",
+      ownerSourceTextSha256: "93963b9b3435502790790a0fd294af0e74361dbd0b3db6675a2c898c0bae2f08",
+      proofSourceTextSha256: "4c95159d68b5c086135b7d79f728d236c7df0f9b200d84e33c2af9abc01cb1cd",
+      expectedReferenceCount: 1,
+      referenceArtifactSha256: "fc3dc00f19a750ad597192679f96b0f34a3bca5c6900b6179ddc78bd716d92fc",
+    },
+  }],
+  ["stacks-cohomology-item-hom-restriction", {
+    title: "Flat pullback compatibility for internal Hom",
+    sourceStem: "stacks-cohomology",
+    startLine: 2338,
+    endLine: 2370,
+    sourceTextSha256: "e67868623c83eca5f74cab5e3fc9799ba1832bdda090423dfdba54f238b2c7ef",
+    routeDebtNote: "The displayed derivation also uses the unlabelled earlier identity c = d composed with Q; that local item remains separate proof debt.",
+  }],
+  ["stacks-sheaves-equation-pushforward", {
+    title: "Fibre-category formula for pushforward of a presheaf",
+    sourceStem: "stacks-sheaves",
+    startLine: 515,
+    endLine: 540,
+    sourceTextSha256: "7a4fe6d4ea2899c8c6766624bae288b816245e5315af033ba83c7af7c73cd800",
+    ownerRouteDebtNotes: {
+      "075B": "The source omits verification that the pointwise bijection commutes with restriction maps; that compatibility remains route debt.",
     },
   }],
 ]);
@@ -99,6 +221,12 @@ const CURATED_CLAIM_DEPENDENCIES = [
     phrasePattern: "rational equivalences",
     expectedOccurrenceCount: 1,
   },
+  {
+    ownerTag: "06W6",
+    targetTag: "004B",
+    phrasePattern: "\\$2\\$-Yoneda lemma",
+    expectedOccurrenceCount: 1,
+  },
 ];
 
 // Complete incoming proof-reference inventories for the newly promoted claims.
@@ -107,8 +235,16 @@ const CURATED_CLAIM_DEPENDENCIES = [
 const CURATED_CLAIM_INCOMING_REFERENCE_COUNTS = new Map([
   ["0148", { "05SR": 1, "05R5": 2, "05RD": 1, "05RE": 1, "05RM": 1, "0CQQ": 1 }],
   ["00E6", { "00E7": 1, "00GT": 1, "05DR": 1, "00HQ": 1, "0BRB": 2, "09EF": 1, "00QE": 1, "00SJ": 1, "0BK8": 1, "01K1": 1 }],
+  ["00BV", { "00E2": 1 }],
+  ["00C3", { "00E5": 1 }],
+  ["00C6", { "00E3": 1 }],
+  ["00C7", { "00E3": 1 }],
+  ["00CD", { "00E3": 1 }],
   ["0EQ8", { "0EQB": 1, "0EQR": 1, "0ER5": 1, "0ER6": 1, "0ERC": 1, "0ERG": 1, "0ERU": 1, "0ERV": 1 }],
+  ["0516", { "051R": 1 }],
+  ["06W6", { "073N": 1, "075B": 1, "075G": 1, "07AT": 2 }],
   ["0F0K", { "07DQ": 1 }],
+  ["0GQT", { "0GRD": 1 }],
   ["0FFR", { "0FFS": 1, "0FFT": 1, "0FFU": 1, "0FPA": 1, "0FPS": 1, "0FNW": 1, "0FNZ": 1 }],
 ]);
 
@@ -699,10 +835,21 @@ const CURATED_NONDEPENDENCY_PROOF_XREFS = new Set([
   // Optional "you can also deduce" notes after complete primary proofs.
   "0FNW|0FFR",
   "0FNZ|0FFR",
+  // These etale-cohomology item labels name goals being established and later
+  // consolidated in Tag 03SC. Their appearances do not import prerequisites.
+  "0A5B|0A58",
+  "0A5B|0A5A",
+  "0A5B|0A57",
+  "0A5B|0A59",
+  "0A5D|0A5A",
+  "0GJA|0A53",
+  "0GJA|0A5A",
+  "03SC|0A53",
+  "03SC|0A5A",
 ]);
 
-// These labeled prose/display spans are definitions, predicates, or
-// constructions used by theorem proofs. They are support nodes rather than
+// These labeled prose/display spans are assumptions, definitions, predicates,
+// or constructions used by theorem proofs. They are support nodes rather than
 // theorem-like claims. Every promotion is guarded by the exact defining span
 // and complete incoming owner/count inventory; equation labels are never
 // promoted as a class.
@@ -806,6 +953,180 @@ const CURATED_PROSE_SUPPORT_NODES = [
     endLine: 3902,
     sourceTextSha256: "5448054e48da2f7c8c7dd7f0f78b3020ed49f2cf081730bf4b97653299d54314",
     ownerOccurrenceCounts: { "08UK": 1, "0GQ5": 1, "0GQ9": 1, "0D17": 1, "0D3Q": 1 },
+  },
+  {
+    targetTag: "0DC2",
+    kind: "assumption",
+    title: "Restriction stability of the subcategories A_U",
+    sourceStem: "spaces-simplicial",
+    startLine: 5088,
+    endLine: 5091,
+    sourceTextSha256: "97f43a7155f74fbab38f4b182d345eaf5833cb4b3241bad661cf626c295da93a",
+    ownerOccurrenceCounts: { "0DC7": 1 },
+  },
+  {
+    targetTag: "0DC3",
+    kind: "assumption",
+    title: "Locality of membership in A_U",
+    sourceStem: "spaces-simplicial",
+    startLine: 5093,
+    endLine: 5098,
+    sourceTextSha256: "349c1202c5738b9a2c6557dc258b655aeed533752dc8c4858bcb6802f923936e",
+    ownerOccurrenceCounts: { "0DC7": 1 },
+  },
+  {
+    targetTag: "0DC4",
+    kind: "assumption",
+    title: "Bounded cohomological dimension hypothesis",
+    sourceStem: "spaces-simplicial",
+    startLine: 5100,
+    endLine: 5114,
+    sourceTextSha256: "7307442b7a6b34df469ad5382f16c6bed01e0ce7794137f9a427dd3fcc07efcb",
+    ownerOccurrenceCounts: { "0DC7": 3 },
+  },
+  {
+    targetTag: "06GN",
+    kind: "construction",
+    title: "Category cofibered in groupoids associated to a groupoid-valued functor",
+    sourceStem: "formal-defos",
+    startLine: 1215,
+    endLine: 1224,
+    sourceTextSha256: "b2d3df1b7fd12af09bd18a3d44b6550e55009f87463df9ae5ff95507df4a2163",
+    ownerOccurrenceCounts: { "06KL": 1, "06KT": 1 },
+    dependencyDebtNote: "The construction delegates its general category-theoretic foundation to the Categories chapter; that learner prerequisite remains to be represented directly.",
+  },
+  {
+    targetTag: "06SI",
+    kind: "construction",
+    title: "2-fiber products of categories cofibered in groupoids",
+    sourceStem: "formal-defos",
+    startLine: 1264,
+    endLine: 1270,
+    sourceTextSha256: "30e9b8463d3cdf7171d4b6072de7edbfb0ad33652c9e4e00da8484417c0ab1c7",
+    ownerOccurrenceCounts: { "06HM": 1, "06L5": 1 },
+    dependencyDebtNote: "Its construction delegates the 2-fiber-product machinery to Tag 0040; that learner prerequisite remains to be represented directly.",
+    ownerRouteDebtNotes: {
+      "06HM": "The source explicitly omits the proof of part (3); that verification remains route debt.",
+    },
+  },
+  {
+    targetTag: "0DZJ",
+    kind: "construction",
+    title: "Products of categories cofibered in groupoids",
+    sourceStem: "formal-defos",
+    startLine: 1272,
+    endLine: 1277,
+    sourceTextSha256: "1bd6a6e9bfbdfea9b1cbc17f7102d4497387c4cbfcf2a8f93260fe9a179e61fa",
+    ownerOccurrenceCounts: { "0DZN": 1 },
+    dependencyDebtNote: "Its product construction uses the 2-fiber-product machinery of Tag 0040; that learner prerequisite remains to be represented directly.",
+  },
+  {
+    targetTag: "0F6I",
+    kind: "construction",
+    title: "Pullback for local cohomology with support",
+    sourceStem: "more-etale",
+    startLine: 118,
+    endLine: 121,
+    sourceTextSha256: "6b9c0cff0f4f62df5deab6ee138bfe0c48d6e4c57cbcb0de982fd789dc2116a6",
+    ownerOccurrenceCounts: { "0F5J": 1 },
+    dependencyDebtNote: "The construction reuses the preceding setup and Tag 0F6G; those learner prerequisites remain to be represented directly.",
+    ownerRouteDebtNotes: {
+      "0F5J": "The source omits compatibility with Tags 0F6K and 0F6L and with restriction maps; those verifications remain route debt.",
+    },
+  },
+  {
+    targetTag: "0880",
+    kind: "construction",
+    title: "Adic completion functor on coherent modules",
+    sourceStem: "coherent",
+    startLine: 6410,
+    endLine: 6420,
+    sourceTextSha256: "1c566193af58926c88f64ace0b69c4f81fea0e3898a38c1652137b19c2d6ac00",
+    ownerOccurrenceCounts: { "0883": 1, "0885": 3, "088A": 1, "088C": 3 },
+  },
+  {
+    targetTag: "0B53",
+    kind: "construction",
+    title: "Projection-formula transformation for ringed spaces",
+    sourceStem: "cohomology",
+    startLine: 13889,
+    endLine: 13907,
+    sourceTextSha256: "6fc32e8879aa5d88d2702782498ffcc576316326791e92d58ffb9473945deec1",
+    ownerOccurrenceCounts: { "0B54": 1, "0B55": 1, "0B6P": 2, "0FML": 1 },
+    dependencyDebtNote: "The construction uses Tags 079U and 079W as provenance; those learner prerequisites remain to be represented directly.",
+  },
+  {
+    targetTag: "035M",
+    kind: "construction",
+    title: "Generic-point inclusion used in normalization",
+    sourceStem: "morphisms",
+    startLine: 14358,
+    endLine: 14376,
+    sourceTextSha256: "8777e4746d6b9e675b6f1bf021b33b068c68039ebebbba1b7cea81bc6f1099ee",
+    ownerOccurrenceCounts: { "035O": 2, "035P": 1, "035Q": 2, "0H3Q": 1 },
+    dependencyDebtNote: "The construction delegates background broadly to Sections 01J5 and 01KH; those learner prerequisites remain unresolved rather than globally aliased.",
+  },
+  {
+    targetTag: "06CU",
+    kind: "definition",
+    title: "Limit preserving on objects",
+    sourceStem: "criteria",
+    startLine: 335,
+    endLine: 363,
+    sourceTextSha256: "f4b923ee4abab1944e06a8ae690c8705a8cc9e3b7d34c8b81d8b970aee1620d8",
+    ownerOccurrenceCounts: { "06CH": 1, "06CV": 1, "06CW": 3 },
+    ownerRouteDebtNotes: {
+      "06CW": "The source omits the final commutativity verification; that verification remains route debt.",
+    },
+  },
+  {
+    targetTag: "06D0",
+    kind: "definition",
+    title: "Formally smooth on objects",
+    sourceStem: "criteria",
+    startLine: 653,
+    endLine: 679,
+    sourceTextSha256: "864d308d679084d820f6bc2bc3a56da4a3830c6aebf1e34476ae7bfedc78b22f",
+    ownerOccurrenceCounts: { "06D1": 1, "06D2": 3, "06D9": 1 },
+    ownerRouteDebtNotes: {
+      "06D2": "The source omits the final commutativity verification; that verification remains route debt.",
+    },
+  },
+  {
+    targetTag: "0EV6",
+    kind: "definition",
+    title: "Almost blow-up square",
+    sourceStem: "flat",
+    startLine: 10955,
+    endLine: 10975,
+    sourceTextSha256: "e27f4c2f7939e6c9a0495b735446a8b07fc7332d922966d11f3f3f545e2a834d",
+    ownerOccurrenceCounts: { "0EVF": 1, "0EVI": 5 },
+    dependencyDebtNote: "The definition invokes Tag 07ZP; that learner prerequisite remains to be represented directly.",
+    ownerRouteDebtNotes: {
+      "0EVF": "The source omits the affine-cover argument in Interlude B; that argument remains route debt.",
+    },
+  },
+  {
+    targetTag: "051U",
+    kind: "definition",
+    title: "Localized finite-presentation and freeness condition",
+    sourceStem: "algebra",
+    startLine: 28627,
+    endLine: 28639,
+    sourceTextSha256: "6d84c20d87f03e327d0b8036306a8627fe55393b2d80d3659b9a4ddd66482e69",
+    ownerOccurrenceCounts: { "051W": 3, "051X": 3 },
+  },
+  {
+    targetTag: "0F9Z",
+    kind: "construction",
+    title: "Base-change restriction of bivariant classes",
+    sourceStem: "chow",
+    startLine: 6183,
+    endLine: 6197,
+    sourceTextSha256: "888b71fcbbfdd0c9ed4e4e74893942ee244047c458f34d73dea9fad14d118046",
+    ownerOccurrenceCounts: { "0GUC": 1, "0GUD": 1, "0FAU": 1, "0FBK": 1, "0FEB": 1, "0FF2": 1, "0FBT": 1, "0FC1": 1, "0FCA": 1 },
+    excludedEnvironment: "remark",
+    dependencyDebtNote: "The construction reuses the bivariant-class definition in Tag 0B76 and the setup in Tag 02QL; those learner prerequisites remain to be represented directly.",
   },
 ];
 
@@ -1229,16 +1550,20 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
   }
 
   for (const [fullLabel, curatedConfig] of CURATED_PROSE_CLAIMS) {
-    if (!fullLabel.startsWith(`${unit.stem}-`)) continue;
+    if (unit.stem !== curatedConfig.sourceStem) continue;
+    if (!fullLabel.startsWith(`${curatedConfig.sourceStem}-`)) {
+      throw new Error(`Curated prose claim ${fullLabel} does not belong to configured source stem ${curatedConfig.sourceStem}`);
+    }
     if (!tags.fullLabelToTag.has(fullLabel)) continue;
-    const localLabel = fullLabel.slice(unit.stem.length + 1);
+    const localLabel = fullLabel.slice(curatedConfig.sourceStem.length + 1);
     const range = {
       startLine: curatedConfig.startLine,
       endLine: curatedConfig.endLine,
     };
     const rawClaim = lines.slice(range.startLine - 1, range.endLine).join("\n");
-    if (sha256(rawClaim) !== curatedConfig.sourceTextSha256) {
-      throw new Error(`Curated prose claim ${fullLabel} changed from its audited source text`);
+    const rawClaimSha256 = sha256(rawClaim);
+    if (rawClaimSha256 !== curatedConfig.sourceTextSha256) {
+      throw new Error(`Curated prose claim ${fullLabel} changed from its audited source text (expected ${curatedConfig.sourceTextSha256}, got ${rawClaimSha256})`);
     }
     if (!labelArguments(rawClaim).includes(localLabel)) {
       throw new Error(`Curated prose claim ${fullLabel} is absent from its audited source range`);
@@ -1247,7 +1572,8 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
     const nodeId = tagNodeId(tag);
     const locator = `${unit.path}:L${range.startLine}-L${range.endLine}`;
     const label = sourceLabel("claim", tag);
-    const artifactSha256 = sha256(rawClaim);
+    const artifactSha256 = rawClaimSha256;
+    const normalizedClaim = normalizeWhitespace(rawClaim.replace(/^\s*\\item\s*/u, ""));
     const hasInlineDerivation = curatedConfig.hasInlineDerivation !== false;
     const proofs = hasInlineDerivation
       ? [{
@@ -1267,7 +1593,7 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
         title: curatedConfig.title,
         sourceXmlId: fullLabel,
         sourceLocator: locator,
-        normalizedStatement: normalizeWhitespace(rawClaim) || label,
+        normalizedStatement: normalizedClaim || label,
         sourceTextSha256: artifactSha256,
         evidence: capturedEvidence({
           sourceUnitId: unitId(unit.stem),
@@ -1290,6 +1616,7 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
       statementReferences: [],
       proofs,
       curatedClaim: true,
+      routeDebtNote: curatedConfig.routeDebtNote ?? null,
     });
   }
 
@@ -1332,7 +1659,7 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
           locator,
           artifactSha256,
           capturedAt,
-          note: "Exact labeled Stacks prose/display span promoted as a source-audited definition or construction because formal proofs use it directly; no theorem-like claim is asserted.",
+          note: `Exact labeled Stacks prose/display span promoted as a source-audited assumption, definition, or construction because formal proofs use it directly; no theorem-like claim is asserted.${curatedConfig.dependencyDebtNote ? ` ${curatedConfig.dependencyDebtNote}` : ""}`,
         }),
       },
       unit,
@@ -1340,6 +1667,7 @@ function graphNodesFromUnit(unit, tags, capturedAt) {
       startLine: range.startLine,
       endLine: range.endLine,
       rawEnvironment: rawSupport,
+      excludedEnvironment: curatedConfig.excludedEnvironment ?? null,
       // Curated support spans represent exactly their own permanent label.
       // Never alias a neighbouring equation or definition into this node.
       aliasFullLabels: [],
@@ -2243,6 +2571,25 @@ export function extractStacksGraphFromUnits(
   }
 
   const proofRoutes = [];
+  const curatedOwnerRouteDebtNotes = new Map();
+  const activeCuratedSourceXmlIds = new Set(metadata
+    .filter(({ curatedClaim, curatedSupport }) => curatedClaim || curatedSupport)
+    .map(({ node }) => node.sourceXmlId));
+  const activeRouteDebtConfigs = [
+    ...[...CURATED_PROSE_CLAIMS]
+      .filter(([fullLabel]) => activeCuratedSourceXmlIds.has(fullLabel))
+      .map(([, config]) => config),
+    ...CURATED_PROSE_SUPPORT_NODES.filter((config) => (
+      activeCuratedSourceXmlIds.has(tags.tagToFullLabel.get(config.targetTag))
+    )),
+  ];
+  for (const config of activeRouteDebtConfigs) {
+    for (const [ownerTag, note] of Object.entries(config.ownerRouteDebtNotes ?? {})) {
+      const notes = curatedOwnerRouteDebtNotes.get(ownerTag) ?? [];
+      notes.push(note);
+      curatedOwnerRouteDebtNotes.set(ownerTag, notes);
+    }
+  }
   for (const owner of metadata.filter(({ node }) => node.nodeClass === "theorem-like")) {
     const proofs = owner.proofs ?? [];
     const routeGroups = proofRouteGroups(proofs);
@@ -2291,8 +2638,13 @@ export function extractStacksGraphFromUnits(
         ...routeGroup.proofs.map(({ rawProof }) => rawProof),
         ...routeEvidenceRegions.map(({ rawText }) => rawText),
       ].join("\n");
-      const routeDebtNotes = [...new Set(routeSemanticGroups
-        .flatMap(({ routeDebtNotes }) => routeDebtNotes))];
+      const routeDebtNotes = [...new Set([
+        owner.routeDebtNote,
+        ...(curatedOwnerRouteDebtNotes.get(
+          tags.fullLabelToTag.get(owner.node.sourceXmlId),
+        ) ?? []),
+        ...routeSemanticGroups.flatMap(({ routeDebtNotes }) => routeDebtNotes),
+      ].filter(Boolean))];
       const hasSemanticDependencies = routeSemanticGroups.length > 0;
       proofRoutes.push({
         id,
@@ -2320,6 +2672,13 @@ export function extractStacksGraphFromUnits(
     if (owner.node.nodeClass === "theorem-like") {
       for (const group of proofGroupsByOwner.get(owner.node.id) ?? []) {
         if (group.targetNode) continue;
+        const ownerTag = tags.fullLabelToTag.get(owner.node.sourceXmlId);
+        const targetTag = tags.fullLabelToTag.get(group.fullLabel);
+        if (targetTag
+          && CURATED_NONDEPENDENCY_PROOF_XREFS.has(`${ownerTag}|${targetTag}`)) {
+          suppressedProofXrefDependencyCount += 1;
+          continue;
+        }
         if (curatedResolvedProofGroupKeys.has(`${owner.node.id}|${group.fullLabel}`)) continue;
         if (curatedResolvedSectionProofGroupKeys.has(`${owner.node.id}|${group.fullLabel}`)) continue;
         references.push(referenceEntity({ group, dependencyId: null, capturedAt, usedIds }));
@@ -2392,7 +2751,10 @@ export function extractStacksGraphFromUnits(
     units.reduce((total, unit) => total + environmentRanges(
       unit.content.split(/\r?\n/u),
       environment,
-    ).length, 0) - metadata.filter((item) => item.curatedClaim && item.environment === environment).length,
+    ).length, 0) - metadata.filter((item) => (
+      (item.curatedClaim && item.environment === environment)
+      || (item.curatedSupport && item.excludedEnvironment === environment)
+    )).length,
   ]));
   const theoremCount = nodes.filter((node) => node.nodeClass === "theorem-like").length;
   const routedTheoremIds = new Set(proofRoutes.map(({ theoremNodeId }) => theoremNodeId));

@@ -1056,6 +1056,128 @@ indices in $I$.
     expect(result.graph.references).toHaveLength(0);
   });
 
+  it("matches the pushforward claim to its exact source stem and keeps route debt owner-specific", () => {
+    const pushforwardClaim = String.raw`\noindent
+Let $f : \mathcal{X} \to \mathcal{Y}$ be a $1$-morphism of categories
+fibred in groupoids over $(\Sch/S)_{fppf}$. Let $\mathcal{F}$
+be a presheaf on $\mathcal{X}$. Let $y \in \Ob(\mathcal{Y})$.
+We can compute $f_*\mathcal{F}(y)$ in the following way. Suppose that
+$y$ lies over the scheme $V$ and using the $2$-Yoneda lemma think
+of $y$ as a $1$-morphism. Consider the projection
+$$
+\text{pr} :
+(\Sch/V)_{fppf} \times_{y, \mathcal{Y}} \mathcal{X}
+\longrightarrow
+\mathcal{X}
+$$
+Then we have a canonical identification
+\begin{equation}
+\label{equation-pushforward}
+f_*\mathcal{F}(y) = \Gamma\Big(
+(\Sch/V)_{fppf} \times_{y, \mathcal{Y}} \mathcal{X},
+\ \text{pr}^{-1}\mathcal{F}\Big)
+\end{equation}
+Namely, objects of the $2$-fibre product are triples
+$(h : U \to V, x, f(x) \to h^*y)$. Dropping the $h$ from the
+notation we see that this is equivalent to the data of an object
+$x$ of $\mathcal{X}$ and a morphism $\alpha : f(x) \to y$ of $\mathcal{Y}$.
+Since $f_*\mathcal{F}(y) = \lim_{f(x) \to y} \mathcal{F}(x)$ by definition
+the equality follows.`;
+    const owner = (label, references) => String.raw`
+\begin{lemma}
+\label{${label}}
+The comparison has the claimed form.
+\end{lemma}
+\begin{proof}
+${references.map((reference) => String.raw`Use Equation \ref{${reference}}.`).join(" ")}
+\end{proof}`;
+    const stacksSheavesContent = [
+      ...Array.from({ length: 514 }, () => "% audited padding"),
+      ...pushforwardClaim.split("\n"),
+      owner("lemma-compare-morphism", ["equation-pushforward"]),
+      owner("lemma-base-change", ["equation-pushforward"]),
+      owner("lemma-pushforward-restriction", ["equation-pushforward"]),
+    ].join("\n");
+    const result = extractStacksGraphFromUnits([
+      {
+        stem: "stacks",
+        path: "stacks.tex",
+        title: "Stacks",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-decoy}
+This shorter stem must not inherit a stacks-sheaves curated span.
+\end{lemma}
+`,
+      },
+      {
+        stem: "categories",
+        path: "categories.tex",
+        title: "Categories",
+        content: String.raw`
+\begin{lemma}
+\label{lemma-yoneda-2category}
+The 2-Yoneda lemma holds.
+\end{lemma}
+`,
+      },
+      {
+        stem: "stacks-sheaves",
+        path: "stacks-sheaves.tex",
+        title: "Sheaves on Algebraic Stacks",
+        content: stacksSheavesContent,
+      },
+      {
+        stem: "stacks-cohomology",
+        path: "stacks-cohomology.tex",
+        title: "Cohomology of Algebraic Stacks",
+        content: owner("lemma-lisse-etale-functorial", [
+          "stacks-sheaves-equation-pushforward",
+          "stacks-sheaves-equation-pushforward",
+        ]),
+      },
+    ], [
+      "0ZZZ,stacks-lemma-decoy",
+      "004B,categories-lemma-yoneda-2category",
+      "06W6,stacks-sheaves-equation-pushforward",
+      "073N,stacks-sheaves-lemma-compare-morphism",
+      "075B,stacks-sheaves-lemma-base-change",
+      "075G,stacks-sheaves-lemma-pushforward-restriction",
+      "07AT,stacks-cohomology-lemma-lisse-etale-functorial",
+    ].join("\n"), {
+      capturedAt,
+      sourceRevision: stacksSourceRevision,
+    });
+
+    expect(result.stats).toMatchObject({
+      curatedClaimCount: 1,
+      curatedClaimDependencyCount: 1,
+      directDependencyCount: 5,
+      explicitProofXrefDependencyCount: 4,
+    });
+    expect(result.graph.nodes.find(({ id }) => id === "tag-06w6")).toMatchObject({
+      sourceXmlId: "stacks-sheaves-equation-pushforward",
+      sourceLocator: "stacks-sheaves.tex:L515-L540",
+      sourceTextSha256: "7a4fe6d4ea2899c8c6766624bae288b816245e5315af033ba83c7af7c73cd800",
+      evidence: { sourceUnitIds: ["unit-stacks-sheaves"] },
+    });
+    expect(result.graph.directDependencies).toContainEqual(expect.objectContaining({
+      id: "dep-tag-06w6-to-tag-004b",
+      dependentNodeId: "tag-06w6",
+      prerequisite: { type: "node", id: "tag-004b" },
+    }));
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-06w6")
+      ?.dependencyIds).toEqual(["dep-tag-06w6-to-tag-004b"]);
+
+    const restrictionDebt = "pointwise bijection commutes with restriction maps";
+    expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === "tag-075b")
+      ?.evidence.note).toContain(restrictionDebt);
+    for (const ownerTag of ["073n", "075g", "07at"]) {
+      expect(result.graph.proofRoutes.find(({ theoremNodeId }) => theoremNodeId === `tag-${ownerTag}`)
+        ?.evidence.note).not.toContain(restrictionDebt);
+    }
+  });
+
   it("keeps adjacent audited support conditions as distinct definition nodes", () => {
     const supportLines = [
       String.raw`\begin{equation}`,
@@ -1134,6 +1256,90 @@ ${references.map((reference) => String.raw`Use (\ref{${reference}}).`).join(" ")
         ["tag-06im", "definition"],
         ["tag-06t6", "definition"],
       ]);
+  });
+
+  it("promotes the exact bivariant restriction remark without retaining it as excluded", () => {
+    const restrictionRemark = String.raw`\begin{remark}
+\label{remark-restriction-bivariant}
+Let $(S, \delta)$ be as in Situation \ref{situation-setup}. Let $X \to Y$
+and $Y' \to Y$ be morphisms of schemes locally of finite type over $S$.
+Let $X' = Y' \times_Y X$. Then there is an obvious restriction map
+$$
+A^p(X \to Y) \longrightarrow A^p(X' \to Y'),\quad
+c \longmapsto res(c)
+$$
+obtained by viewing a scheme $Y''$ locally of finite type over $Y'$
+as a scheme locally of finite type over $Y$ and setting
+$res(c) \cap \alpha'' = c \cap \alpha''$ for any $\alpha'' \in \CH_k(Y'')$.
+This restriction operation is compatible with compositions in an
+obvious manner.
+\end{remark}`;
+    const owner = (label) => String.raw`
+\begin{lemma}
+\label{${label}}
+The construction is compatible with the desired operation.
+\end{lemma}
+\begin{proof}
+Use Remark \ref{remark-restriction-bivariant}.
+\end{proof}`;
+    const ownerLabelsByTag = {
+      "0GUC": "lemma-envelope-bivariant",
+      "0GUD": "lemma-defined-by-envelope",
+      "0FAU": "lemma-localized-chern-pre-independent",
+      "0FBK": "lemma-construction-gysin",
+      "0FEB": "lemma-relation-normal-cones",
+      "0FF2": "lemma-lci-gysin-well-defined",
+      "0FBT": "proposition-compute-bivariant",
+      "0FC1": "lemma-associative",
+      "0FCA": "lemma-associative-dim-1",
+    };
+    const content = [
+      ...Array.from({ length: 6182 }, () => "% audited padding"),
+      ...restrictionRemark.split("\n"),
+      String.raw`\begin{remark}
+\label{remark-unpromoted-control}
+This ordinary remark remains outside the graph.
+\end{remark}`,
+      ...Object.values(ownerLabelsByTag).map(owner),
+    ].join("\n");
+    const result = extractStacksGraphFromUnits([{
+      stem: "chow",
+      path: "chow.tex",
+      title: "Chow Homology and Bivariant Classes",
+      content,
+    }], [
+      "0F9Z,chow-remark-restriction-bivariant",
+      ...Object.entries(ownerLabelsByTag).map(([tag, label]) => `${tag},chow-${label}`),
+    ].join("\n"), {
+      capturedAt,
+      sourceRevision: stacksSourceRevision,
+    });
+
+    expect(result.stats).toMatchObject({
+      theoremCount: 9,
+      supportCount: 1,
+      curatedSupportCount: 1,
+      directDependencyCount: 9,
+      explicitProofXrefDependencyCount: 9,
+      excludedEnvironmentCounts: expect.objectContaining({ remark: 1 }),
+    });
+    expect(result.graph.nodes.find(({ id }) => id === "tag-0f9z")).toMatchObject({
+      nodeClass: "support",
+      kind: "construction",
+      sourceLocator: "chow.tex:L6183-L6197",
+      sourceTextSha256: "888b71fcbbfdd0c9ed4e4e74893942ee244047c458f34d73dea9fad14d118046",
+    });
+    expect(result.graph.directDependencies
+      .filter(({ prerequisite }) => prerequisite.id === "tag-0f9z")
+      .map(({ dependentNodeId, role }) => [dependentNodeId, role])
+      .sort()).toEqual(Object.keys(ownerLabelsByTag)
+        .map((tag) => [`tag-${tag.toLowerCase()}`, "construction"])
+        .sort());
+    expect(result.graph.proofRoutes.some(({ theoremNodeId }) => theoremNodeId === "tag-0f9z"))
+      .toBe(false);
+    expect(result.graph.nodes.some(({ sourceXmlId }) => (
+      sourceXmlId === "chow-remark-unpromoted-control"
+    ))).toBe(false);
   });
 
   it("represents audited Zorn invocations as one shared typed external theorem", () => {
@@ -1404,5 +1610,83 @@ Use notation as in Remark
       dependency.dependentNodeId === "tag-0dkq"
       && dependency.prerequisite.id === "tag-08gh"
     ))).toBe(false);
+  });
+
+  it("suppresses only the nine audited etale goal-item references", () => {
+    const owner = (environment, label, references) => String.raw`
+\begin{${environment}}
+\label{${label}}
+The listed goal clauses hold.
+\end{${environment}}
+\begin{proof}
+${references.map((reference) => String.raw`We establish \ref{${reference}}.`).join(" ")}
+\end{proof}`;
+    const content = [
+      String.raw`\label{item-vanishing}`,
+      String.raw`\label{item-finite-proper}`,
+      String.raw`\label{item-base-change-prime-to-p}`,
+      String.raw`\label{item-base-change-proper}`,
+      String.raw`\label{item-surjective}`,
+      owner("lemma", "lemma-constant-smooth-statements", [
+        "item-base-change-prime-to-p",
+        "item-base-change-proper",
+        "item-finite-proper",
+        "item-surjective",
+        "item-vanishing",
+      ]),
+      owner("lemma", "lemma-finite-pushforward-statements", [
+        "item-surjective",
+      ]),
+      owner("lemma", "lemma-restrict-to-open", [
+        "item-vanishing",
+        "item-surjective",
+      ]),
+      owner("theorem", "theorem-vanishing-affine-curves", [
+        "item-vanishing",
+        "item-surjective",
+      ]),
+    ].join("\n");
+    const result = extractStacksGraphFromUnits([{
+      stem: "etale-cohomology",
+      path: "etale-cohomology.tex",
+      title: "Etale Cohomology",
+      content,
+    }], [
+      "0A53,etale-cohomology-item-vanishing",
+      "0A57,etale-cohomology-item-finite-proper",
+      "0A58,etale-cohomology-item-base-change-prime-to-p",
+      "0A59,etale-cohomology-item-base-change-proper",
+      "0A5A,etale-cohomology-item-surjective",
+      "0A5B,etale-cohomology-lemma-constant-smooth-statements",
+      "0A5D,etale-cohomology-lemma-finite-pushforward-statements",
+      "0GJA,etale-cohomology-lemma-restrict-to-open",
+      "03SC,etale-cohomology-theorem-vanishing-affine-curves",
+    ].join("\n"), {
+      capturedAt,
+      sourceRevision: stacksSourceRevision,
+    });
+
+    expect(result.stats).toMatchObject({
+      theoremCount: 4,
+      directDependencyCount: 0,
+      suppressedProofXrefDependencyCount: 9,
+      unresolvedTaggedProofReferenceCount: 1,
+      uniqueUnresolvedTaggedProofTargetCount: 1,
+    });
+    expect(result.graph.nodes.some(({ id }) => [
+      "tag-0a53",
+      "tag-0a57",
+      "tag-0a58",
+      "tag-0a59",
+      "tag-0a5a",
+    ].includes(id))).toBe(false);
+    expect(result.graph.references).toEqual([
+      expect.objectContaining({
+        ownerNodeId: "tag-0a5b",
+        ref: "etale-cohomology-item-vanishing",
+        basis: "proof-xref",
+        resolution: expect.objectContaining({ status: "unresolved" }),
+      }),
+    ]);
   });
 });

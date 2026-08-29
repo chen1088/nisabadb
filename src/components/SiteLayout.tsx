@@ -1,14 +1,9 @@
 import { useEffect } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import nisabaMarkUrl from "../assets/nisaba-mark.svg";
 
 export function NisabaMark() {
-  return (
-    <span className="nisaba-mark" aria-hidden="true">
-      <span />
-      <span />
-      <span />
-    </span>
-  );
+  return <img className="nisaba-mark" src={nisabaMarkUrl} alt="" aria-hidden="true" />;
 }
 
 function RouteEffects() {
